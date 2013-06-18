@@ -24,7 +24,7 @@ Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "swagger-ui", "http://localh
 		SlnRelativePath = "swagger-ui\"
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Swashbuckle.WebApi", "Swashbuckle.Area\Swashbuckle.WebApi.csproj", "{D08956C3-4831-4623-93FD-CB256953BCA1}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Swashbuckle.WebApi", "Swashbuckle.WebApi\Swashbuckle.WebApi.csproj", "{D08956C3-4831-4623-93FD-CB256953BCA1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
