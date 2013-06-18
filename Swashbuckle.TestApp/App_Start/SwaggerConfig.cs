@@ -1,5 +1,5 @@
 ﻿using System.Web.Http.Description;
-using Swashbuckle.Models;
+using Swashbuckle.Area.Models;
 
 namespace Swashbuckle.TestApp.App_Start
 {

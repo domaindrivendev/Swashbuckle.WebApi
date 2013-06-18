@@ -3,9 +3,9 @@ using System.Web;
 using System.Web.Http;
 using System.Web.Mvc;
 using System.Web.Routing;
-using Swashbuckle.Models;
+using Swashbuckle.Area.Models;
 
-namespace Swashbuckle
+namespace Swashbuckle.Area
 {
     public class SwaggerAreaRegistration : AreaRegistration
     {

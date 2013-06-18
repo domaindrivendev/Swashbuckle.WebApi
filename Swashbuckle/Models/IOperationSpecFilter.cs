@@ -1,6 +1,6 @@
 ﻿using System.Web.Http.Description;
 
-namespace Swashbuckle.Models
+namespace Swashbuckle.Area.Models
 {
     public interface IOperationSpecFilter
     {

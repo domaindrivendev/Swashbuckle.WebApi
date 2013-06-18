@@ -5,7 +5,7 @@ using System.Linq;
 using System.Reflection;
 using System.Web.Http.Description;
 
-namespace Swashbuckle.Models
+namespace Swashbuckle.Area.Models
 {
     public class SwaggerGenerator
     {

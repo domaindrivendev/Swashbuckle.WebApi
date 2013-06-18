@@ -1,9 +1,30 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Swashbuckle", "Swashbuckle\Swashbuckle.csproj", "{D08956C3-4831-4623-93FD-CB256953BCA1}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Swashbuckle.Area", "Swashbuckle\Swashbuckle.Area.csproj", "{D08956C3-4831-4623-93FD-CB256953BCA1}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Swashbuckle.TestApp", "Swashbuckle.TestApp\Swashbuckle.TestApp.csproj", "{BCE144C9-0658-4049-9C64-06577787B2B5}"
+EndProject
+Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "swagger-ui", "http://localhost:55139", "{DDE07B02-DD45-4ABF-96D3-A4FBB144BBA1}"
+	ProjectSection(WebsiteProperties) = preProject
+		UseIISExpress = "true"
+		TargetFrameworkMoniker = ".NETFramework,Version%3Dv4.0"
+		Debug.AspNetCompiler.VirtualPath = "/localhost_55139"
+		Debug.AspNetCompiler.PhysicalPath = "swagger-ui\"
+		Debug.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_55139\"
+		Debug.AspNetCompiler.Updateable = "true"
+		Debug.AspNetCompiler.ForceOverwrite = "true"
+		Debug.AspNetCompiler.FixedNames = "false"
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.VirtualPath = "/localhost_55139"
+		Release.AspNetCompiler.PhysicalPath = "swagger-ui\"
+		Release.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_55139\"
+		Release.AspNetCompiler.Updateable = "true"
+		Release.AspNetCompiler.ForceOverwrite = "true"
+		Release.AspNetCompiler.FixedNames = "false"
+		Release.AspNetCompiler.Debug = "False"
+		SlnRelativePath = "swagger-ui\"
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -19,6 +40,10 @@ Global
 		{BCE144C9-0658-4049-9C64-06577787B2B5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BCE144C9-0658-4049-9C64-06577787B2B5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BCE144C9-0658-4049-9C64-06577787B2B5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DDE07B02-DD45-4ABF-96D3-A4FBB144BBA1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DDE07B02-DD45-4ABF-96D3-A4FBB144BBA1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DDE07B02-DD45-4ABF-96D3-A4FBB144BBA1}.Release|Any CPU.ActiveCfg = Debug|Any CPU
+		{DDE07B02-DD45-4ABF-96D3-A4FBB144BBA1}.Release|Any CPU.Build.0 = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

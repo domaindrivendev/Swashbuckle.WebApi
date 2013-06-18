@@ -6,7 +6,6 @@ using System.Web.Http;
 using System.Web.Http.Description;
 using System.Web.Mvc;
 using System.Web.Routing;
-using Swashbuckle.Models;
 using Swashbuckle.TestApp.App_Start;
 
 namespace Swashbuckle.TestApp

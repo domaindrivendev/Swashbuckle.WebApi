@@ -1,7 +1,7 @@
 ﻿using System.Web;
 using System.Web.Routing;
 
-namespace Swashbuckle
+namespace Swashbuckle.Area
 {
     public class RedirectRouteHandler : IRouteHandler
     {

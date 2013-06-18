@@ -1,7 +1,7 @@
 ﻿using System.Web.Mvc;
-using Swashbuckle.Models;
+using Swashbuckle.Area.Models;
 
-namespace Swashbuckle.Controllers
+namespace Swashbuckle.Area.Controllers
 {
     public class ApiDocsController : Controller
     {

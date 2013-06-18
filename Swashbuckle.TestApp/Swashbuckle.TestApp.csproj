@@ -134,9 +134,9 @@
     <Content Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Swashbuckle\Swashbuckle.csproj">
+    <ProjectReference Include="..\Swashbuckle\Swashbuckle.Area.csproj">
       <Project>{d08956c3-4831-4623-93fd-cb256953bca1}</Project>
-      <Name>Swashbuckle</Name>
+      <Name>Swashbuckle.Area</Name>
     </ProjectReference>
   </ItemGroup>
   <PropertyGroup>

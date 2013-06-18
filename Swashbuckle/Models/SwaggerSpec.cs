@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Swashbuckle.Models
+namespace Swashbuckle.Area.Models
 {
     public class SwaggerSpec
     {

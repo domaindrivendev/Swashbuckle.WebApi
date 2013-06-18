@@ -2,7 +2,7 @@
 using System.Web;
 using System.Web.Routing;
 
-namespace Swashbuckle
+namespace Swashbuckle.Area
 {
     public class SwaggerUiRouteHandler : IRouteHandler
     {
@@ -30,8 +30,7 @@ namespace Swashbuckle
             }
 
             var filePath = _routeData.Values["path"].ToString();
-            var assembly = typeof (SwaggerUiHttpHandler).Assembly;
-            var resourceName = String.Format("{0}.Content.{1}", assembly.GetName().Name, filePath.Replace("/", "."));
+            var resourceName = String.Format("swagger-ui\\dist\\{0}", filePath.Replace("/", "\\"));
             var stream = GetType().Assembly.GetManifestResourceStream(resourceName);
 
             context.Response.Clear();
