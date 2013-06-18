@@ -11,8 +11,8 @@
     <ProjectTypeGuids>{E3E379DF-F4C6-4180-9B81-6769533ABE47};{349c5851-65df-11da-9384-00065b846f21};{fae04ec0-301f-11d3-bf4b-00c04f79efbc}</ProjectTypeGuids>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Swashbuckle.Area</RootNamespace>
-    <AssemblyName>Swashbuckle.Area</AssemblyName>
+    <RootNamespace>Swashbuckle.WebApi</RootNamespace>
+    <AssemblyName>Swashbuckle.WebApi</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <UseIISExpress>false</UseIISExpress>
     <IISExpressSSLPort />
@@ -117,7 +117,7 @@
     <EmbeddedResource Include="..\swagger-ui\dist\**\*.*">
       <LogicalName>swagger-ui\dist\%(RecursiveDir)%(FileName)%(Extension)</LogicalName>
       <InProject>false</InProject>
-    </EmbeddedResource>  
+    </EmbeddedResource>
     <Content Include="packages.config" />
   </ItemGroup>
   <PropertyGroup>

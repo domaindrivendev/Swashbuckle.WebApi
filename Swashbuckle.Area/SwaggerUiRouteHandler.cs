@@ -2,7 +2,7 @@
 using System.Web;
 using System.Web.Routing;
 
-namespace Swashbuckle.Area
+namespace Swashbuckle.WebApi
 {
     public class SwaggerUiRouteHandler : IRouteHandler
     {

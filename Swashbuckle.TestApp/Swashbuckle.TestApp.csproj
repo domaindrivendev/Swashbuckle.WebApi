@@ -132,9 +132,9 @@
     <Content Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Swashbuckle\Swashbuckle.Area.csproj">
+    <ProjectReference Include="..\Swashbuckle.Area\Swashbuckle.WebApi.csproj">
       <Project>{d08956c3-4831-4623-93fd-cb256953bca1}</Project>
-      <Name>Swashbuckle.Area</Name>
+      <Name>Swashbuckle.WebApi</Name>
     </ProjectReference>
   </ItemGroup>
   <PropertyGroup>
