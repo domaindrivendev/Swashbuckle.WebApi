@@ -104,7 +104,7 @@
     <Reference Include="System.Xml.Linq" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="App_Start\SwaggerConfig.cs" />
+    <Compile Include="App_Start\SwashbuckleConfig.cs" />
     <Compile Include="Models\OrderItem.cs" />
     <Compile Include="Controllers\OrderItemsController.cs" />
     <Compile Include="Models\Order.cs" />
@@ -115,8 +115,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="App_Start\FilterConfig.cs" />
-    <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Content Include="Global.asax" />
     <Content Include="Web.config" />

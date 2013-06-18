@@ -3,9 +3,9 @@ using Swashbuckle.Area.Models;
 
 namespace Swashbuckle.TestApp.App_Start
 {
-    public class SwaggerConfig
+    public class SwashbuckleConfig
     {
-        public static void ConfigureGenerator()
+        public static void Configure()
         {
             SwaggerGenerator.Configure()
                 .AddOperationSpecFilter(new AddSupportedStatusCodesFilter());
