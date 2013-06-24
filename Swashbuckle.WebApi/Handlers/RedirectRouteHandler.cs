@@ -1,7 +1,7 @@
 ﻿using System.Web;
 using System.Web.Routing;
 
-namespace Swashbuckle.WebApi
+namespace Swashbuckle.WebApi.Handlers
 {
     public class RedirectRouteHandler : IRouteHandler
     {

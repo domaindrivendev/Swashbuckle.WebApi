@@ -3,6 +3,7 @@ using System.Web;
 using System.Web.Http;
 using System.Web.Mvc;
 using System.Web.Routing;
+using Swashbuckle.WebApi.Handlers;
 using Swashbuckle.WebApi.Models;
 
 namespace Swashbuckle.WebApi
@@ -33,15 +34,6 @@ namespace Swashbuckle.WebApi
             context.Routes.Add(new Route(
                 "swagger/ui/{*path}",
                 new SwaggerUiRouteHandler()));
-
-            SwaggerGenerator.Configure()
-                .UseBasePath(GetBasePath)
-                .UseApiExplorer(GlobalConfiguration.Configuration.Services.GetApiExplorer());
-        }
-
-        private static string GetBasePath()
-        {
-            return HttpContext.Current.Request.Url.GetLeftPart(UriPartial.Authority) + HttpRuntime.AppDomainAppVirtualPath;
         }
     }
 }

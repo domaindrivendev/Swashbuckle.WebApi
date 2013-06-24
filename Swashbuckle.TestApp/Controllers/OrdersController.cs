@@ -14,5 +14,14 @@ namespace Swashbuckle.TestApp.Controllers
                     new Order {Id = 2, Description = "TestOrder 2"}
                 };
         }
+
+        public IEnumerable<Order> Get(string foo, string bar)
+        {
+            return new[]
+                {
+                    new Order {Id = 1, Description = "TestOrder 1"},
+                    new Order {Id = 2, Description = "TestOrder 2"}
+                };           
+        }
     }
 }

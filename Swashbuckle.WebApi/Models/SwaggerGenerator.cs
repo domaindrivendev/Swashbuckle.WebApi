@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
 using System.Reflection;
+using System.Web;
+using System.Web.Http;
 using System.Web.Http.Description;
 
 namespace Swashbuckle.WebApi.Models
@@ -24,34 +26,29 @@ namespace Swashbuckle.WebApi.Models
                 {"DateTime", "date"}
             };
 
-        private static readonly SwaggerGeneratorConfig Config = new SwaggerGeneratorConfig();
-
         public static SwaggerGenerator GetInstance()
         {
-            if (Config.ApiExplorer == null)
-                throw new InvalidOperationException("SwaggerGenerator ApiExplorer not set");
-            if (Config.BasePathAccessor == null)
-                throw new InvalidOperationException("SwaggerGenerator BasePath not set");
-
-            return new SwaggerGenerator(Config);
+            return new SwaggerGenerator(
+                GlobalConfiguration.Configuration.Services.GetApiExplorer(),
+                () => HttpContext.Current.Request.Url.GetLeftPart(UriPartial.Authority) + HttpRuntime.AppDomainAppVirtualPath,
+                SwashbuckleConfig.Instance.GeneratorConfig);
         }
 
-        public static SwaggerGeneratorConfig Configure()
-        {
-            return Config;
-        }
+        private readonly IApiExplorer _apiExplorer;
+        private readonly Func<string> _basePathAccessor;
+        private readonly GeneratorConfig _config;
 
-        private readonly SwaggerGeneratorConfig _config;
-
-        private SwaggerGenerator(SwaggerGeneratorConfig config)
+        private SwaggerGenerator(IApiExplorer apiExplorer, Func<string> basePathAccessor, GeneratorConfig config)
         {
+            _apiExplorer = apiExplorer;
+            _basePathAccessor = basePathAccessor;
             _config = config;
         }
 
         public SwaggerSpec GenerateSpec()
         {
             // Group ApiDescriptions by controller name - each group corresponds to an ApiDeclaration
-            var descriptionGroups = _config.ApiExplorer.ApiDescriptions
+            var descriptionGroups = _apiExplorer.ApiDescriptions
                 .Where(ad => !ad.RelativePath.ToLower().StartsWith("swagger"))
                 .GroupBy(ad => ad.ActionDescriptor.ControllerDescriptor.ControllerName)
                 .ToArray();
@@ -69,7 +66,7 @@ namespace Swashbuckle.WebApi.Models
                 {
                     apiVersion = "1.0",
                     swaggerVersion = SwaggerVersion,
-                    basePath = _config.BasePathAccessor(),
+                    basePath = _basePathAccessor(),
                     apis = descriptionGroups.Select(dg => new ResourceLink {path = "/swagger/api-docs/" + dg.Key})
                 };
         }
@@ -91,7 +88,7 @@ namespace Swashbuckle.WebApi.Models
                 {
                     apiVersion = "1.0",
                     swaggerVersion = SwaggerVersion,
-                    basePath = _config.BasePathAccessor(),
+                    basePath = _basePathAccessor(),
                     resourcePath = descriptionGroup.Key,
                     apis = apiSpecs,
                     models = BuildModels(descriptionGroup)
@@ -100,19 +97,20 @@ namespace Swashbuckle.WebApi.Models
 
         private ApiSpec DescriptionGroupToApiSpec(IGrouping<string, ApiDescription> descriptionGroup)
         {
+            var pathParts = descriptionGroup.Key.Split('?');
+            var pathOnly = pathParts[0];
+            var queryString = pathParts.Length == 1 ? String.Empty : pathParts[1];
+
             return new ApiSpec
                 {
-                    path = "/" + descriptionGroup.Key,
+                    path = "/" + pathOnly,
                     description = String.Empty,
-                    operations = descriptionGroup.Select(DescriptionToOperationSpec)
+                    operations = descriptionGroup.Select(dg => DescriptionToOperationSpec(dg, queryString))
                 };
         }
 
-        private ApiOperationSpec DescriptionToOperationSpec(ApiDescription description)
+        private ApiOperationSpec DescriptionToOperationSpec(ApiDescription description, string queryString)
         {
-            var queryStart = description.RelativePath.IndexOf('?');
-            var queryString = (queryStart == -1) ? String.Empty : description.RelativePath.Substring(queryStart);
-
             var paramSpecs = description.ParameterDescriptions
                 .Select(pd => ParamDescriptionToParameterSpec(pd, queryString.Contains(pd.Name)));
 
@@ -124,7 +122,7 @@ namespace Swashbuckle.WebApi.Models
                     summary = description.Documentation
                 };
 
-            foreach (var filter in _config.OperationSpecFilters)
+            foreach (var filter in _config.Filters)
             {
                 filter.UpdateSpec(description, operationSpec);
             }
