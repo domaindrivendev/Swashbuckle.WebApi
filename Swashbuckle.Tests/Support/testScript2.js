@@ -1,0 +1,1 @@
+﻿var testVal = '2';

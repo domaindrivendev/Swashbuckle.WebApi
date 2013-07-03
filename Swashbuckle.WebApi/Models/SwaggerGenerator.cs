@@ -31,14 +31,14 @@ namespace Swashbuckle.WebApi.Models
             return new SwaggerGenerator(
                 GlobalConfiguration.Configuration.Services.GetApiExplorer(),
                 () => HttpContext.Current.Request.Url.GetLeftPart(UriPartial.Authority) + HttpRuntime.AppDomainAppVirtualPath,
-                SwashbuckleConfig.Instance.GeneratorConfig);
+                SwaggerGeneratorConfig.Instance);
         }
 
         private readonly IApiExplorer _apiExplorer;
         private readonly Func<string> _basePathAccessor;
-        private readonly GeneratorConfig _config;
+        private readonly SwaggerGeneratorConfig _config;
 
-        private SwaggerGenerator(IApiExplorer apiExplorer, Func<string> basePathAccessor, GeneratorConfig config)
+        private SwaggerGenerator(IApiExplorer apiExplorer, Func<string> basePathAccessor, SwaggerGeneratorConfig config)
         {
             _apiExplorer = apiExplorer;
             _basePathAccessor = basePathAccessor;
@@ -122,7 +122,7 @@ namespace Swashbuckle.WebApi.Models
                     summary = description.Documentation
                 };
 
-            foreach (var filter in _config.Filters)
+            foreach (var filter in _config.PostFilters)
             {
                 filter.UpdateSpec(description, operationSpec);
             }

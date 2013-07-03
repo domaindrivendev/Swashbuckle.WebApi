@@ -26,8 +26,6 @@ Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "swagger-ui", "http://localh
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Swashbuckle.WebApi", "Swashbuckle.WebApi\Swashbuckle.WebApi.csproj", "{D08956C3-4831-4623-93FD-CB256953BCA1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Swashbuckle.Extended", "Swashbuckle.Extended\Swashbuckle.Extended.csproj", "{9DAC3F57-C5B7-483C-AEA8-E96EC0A09B66}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Swashbuckle.Tests", "Swashbuckle.Tests\Swashbuckle.Tests.csproj", "{2F5D233D-F779-473E-9EEC-ACC58AC266ED}"
 EndProject
 Global
@@ -48,10 +46,6 @@ Global
 		{D08956C3-4831-4623-93FD-CB256953BCA1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D08956C3-4831-4623-93FD-CB256953BCA1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D08956C3-4831-4623-93FD-CB256953BCA1}.Release|Any CPU.Build.0 = Release|Any CPU
-		{9DAC3F57-C5B7-483C-AEA8-E96EC0A09B66}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{9DAC3F57-C5B7-483C-AEA8-E96EC0A09B66}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{9DAC3F57-C5B7-483C-AEA8-E96EC0A09B66}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{9DAC3F57-C5B7-483C-AEA8-E96EC0A09B66}.Release|Any CPU.Build.0 = Release|Any CPU
 		{2F5D233D-F779-473E-9EEC-ACC58AC266ED}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{2F5D233D-F779-473E-9EEC-ACC58AC266ED}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2F5D233D-F779-473E-9EEC-ACC58AC266ED}.Release|Any CPU.ActiveCfg = Release|Any CPU

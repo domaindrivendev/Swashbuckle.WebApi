@@ -8,17 +8,23 @@ namespace Swashbuckle.WebApi.Handlers
     public class EmbeddedResourceHttpHandler : IHttpHandler
     {
         private readonly Assembly _resourceAssembly;
-        private readonly Func<HttpRequest, string> _resourceNameSelector;
+        private readonly Func<HttpRequestBase, string> _resourceNameSelector;
 
         public EmbeddedResourceHttpHandler(
             Assembly resourceAssembly,
-            Func<HttpRequest, string> resourceNameSelector)
+            Func<HttpRequestBase, string> resourceNameSelector)
         {
             _resourceAssembly = resourceAssembly;
             _resourceNameSelector = resourceNameSelector;
         }
 
         public void ProcessRequest(HttpContext context)
+        {
+            // Delegate to testable overload
+            ProcessRequest(new HttpContextWrapper(context));
+        }
+
+        public void ProcessRequest(HttpContextBase context)
         {
             var resourceName = _resourceNameSelector(context.Request);
 

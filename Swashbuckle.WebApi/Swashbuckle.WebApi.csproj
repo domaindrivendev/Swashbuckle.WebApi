@@ -105,9 +105,8 @@
   <ItemGroup>
     <Compile Include="Handlers\EmbeddedResourceHttpHandler.cs" />
     <Compile Include="Handlers\SwaggerUiConfigFilter.cs" />
-    <Compile Include="Models\GeneratorConfig.cs" />
+    <Compile Include="Models\SwaggerGeneratorConfig.cs" />
     <Compile Include="Models\SwaggerUiConfig.cs" />
-    <Compile Include="Models\SwashbuckleConfig.cs" />
     <Compile Include="Controllers\ApiDocsController.cs" />
     <Compile Include="Models\SwaggerGenerator.cs" />
     <Compile Include="Models\SwaggerSpec.cs" />

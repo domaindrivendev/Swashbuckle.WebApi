@@ -104,6 +104,7 @@
     <Reference Include="System.Xml.Linq" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="App_Start\SwaggerConfig.cs" />
     <Compile Include="Models\OrderItem.cs" />
     <Compile Include="Controllers\OrderItemsController.cs" />
     <Compile Include="Models\Order.cs" />
@@ -116,6 +117,7 @@
   <ItemGroup>
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Content Include="Global.asax" />
+    <EmbeddedResource Include="swagger-ui\ext\onComplete.js" />
     <Content Include="Web.config" />
     <Content Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
@@ -125,16 +127,13 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="App_Data\" />
+    <ProjectReference Include="..\Swashbuckle.WebApi\Swashbuckle.WebApi.csproj">
+      <Project>{D08956C3-4831-4623-93FD-CB256953BCA1}</Project>
+      <Name>Swashbuckle.WebApi</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Content Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Swashbuckle.Extended\Swashbuckle.Extended.csproj">
-      <Project>{9dac3f57-c5b7-483c-aea8-e96ec0a09b66}</Project>
-      <Name>Swashbuckle.Extended</Name>
-    </ProjectReference>
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

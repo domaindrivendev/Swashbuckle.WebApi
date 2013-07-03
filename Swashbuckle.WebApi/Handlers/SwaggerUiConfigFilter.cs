@@ -34,10 +34,8 @@ namespace Swashbuckle.WebApi.Handlers
                 .Replace("%(ApiKey)", String.Format("\"{0}\"", _swaggerUiConfig.ApiKey))
                 .Replace("%(SupportHeaderParams)", _swaggerUiConfig.SupportHeaderParams.ToString().ToLower())
                 .Replace("%(SupportedSubmitMethods)", String.Format("[{0}]", _swaggerUiConfig.SupportedSubmitMethods.ToCommaList()))
-                .Replace("%(DocExpansion)", String.Format("\"{0}\"", _swaggerUiConfig.DocExpansion.ToString().ToLower()));
-
-            if (!String.IsNullOrEmpty(_swaggerUiConfig.OnCompleteScriptPath))
-                filteredText = filteredText.Replace("%(OnCompleteScript)", String.Format("$.getScript('{0}');", _swaggerUiConfig.OnCompleteScriptPath));
+                .Replace("%(DocExpansion)", String.Format("\"{0}\"", _swaggerUiConfig.DocExpansion.ToString().ToLower()))
+                .Replace("%(OnCompleteScript)", _swaggerUiConfig.OnCompleteScripts.ToScriptIncludes());
 
             _ouputStream.Write(Encoding.UTF8.GetBytes(filteredText), offset, Encoding.UTF8.GetByteCount(filteredText));
         }
@@ -48,6 +46,16 @@ namespace Swashbuckle.WebApi.Handlers
         public static string ToCommaList(this IEnumerable<HttpMethod> submitMethods)
         {
             return String.Join(",", submitMethods.Select(m => String.Format("'{0}'", m.Method.ToLower())));
+        }
+
+        public static string ToScriptIncludes(this IEnumerable<EmbeddedResourceDescriptor> scriptDescriptors)
+        {
+            var includesBuilder = new StringBuilder();
+            foreach (var descriptor in scriptDescriptors)
+            {
+                includesBuilder.AppendFormat("$.getScript('{0}');", descriptor.Path);
+            }
+            return includesBuilder.ToString();
         }
     }
 }
