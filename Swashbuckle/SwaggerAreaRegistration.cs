@@ -1,12 +1,8 @@
-﻿using System;
-using System.Web;
-using System.Web.Http;
-using System.Web.Mvc;
+﻿using System.Web.Mvc;
 using System.Web.Routing;
-using Swashbuckle.WebApi.Handlers;
-using Swashbuckle.WebApi.Models;
+using Swashbuckle.Handlers;
 
-namespace Swashbuckle.WebApi
+namespace Swashbuckle
 {
     public class SwaggerAreaRegistration : AreaRegistration
     {

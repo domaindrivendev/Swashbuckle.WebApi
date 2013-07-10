@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Net.Http;
 using System.Reflection;
 
-namespace Swashbuckle.WebApi.Models
+namespace Swashbuckle.Models
 {
     public enum DocExpansion
     {

@@ -2,9 +2,9 @@
 using System.Net.Http;
 using System.Web.Routing;
 using NUnit.Framework;
+using Swashbuckle.Handlers;
+using Swashbuckle.Models;
 using Swashbuckle.Tests.Support;
-using Swashbuckle.WebApi.Handlers;
-using Swashbuckle.WebApi.Models;
 
 namespace Swashbuckle.Tests
 {
@@ -33,7 +33,7 @@ namespace Swashbuckle.Tests
         [Test]
         public void ItShouldCustomizeTheSwaggerUiIndex()
         {
-            var responseText = ExecuteRequest("/swagger/ui/index.html");
+            var responseText = ExecuteRequest("index.html");
 
             Assert.IsTrue(responseText.Contains("apiKey: \"TestApiKey\""), "apiKey not customized");
             Assert.IsTrue(responseText.Contains("apiKeyName: \"TestApiKeyName\""), "apiKeyName not customized");
@@ -48,20 +48,27 @@ namespace Swashbuckle.Tests
         [Test]
         public void ItShouldServeOnCompleteScripts()
         {
-            var responseText = ExecuteRequest("/swagger/ui/ext/onComplete_1.js");
+            var responseText = ExecuteRequest("ext/onComplete_1.js");
             Assert.IsTrue(responseText.StartsWith("var testVal = '1';"));
 
-            responseText = ExecuteRequest("/swagger/ui/ext/onComplete_2.js");
+            responseText = ExecuteRequest("ext/onComplete_2.js");
             Assert.IsTrue(responseText.StartsWith("var testVal = '2';"));
         }
 
-        private string ExecuteRequest(string requestPath)
+        private string ExecuteRequest(string routePath)
         {
-            var httpContext = new FakeHttpContext(requestPath);
+            var httpContext = new FakeHttpContext(routePath);
             var sinkFilter = new MemoryStream();
             httpContext.Response.Filter = sinkFilter;
 
-            var requestContext = new RequestContext {HttpContext = httpContext};
+            var routeData = new RouteData();
+            routeData.Values.Add("path", routePath);
+            var requestContext = new RequestContext
+                {
+                    RouteData =  routeData,
+                    HttpContext = httpContext
+                };
+
             var httpHandler = _routeHandler.GetHttpHandler(requestContext) as EmbeddedResourceHttpHandler;
             httpHandler.ProcessRequest(httpContext);
 

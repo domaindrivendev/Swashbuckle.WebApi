@@ -1,6 +1,6 @@
 ﻿using System.Net.Http;
 using System.Web.Http.Description;
-using Swashbuckle.WebApi.Models;
+using Swashbuckle.Models;
 
 namespace Swashbuckle.TestApp.App_Start
 {

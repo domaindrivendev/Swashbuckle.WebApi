@@ -4,9 +4,9 @@ using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Text;
-using Swashbuckle.WebApi.Models;
+using Swashbuckle.Models;
 
-namespace Swashbuckle.WebApi.Handlers
+namespace Swashbuckle.Handlers
 {
     /// <summary>
     /// NOTE: This filter may produce unexpected results when responses are buffered.

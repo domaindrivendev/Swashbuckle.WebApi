@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Web.Http.Description;
 
-namespace Swashbuckle.WebApi.Models
+namespace Swashbuckle.Models
 {
     public interface IOperationSpecFilter
     {
