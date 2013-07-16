@@ -23,7 +23,7 @@ namespace Swashbuckle.Models
             SupportHeaderParams = false;
             SupportedSubmitMethods = new[] {HttpMethod.Get, HttpMethod.Post, HttpMethod.Put};
             DocExpansion = DocExpansion.None;
-            OnCompleteScripts = new List<EmbeddedResourceDescriptor>();
+            OnCompleteScripts = new List<EmbeddedScriptDescriptor>();
         }
 
         public string ApiKeyName { get; set; }
@@ -31,7 +31,7 @@ namespace Swashbuckle.Models
         public bool SupportHeaderParams { get; set; }
         public IEnumerable<HttpMethod> SupportedSubmitMethods { get; set; }
         public DocExpansion DocExpansion { get; set; }
-        internal IList<EmbeddedResourceDescriptor> OnCompleteScripts { get; private set; }
+        internal IList<EmbeddedScriptDescriptor> OnCompleteScripts { get; private set; }
 
         public static void Customize(Action<SwaggerUiConfig> customize)
         {
@@ -40,14 +40,18 @@ namespace Swashbuckle.Models
 
         public void AddOnCompleteScript(Assembly resourceAssembly, string resourceName)
         {
-            var path = String.Format("/swagger/ui/ext/onComplete_{0}.js", OnCompleteScripts.Count + 1);
-            OnCompleteScripts.Add(new EmbeddedResourceDescriptor {Path = path, ResourceAssembly = resourceAssembly, ResourceName = resourceName});
+            OnCompleteScripts.Add(new EmbeddedScriptDescriptor
+                {
+                    RelativePath = String.Format("ext/{0}", resourceName),
+                    ResourceAssembly = resourceAssembly,
+                    ResourceName = resourceName,
+                });
         }
     }
 
-    internal class EmbeddedResourceDescriptor
+    internal class EmbeddedScriptDescriptor
     {
-        public string Path { get; set; }
+        public string RelativePath { get; set; }
 
         public Assembly ResourceAssembly { get; set; }
 

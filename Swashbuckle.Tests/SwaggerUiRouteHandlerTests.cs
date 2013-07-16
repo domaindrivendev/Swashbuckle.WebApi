@@ -41,17 +41,17 @@ namespace Swashbuckle.Tests
             Assert.IsTrue(responseText.Contains("supportedSubmitMethods: ['get','post','put','head']"), "supportedSubmitMethods not customized");
             Assert.IsTrue(responseText.Contains("docExpansion: \"full\""), "docExpansion not customized");
             Assert.IsTrue(responseText.Contains(
-                "$.getScript('/swagger/ui/ext/onComplete_1.js');$.getScript('/swagger/ui/ext/onComplete_2.js');"),
+                "$.getScript('ext/Swashbuckle.Tests.Support.testScript1.js');\r\n$.getScript('ext/Swashbuckle.Tests.Support.testScript2.js');"),
                 "onComplete not customized");
         }
 
         [Test]
         public void ItShouldServeOnCompleteScripts()
         {
-            var responseText = ExecuteRequest("ext/onComplete_1.js");
+            var responseText = ExecuteRequest("ext/Swashbuckle.Tests.Support.testScript1.js");
             Assert.IsTrue(responseText.StartsWith("var testVal = '1';"));
 
-            responseText = ExecuteRequest("ext/onComplete_2.js");
+            responseText = ExecuteRequest("ext/Swashbuckle.Tests.Support.testScript2.js");
             Assert.IsTrue(responseText.StartsWith("var testVal = '2';"));
         }
 

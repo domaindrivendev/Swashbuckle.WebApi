@@ -105,10 +105,10 @@
       <SubType>Designer</SubType>
     </Content>
   </ItemGroup>
-  <!-- Automatically embed swagger-ui files. Construct name so that Http handler can easily retrieve by relative path -->
+  <!-- Automatically embed swagger-ui files. Construct name so resource can be retrieved by swagger-ui relative path -->
   <ItemGroup>
     <EmbeddedResource Include="..\swagger-ui\dist\**\*.*">
-      <LogicalName>/swagger/ui/$([System.String]::Copy('%(RecursiveDir)%(FileName)%(Extension)').Replace('\', '/'))</LogicalName>
+      <LogicalName>$([System.String]::Copy('%(RecursiveDir)%(FileName)%(Extension)').Replace('\', '/'))</LogicalName>
       <InProject>false</InProject>
     </EmbeddedResource>
   </ItemGroup>

@@ -48,12 +48,12 @@ namespace Swashbuckle.Handlers
             return String.Join(",", submitMethods.Select(m => String.Format("'{0}'", m.Method.ToLower())));
         }
 
-        public static string ToScriptIncludes(this IEnumerable<EmbeddedResourceDescriptor> scriptDescriptors)
+        public static string ToScriptIncludes(this IEnumerable<EmbeddedScriptDescriptor> scriptDescriptors)
         {
             var includesBuilder = new StringBuilder();
             foreach (var descriptor in scriptDescriptors)
             {
-                includesBuilder.AppendFormat("$.getScript('{0}');", descriptor.Path);
+                includesBuilder.AppendFormat("$.getScript('{0}');\r\n", descriptor.RelativePath);
             }
             return includesBuilder.ToString();
         }

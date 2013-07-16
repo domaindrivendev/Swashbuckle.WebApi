@@ -10,20 +10,20 @@ namespace Swashbuckle.Handlers
         public IHttpHandler GetHttpHandler(RequestContext requestContext)
         {
             var swaggerUiConfig = SwaggerUiConfig.Instance;
-            var requestPath = string.Format("/swagger/ui/{0}", requestContext.RouteData.Values["path"]);
 
-            // Check if it's the path to a configured extensibility script 
-            var scriptDescriptor = swaggerUiConfig.OnCompleteScripts.SingleOrDefault(d => d.Path == requestPath);
-            if (scriptDescriptor != null)
-                return new EmbeddedResourceHttpHandler(scriptDescriptor.ResourceAssembly, r => scriptDescriptor.ResourceName);
+            var routePath = requestContext.RouteData.Values["path"].ToString();
+            var extensionScript = swaggerUiConfig.OnCompleteScripts.FirstOrDefault(s => s.RelativePath == routePath);
 
-            if (requestPath == "/swagger/ui/index.html")
+            var resourceAssembly = (extensionScript != null) ? extensionScript.ResourceAssembly : GetType().Assembly;
+            var resourceName = (extensionScript != null) ? extensionScript.ResourceName : routePath;
+
+            if (resourceName == "index.html")
             {
                 var response = requestContext.HttpContext.Response;
                 response.Filter = new SwaggerUiConfigFilter(response.Filter, swaggerUiConfig);
             }
 
-            return new EmbeddedResourceHttpHandler(GetType().Assembly, r => requestPath);
+            return new EmbeddedResourceHttpHandler(resourceAssembly, r => resourceName);
         }
     }
 }

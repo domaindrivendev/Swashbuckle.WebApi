@@ -8,11 +8,11 @@ namespace Swashbuckle.Handlers
     public class EmbeddedResourceHttpHandler : IHttpHandler
     {
         private readonly Assembly _resourceAssembly;
-        private readonly Func<HttpRequestBase, string> _resourceNameSelector;
+        private readonly Func<HttpContextBase, string> _resourceNameSelector;
 
         public EmbeddedResourceHttpHandler(
             Assembly resourceAssembly,
-            Func<HttpRequestBase, string> resourceNameSelector)
+            Func<HttpContextBase, string> resourceNameSelector)
         {
             _resourceAssembly = resourceAssembly;
             _resourceNameSelector = resourceNameSelector;
@@ -26,7 +26,7 @@ namespace Swashbuckle.Handlers
 
         public void ProcessRequest(HttpContextBase context)
         {
-            var resourceName = _resourceNameSelector(context.Request);
+            var resourceName = _resourceNameSelector(context);
 
             var resourceStream = _resourceAssembly.GetManifestResourceStream(resourceName);
             if (resourceStream == null)
