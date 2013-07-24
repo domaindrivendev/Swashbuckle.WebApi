@@ -5,21 +5,22 @@ namespace Swashbuckle.Controllers
 {
     public class ApiDocsController : Controller
     {
-        private readonly SwaggerSpec _swaggerSpec;
+        private readonly ISwaggerSpec _swaggerSpec;
 
         public ApiDocsController()
         {
-            _swaggerSpec = SwaggerGenerator.GetInstance().GenerateSpec();
+            _swaggerSpec = SwaggerSpecFactory.GetSpec();
         }
 
         public JsonResult Index()
         {
-            return Json(_swaggerSpec.ResourceListing, JsonRequestBehavior.AllowGet);
+            return Json(_swaggerSpec.GetResourceListing(), JsonRequestBehavior.AllowGet);
         }
 
         public JsonResult Show(string resourceName)
         {
-            return Json(_swaggerSpec.ApiDeclarations[resourceName], JsonRequestBehavior.AllowGet);
+            var resourcePath = "/swagger/api-docs/" + resourceName;
+            return Json(_swaggerSpec.GetApiDeclaration(resourcePath), JsonRequestBehavior.AllowGet);
         }
     }
 }

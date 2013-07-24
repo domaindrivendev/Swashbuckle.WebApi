@@ -1,0 +1,13 @@
+﻿{
+  "apiVersion": "1.0",
+  "swaggerVersion": "1.1",
+  "basePath": "http://tempuri.org",
+  "apis": [
+    {
+      "path": "/swagger/api-docs/Orders"
+    },
+    {
+      "path": "/swagger/api-docs/OrderItems"
+    }
+  ]
+}

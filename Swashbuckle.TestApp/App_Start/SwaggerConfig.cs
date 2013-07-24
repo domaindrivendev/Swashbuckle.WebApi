@@ -1,6 +1,6 @@
 ﻿using System.Net.Http;
-using System.Web.Http.Description;
 using Swashbuckle.Models;
+using Swashbuckle.TestApp.SwaggerFilters;
 
 namespace Swashbuckle.TestApp.App_Start
 {
@@ -8,28 +8,19 @@ namespace Swashbuckle.TestApp.App_Start
     {
         public static void Customize()
         {
-            SwaggerGeneratorConfig.Customize(c => c.AddFilter<AddSupportedStatusCodesFilter>());
+            SwaggerSpecConfig.Customize(c =>
+                {
+                    c.PostFilter(new AddErrorCodeFilter(200, "It's all good!"));
+                    c.PostFilter(new AddErrorCodeFilter(400, "Something's up!"));
+                });
 
             SwaggerUiConfig.Customize(c =>
                 {
                     c.SupportHeaderParams = true;
                     c.DocExpansion = DocExpansion.Full;
                     c.SupportedSubmitMethods = new[] {HttpMethod.Get, HttpMethod.Post, HttpMethod.Put, HttpMethod.Head};
-                    c.AddOnCompleteScript(typeof(SwaggerConfig).Assembly, "Swashbuckle.TestApp.swagger_ui.ext.onComplete.js");
+                    c.AddOnCompleteScript(typeof (SwaggerConfig).Assembly, "Swashbuckle.TestApp.swagger_ui.ext.onComplete.js");
                 });
-        }
-    }
-
-    public class AddSupportedStatusCodesFilter : IOperationSpecFilter
-    {
-        public void UpdateSpec(ApiDescription apiDescription, ApiOperationSpec operationSpec)
-        {
-            operationSpec.errorResponses = new[]
-                {
-                    new ApiErrorResponseSpec {code = 200, reason = "OK"},
-                    new ApiErrorResponseSpec {code = 400, reason = "Bad Request"},
-                    new ApiErrorResponseSpec {code = 500, reason = "Internal Server Error"}
-                };
         }
     }
 }

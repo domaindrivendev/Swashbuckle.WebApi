@@ -52,25 +52,21 @@ There may also be cases where you'd like to make ammendments to the spec after i
 
 To do this, Swashbuckle provides a separate configuration where you can specify one or more filters to be applied to the generated operation specs:
 
-    SwaggerGeneratorConfig.Customize(c =>
+    SwaggerSpecConfig.Customize(c =>
     {
-        c.AddFilter<ApplyHeaderParamsFilter>();
-        c.AddFilter<ApplyErrorCodesFilter>();
+        c.PostFilter<ApplyHeaderParamsFilter>();
+        c.PostFilter<ApplyErrorCodesFilter>();
     });
     
 By implementing the IOperationSpecFilter interface, you can write filters that hook into the spec generation process. The code below shows an example that adds error codes based on the AuthorizeAttribute:
 
     public class ApplyErrorCodesFilter : IOperationSpecFilter
     {
-        public void UpdateSpec(ApiDescription apiDescription, ApiOperationSpec operationSpec)
+        public void Apply(ApiDescription apiDescription, ApiOperationSpec operationSpec)
         {
-            var errorResponses = new List<ApiErrorResponseSpec>(operationSpec.errorResponses);
-
             if (apiDescription.ActionDescriptor.GetFilters().OfType<AuthorizeAttribute>().Any())
             {
-                errorResponses.Add(new ApiErrorResponseSpec {code = (int) HttpStatusCode.Unauthorized, reason = "Basic Auth required"});
+                operationSpec.errorResponses.Add(new ApiErrorResponseSpec {code = (int) HttpStatusCode.Unauthorized, reason = "Basic Auth required"});
             }
-            
-            operationSpec.errorResponses = errorResponses;
         }
     }
