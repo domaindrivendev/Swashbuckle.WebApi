@@ -20,7 +20,7 @@ namespace Swashbuckle.TestApp.Controllers
                 };
         }
 
-        public IEnumerable<Order> Get(string foo, string bar)
+        public IEnumerable<Order> GetByParams(string foo, string bar)
         {
             return new[]
                 {

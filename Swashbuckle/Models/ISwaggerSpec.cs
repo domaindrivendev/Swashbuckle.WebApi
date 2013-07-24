@@ -2,11 +2,11 @@
 
 namespace Swashbuckle.Models
 {
-    public class SwaggerSpec
+    public interface ISwaggerSpec
     {
-        public ResourceListing ResourceListing { get; set; }
+        ResourceListing GetResourceListing();
 
-        public Dictionary<string, ApiDeclaration> ApiDeclarations { get; set; } 
+        ApiDeclaration GetApiDeclaration(string resourcePath);
     }
 
     public class ResourceListing
@@ -14,10 +14,10 @@ namespace Swashbuckle.Models
         public string apiVersion { get; set; }
         public string swaggerVersion { get; set; }
         public string basePath { get; set; }
-        public IEnumerable<ResourceLink> apis { get; set; }
+        public ICollection<ApiDeclarationLink> apis { get; set; }
     }
 
-    public class ResourceLink
+    public class ApiDeclarationLink
     {
         public string path { get; set; }
     }
@@ -28,7 +28,7 @@ namespace Swashbuckle.Models
         public string swaggerVersion { get; set; }
         public string basePath { get; set; }
         public string resourcePath { get; set; }
-        public IEnumerable<ApiSpec> apis { get; set; }
+        public ICollection<ApiSpec> apis { get; set; }
         public Dictionary<string, ModelSpec> models { get; set; }
     }
 
@@ -36,17 +36,17 @@ namespace Swashbuckle.Models
     {
         public string path { get; set; }
         public string description { get; set; }
-        public IEnumerable<ApiOperationSpec> operations { get; set; }
+        public ICollection<ApiOperationSpec> operations { get; set; }
     }
 
     public class ApiOperationSpec
     {
         public string httpMethod { get; set; }
+        public string nickname { get; set; }
         public string summary { get; set; }
         public string responseClass { get; set; }
-        public string nickname { get; set; }
-        public IEnumerable<ApiParameterSpec> parameters { get; set; }
-        public IEnumerable<ApiErrorResponseSpec> errorResponses { get; set; }
+        public ICollection<ApiParameterSpec> parameters { get; set; }
+        public ICollection<ApiErrorResponseSpec> errorResponses { get; set; }
     }
 
     public class ApiParameterSpec
