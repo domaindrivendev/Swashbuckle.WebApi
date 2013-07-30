@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.Specialized;
 using System.Linq;
 using Swashbuckle.Models;
 
@@ -10,12 +9,17 @@ namespace Swashbuckle
     {
         public static string ToSwaggerType(this Type type)
         {
-            TypeCategory category;
-            Type containedType;
-            return type.ToSwaggerType(out category, out containedType);
+            return type.ToSwaggerType(null);
         }
 
-        internal static string ToSwaggerType(this Type type, out TypeCategory category, out Type containedType)
+        public static string ToSwaggerType(this Type type, IDictionary<string,string> customTypeMappings)
+        {
+            TypeCategory category;
+            Type containedType;
+            return type.ToSwaggerType(out category, out containedType, customTypeMappings);
+        }
+
+        internal static string ToSwaggerType(this Type type, out TypeCategory category, out Type containedType, IDictionary<string,string> customTypeMappings = null)
         {
             if (type == null)
             {
@@ -24,7 +28,7 @@ namespace Swashbuckle
                 return null;
             }
 
-            var primitiveTypeMap = new StringDictionary {
+            var primitiveTypeMap = new Dictionary<string,string> {
                 {"Byte", "byte"},
                 {"Boolean", "boolean"},
                 {"Int32", "int"},
@@ -35,6 +39,8 @@ namespace Swashbuckle
                 {"String", "string"},
                 {"DateTime", "date"}
             };
+            if (customTypeMappings != null)
+                primitiveTypeMap = primitiveTypeMap.Concat(customTypeMappings).ToDictionary(m => m.Key, m => m.Value);
 
             if (primitiveTypeMap.ContainsKey(type.Name))
             {
@@ -61,7 +67,7 @@ namespace Swashbuckle
             {
                 category = TypeCategory.Container;
                 containedType = enumerable.GetGenericArguments().First();
-                return String.Format("List[{0}]", containedType.ToSwaggerType());
+                return String.Format("List[{0}]", containedType.ToSwaggerType(customTypeMappings));
             }
 
             category = TypeCategory.Complex;
