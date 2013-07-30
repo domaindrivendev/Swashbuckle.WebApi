@@ -99,6 +99,7 @@
     <Compile Include="Handlers\RedirectRouteHandler.cs" />
     <Compile Include="SwaggerAreaRegistration.cs" />
     <Compile Include="Handlers\SwaggerUiRouteHandler.cs" />
+    <Compile Include="TypeMappingExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="packages.config" />
