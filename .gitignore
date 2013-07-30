@@ -3,6 +3,7 @@
 App_Data
 Packages
 Logs
+PrecompiledWeb/
 
 _ReSharper.*
 *crunch*
