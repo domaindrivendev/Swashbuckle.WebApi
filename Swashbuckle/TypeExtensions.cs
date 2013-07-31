@@ -1,25 +1,32 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Swashbuckle.Models;
 
 namespace Swashbuckle
 {
-    public static class TypeMappingExtensions
+    internal enum TypeCategory
+    {
+        Unkown,
+        Primitive,
+        Container,
+        Complex
+    }
+
+    public static class TypeExtensions
     {
         public static string ToSwaggerType(this Type type)
         {
             return type.ToSwaggerType(null);
         }
 
-        public static string ToSwaggerType(this Type type, IDictionary<string,string> customTypeMappings)
+        public static string ToSwaggerType(this Type type, IDictionary<string, string> customTypeMappings)
         {
             TypeCategory category;
             Type containedType;
             return type.ToSwaggerType(out category, out containedType, customTypeMappings);
         }
 
-        internal static string ToSwaggerType(this Type type, out TypeCategory category, out Type containedType, IDictionary<string,string> customTypeMappings = null)
+        internal static string ToSwaggerType(this Type type, out TypeCategory category, out Type containedType, IDictionary<string, string> customTypeMappings = null)
         {
             if (type == null)
             {
@@ -28,17 +35,18 @@ namespace Swashbuckle
                 return null;
             }
 
-            var primitiveTypeMap = new Dictionary<string,string> {
-                {"Byte", "byte"},
-                {"Boolean", "boolean"},
-                {"Int32", "int"},
-                {"Int64", "long"},
-                {"Single", "float"},
-                {"Double", "double"},
-                {"Decimal", "double"},
-                {"String", "string"},
-                {"DateTime", "date"}
-            };
+            var primitiveTypeMap = new Dictionary<string, string>
+                {
+                    {"Byte", "byte"},
+                    {"Boolean", "boolean"},
+                    {"Int32", "int"},
+                    {"Int64", "long"},
+                    {"Single", "float"},
+                    {"Double", "double"},
+                    {"Decimal", "double"},
+                    {"String", "string"},
+                    {"DateTime", "date"}
+                };
             if (customTypeMappings != null)
                 primitiveTypeMap = primitiveTypeMap.Concat(customTypeMappings).ToDictionary(m => m.Key, m => m.Value);
 
@@ -62,7 +70,7 @@ namespace Swashbuckle
                 return "string";
             }
 
-            var enumerable = type.AsGenericType(typeof(IEnumerable<>));
+            var enumerable = type.AsGenericType(typeof (IEnumerable<>));
             if (enumerable != null)
             {
                 category = TypeCategory.Container;
@@ -74,13 +82,25 @@ namespace Swashbuckle
             containedType = null;
             return type.Name;
         }
-    }
 
-    internal enum TypeCategory
-    {
-        Unkown,
-        Primitive,
-        Container,
-        Complex
+        internal static bool IsNullableType(this Type type, out Type innerType)
+        {
+            var isNullable = type.IsGenericType && type.GetGenericTypeDefinition() == typeof (Nullable<>);
+            if (isNullable)
+            {
+                innerType = type.GetGenericArguments().Single();
+                return true;
+            }
+
+            innerType = null;
+            return false;
+        }
+
+        private static Type AsGenericType(this Type type, Type genericType)
+        {
+            return type.GetInterfaces()
+                .Union(new[] {type})
+                .SingleOrDefault(t => t.IsGenericType && t.GetGenericTypeDefinition() == genericType);
+        }
     }
 }

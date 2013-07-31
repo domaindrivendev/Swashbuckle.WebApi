@@ -63,13 +63,12 @@ namespace Swashbuckle.Models
 
         private ApiDeclaration DescriptionGroupToApiDeclaration(IGrouping<string, ApiDescription> descriptionGroup)
         {
-            var uniqueTypes = GetUniqueTypesForApis(descriptionGroup);
-            var modelMap = new DataTypeMap(uniqueTypes);
+            var modelSpecsBuilder = new ModelSpecsBuilder(); 
 
             // Group further by relative path - each group corresponds to an ApiSpec
             var apiSpecs = descriptionGroup
                 .GroupBy(ad => ad.RelativePath)
-                .Select(dg => DescriptionGroupToApiSpec(dg, modelMap))
+                .Select(dg => DescriptionGroupToApiSpec(dg, modelSpecsBuilder))
                 .ToList();
 
             return new ApiDeclaration
@@ -79,18 +78,18 @@ namespace Swashbuckle.Models
                     basePath = _basePathAccessor(),
                     resourcePath = descriptionGroup.Key,
                     apis = apiSpecs,
-                    models = modelMap.ModelSpecs()
+                    models = modelSpecsBuilder.Build()
                 };
         }
 
-        private ApiSpec DescriptionGroupToApiSpec(IGrouping<string, ApiDescription> descriptionGroup, DataTypeMap dataTypeMap)
+        private ApiSpec DescriptionGroupToApiSpec(IGrouping<string, ApiDescription> descriptionGroup, ModelSpecsBuilder modelSpecsBuilder)
         {
             var pathParts = descriptionGroup.Key.Split('?');
             var pathOnly = pathParts[0];
             var queryString = pathParts.Length == 1 ? String.Empty : pathParts[1];
 
             var operationSpecs = descriptionGroup
-                .Select(dg => DescriptionToOperationSpec(dg, queryString, dataTypeMap))
+                .Select(dg => DescriptionToOperationSpec(dg, queryString, modelSpecsBuilder))
                 .ToList();
 
             return new ApiSpec
@@ -101,20 +100,20 @@ namespace Swashbuckle.Models
                 };
         }
 
-        private ApiOperationSpec DescriptionToOperationSpec(ApiDescription description, string queryString, DataTypeMap dataTypeMap)
+        private ApiOperationSpec DescriptionToOperationSpec(ApiDescription description, string queryString, ModelSpecsBuilder modelSpecsBuilder)
         {
-            var paramSpecs = description.ParameterDescriptions
-                .Select(pd => ParamDescriptionToParameterSpec(pd, queryString.Contains(pd.Name), dataTypeMap))
-                .ToList();
+            modelSpecsBuilder.AddType(description.ActionDescriptor.ReturnType);
 
-            var responseDataType = dataTypeMap.DataTypeFor(description.ActionDescriptor.ReturnType);
+            var paramSpecs = description.ParameterDescriptions
+                .Select(pd => ParamDescriptionToParameterSpec(pd, queryString.Contains(pd.Name), modelSpecsBuilder))
+                .ToList();
 
             var operationSpec = new ApiOperationSpec
                 {
                     httpMethod = description.HttpMethod.Method,
                     nickname = description.ActionDescriptor.ControllerDescriptor.ControllerName,
                     parameters = paramSpecs,
-                    responseClass = responseDataType,
+                    responseClass = description.ActionDescriptor.ReturnType.ToSwaggerType(),
                     summary = description.Documentation,
                     errorResponses = new List<ApiErrorResponseSpec>()
                 };
@@ -127,8 +126,10 @@ namespace Swashbuckle.Models
             return operationSpec;
         }
 
-        private ApiParameterSpec ParamDescriptionToParameterSpec(ApiParameterDescription parameterDescription, bool isInQueryString, DataTypeMap dataTypeMap)
+        private ApiParameterSpec ParamDescriptionToParameterSpec(ApiParameterDescription parameterDescription, bool isInQueryString, ModelSpecsBuilder modelSpecsBuilder)
         {
+            modelSpecsBuilder.AddType(parameterDescription.ParameterDescriptor.ParameterType);
+
             var paramType = "";
             switch (parameterDescription.Source)
             {
@@ -140,33 +141,15 @@ namespace Swashbuckle.Models
                     break;
             }
 
-            var dataType = dataTypeMap.DataTypeFor(parameterDescription.ParameterDescriptor.ParameterType);
             return new ApiParameterSpec
                 {
                     paramType = paramType,
                     name = parameterDescription.Name,
                     description = parameterDescription.Documentation,
-                    dataType = dataType,
+                    dataType = parameterDescription.ParameterDescriptor.ParameterType.ToSwaggerType(),
                     required = !parameterDescription.ParameterDescriptor.IsOptional,
-                    allowableValues = dataTypeMap.AllowableValuesFor(parameterDescription.ParameterDescriptor.ParameterType)
+                    allowableValues = parameterDescription.ParameterDescriptor.ParameterType.AllowableValues()
                 };
-        }
-
-        private IEnumerable<Type> GetUniqueTypesForApis(IEnumerable<ApiDescription> apiDescriptions)
-        {
-            var arrayOfDescriptions = apiDescriptions.ToArray();
-
-            var paramTypes = arrayOfDescriptions
-                .SelectMany(d => d.ParameterDescriptions)
-                .Select(pd => pd.ParameterDescriptor.ParameterType);
-
-            var returnTypes = arrayOfDescriptions
-                .Select(d => d.ActionDescriptor.ReturnType);
-
-            return paramTypes
-                .Union(returnTypes)
-                .Distinct()
-                .Where(t => t != null);
         }
     }
 }

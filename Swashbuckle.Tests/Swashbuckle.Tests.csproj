@@ -56,8 +56,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Support\expectedOrderItemsDeclaration.json" />
-    <None Include="Support\expectedOrdersDeclaration.json" />
     <Compile Include="Support\FakeHttpContext.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ApiExplorerAdapterTests.cs" />
@@ -65,7 +63,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
-    <None Include="Support\expectedResourceListing.json" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Support\testScript1.js" />

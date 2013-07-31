@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
 using System.Web.Http;
 using System.Web.Http.Description;
 using NUnit.Framework;
 using Swashbuckle.Models;
+using Swashbuckle.TestApp.App_Start;
 using Swashbuckle.TestApp.SwaggerFilters;
-using Swashbuckle.Tests.Support;
 
 namespace Swashbuckle.Tests
 {
@@ -21,7 +20,7 @@ namespace Swashbuckle.Tests
         {
             // Get ApiExplorer for TestApp
             var httpConfiguration = new HttpConfiguration();
-            TestApp.App_Start.WebApiConfig.Register(httpConfiguration);
+            WebApiConfig.Register(httpConfiguration);
 
             _postFilters = new List<IOperationSpecFilter>();
             _swaggerSpec = new ApiExplorerAdapter(new ApiExplorer(httpConfiguration), () => "http://tempuri.org", _postFilters);
@@ -69,104 +68,102 @@ namespace Swashbuckle.Tests
                         });
 
                     AssertApiOperationSpec(api, "GET", operation =>
-                    {
-                        Assert.AreEqual("Orders", operation.nickname);
-                        Assert.AreEqual("Documentation for 'GetAll'.", operation.summary);
-                        Assert.AreEqual("List[Order]", operation.responseClass);
-                        CollectionAssert.IsEmpty(operation.parameters);
-                    });
+                        {
+                            Assert.AreEqual("Orders", operation.nickname);
+                            Assert.AreEqual("Documentation for 'GetAll'.", operation.summary);
+                            Assert.AreEqual("List[Order]", operation.responseClass);
+                            CollectionAssert.IsEmpty(operation.parameters);
+                        });
                 });
 
             AssertApiSpec("/swagger/api-docs/Orders", "/api/orders", 1, api =>
-                
                 AssertApiOperationSpec(api, "GET", operation =>
-                {
-                    Assert.AreEqual("Orders", operation.nickname);
-                    Assert.AreEqual("Documentation for 'GetByParams'.", operation.summary);
-                    Assert.AreEqual("List[Order]", operation.responseClass);
+                    {
+                        Assert.AreEqual("Orders", operation.nickname);
+                        Assert.AreEqual("Documentation for 'GetByParams'.", operation.summary);
+                        Assert.AreEqual("List[Order]", operation.responseClass);
 
-                    AssertApiParameterSpec(operation, "foo", parameter =>
-                        {
-                            Assert.AreEqual("query", parameter.paramType);
-                            Assert.AreEqual("Documentation for 'foo'.", parameter.description);
-                            Assert.AreEqual("string", parameter.dataType);
-                            Assert.AreEqual(true, parameter.required);
-                            Assert.AreEqual(false, parameter.allowMultiple);
-                        });
+                        AssertApiParameterSpec(operation, "foo", parameter =>
+                            {
+                                Assert.AreEqual("query", parameter.paramType);
+                                Assert.AreEqual("Documentation for 'foo'.", parameter.description);
+                                Assert.AreEqual("string", parameter.dataType);
+                                Assert.AreEqual(true, parameter.required);
+                                Assert.AreEqual(false, parameter.allowMultiple);
+                            });
 
-                    AssertApiParameterSpec(operation, "bar", parameter =>
-                        {
-                            Assert.AreEqual("query", parameter.paramType);
-                            Assert.AreEqual("Documentation for 'bar'.", parameter.description);
-                            Assert.AreEqual("string", parameter.dataType);
-                            Assert.AreEqual(true, parameter.required);
-                            Assert.AreEqual(false, parameter.allowMultiple);
-                        });
-                }));
+                        AssertApiParameterSpec(operation, "bar", parameter =>
+                            {
+                                Assert.AreEqual("query", parameter.paramType);
+                                Assert.AreEqual("Documentation for 'bar'.", parameter.description);
+                                Assert.AreEqual("string", parameter.dataType);
+                                Assert.AreEqual(true, parameter.required);
+                                Assert.AreEqual(false, parameter.allowMultiple);
+                            });
+                    }));
 
             AssertApiSpec("/swagger/api-docs/OrderItems", "/api/orders/{orderId}/items/{id}", 0, api =>
-                
                 AssertApiOperationSpec(api, "GET", operation =>
-                {
-                    Assert.AreEqual("OrderItems", operation.nickname);
-                    Assert.AreEqual("Documentation for 'GetById'.", operation.summary);
-                    Assert.AreEqual("OrderItem", operation.responseClass);
+                    {
+                        Assert.AreEqual("OrderItems", operation.nickname);
+                        Assert.AreEqual("Documentation for 'GetById'.", operation.summary);
+                        Assert.AreEqual("OrderItem", operation.responseClass);
 
-                    AssertApiParameterSpec(operation, "orderId", parameter =>
-                        {
-                            Assert.AreEqual("path", parameter.paramType);
-                            Assert.AreEqual("Documentation for 'orderId'.", parameter.description);
-                            Assert.AreEqual("int", parameter.dataType);
-                            Assert.AreEqual(true, parameter.required);
-                            Assert.AreEqual(false, parameter.allowMultiple);
-                        });
+                        AssertApiParameterSpec(operation, "orderId", parameter =>
+                            {
+                                Assert.AreEqual("path", parameter.paramType);
+                                Assert.AreEqual("Documentation for 'orderId'.", parameter.description);
+                                Assert.AreEqual("int", parameter.dataType);
+                                Assert.AreEqual(true, parameter.required);
+                                Assert.AreEqual(false, parameter.allowMultiple);
+                            });
 
-                    AssertApiParameterSpec(operation, "id", parameter =>
-                        {
-                            Assert.AreEqual("path", parameter.paramType);
-                            Assert.AreEqual("Documentation for 'id'.", parameter.description);
-                            Assert.AreEqual("int", parameter.dataType);
-                            Assert.AreEqual(true, parameter.required);
-                            Assert.AreEqual(false, parameter.allowMultiple);
-                        });
-                }));
+                        AssertApiParameterSpec(operation, "id", parameter =>
+                            {
+                                Assert.AreEqual("path", parameter.paramType);
+                                Assert.AreEqual("Documentation for 'id'.", parameter.description);
+                                Assert.AreEqual("int", parameter.dataType);
+                                Assert.AreEqual(true, parameter.required);
+                                Assert.AreEqual(false, parameter.allowMultiple);
+                            });
+                    }));
 
             AssertApiSpec("/swagger/api-docs/OrderItems", "/api/orders/{orderId}/items", 0, api =>
-                
                 AssertApiOperationSpec(api, "GET", operation =>
-                {
-                    Assert.AreEqual("OrderItems", operation.nickname);
-                    Assert.AreEqual("Documentation for 'GetAll'.", operation.summary);
-                    Assert.AreEqual("List[OrderItem]", operation.responseClass);
-
-                    AssertApiParameterSpec(operation, "orderId", parameter =>
-                        {
-                            Assert.AreEqual("path", parameter.paramType);
-                            Assert.AreEqual("Documentation for 'orderId'.", parameter.description);
-                            Assert.AreEqual("int", parameter.dataType);
-                            Assert.AreEqual(true, parameter.required);
-                            Assert.AreEqual(false, parameter.allowMultiple);
-                        });
-
-                    AssertApiParameterSpec(operation, "category", parameter =>
                     {
-                        Assert.AreEqual("path", parameter.paramType);
-                        Assert.AreEqual("Documentation for 'category'.", parameter.description);
-                        Assert.AreEqual("string", parameter.dataType);
-                        Assert.AreEqual(false, parameter.allowMultiple);
-                        Assert.IsNotNull(parameter.allowableValues);
-                        Assert.AreEqual("Category1", ((EnumeratedValuesSpec)parameter.allowableValues).values[0]);
-                        Assert.AreEqual("Category2", ((EnumeratedValuesSpec)parameter.allowableValues).values[1]);
-                        Assert.AreEqual("Category3", ((EnumeratedValuesSpec)parameter.allowableValues).values[2]);
-                    });
-                }));
+                        Assert.AreEqual("OrderItems", operation.nickname);
+                        Assert.AreEqual("Documentation for 'GetAll'.", operation.summary);
+                        Assert.AreEqual("List[OrderItem]", operation.responseClass);
+
+                        AssertApiParameterSpec(operation, "orderId", parameter =>
+                            {
+                                Assert.AreEqual("path", parameter.paramType);
+                                Assert.AreEqual("Documentation for 'orderId'.", parameter.description);
+                                Assert.AreEqual("int", parameter.dataType);
+                                Assert.AreEqual(true, parameter.required);
+                                Assert.AreEqual(false, parameter.allowMultiple);
+                            });
+
+                        AssertApiParameterSpec(operation, "category", parameter =>
+                            {
+                                Assert.AreEqual("path", parameter.paramType);
+                                Assert.AreEqual("Documentation for 'category'.", parameter.description);
+                                Assert.AreEqual("string", parameter.dataType);
+                                Assert.AreEqual(false, parameter.allowMultiple);
+                                
+                                Assert.IsInstanceOf<EnumeratedValuesSpec>(parameter.allowableValues);
+                                var values = (parameter.allowableValues as EnumeratedValuesSpec).values.ToArray();
+                                Assert.AreEqual("Category1", values[0]);
+                                Assert.AreEqual("Category2", values[1]);
+                                Assert.AreEqual("Category3", values[2]);
+                            });
+                    }));
         }
 
         [Test]
         public void ItShouldProvideModelSpecForEachComplexType()
         {
             AssertModel("/swagger/api-docs/Orders", "Order", model =>
-
                 AssertModelProperty(model, "Id", property =>
                     {
                         Assert.AreEqual("int", property.type);
@@ -188,16 +185,17 @@ namespace Swashbuckle.Tests
                         });
 
                     AssertModelProperty(model, "Category", property =>
-                    {
-                        Assert.AreEqual("string", property.type);
-                        Assert.AreEqual(true, property.required);
-                        Assert.AreEqual("LIST", property.allowableValues.valueType);
-                        var enumerationValues = ((EnumeratedValuesSpec) property.allowableValues).values;
-                        Assert.AreEqual(3, enumerationValues.Length);
-                        Assert.AreEqual("Category1", enumerationValues[0]);
-                        Assert.AreEqual("Category2", enumerationValues[1]);
-                        Assert.AreEqual("Category3", enumerationValues[2]);
-                    });
+                        {
+                            Assert.AreEqual("string", property.type);
+                            Assert.AreEqual(true, property.required);
+                            Assert.AreEqual("LIST", property.allowableValues.valueType);
+
+                            Assert.IsInstanceOf<EnumeratedValuesSpec>(property.allowableValues);
+                            var values = (property.allowableValues as EnumeratedValuesSpec).values.ToArray();
+                            Assert.AreEqual("Category1", values[0]);
+                            Assert.AreEqual("Category2", values[1]);
+                            Assert.AreEqual("Category3", values[2]);
+                        });
 
                     AssertModelProperty(model, "Quantity", property =>
                         {

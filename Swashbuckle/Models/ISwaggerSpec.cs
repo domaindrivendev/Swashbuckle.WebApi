@@ -91,7 +91,7 @@ namespace Swashbuckle.Models
             get { return "LIST"; }
         }
 
-        public string[] values { get; set; }
+        public ICollection<string> values { get; set; }
     }
 
     public class RangeValuesSpec : AllowableValuesSpec
