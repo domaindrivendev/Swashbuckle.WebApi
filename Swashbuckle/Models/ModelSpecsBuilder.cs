@@ -60,20 +60,5 @@ namespace Swashbuckle.Models
                 AddToModelSpecs(relatedTypes, modelSpecs);
             }
         }
-
-        public AllowableValuesSpec AllowableValuesFor(Type type)
-        {
-            Type innerType;
-            if (type.IsNullableType(out innerType))
-                return AllowableValuesFor(innerType);
-
-            if (!type.IsEnum)
-                return null;
-
-            return new EnumeratedValuesSpec
-            {
-                values = type.GetEnumNames()
-            };
-        }
     }
 }

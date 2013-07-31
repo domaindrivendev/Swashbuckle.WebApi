@@ -28,5 +28,9 @@ namespace Swashbuckle.TestApp.Controllers
                     new Order {Id = 2, Description = "TestOrder 2", Total = 20.0M}
                 };
         }
+
+        public void Delete(int id)
+        {    
+        }
     }
 }

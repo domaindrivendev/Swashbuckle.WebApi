@@ -107,6 +107,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="App_Start\SwaggerConfig.cs" />
+    <Compile Include="Controllers\CustomersController.cs" />
     <Compile Include="Models\OrderItem.cs" />
     <Compile Include="Controllers\OrderItemsController.cs" />
     <Compile Include="Models\Order.cs" />
