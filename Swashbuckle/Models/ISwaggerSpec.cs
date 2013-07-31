@@ -57,6 +57,7 @@ namespace Swashbuckle.Models
         public string dataType { get; set; }
         public bool required { get; set; }
         public bool allowMultiple { get; set; }
+        public AllowableValuesSpec allowableValues { get; set; }
     }
 
     public class ApiErrorResponseSpec
@@ -75,5 +76,32 @@ namespace Swashbuckle.Models
     {
         public string type { get; set; }
         public bool required { get; set; }
+        public AllowableValuesSpec allowableValues { get; set; }
+    }
+
+    public abstract class AllowableValuesSpec
+    {
+        public abstract string valueType { get; }
+    }
+
+    public class EnumeratedValuesSpec : AllowableValuesSpec
+    {
+        public override string valueType
+        {
+            get { return "LIST"; }
+        }
+
+        public string[] values { get; set; }
+    }
+
+    public class RangeValuesSpec : AllowableValuesSpec
+    {
+        public override string valueType
+        {
+            get { return "RANGE"; }
+        }
+
+        public int min { get; set; }
+        public int max { get; set; }
     }
 }

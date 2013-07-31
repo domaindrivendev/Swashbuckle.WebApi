@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Web.Http;
 using System.Web.Http.Description;
@@ -146,6 +147,18 @@ namespace Swashbuckle.Tests
                             Assert.AreEqual(true, parameter.required);
                             Assert.AreEqual(false, parameter.allowMultiple);
                         });
+
+                    AssertApiParameterSpec(operation, "category", parameter =>
+                    {
+                        Assert.AreEqual("path", parameter.paramType);
+                        Assert.AreEqual("Documentation for 'category'.", parameter.description);
+                        Assert.AreEqual("string", parameter.dataType);
+                        Assert.AreEqual(false, parameter.allowMultiple);
+                        Assert.IsNotNull(parameter.allowableValues);
+                        Assert.AreEqual("Category1", ((EnumeratedValuesSpec)parameter.allowableValues).values[0]);
+                        Assert.AreEqual("Category2", ((EnumeratedValuesSpec)parameter.allowableValues).values[1]);
+                        Assert.AreEqual("Category3", ((EnumeratedValuesSpec)parameter.allowableValues).values[2]);
+                    });
                 }));
         }
 
@@ -173,6 +186,18 @@ namespace Swashbuckle.Tests
                             Assert.AreEqual("string", property.type);
                             Assert.AreEqual(true, property.required);
                         });
+
+                    AssertModelProperty(model, "Category", property =>
+                    {
+                        Assert.AreEqual("string", property.type);
+                        Assert.AreEqual(true, property.required);
+                        Assert.AreEqual("LIST", property.allowableValues.valueType);
+                        var enumerationValues = ((EnumeratedValuesSpec) property.allowableValues).values;
+                        Assert.AreEqual(3, enumerationValues.Length);
+                        Assert.AreEqual("Category1", enumerationValues[0]);
+                        Assert.AreEqual("Category2", enumerationValues[1]);
+                        Assert.AreEqual("Category3", enumerationValues[2]);
+                    });
 
                     AssertModelProperty(model, "Quantity", property =>
                         {

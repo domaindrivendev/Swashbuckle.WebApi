@@ -9,14 +9,6 @@ namespace Swashbuckle.Models
 {
     public class DataTypeMap
     {
-        private enum Category
-        {
-            Unkown,
-            Primitive,
-            Container,
-            Complex
-        }
-
         private readonly Dictionary<string, ModelSpec> _modelSpecs;
 
         public DataTypeMap(IEnumerable<Type> types)
@@ -27,66 +19,28 @@ namespace Swashbuckle.Models
 
         public string DataTypeFor(Type type)
         {
-            Category category;
-            Type containedType;
-            return DataTypeFor(type, out category, out containedType);
+            return type.ToSwaggerType();
         }
 
-        private string DataTypeFor(Type type, out Category category, out Type containedType)
+        private string DataTypeFor(Type type, out TypeCategory category, out Type containedType)
         {
-            if (type == null)
-            {
-                category = Category.Unkown;
-                containedType = null;
-                return null;
-            }
-
-            var primitiveTypeMap = new StringDictionary {
-                {"Byte", "byte"},
-                {"Boolean", "boolean"},
-                {"Int32", "int"},
-                {"Int64", "long"},
-                {"Single", "float"},
-                {"Double", "double"},
-                {"Decimal", "double"},
-                {"String", "string"},
-                {"DateTime", "date"}
-            };
-
-            if (primitiveTypeMap.ContainsKey(type.Name))
-            {
-                category = Category.Primitive;
-                containedType = null;
-                return primitiveTypeMap[type.Name];    
-            }
-
-            var enumerable = type.AsGenericType(typeof (IEnumerable<>));
-            if(enumerable != null)
-            {
-                category = Category.Container;
-                containedType = enumerable.GetGenericArguments().First();
-                return String.Format("List[{0}]", DataTypeFor(containedType));
-            }
-
-            category = Category.Complex;
-            containedType = null;
-            return type.Name;
+            return type.ToSwaggerType(out category, out containedType);
         }
 
         private void AddToModelSpecs(IEnumerable<Type> apiTypes)
         {
             foreach (var type in apiTypes)
             {
-                Category category;
+                TypeCategory category;
                 Type containedType;
                 var dataType = DataTypeFor(type, out category, out containedType);
 
                 if (_modelSpecs.ContainsKey(dataType)) continue;
 
-                if (category == Category.Unkown || category == Category.Primitive) continue;
+                if (category == TypeCategory.Unkown || category == TypeCategory.Primitive) continue;
 
                 var relatedTypes = new List<Type>();
-                if (category == Category.Container)
+                if (category == TypeCategory.Container)
                 {
                     relatedTypes.Add(containedType);
                 }
@@ -94,7 +48,12 @@ namespace Swashbuckle.Models
                 {
                     var properties = type.GetProperties(BindingFlags.Instance | BindingFlags.Public);
                     var propertySpecs = properties
-                        .ToDictionary(pi => pi.Name, pi => new ModelPropertySpec { type = DataTypeFor(pi.PropertyType), required = true });
+                        .ToDictionary(pi => pi.Name, pi => new ModelPropertySpec
+                        {
+                            type = DataTypeFor(pi.PropertyType),
+                            required = true,
+                            allowableValues = AllowableValuesFor(pi.PropertyType)
+                        });
                     _modelSpecs.Add(dataType, new ModelSpec { id = dataType, properties = propertySpecs });
 
                     relatedTypes.AddRange(properties.Select(p => p.PropertyType));    
@@ -102,6 +61,21 @@ namespace Swashbuckle.Models
 
                 AddToModelSpecs(relatedTypes);
             }
+        }
+
+        public AllowableValuesSpec AllowableValuesFor(Type type)
+        {
+            Type innerType;
+            if (type.IsNullableType(out innerType))
+                return AllowableValuesFor(innerType);
+            
+            if (!type.IsEnum)
+                return null;
+
+            return new EnumeratedValuesSpec
+            {
+                values = type.GetEnumNames()
+            };
         }
 
         public Dictionary<string, ModelSpec> ModelSpecs()

@@ -147,7 +147,8 @@ namespace Swashbuckle.Models
                     name = parameterDescription.Name,
                     description = parameterDescription.Documentation,
                     dataType = dataType,
-                    required = !parameterDescription.ParameterDescriptor.IsOptional
+                    required = !parameterDescription.ParameterDescriptor.IsOptional,
+                    allowableValues = dataTypeMap.AllowableValuesFor(parameterDescription.ParameterDescriptor.ParameterType)
                 };
         }
 
