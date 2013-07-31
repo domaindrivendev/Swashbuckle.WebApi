@@ -34,9 +34,10 @@ namespace Swashbuckle.Tests
             Assert.AreEqual("1.1", resourceListing.swaggerVersion);
             Assert.AreEqual("http://tempuri.org", resourceListing.basePath);
 
-            Assert.AreEqual(2, resourceListing.apis.Count());
+            Assert.AreEqual(3, resourceListing.apis.Count());
             AssertApiDeclarationLink(resourceListing, "/swagger/api-docs/Orders");
             AssertApiDeclarationLink(resourceListing, "/swagger/api-docs/OrderItems");
+            AssertApiDeclarationLink(resourceListing, "/swagger/api-docs/Customers");
         }
 
         [Test]
@@ -44,11 +45,13 @@ namespace Swashbuckle.Tests
         {
             AssertApiDeclaration("/swagger/api-docs/Orders", dec => Assert.AreEqual("http://tempuri.org", dec.basePath));
             AssertApiDeclaration("/swagger/api-docs/OrderItems", dec => Assert.AreEqual("http://tempuri.org", dec.basePath));
+            AssertApiDeclaration("/swagger/api-docs/Customers", dec => Assert.AreEqual("http://tempuri.org", dec.basePath));
         }
 
         [Test]
         public void ItShouldProvideApiSpecForEachUrlPattern()
         {
+            // /api/orders
             AssertApiSpec("/swagger/api-docs/Orders", "/api/orders", 0, api =>
                 {
                     AssertApiOperationSpec(api, "POST", operation =>
@@ -76,6 +79,7 @@ namespace Swashbuckle.Tests
                         });
                 });
 
+            // /api/orders?foo={foo}&bar={bar}
             AssertApiSpec("/swagger/api-docs/Orders", "/api/orders", 1, api =>
                 AssertApiOperationSpec(api, "GET", operation =>
                     {
@@ -102,6 +106,25 @@ namespace Swashbuckle.Tests
                             });
                     }));
 
+            // /api/orders/{id}
+            AssertApiSpec("/swagger/api-docs/Orders", "/api/orders/{id}", 0, api =>
+                    AssertApiOperationSpec(api, "DELETE", operation =>
+                    {
+                        Assert.AreEqual("Orders", operation.nickname);
+                        Assert.AreEqual("Documentation for 'Delete'.", operation.summary);
+                        Assert.AreEqual("void", operation.responseClass);
+
+                        AssertApiParameterSpec(operation, "id", parameter =>
+                        {
+                            Assert.AreEqual("path", parameter.paramType);
+                            Assert.AreEqual("Documentation for 'id'.", parameter.description);
+                            Assert.AreEqual("int", parameter.dataType);
+                            Assert.AreEqual(true, parameter.required);
+                            Assert.AreEqual(false, parameter.allowMultiple);
+                        });
+                    }));
+
+            // /api/orders/{orderId}/items/{id}
             AssertApiSpec("/swagger/api-docs/OrderItems", "/api/orders/{orderId}/items/{id}", 0, api =>
                 AssertApiOperationSpec(api, "GET", operation =>
                     {
@@ -128,6 +151,7 @@ namespace Swashbuckle.Tests
                             });
                     }));
 
+            // /api/orders/{orderId}/items
             AssertApiSpec("/swagger/api-docs/OrderItems", "/api/orders/{orderId}/items", 0, api =>
                 AssertApiOperationSpec(api, "GET", operation =>
                     {
@@ -158,10 +182,20 @@ namespace Swashbuckle.Tests
                                 Assert.AreEqual("Category3", values[2]);
                             });
                     }));
+
+            // /api/customers
+            AssertApiSpec("/swagger/api-docs/Customers", "/api/customers", 0, api =>
+                AssertApiOperationSpec(api, "GET", operation =>
+                {
+                    Assert.AreEqual("Customers", operation.nickname);
+                    Assert.AreEqual("Documentation for 'GetAll'.", operation.summary);
+                    Assert.AreEqual(null, operation.responseClass);
+                    CollectionAssert.IsEmpty(operation.parameters);
+                }));
         }
 
         [Test]
-        public void ItShouldProvideModelSpecForEachComplexType()
+        public void ItShouldProvideModelSpecForComplexTypes()
         {
             AssertModel("/swagger/api-docs/Orders", "Order", model =>
                 AssertModelProperty(model, "Id", property =>
@@ -203,6 +237,12 @@ namespace Swashbuckle.Tests
                             Assert.AreEqual(true, property.required);
                         });
                 });
+        }
+
+        [Test]
+        public void ItShouldExcludeModelSpecForHttpResponseMessage()
+        {
+            AssertApiDeclaration("/swagger/api-docs/Customers", api => CollectionAssert.IsEmpty(api.models));
         }
 
         [Test]

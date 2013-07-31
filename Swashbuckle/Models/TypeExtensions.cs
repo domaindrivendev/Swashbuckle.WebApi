@@ -1,17 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 
-namespace Swashbuckle
+namespace Swashbuckle.Models
 {
-    internal enum TypeCategory
-    {
-        Unkown,
-        Primitive,
-        Container,
-        Complex
-    }
-
     public static class TypeExtensions
     {
         public static string ToSwaggerType(this Type type)
@@ -28,11 +21,18 @@ namespace Swashbuckle
 
         internal static string ToSwaggerType(this Type type, out TypeCategory category, out Type containedType, IDictionary<string, string> customTypeMappings = null)
         {
-            if (type == null)
+            if (type == typeof (HttpResponseMessage))
             {
                 category = TypeCategory.Unkown;
                 containedType = null;
                 return null;
+            }
+
+            if (type == null)
+            {
+                category = TypeCategory.Primitive;
+                containedType = null;
+                return "void";
             }
 
             var primitiveTypeMap = new Dictionary<string, string>
@@ -70,7 +70,7 @@ namespace Swashbuckle
                 return "string";
             }
 
-            var enumerable = type.AsGenericType(typeof (IEnumerable<>));
+            var enumerable = type.AsGenericType(typeof(IEnumerable<>));
             if (enumerable != null)
             {
                 category = TypeCategory.Container;
@@ -85,7 +85,7 @@ namespace Swashbuckle
 
         internal static bool IsNullableType(this Type type, out Type innerType)
         {
-            var isNullable = type.IsGenericType && type.GetGenericTypeDefinition() == typeof (Nullable<>);
+            var isNullable = type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>);
             if (isNullable)
             {
                 innerType = type.GetGenericArguments().Single();
@@ -96,11 +96,44 @@ namespace Swashbuckle
             return false;
         }
 
+        internal static AllowableValuesSpec AllowableValues(this Type type)
+        {
+            Type innerType;
+            if (type.IsNullableType(out innerType))
+                return innerType.AllowableValues();
+
+            if (!type.IsEnum)
+                return null;
+
+            return new EnumeratedValuesSpec
+                {
+                    values = type.GetEnumNames()
+                };
+        }
+
+        internal static ModelPropertySpec ToModelPropertySpec(this Type type)
+        {
+            return new ModelPropertySpec
+                {
+                    type = type.ToSwaggerType(),
+                    required = true,
+                    allowableValues = type.AllowableValues()
+                };
+        }
+
         private static Type AsGenericType(this Type type, Type genericType)
         {
             return type.GetInterfaces()
-                .Union(new[] {type})
+                .Union(new[] { type })
                 .SingleOrDefault(t => t.IsGenericType && t.GetGenericTypeDefinition() == genericType);
         }
+    }
+
+    public enum TypeCategory
+    {
+        Unkown,
+        Primitive,
+        Complex,
+        Container
     }
 }
