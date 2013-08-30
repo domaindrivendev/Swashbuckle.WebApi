@@ -43,6 +43,7 @@ namespace Swashbuckle.Models
     {
         public string httpMethod { get; set; }
         public string nickname { get; set; }
+        public string notes { get; set; }
         public string summary { get; set; }
         public string responseClass { get; set; }
         public ICollection<ApiParameterSpec> parameters { get; set; }
