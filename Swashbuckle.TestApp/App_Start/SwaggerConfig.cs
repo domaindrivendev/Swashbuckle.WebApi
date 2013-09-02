@@ -12,6 +12,8 @@ namespace Swashbuckle.TestApp.App_Start
                 {
                     c.PostFilter(new AddErrorCodeFilter(200, "It's all good!"));
                     c.PostFilter(new AddErrorCodeFilter(400, "Something's up!"));
+                    // uncomment this to parse documentation field when using XmlCommentDocumentationProvider
+                    //c.PostFilter(new AddXmlCommentsParsingFilter());
                 });
 
             SwaggerUiConfig.Customize(c =>
