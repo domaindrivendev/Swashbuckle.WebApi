@@ -108,6 +108,7 @@ namespace Swashbuckle.Models
                 .Select(pd => ParamDescriptionToParameterSpec(pd, queryString.Contains(pd.Name), modelSpecsBuilder))
                 .ToList();
 
+
             var operationSpec = new ApiOperationSpec
                 {
                     httpMethod = description.HttpMethod.Method,
