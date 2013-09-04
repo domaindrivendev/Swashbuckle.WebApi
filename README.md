@@ -70,3 +70,21 @@ By implementing the IOperationSpecFilter interface, you can write filters that h
             }
         }
     }
+
+Another example would be using  XML comments to document API calls. Assume we've got a method commented like this:
+
+    /// <summary> Get all foo's for particular bar </summary>
+    /// <param name="barId"> bar identifier </param>
+    /// <remarks>Returns all three order items we've got here</remarks>
+    /// <response code="200">OK</response>
+    public List<Foo> GetAll(int barId) {...}
+    
+One can implement IDocumentationProvider to read info from these comments, and substite the default one for ApiExplorer. While ApiDescription only has one string field available to put all info, one can serialize desirable information to xml once again (or csv, or json), and then implement IOperationSpecFilter to deserialize it and populate the fields needed:
+
+    var descriptionXml = XElement.Parse(apiDescription.Documentation);
+
+    var notes = descriptionXml.Element("remarks");
+    if (notes != null)
+        operationSpec.notes = notes.Value;
+
+And so on. The above examles are included in a Swashbuckle.TestApp project.

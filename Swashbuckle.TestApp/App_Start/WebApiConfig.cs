@@ -14,7 +14,7 @@ namespace Swashbuckle.TestApp.App_Start
 
             //try
             //{
-            //    config.Services.Replace(typeof (IDocumentationProvider),
+            //    config.Services.Replace(typeof(IDocumentationProvider),
             //                            new XmlCommentDocumentationProvider(
             //                                HttpContext.Current.Server.MapPath("~/bin/Swashbuckle.TestApp.xml")));
             //}

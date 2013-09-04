@@ -1,4 +1,5 @@
-﻿using System.Web.Http.Description;
+﻿using System;
+using System.Web.Http.Description;
 using System.Xml;
 using System.Xml.Linq;
 using Swashbuckle.Models;
@@ -16,6 +17,11 @@ namespace Swashbuckle.TestApp.SwaggerFilters
                 var notes = descriptionXml.Element("remarks");
                 if (notes != null)
                     operationSpec.notes = notes.Value;
+
+                foreach (var error in descriptionXml.Elements("response"))
+                {
+                    operationSpec.errorResponses.Add(new ApiErrorResponseSpec() { code = Convert.ToInt32(error.Attribute("code").Value), reason = error.Value });
+                }
 
                 var summary = descriptionXml.Element("summary");
                 operationSpec.summary = summary != null ? summary.Value : descriptionXml.Value;

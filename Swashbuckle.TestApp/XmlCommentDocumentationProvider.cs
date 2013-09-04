@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using System.Web.Http.Controllers;
@@ -6,7 +7,7 @@ using System.Web.Http.Description;
 using System.Xml.Linq;
 using System.Xml.XPath;
 
-namespace Swashbuckle
+namespace Swashbuckle.TestApp
 {
     /// <summary>
     /// Accesses the XML doc blocks written in code to further document the API.
@@ -44,7 +45,6 @@ namespace Swashbuckle
             return "No Documentation Found.";
         }
 
-        // actually returns xml, cause we need to stuff implementation notes in there
         public virtual string GetDocumentation(HttpActionDescriptor actionDescriptor)
         {
             var result = new XElement("documentation", "No Documentation Found.");
@@ -55,6 +55,7 @@ namespace Swashbuckle
                 if (summaryNode != null)
                 {
                     result.Add(new XElement(summaryNode.Name, summaryNode.Value), GetNotes(actionDescriptor));
+                    result.Add(GetResponses(actionDescriptor).ToArray());
                 }
             }
 
@@ -74,6 +75,12 @@ namespace Swashbuckle
             }
 
             return null;
+        }
+
+        private List<XElement> GetResponses(HttpActionDescriptor actionDescriptor)
+        {
+            var memberNode = GetMemberNode(actionDescriptor);
+            return (from XPathNavigator node in memberNode.Select("response") select new XElement(node.Name, node.Value, new XAttribute("code", node.GetAttribute("code", "")))).ToList();
         }
 
         private XPathNavigator GetMemberNode(HttpActionDescriptor actionDescriptor)

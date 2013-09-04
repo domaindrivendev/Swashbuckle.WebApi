@@ -22,6 +22,8 @@ namespace Swashbuckle.TestApp.Controllers
         /// Get all order items
         /// </summary>
         /// <remarks>Returns all three order items we've got here</remarks>
+        /// <response code="200">OK</response>
+        /// <response code="401">Unauthorized</response>
         /// <returns></returns>
         public IEnumerable<OrderItem> GetAll(int orderId, ProductCategory? category)
         {
