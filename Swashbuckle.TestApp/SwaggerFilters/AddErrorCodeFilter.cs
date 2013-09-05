@@ -16,7 +16,7 @@ namespace Swashbuckle.TestApp.SwaggerFilters
 
         public void Apply(ApiDescription apiDescription, ApiOperationSpec operationSpec)
         {
-            operationSpec.errorResponses.Add(new ApiErrorResponseSpec {code = _code, reason = _reason});
+            operationSpec.responseMessages.Add(new ApiResponseMessageSpec {code = _code, message = _reason});
         }
     }
 }

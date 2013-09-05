@@ -13,7 +13,6 @@ namespace Swashbuckle.Models
     {
         public string apiVersion { get; set; }
         public string swaggerVersion { get; set; }
-        public string basePath { get; set; }
         public ICollection<ApiDeclarationLink> apis { get; set; }
     }
 
@@ -29,7 +28,7 @@ namespace Swashbuckle.Models
         public string basePath { get; set; }
         public string resourcePath { get; set; }
         public ICollection<ApiSpec> apis { get; set; }
-        public Dictionary<string, ModelSpec> models { get; set; }
+        public Dictionary<string, JsonSchemaSpec> models { get; set; }
     }
 
     public class ApiSpec
@@ -39,69 +38,37 @@ namespace Swashbuckle.Models
         public ICollection<ApiOperationSpec> operations { get; set; }
     }
 
-    public class ApiOperationSpec
+    public class ApiOperationSpec : JsonSchemaSpec
     {
         public string httpMethod { get; set; }
         public string nickname { get; set; }
         public string summary { get; set; }
-        public string responseClass { get; set; }
         public ICollection<ApiParameterSpec> parameters { get; set; }
-        public ICollection<ApiErrorResponseSpec> errorResponses { get; set; }
+        public ICollection<ApiResponseMessageSpec> responseMessages { get; set; }
     }
 
-    public class ApiParameterSpec
+    public class ApiParameterSpec : JsonSchemaSpec
     {
         public string paramType { get; set; }
         public string name { get; set; }
         public string description { get; set; }
-        public string dataType { get; set; }
         public bool required { get; set; }
         public bool allowMultiple { get; set; }
-        public AllowableValuesSpec allowableValues { get; set; }
     }
 
-    public class ApiErrorResponseSpec
+    public class ApiResponseMessageSpec
     {
         public int code { get; set; }
-        public string reason { get; set; }
+        public string message { get; set; }
     }
 
-    public class ModelSpec
+    public class JsonSchemaSpec
     {
         public string id { get; set; }
-        public Dictionary<string, ModelPropertySpec> properties { get; set; }
-    }
-
-    public class ModelPropertySpec
-    {
         public string type { get; set; }
-        public bool required { get; set; }
-        public AllowableValuesSpec allowableValues { get; set; }
-    }
-
-    public abstract class AllowableValuesSpec
-    {
-        public abstract string valueType { get; }
-    }
-
-    public class EnumeratedValuesSpec : AllowableValuesSpec
-    {
-        public override string valueType
-        {
-            get { return "LIST"; }
-        }
-
-        public ICollection<string> values { get; set; }
-    }
-
-    public class RangeValuesSpec : AllowableValuesSpec
-    {
-        public override string valueType
-        {
-            get { return "RANGE"; }
-        }
-
-        public int min { get; set; }
-        public int max { get; set; }
+        public string format { get; set; }
+        public IEnumerable<string> @enum { get; set; }
+        public string items { get; set; }
+        public IDictionary<string, JsonSchemaSpec> properties { get; set; }
     }
 }

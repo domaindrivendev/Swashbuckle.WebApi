@@ -88,6 +88,7 @@
     <Compile Include="Handlers\EmbeddedResourceHttpHandler.cs" />
     <Compile Include="Handlers\SwaggerUiConfigFilter.cs" />
     <Compile Include="Models\ApiExplorerAdapter.cs" />
+    <Compile Include="Models\_ApiExplorerAdapter.cs" />
     <Compile Include="Models\ISwaggerSpec.cs" />
     <Compile Include="Models\ModelSpecsBuilder.cs" />
     <Compile Include="Models\SwaggerSpecFactory.cs" />

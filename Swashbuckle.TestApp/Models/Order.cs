@@ -1,4 +1,6 @@
-﻿namespace Swashbuckle.TestApp.Models
+﻿using System.Collections.Generic;
+
+namespace Swashbuckle.TestApp.Models
 {
     public class Order
     {
@@ -7,5 +9,7 @@
         public string Description { get; set; }
 
         public decimal Total { get; set; }
+
+        public IEnumerable<OrderItem> OrderItems { get; set; }
     }
 }

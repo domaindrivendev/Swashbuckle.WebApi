@@ -10,8 +10,9 @@ namespace Swashbuckle.Models
         {
             return new ApiExplorerAdapter(
                 GlobalConfiguration.Configuration.Services.GetApiExplorer(),
-                () => HttpContext.Current.Request.Url.GetLeftPart(UriPartial.Authority) + HttpRuntime.AppDomainAppVirtualPath,
-                SwaggerSpecConfig.Instance.PostFilters);
+                SwaggerSpecConfig.Instance.GroupingStrategy,
+                SwaggerSpecConfig.Instance.PostFilters,
+                () => HttpContext.Current.Request.Url.GetLeftPart(UriPartial.Authority) + HttpRuntime.AppDomainAppVirtualPath);
         }
     }
 }

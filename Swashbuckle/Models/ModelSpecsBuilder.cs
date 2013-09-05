@@ -2,15 +2,21 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using Newtonsoft.Json.Schema;
 
 namespace Swashbuckle.Models
 {
     public class ModelSpecsBuilder
     {
+        private readonly JsonSchemaGenerator _jsonSchemaGenerator;
         private readonly List<Type> _apiTypes;
 
         public ModelSpecsBuilder()
+        {}
+
+        public ModelSpecsBuilder(JsonSchemaGenerator jsonSchemaGenerator)
         {
+            _jsonSchemaGenerator = jsonSchemaGenerator;
             _apiTypes = new List<Type>();
         }
 
@@ -21,44 +27,52 @@ namespace Swashbuckle.Models
             return this;
         }
 
-        public Dictionary<string, ModelSpec> Build()
+        public Dictionary<string, JsonSchemaSpec> Build()
         {
-            var modelSpecs = new Dictionary<string, ModelSpec>();
-            AddToModelSpecs(_apiTypes, modelSpecs);
-
+            var modelSpecs = new Dictionary<string, JsonSchemaSpec>();
             return modelSpecs;
         }
-
-        private void AddToModelSpecs(IEnumerable<Type> apiTypes, Dictionary<string, ModelSpec> modelSpecs)
-        {
-            foreach (var type in apiTypes)
-            {
-                TypeCategory category;
-                Type containedType;
-                var dataType = type.ToSwaggerType(out category, out containedType);
-
-                if (category == TypeCategory.Unkown || category == TypeCategory.Primitive) continue;
-
-                if (modelSpecs.ContainsKey(dataType)) continue;
-
-                var relatedTypes = new List<Type>();
-                if (category == TypeCategory.Container)
-                {
-                    relatedTypes.Add(containedType);
-                }
-                else
-                {
-                    var properties = type.GetProperties(BindingFlags.Instance | BindingFlags.Public);
-                    var propertySpecs = properties
-                        .ToDictionary(pi => pi.Name, pi => pi.PropertyType.ToModelPropertySpec());
-
-                    modelSpecs.Add(dataType, new ModelSpec {id = dataType, properties = propertySpecs});
-
-                    relatedTypes.AddRange(properties.Select(p => p.PropertyType));
-                }
-
-                AddToModelSpecs(relatedTypes, modelSpecs);
-            }
-        }
+//
+//        private void AddToModelSpecs(IEnumerable<Type> apiTypes, Dictionary<string, JsonSchemaSpec> modelSpecs)
+//        {
+//            foreach (var type in apiTypes)
+//            {
+//                var swaggerType = type.ToSwaggerType();
+//                var category = swaggerType.Category;
+//
+//                if (category == SwaggerTypeCategory.Unknown || category == SwaggerTypeCategory.Primitive) continue;
+//
+//                if (modelSpecs.ContainsKey(swaggerType.Name)) continue;
+//
+//                var relatedTypes = new List<Type>();
+//                if (category == SwaggerTypeCategory.Container)
+//                {
+//                    //relatedTypes.Add(swaggerType.ContainedType);
+//                }
+//                else
+//                {
+//                    var properties = type.GetProperties(BindingFlags.Instance | BindingFlags.Public);
+//                    var propertySpecs = properties
+//                        .ToDictionary(pi => pi.Name, PropertyInfoToPropertySpec);
+//
+//                    modelSpecs.Add(swaggerType.Name, new ModelSpec {id = swaggerType.Name, properties = propertySpecs});
+//
+//                    relatedTypes.AddRange(properties.Select(p => p.PropertyType));
+//                }
+//
+//                AddToModelSpecs(relatedTypes, modelSpecs);
+//            }
+//        }
+//
+//        private ModelPropertySpec PropertyInfoToPropertySpec(PropertyInfo popertyInfo)
+//        {
+//            var swaggerType = popertyInfo.PropertyType.ToSwaggerType();
+//            return new ModelPropertySpec
+//                {
+//                    type = swaggerType.Name,
+//                    format = swaggerType.Format,
+//                    @enum = swaggerType.Enum
+//                };
+//        }
     }
 }

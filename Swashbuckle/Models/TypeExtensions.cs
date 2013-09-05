@@ -2,138 +2,122 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
+using Newtonsoft.Json.Schema;
 
 namespace Swashbuckle.Models
 {
+    public class SwaggerTypeDescriptor
+    {
+        public SwaggerTypeCategory Category { get; set; }
+        public string Name { get; set; }
+        public string Format { get; set; }
+        public IEnumerable<string> Enum { get; set; }
+        public JsonSchema JsonSchema { get; set; }
+        public SwaggerTypeDescriptor ContainedType { get; set; }
+    }
+
+    public enum SwaggerTypeCategory
+    {
+        Unknown,
+        Primitive,
+        Complex,
+        Container
+    }
+
     public static class TypeExtensions
     {
-        public static string ToSwaggerType(this Type type)
+        public static SwaggerTypeDescriptor ToSwaggerType(this Type type)
         {
             return type.ToSwaggerType(null);
         }
 
-        public static string ToSwaggerType(this Type type, IDictionary<string, string> customTypeMappings)
-        {
-            TypeCategory category;
-            Type containedType;
-            return type.ToSwaggerType(out category, out containedType, customTypeMappings);
-        }
-
-        internal static string ToSwaggerType(this Type type, out TypeCategory category, out Type containedType, IDictionary<string, string> customTypeMappings = null)
+        public static SwaggerTypeDescriptor ToSwaggerType(this Type type, IDictionary<string, string> customTypeMappings)
         {
             if (type == typeof (HttpResponseMessage))
-            {
-                category = TypeCategory.Unkown;
-                containedType = null;
-                return null;
-            }
+                return new SwaggerTypeDescriptor {Category = SwaggerTypeCategory.Unknown};
 
             if (type == null)
-            {
-                category = TypeCategory.Primitive;
-                containedType = null;
-                return "void";
-            }
+                return new SwaggerTypeDescriptor {Category = SwaggerTypeCategory.Primitive, Name = "void"};
 
-            var primitiveTypeMap = new Dictionary<string, string>
+            var primitiveTypes = new Dictionary<string, string[]>
                 {
-                    {"Byte", "byte"},
-                    {"Boolean", "boolean"},
-                    {"Int32", "int"},
-                    {"Int64", "long"},
-                    {"Single", "float"},
-                    {"Double", "double"},
-                    {"Decimal", "double"},
-                    {"String", "string"},
-                    {"DateTime", "date"}
+                    {"Int32",       new[]{ "integer", "int32" }},
+                    {"Int64",       new[]{ "integer", "int64" }},
+                    {"Single",      new[]{ "number", "float" }},
+                    {"Double",      new[]{ "number", "double" }},
+                    {"String",      new[]{ "string", null }},
+                    {"Byte",        new[]{ "string", "byte" }},
+                    {"Boolean",     new[]{ "boolean", null }},
+                    {"DateTime",    new[]{ "string", "date-time" }}
                 };
-            if (customTypeMappings != null)
-                primitiveTypeMap = primitiveTypeMap.Concat(customTypeMappings).ToDictionary(m => m.Key, m => m.Value);
 
-            if (primitiveTypeMap.ContainsKey(type.Name))
+            if (primitiveTypes.ContainsKey(type.Name))
             {
-                category = TypeCategory.Primitive;
-                containedType = null;
-                return primitiveTypeMap[type.Name];
+                var tuple = primitiveTypes[type.Name];
+                return new SwaggerTypeDescriptor {Category = SwaggerTypeCategory.Primitive, Name = tuple[0], Format = tuple[1]};
             }
 
-            Type innerTypeOfNullable;
-            if (type.IsNullableType(out innerTypeOfNullable))
+            IEnumerable<string> values;
+            if (type.IsEnum(out values))
             {
-                return innerTypeOfNullable.ToSwaggerType(out category, out containedType);
+                return new SwaggerTypeDescriptor {Category = SwaggerTypeCategory.Primitive, Name = "string", Enum = values};
             }
 
-            if (type.IsEnum)
+            Type nullableType;
+            if (type.IsNullable(out nullableType))
             {
-                category = TypeCategory.Primitive;
-                containedType = null;
-                return "string";
+                return nullableType.ToSwaggerType();
             }
 
-            var enumerable = type.AsGenericType(typeof(IEnumerable<>));
-            if (enumerable != null)
+            Type containedType;
+            if (type.IsEnumerable(out containedType))
             {
-                category = TypeCategory.Container;
-                containedType = enumerable.GetGenericArguments().First();
-                return String.Format("List[{0}]", containedType.ToSwaggerType(customTypeMappings));
+                var name = String.Format("array[{0}]", containedType.Name);
+                return new SwaggerTypeDescriptor { Category = SwaggerTypeCategory.Container, Name = name, ContainedType = containedType.ToSwaggerType()};
             }
 
-            category = TypeCategory.Complex;
-            containedType = null;
-            return type.Name;
+            return new SwaggerTypeDescriptor {Category = SwaggerTypeCategory.Complex, Name = type.Name};
         }
 
-        internal static bool IsNullableType(this Type type, out Type innerType)
+        internal static bool IsEnum(this Type type, out IEnumerable<string> values)
+        {
+            if (!type.IsEnum)
+            {
+                values = null;
+                return false;
+            }
+
+            values = type.GetEnumNames();
+            return true;
+        }
+
+        internal static bool IsNullable(this Type type, out Type nullableType)
         {
             var isNullable = type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>);
             if (isNullable)
             {
-                innerType = type.GetGenericArguments().Single();
+                nullableType = type.GetGenericArguments().Single();
                 return true;
             }
 
-            innerType = null;
+            nullableType = null;
             return false;
         }
 
-        internal static AllowableValuesSpec AllowableValues(this Type type)
+        internal static bool IsEnumerable(this Type type, out Type containedType)
         {
-            Type innerType;
-            if (type.IsNullableType(out innerType))
-                return innerType.AllowableValues();
+            var enumerable = type.GetInterfaces()
+                .Union(new[] {type})
+                .SingleOrDefault(t => t.IsGenericType && t.GetGenericTypeDefinition() == typeof (IEnumerable<>));
 
-            if (!type.IsEnum)
-                return null;
+            if (enumerable == null)
+            {
+                containedType = null;
+                return false;
+            }
 
-            return new EnumeratedValuesSpec
-                {
-                    values = type.GetEnumNames()
-                };
+            containedType = enumerable.GetGenericArguments()[0];
+            return true;
         }
-
-        internal static ModelPropertySpec ToModelPropertySpec(this Type type)
-        {
-            return new ModelPropertySpec
-                {
-                    type = type.ToSwaggerType(),
-                    required = true,
-                    allowableValues = type.AllowableValues()
-                };
-        }
-
-        private static Type AsGenericType(this Type type, Type genericType)
-        {
-            return type.GetInterfaces()
-                .Union(new[] { type })
-                .SingleOrDefault(t => t.IsGenericType && t.GetGenericTypeDefinition() == genericType);
-        }
-    }
-
-    public enum TypeCategory
-    {
-        Unkown,
-        Primitive,
-        Complex,
-        Container
     }
 }
