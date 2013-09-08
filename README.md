@@ -34,6 +34,7 @@ In Swashbuckle however, this file is not accessible as it's embedded in the libr
         c.DocExpansion = DocExpansion.List;
         c.SupportedSubmitMethods = new[] {HttpMethod.Get, HttpMethod.Post, HttpMethod.Put, HttpMethod.Head, HttpMethod.Delete};
         c.AddOnCompleteScript(typeof(Bootstrapper).Assembly, "YourApp.swagger_ui.ext.after-load.js");
+        c.AddStylesheet(typeof(Bootstrapper).Assembly, "YourApp.swagger_ui.ext.stylesheet.css");
     });
        
 It's possible to include one or more custom JavaScript files to be executed as soon as the UI is rendered. You can use this to add additional UI components through the DOM. The UI itself depends on jquery and so it can be used in your custom script.
@@ -45,6 +46,10 @@ To add a custom script, you need to include it in your project as an Embedded Re
 For example, if your app's default namespace is "YourApp", and you want to include a script at the following path within your project - "swagger-ui/ext/after-load.js", then it will, by default, be assigned the following Logical Name at build time:
 
 "YourApp.swagger_ui.ext.after-load.js"
+
+Same approach applies to custom stylesheets. Unlike the injected scripts, which are executed only after the UI is rendered, injected stylesheets appear as <link rel='stylesheet' ... /> elements in the <head> tag, so they are loaded prior to UI rendering. This extension point may be used for altering the appearance of the UI itself in a simpler way.
+
+To add a custom stylesheet, you need to include it as an Embedded Resource, and treat it as described above for JavaScript includes.
         
 ## Ammend generated operation specs 
 
