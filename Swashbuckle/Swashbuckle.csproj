@@ -101,7 +101,6 @@
     <Compile Include="Handlers\RedirectRouteHandler.cs" />
     <Compile Include="SwaggerAreaRegistration.cs" />
     <Compile Include="Handlers\SwaggerUiRouteHandler.cs" />
-    <Compile Include="XmlCommentDocumentationProvider.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="packages.config" />

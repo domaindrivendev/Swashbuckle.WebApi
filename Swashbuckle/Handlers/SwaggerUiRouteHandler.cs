@@ -12,10 +12,13 @@ namespace Swashbuckle.Handlers
             var swaggerUiConfig = SwaggerUiConfig.Instance;
 
             var routePath = requestContext.RouteData.Values["path"].ToString();
-            var extensionScript = swaggerUiConfig.OnCompleteScripts.FirstOrDefault(s => s.RelativePath == routePath);
+            var includes =
+                swaggerUiConfig.EmbeddedStylesheets.Union(swaggerUiConfig.OnCompleteScripts)
+                               .FirstOrDefault(e => e.RelativePath == routePath);
 
-            var resourceAssembly = (extensionScript != null) ? extensionScript.ResourceAssembly : GetType().Assembly;
-            var resourceName = (extensionScript != null) ? extensionScript.ResourceName : routePath;
+
+            var resourceAssembly = includes != null ? includes.ResourceAssembly : GetType().Assembly;
+            var resourceName = includes != null ? includes.ResourceName : routePath;
 
             if (resourceName == "index.html")
             {
