@@ -28,47 +28,53 @@ namespace Swashbuckle.Models
         public string basePath { get; set; }
         public string resourcePath { get; set; }
         public ICollection<ApiSpec> apis { get; set; }
-        public Dictionary<string, JsonSchemaSpec> models { get; set; }
+        public IDictionary<string, ModelSpec> models { get; set; }
     }
 
     public class ApiSpec
     {
         public string path { get; set; }
         public string description { get; set; }
-        public ICollection<ApiOperationSpec> operations { get; set; }
+        public ICollection<OperationSpec> operations { get; set; }
     }
 
-    public class ApiOperationSpec : JsonSchemaSpec
+    public class OperationSpec
     {
-        public string httpMethod { get; set; }
+        public string method { get; set; }
         public string nickname { get; set; }
         public string summary { get; set; }
-        public ICollection<ApiParameterSpec> parameters { get; set; }
-        public ICollection<ApiResponseMessageSpec> responseMessages { get; set; }
+        public string notes { get; set; }
+        public string type { get; set; }
+        public IEnumerable<string> @enum { get; set; }
+        public IDictionary<string, string> items { get; set; }
+        public ICollection<ParameterSpec> parameters { get; set; }
+        public ICollection<ResponseMessageSpec> responseMessages { get; set; }
     }
 
-    public class ApiParameterSpec : JsonSchemaSpec
+    public class ParameterSpec
     {
         public string paramType { get; set; }
         public string name { get; set; }
         public string description { get; set; }
         public bool required { get; set; }
-        public bool allowMultiple { get; set; }
+        public string type { get; set; }
+        public IEnumerable<string> @enum { get; set; }
+        public IDictionary<string, string> items { get; set; }
     }
 
-    public class ApiResponseMessageSpec
+    public class ResponseMessageSpec
     {
         public int code { get; set; }
         public string message { get; set; }
     }
 
-    public class JsonSchemaSpec
+    public class ModelSpec
     {
         public string id { get; set; }
         public string type { get; set; }
         public string format { get; set; }
         public IEnumerable<string> @enum { get; set; }
-        public string items { get; set; }
-        public IDictionary<string, JsonSchemaSpec> properties { get; set; }
+        public IDictionary<string, string> items { get; set; }
+        public IDictionary<string, ModelSpec> properties { get; set; }
     }
 }

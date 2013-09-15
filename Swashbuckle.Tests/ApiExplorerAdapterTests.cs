@@ -31,31 +31,356 @@ namespace Swashbuckle.Tests
         }
 
         [Test]
-        public void ItShouldListResourcesByControllerName()
+        public void ItShouldListApiDeclarationsByGroupingStrategy()
         {
+            // e.g. By controller name
             var resourceListing = _swaggerSpec.GetResourceListing();
             Assert.AreEqual("1.0", resourceListing.apiVersion);
             Assert.AreEqual("1.2", resourceListing.swaggerVersion);
             Assert.AreEqual(3, resourceListing.apis.Count());
 
-            AssertApiDeclarationLink(resourceListing, "Orders");
-            AssertApiDeclarationLink(resourceListing, "OrderItems");
-            AssertApiDeclarationLink(resourceListing, "Customers");
+            Assert.IsTrue(resourceListing.apis.Any(a => a.path == "/swagger/api-docs/Orders"), "Orders declaration not listed");
+            Assert.IsTrue(resourceListing.apis.Any(a => a.path == "/swagger/api-docs/OrderItems"), "OrderItems declaration not listed");
+            Assert.IsTrue(resourceListing.apis.Any(a => a.path == "/swagger/api-docs/Customers"), "Customers declaration not listed");
         }
 
         [Test]
-        public void ItShouldProvideApiDeclarationsForEachController()
+        public void ItShouldProvideTheListedApiDeclarations()
         {
-            AssertApiDeclaration("Orders", dec => Assert.AreEqual("http://tempuri.org", dec.basePath));
-            AssertApiDeclaration("OrderItems", dec => Assert.AreEqual("http://tempuri.org", dec.basePath));
-            AssertApiDeclaration("Customers", dec => Assert.AreEqual("http://tempuri.org", dec.basePath));
+            ApiDeclaration("/swagger/api-docs/Orders", dec =>
+                {
+                    Assert.AreEqual("1.2", dec.swaggerVersion);
+                    Assert.AreEqual("http://tempuri.org", dec.basePath);
+                    Assert.AreEqual("/swagger/api-docs/Orders", dec.resourcePath);
+                });
+
+            ApiDeclaration("/swagger/api-docs/OrderItems", dec =>
+                {
+                    Assert.AreEqual("1.2", dec.swaggerVersion);
+                    Assert.AreEqual("http://tempuri.org", dec.basePath);
+                    Assert.AreEqual("/swagger/api-docs/OrderItems", dec.resourcePath);
+                });
+
+            ApiDeclaration("/swagger/api-docs/Customers", dec =>
+                {
+                    Assert.AreEqual("1.2", dec.swaggerVersion);
+                    Assert.AreEqual("http://tempuri.org", dec.basePath);
+                    Assert.AreEqual("/swagger/api-docs/Customers", dec.resourcePath);
+                });
         }
+
+        [Test]
+        public void ItShouldProvideAnApiSpecForEachUrlPatternInAnApiDeclaration()
+        {
+            ApiDeclaration("/swagger/api-docs/Orders", dec =>
+            {
+                // 3: /api/orders, /api/orders?foo={foo}&bar={bar}, /api/orders/{id}
+                Assert.AreEqual(3, dec.apis.Count);
+
+                ApiSpec(dec, "/api/orders", 0, api => Assert.IsNull(api.description));
+                ApiSpec(dec, "/api/orders", 1, api => Assert.IsNull(api.description));
+                ApiSpec(dec, "/api/orders/{id}", 0, api => Assert.IsNull(api.description));
+            });
+
+            ApiDeclaration("/swagger/api-docs/OrderItems", dec =>
+            {
+                // 2: /api/orders/{orderId}/items/{id}, /api/orders/{orderId}/items?category={category}
+                Assert.AreEqual(2, dec.apis.Count);
+
+                ApiSpec(dec, "/api/orders/{orderId}/items/{id}", 0, api => Assert.IsNull(api.description));
+                ApiSpec(dec, "/api/orders/{orderId}/items", 0, api => Assert.IsNull(api.description));
+            });
+
+            ApiDeclaration("/swagger/api-docs/Customers", dec =>
+            {
+                // 2: /api/customers
+                Assert.AreEqual(1, dec.apis.Count);
+
+                ApiSpec(dec, "/api/customers", 0, api => Assert.IsNull(api.description));
+            });
+        }
+
+        [Test]
+        public void ItShouldProvideAnOperationSpecForEachMethodOnAUrlPattern()
+        {
+            ApiSpec("/swagger/api-docs/Orders", "/api/orders", 0, api =>
+                {
+                    // 2: POST /api/orders, GET /api/orders
+                    Assert.AreEqual(2, api.operations.Count);
+
+                    OperationSpec(api, "POST", operation =>
+                        {
+                            Assert.AreEqual("Orders_Post", operation.nickname);
+                            Assert.AreEqual("Documentation for 'Post'.", operation.summary);
+                            Assert.IsNull(operation.notes);
+                            Assert.AreEqual("Order", operation.type);
+                            Assert.IsNull(operation.@enum);
+                            Assert.IsNull(operation.items);
+                        });
+
+                    OperationSpec(api, "GET", operation =>
+                    {
+                        Assert.AreEqual("Orders_GetAll", operation.nickname);
+                        Assert.AreEqual("Documentation for 'GetAll'.", operation.summary);
+                        Assert.IsNull(operation.notes);
+                        Assert.AreEqual("array", operation.type);
+                        Assert.IsNull(operation.@enum);
+                        Assert.IsNotNull(operation.items);
+                        Assert.AreEqual("Order", operation.items["$ref"]);
+                    });
+                });
+
+            ApiSpec("/swagger/api-docs/Orders", "/api/orders", 1, api =>
+                {
+                    // 1: GET /api/orders?foo={foo}&bar={bar}
+                    Assert.AreEqual(1, api.operations.Count);
+
+                    OperationSpec(api, "GET", operation =>
+                    {
+                        Assert.AreEqual("Orders_GetByParams", operation.nickname);
+                        Assert.AreEqual("Documentation for 'GetByParams'.", operation.summary);
+                        Assert.IsNull(operation.notes);
+                        Assert.AreEqual("array", operation.type);
+                        Assert.IsNull(operation.@enum);
+                        Assert.IsNotNull(operation.items);
+                        Assert.AreEqual("Order", operation.items["$ref"]);
+                    });
+                });
+
+            ApiSpec("/swagger/api-docs/Orders", "/api/orders/{id}", 0, api =>
+            {
+                // 1: DELETE /api/orders/{id}
+                Assert.AreEqual(1, api.operations.Count);
+
+                OperationSpec(api, "DELETE", operation =>
+                {
+                    Assert.AreEqual("Orders_Delete", operation.nickname);
+                    Assert.AreEqual("Documentation for 'Delete'.", operation.summary);
+                    Assert.IsNull(operation.notes);
+                    Assert.AreEqual("void", operation.type);
+                    Assert.IsNull(operation.@enum);
+                    Assert.IsNull(operation.items);
+                });
+            });
+
+            ApiSpec("/swagger/api-docs/OrderItems", "/api/orders/{orderId}/items/{id}", 0, api =>
+            {
+                // 1: GET /api/orders/{orderId}/items/{id}
+                Assert.AreEqual(1, api.operations.Count);
+
+                OperationSpec(api, "GET", operation =>
+                {
+                    Assert.AreEqual("OrderItems_GetById", operation.nickname);
+                    Assert.AreEqual("Documentation for 'GetById'.", operation.summary);
+                    Assert.IsNull(operation.notes);
+                    Assert.AreEqual("OrderItem", operation.type);
+                    Assert.IsNull(operation.@enum);
+                    Assert.IsNull(operation.items);
+                });
+            });
+
+            ApiSpec("/swagger/api-docs/OrderItems", "/api/orders/{orderId}/items", 0, api =>
+            {
+                // 1: GET /api/orders/{orderId}/items?category={category}
+                Assert.AreEqual(1, api.operations.Count);
+
+                OperationSpec(api, "GET", operation =>
+                {
+                    Assert.AreEqual("OrderItems_GetAll", operation.nickname);
+                    Assert.AreEqual("Documentation for 'GetAll'.", operation.summary);
+                    Assert.IsNull(operation.notes);
+                    Assert.AreEqual("array", operation.type);
+                    Assert.IsNull(operation.@enum);
+                    Assert.IsNotNull(operation.items);
+                    Assert.AreEqual("OrderItem", operation.items["$ref"]);
+                });
+            });
+
+            ApiSpec("/swagger/api-docs/Customers", "/api/customers", 0, api =>
+            {
+                // 1: GET /api/customers
+                Assert.AreEqual(1, api.operations.Count);
+
+                OperationSpec(api, "GET", operation =>
+                {
+                    Assert.AreEqual("Customers_GetAll", operation.nickname);
+                    Assert.AreEqual("Documentation for 'GetAll'.", operation.summary);
+                    Assert.IsNull(operation.notes);
+                    Assert.IsNull(operation.type);
+                    Assert.IsNull(operation.@enum);
+                    Assert.IsNull(operation.items);
+                });
+            });
+        }
+
+        [Test]
+        public void ItShouldProvideAParameterSpecForEachParameterInAMethod()
+        {
+            OperationSpec("/swagger/api-docs/Orders", "/api/orders", 0, "POST", operation =>
+                {
+                    Assert.AreEqual(1, operation.parameters.Count);
+
+                    ParameterSpec(operation, "order", parameter =>
+                        {
+                            Assert.AreEqual("body", parameter.paramType);
+                            Assert.AreEqual("Documentation for 'order'.", parameter.description);
+                            Assert.AreEqual(true, parameter.required);
+                            Assert.AreEqual("Order", parameter.type);
+                            Assert.IsNull(parameter.@enum);
+                            Assert.IsNull(parameter.items);
+                        });
+                });
+
+            OperationSpec("/swagger/api-docs/Orders", "/api/orders", 0, "GET", operation =>
+                Assert.AreEqual(0, operation.parameters.Count));
+
+            OperationSpec("/swagger/api-docs/Orders", "/api/orders", 1, "GET", operation =>
+                {
+                    Assert.AreEqual(2, operation.parameters.Count);
+
+                    ParameterSpec(operation, "foo", parameter =>
+                    {
+                        Assert.AreEqual("query", parameter.paramType);
+                        Assert.AreEqual("Documentation for 'foo'.", parameter.description);
+                        Assert.AreEqual(true, parameter.required);
+                        Assert.AreEqual("string", parameter.type);
+                        Assert.IsNull(parameter.@enum);
+                        Assert.IsNull(parameter.items);
+                    });
+
+                    ParameterSpec(operation, "bar", parameter =>
+                    {
+                        Assert.AreEqual("query", parameter.paramType);
+                        Assert.AreEqual("Documentation for 'bar'.", parameter.description);
+                        Assert.AreEqual(true, parameter.required);
+                        Assert.AreEqual("string", parameter.type);
+                        Assert.IsNull(parameter.@enum);
+                        Assert.IsNull(parameter.items);
+                    });
+                });
+
+            OperationSpec("/swagger/api-docs/Orders", "/api/orders/{id}", 0, "DELETE", operation =>
+                {
+                    Assert.AreEqual(1, operation.parameters.Count);
+
+                    ParameterSpec(operation, "id", parameter =>
+                    {
+                        Assert.AreEqual("path", parameter.paramType);
+                        Assert.AreEqual("Documentation for 'id'.", parameter.description);
+                        Assert.AreEqual(true, parameter.required);
+                        Assert.AreEqual("integer", parameter.type);
+                        Assert.IsNull(parameter.@enum);
+                        Assert.IsNull(parameter.items);
+                    });
+                });
+
+            OperationSpec("/swagger/api-docs/OrderItems", "/api/orders/{orderId}/items/{id}", 0, "GET", operation =>
+                {
+                    Assert.AreEqual(2, operation.parameters.Count);
+
+                    ParameterSpec(operation, "orderId", parameter =>
+                    {
+                        Assert.AreEqual("path", parameter.paramType);
+                        Assert.AreEqual("Documentation for 'orderId'.", parameter.description);
+                        Assert.AreEqual(true, parameter.required);
+                        Assert.AreEqual("integer", parameter.type);
+                        Assert.IsNull(parameter.@enum);
+                        Assert.IsNull(parameter.items);
+                    });
+
+                    ParameterSpec(operation, "id", parameter =>
+                    {
+                        Assert.AreEqual("path", parameter.paramType);
+                        Assert.AreEqual("Documentation for 'id'.", parameter.description);
+                        Assert.AreEqual(true, parameter.required);
+                        Assert.AreEqual("integer", parameter.type);
+                        Assert.IsNull(parameter.@enum);
+                        Assert.IsNull(parameter.items);
+                    });
+                });
+
+            OperationSpec("/swagger/api-docs/OrderItems", "/api/orders/{orderId}/items", 0, "GET", operation =>
+                {
+                    Assert.AreEqual(2, operation.parameters.Count);
+
+                    ParameterSpec(operation, "orderId", parameter =>
+                    {
+                        Assert.AreEqual("path", parameter.paramType);
+                        Assert.AreEqual("Documentation for 'orderId'.", parameter.description);
+                        Assert.AreEqual(true, parameter.required);
+                        Assert.AreEqual("integer", parameter.type);
+                        Assert.IsNull(parameter.@enum);
+                        Assert.IsNull(parameter.items);
+                    });
+
+                    ParameterSpec(operation, "category", parameter =>
+                    {
+                        Assert.AreEqual("query", parameter.paramType);
+                        Assert.AreEqual("Documentation for 'category'.", parameter.description);
+                        Assert.AreEqual(false, parameter.required);
+                        Assert.AreEqual("string", parameter.type);
+                        Assert.IsNull(parameter.@enum);
+                        Assert.IsNull(parameter.items);
+                    });
+                });
+
+            OperationSpec("/swagger/api-docs/Customers", "/api/customers", 0, "GET", operation =>
+                Assert.AreEqual(0, operation.parameters.Count));
+        }
+
+        [Test]
+        public void ItShouldProvideAModelSpecForComplexTypesInAnApiDeclaration()
+        {
+            ApiDeclaration("/swagger/api-docs/Orders", dec =>
+            {
+                Assert.AreEqual(3, dec.models.Count);
+
+                ModelSpec(dec, "Order", model =>
+                    Assert.AreEqual("Order", model.id));
+
+//                    AssertModelProperty(model, "Id", property =>
+//                        {
+//                            Assert.AreEqual("integer", property.type);
+//                            Assert.AreEqual("int32", property.format);
+//                        }));
+            });
+
+//            ApiDeclaration("/swagger/api-docs/OrderItems", dec =>
+//            {
+//                // 2: /api/orders/{orderId}/items/{id}, /api/orders/{orderId}/items?category={category}
+//                Assert.AreEqual(2, dec.apis.Count);
+//
+//                ApiSpec(dec, "/api/orders/{orderId}/items/{id}", 0, api => Assert.IsNull(api.description));
+//                ApiSpec(dec, "/api/orders/{orderId}/items", 0, api => Assert.IsNull(api.description));
+//            });
+//
+//            ApiDeclaration("/swagger/api-docs/Customers", dec =>
+//            {
+//                // 2: /api/customers
+//                Assert.AreEqual(1, dec.apis.Count);
+//
+//                ApiSpec(dec, "/api/customers", 0, api => Assert.IsNull(api.description));
+//            });
+        }
+
+//        [Test]
+//        public void ItShouldProvideAnOperationSpecForEachOperation()
+//        {
+//            // Within the orders ApiSpec - GET /api/orders, POST /api/orders
+//            Api
+//            Assert.AreEqual(2, ordersSpec.operations.Count);
+//
+//            var getOrdersSpec = ordersSpec.operations.First(op => op.method == "POST");
+//            Assert.AreEqual("Documentation for 'Post'.", getOrdersSpec.summary);
+//            Assert.AreEqual("Order", getOrdersSpec.type);
+//        }
+
 //
 //        [Test]
 //        public void ItShouldProvideApiSpecForEachUrlPattern()
 //        {
-//            // /api/orders
-//            AssertApiSpec("/swagger/api-docs/Orders", "/api/orders", 0, api =>
+            // /api/orders
+            //AssertApiSpec("/swagger/api-docs/Orders", "/api/orders", 0, api => ());
 //                {
 //                    AssertApiOperationSpec(api, "POST", operation =>
 //                        {
@@ -256,52 +581,61 @@ namespace Swashbuckle.Tests
 //            }
 //        }
 
-        private void AssertApiDeclarationLink(ResourceListing resourceListing, string resourcePath)
-        {
-            var links = resourceListing.apis.Where(a => a.path == resourcePath);
-            Assert.AreEqual(1, links.Count());
-        }
-
-        private void AssertApiDeclaration(string resourcePath, Action<ApiDeclaration> applyAssertions)
+        private void ApiDeclaration(string resourcePath, Action<ApiDeclaration> applyAssertions)
         {
             var declaration = _swaggerSpec.GetApiDeclaration(resourcePath);
+
             applyAssertions(declaration);
         }
-//
-//        private void AssertApiSpec(string resourcePath, string apiPath, int apiIndex, Action<ApiSpec> applyAssertions)
-//        {
-//            var declaration = _swaggerSpec.GetApiDeclaration(resourcePath);
-//            var apiSpec = declaration.apis
-//                .Where(a => a.path == apiPath)
-//                .ElementAt(apiIndex);
-//
-//            applyAssertions(apiSpec);
-//        }
-//
-//        private void AssertApiOperationSpec(ApiSpec apiSpec, string httpMethod, Action<ApiOperationSpec> applyAssertions)
-//        {
-//            var operationSpec = apiSpec.operations.Single(op => op.httpMethod == httpMethod);
-//            applyAssertions(operationSpec);
-//        }
-//
-//        private void AssertApiParameterSpec(ApiOperationSpec operationSpec, string paramName, Action<ApiParameterSpec> applyAssertions)
-//        {
-//            var paramSpec = operationSpec.parameters.Single(p => p.name == paramName);
-//            applyAssertions(paramSpec);
-//        }
-//
-//        private void AssertModel(string resourcePath, string modelName, Action<ModelSpec> applyAssertions)
-//        {
-//            var declaration = _swaggerSpec.GetApiDeclaration(resourcePath);
-//            var modelSpec = declaration.models[modelName];
-//            Assert.IsNotNull(modelSpec);
-//            applyAssertions(modelSpec);
-//        }
-//
-//        private void AssertModelProperty(ModelSpec modelSpec, string propertyName, Action<ModelPropertySpec> applyAssertions)
-//        {
-//            var propertySpec = modelSpec.properties[propertyName];
-//            applyAssertions(propertySpec);
-//        }
+
+        private void ApiSpec(ApiDeclaration declaration, string apiPath, int index, Action<ApiSpec> applyAssertions)
+        {
+            var apiSpec = declaration.apis
+                .Where(api => api.path == apiPath)
+                .ElementAt(index);
+
+            applyAssertions(apiSpec);
+        }
+
+        private void ModelSpec(ApiDeclaration declaration, string key, Action<ModelSpec> applyAssertions)
+        {
+            var modelSpec = declaration.models[key];
+
+            applyAssertions(modelSpec);
+        }
+
+        private void ApiSpec(string declarationPath, string apiPath, int index, Action<ApiSpec> applyAssertions)
+        {
+            var apiSpec = _swaggerSpec.GetApiDeclaration(declarationPath).apis
+                .Where(api => api.path == apiPath)
+                .ElementAt(index);
+
+            applyAssertions(apiSpec);
+        }
+
+        private void OperationSpec(ApiSpec api, string httpMethod, Action<OperationSpec> applyAssertions)
+        {
+            var operationSpec = api.operations.Single(op => op.method == httpMethod);
+
+            applyAssertions(operationSpec);
+        }
+
+        private void OperationSpec(string declarationPath, string apiPath, int index, string httpMethod, Action<OperationSpec> applyAssertions)
+        {
+            var apiSpec = _swaggerSpec.GetApiDeclaration(declarationPath).apis
+                .Where(api => api.path == apiPath)
+                .ElementAt(index);
+
+            var operationSpec = apiSpec.operations.Single(op => op.method == httpMethod);
+
+            applyAssertions(operationSpec);
+        }
+
+        private void ParameterSpec(OperationSpec operation, string name, Action<ParameterSpec> applyAssertions)
+        {
+            var parameterSpec = operation.parameters.Single(param => param.name == name);
+
+            applyAssertions(parameterSpec);
+        }
     }
 }

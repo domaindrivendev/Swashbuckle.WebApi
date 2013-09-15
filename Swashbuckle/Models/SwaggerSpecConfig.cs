@@ -16,11 +16,11 @@ namespace Swashbuckle.Models
 
         private SwaggerSpecConfig()
         {
-            PostFilters = new List<IOperationSpecFilter>();
             GroupingStrategy = new ControllerGroupingStrategy();
+            PostFilters = new List<IOperationSpecFilter>();
         }
 
-        internal IApiGroupingStrategy GroupingStrategy { get; private set; }
+        internal IGroupingStrategy GroupingStrategy { get; private set; }
 
         internal ICollection<IOperationSpecFilter> PostFilters { get; private set; }
 
@@ -36,21 +36,21 @@ namespace Swashbuckle.Models
         }
     }
 
-    public interface IApiGroupingStrategy
+    public interface IGroupingStrategy
     {
-        IEnumerable<IGrouping<string, ApiDescription>> Group(IEnumerable<ApiDescription> apiDescriptions);
+        string GetKeyFrom(ApiDescription apiDescription);
     }
 
     public interface IOperationSpecFilter
     {
-        void Apply(ApiDescription apiDescription, ApiOperationSpec operationSpec);
+        void Apply(ApiDescription apiDescription, OperationSpec operationSpec);
     }
 
-    public class ControllerGroupingStrategy : IApiGroupingStrategy
+    public class ControllerGroupingStrategy : IGroupingStrategy
     {
-        public IEnumerable<IGrouping<string, ApiDescription>> Group(IEnumerable<ApiDescription> apiDescriptions)
+        public string GetKeyFrom(ApiDescription apiDescription)
         {
-            return apiDescriptions.GroupBy(ad => ad.ActionDescriptor.ControllerDescriptor.ControllerName);
+            return apiDescription.ActionDescriptor.ControllerDescriptor.ControllerName;
         }
     }
 }

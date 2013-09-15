@@ -14,9 +14,9 @@ namespace Swashbuckle.TestApp.SwaggerFilters
             _reason = reason;
         }
 
-        public void Apply(ApiDescription apiDescription, ApiOperationSpec operationSpec)
+        public void Apply(ApiDescription apiDescription, OperationSpec operationSpec)
         {
-            operationSpec.responseMessages.Add(new ApiResponseMessageSpec {code = _code, message = _reason});
+            operationSpec.responseMessages.Add(new ResponseMessageSpec {code = _code, message = _reason});
         }
     }
 }

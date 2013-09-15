@@ -95,7 +95,7 @@
     <Compile Include="Models\SwaggerSpecConfig.cs" />
     <Compile Include="Models\SwaggerUiConfig.cs" />
     <Compile Include="Controllers\ApiDocsController.cs" />
-    <Compile Include="Models\TypeExtensions.cs" />
+    <Compile Include="Models\JsonSchemaExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Handlers\RedirectRouteHandler.cs" />
     <Compile Include="SwaggerAreaRegistration.cs" />

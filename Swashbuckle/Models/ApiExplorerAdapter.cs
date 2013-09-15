@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
-using System.Text;
+using System.Net.Http;
 using System.Web.Http.Description;
-using Newtonsoft.Json.Linq;
 using Newtonsoft.Json.Schema;
 
 namespace Swashbuckle.Models
@@ -16,20 +14,23 @@ namespace Swashbuckle.Models
         private readonly IEnumerable<IGrouping<string, ApiDescription>> _apiGroups;
         private readonly Func<string> _basePathAccessor;
         private readonly IEnumerable<IOperationSpecFilter> _postFilters;
-        private readonly Lazy<ResourceListing> _resourceListing;
+        private readonly JsonSchemaGenerator _jsonSchemaGenerator;
         private readonly Lazy<Dictionary<string, ApiDeclaration>> _apiDeclarations;
+        private readonly Lazy<ResourceListing> _resourceListing;
 
         public ApiExplorerAdapter(
             IApiExplorer apiExplorer,
-            IApiGroupingStrategy apiGroupingStrategy,
+            IGroupingStrategy groupingStrategy,
             IEnumerable<IOperationSpecFilter> postFilters,
             Func<string> basePathAccessor)
         {
             // Initial grouping - Api Declaration for each group
-            _apiGroups = apiGroupingStrategy.Group(apiExplorer.ApiDescriptions);
+            _apiGroups = apiExplorer.ApiDescriptions.GroupBy(description => "/swagger/api-docs/" + groupingStrategy.GetKeyFrom(description));
 
             _postFilters = postFilters;
             _basePathAccessor = basePathAccessor;
+            _jsonSchemaGenerator = new JsonSchemaGenerator {UndefinedSchemaIdHandling = UndefinedSchemaIdHandling.UseTypeName};
+
             _resourceListing = new Lazy<ResourceListing>(GenerateResourceListing);
             _apiDeclarations = new Lazy<Dictionary<string, ApiDeclaration>>(GenerateApiDeclarations);
         }
@@ -46,11 +47,11 @@ namespace Swashbuckle.Models
 
         private ResourceListing GenerateResourceListing()
         {
-            return new ResourceListing()
+            return new ResourceListing
                 {
                     apiVersion = "1.0",
                     swaggerVersion = SwaggerVersion,
-                    apis = _apiGroups.Select(group => new ApiDeclarationLink { path = group.Key }).ToArray()
+                    apis = _apiGroups.Select(group => new ApiDeclarationLink {path = group.Key}).ToArray()
                 };
         }
 
@@ -62,22 +63,13 @@ namespace Swashbuckle.Models
 
         private ApiDeclaration DescriptionGroupToApiDeclaration(IGrouping<string, ApiDescription> descriptionGroup)
         {
-            // Create JsonSchemas for all types in the ApiDescription
-            var apiTypes = descriptionGroup
-                .SelectMany(ad => ad
-                    .ParameterDescriptions.Select(pd => pd.ParameterDescriptor.ParameterType)
-                    .Union(new[] {ad.ActionDescriptor.ReturnType}))
-                .Where(t => t != null)
-                .Distinct();
+            var modelSpecs = new Dictionary<string, ModelSpec>();
 
-            var schemaGenerator = new JsonSchemaGenerator();
-            var schemas = apiTypes.Select(schemaGenerator.Generate);
-
-//            // Group further by relative path - ApiSpec for each group
-//            var apiSpecs = descriptionGroup
-//                .GroupBy(ad => ad.RelativePath)
-//                .Select(group => DescriptionGroupToApiSpec(group, schemas))
-//                .ToList();
+            // Group further by relative path - ApiSpec for each group
+            var apiSpecs = descriptionGroup
+                .GroupBy(ad => "/" + ad.RelativePath)
+                .Select(group => DescriptionGroupToApiSpec(group, modelSpecs))
+                .ToArray();
 
             return new ApiDeclaration
                 {
@@ -85,31 +77,99 @@ namespace Swashbuckle.Models
                     swaggerVersion = SwaggerVersion,
                     basePath = _basePathAccessor(),
                     resourcePath = descriptionGroup.Key,
-                    //apis = apiSpecs,
-                    //models = modelSpecsBuilder.Build()
+                    apis = apiSpecs,
+                    models = modelSpecs
                 };
         }
 
-        private JObject DescriptionGroupToApiSpec(IGrouping<string, ApiDescription> descriptionGroup, IEnumerable<JsonSchema> jsonSchemas)
+        private ApiSpec DescriptionGroupToApiSpec(IGrouping<string, ApiDescription> descriptionGroup, IDictionary<string, ModelSpec> modelSpecs)
         {
-//            var pathParts = descriptionGroup.Key.Split('?');
-//            var pathOnly = pathParts[0];
-//            var queryString = pathParts.Length == 1 ? String.Empty : pathParts[1];
-            
-//            var operationSpecs = descriptionGroup
-//                .Select(group => DescriptionToOperationSpec(group, jsonSchemas))
-//                .ToList();
+            var operationSpecs = descriptionGroup
+                .Select(group => DescriptionToOperationSpec(group, modelSpecs))
+                .ToArray();
 
-            return JObject.FromObject(new
+            return new ApiSpec
                 {
                     path = descriptionGroup.Key.Split('?').First(),
-                    //operations = operationSpecs
-                });
+                    operations = operationSpecs
+                };
         }
 
-        private JObject DescriptionToOperationSpec(ApiDescription description, IEnumerable<JsonSchema> jsonSchemas)
+        private OperationSpec DescriptionToOperationSpec(ApiDescription description, IDictionary<string, ModelSpec> modelSpecs)
         {
-            throw new NotImplementedException();
+            var apiPath = description.RelativePath.Split('?').First();
+
+            var paramSpecs = description.ParameterDescriptions
+                .Select(pd => ParamDescriptionToParameterSpec(pd, apiPath, modelSpecs))
+                .ToArray();
+
+            var operationSpec = new OperationSpec
+                {
+                    method = description.HttpMethod.Method,
+                    nickname = String.Format("{0}_{1}",
+                        description.ActionDescriptor.ControllerDescriptor.ControllerName,
+                        description.ActionDescriptor.ActionName),
+                    parameters = paramSpecs,
+                    summary = description.Documentation,
+                    responseMessages = new List<ResponseMessageSpec>()
+                };
+
+            var returnType = description.ActionDescriptor.ReturnType;
+            if (returnType == null)
+            {
+                operationSpec.type = "void";
+            }
+            else if (returnType != typeof (HttpResponseMessage))
+            {
+                var jsonSchema = _jsonSchemaGenerator.Generate(returnType);
+                var complexJsonSchemas = _jsonSchemaNormalizer(jsonSchema);
+
+
+                operationSpec.type = modelSpec.type;
+                operationSpec.items = modelSpec.items;
+                operationSpec.@enum = modelSpec.@enum;
+            }
+
+            foreach (var filter in _postFilters)
+            {
+                filter.Apply(description, operationSpec);
+            }
+
+            return operationSpec;
+        }
+
+        private ParameterSpec ParamDescriptionToParameterSpec(
+            ApiParameterDescription parameterDescription,
+            string apiPath,
+            IDictionary<string, ModelSpec> modelSpecs)
+        {
+            var paramType = "";
+            switch (parameterDescription.Source)
+            {
+                case ApiParameterSource.FromBody:
+                    paramType = "body";
+                    break;
+                case ApiParameterSource.FromUri:
+                    paramType = apiPath.Contains(parameterDescription.Name) ? "path" : "query";
+                    break;
+            }
+
+            var schema = _jsonSchemaGenerator.Generate(parameterDescription.ParameterDescriptor.ParameterType);
+            if (schema.Type == JsonSchemaType.Object)
+                jsonSchemas.Add(schema);
+
+            var modelSpec = JsonSchemaToModelSpec(schema);
+
+            return new ParameterSpec
+                {
+                    paramType = paramType,
+                    name = parameterDescription.Name,
+                    description = parameterDescription.Documentation,
+                    required = !parameterDescription.ParameterDescriptor.IsOptional,
+                    type = modelSpec.type,
+                    items = modelSpec.items,
+                    @enum = modelSpec.@enum
+                };
         }
     }
 }

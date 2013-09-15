@@ -11,7 +11,7 @@ namespace Swashbuckle.TestApp.Controllers
             return new OrderItem {LineNo = id, Product = "Test Product 1", Quantity = 2};
         }
 
-        public IEnumerable<OrderItem> GetAll(int orderId, ProductCategory? category)
+        public IEnumerable<OrderItem> GetAll(int orderId, ProductCategory? category = null)
         {
             return new[]
                 {
