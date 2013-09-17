@@ -119,6 +119,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SwaggerFilters\AddErrorCodeFilter.cs" />
     <Compile Include="SwaggerFilters\AddXmlCommentsParsingFilter.cs" />
+    <Compile Include="XmlCommentDocumentationProvider.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="App_Start\WebApiConfig.cs" />
