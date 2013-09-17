@@ -1,5 +1,7 @@
-﻿using System.Web;
+﻿using System;
+using System.Web;
 using System.Web.Routing;
+using Swashbuckle.Models;
 
 namespace Swashbuckle.Handlers
 {
@@ -29,7 +31,14 @@ namespace Swashbuckle.Handlers
 
         public void ProcessRequest(HttpContext context)
         {
-            context.Response.Redirect(_redirectUrl);
+            var baseUrl = SwaggerSpecConfig.Instance.BasePathResolver();
+            if (!baseUrl.EndsWith("/"))
+                baseUrl += "/";
+            var relativeUrl = _redirectUrl;
+            if (relativeUrl.StartsWith("/"))
+                relativeUrl = relativeUrl.Substring(1);
+            
+            context.Response.Redirect(baseUrl + relativeUrl);
         }
 
         public bool IsReusable
