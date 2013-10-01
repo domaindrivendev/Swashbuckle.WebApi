@@ -48,13 +48,13 @@ namespace Swashbuckle.Models
                 }
                 else
                 {
-                    var properties = type.GetProperties(BindingFlags.Instance | BindingFlags.Public);
-                    var propertySpecs = properties
-                        .ToDictionary(pi => pi.Name, pi => pi.PropertyType.ToModelPropertySpec());
-
-                    modelSpecs.Add(dataType, new ModelSpec {id = dataType, properties = propertySpecs});
-
-                    relatedTypes.AddRange(properties.Select(p => p.PropertyType));
+//                    var properties = type.GetProperties(BindingFlags.Instance | BindingFlags.Public);
+//                    var propertySpecs = properties
+//                        .ToDictionary(pi => pi.Name, pi => pi.PropertyType.ToModelPropertySpec());
+//
+//                    modelSpecs.Add(dataType, new ModelSpec {id = dataType, properties = propertySpecs});
+//
+//                    relatedTypes.AddRange(properties.Select(p => p.PropertyType));
                 }
 
                 AddToModelSpecs(relatedTypes, modelSpecs);
