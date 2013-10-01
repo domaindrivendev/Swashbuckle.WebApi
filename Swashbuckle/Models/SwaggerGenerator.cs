@@ -7,7 +7,7 @@ namespace Swashbuckle.Models
 {
     public class SwaggerGenerator
     {
-        protected const string SwaggerVersion = "1.1";
+        protected const string SwaggerVersion = "1.2";
 
         static SwaggerGenerator()
         {
@@ -36,7 +36,7 @@ namespace Swashbuckle.Models
         public SwaggerSpec Generate(IApiExplorer apiExplorer)
         {
             var apiDescriptionGroups = apiExplorer.ApiDescriptions
-                .GroupBy(apiDesc => "/swagger/api-docs/" + _declarationKeySelector(apiDesc))
+                .GroupBy(apiDesc => "/" + _declarationKeySelector(apiDesc))
                 .ToArray();
 
             return new SwaggerSpec
@@ -49,15 +49,14 @@ namespace Swashbuckle.Models
         private ResourceListing GenerateListing(IEnumerable<IGrouping<string, ApiDescription>> apiDescriptionGroups)
         {
             var declarationLinks = apiDescriptionGroups
-                .Select(apiDescGrp => new ApiDeclarationLink { path = apiDescGrp.Key })
+                .Select(apiDescGrp => new ApiDeclarationLink { Path = apiDescGrp.Key })
                 .ToArray();
 
             return new ResourceListing
             {
-                apiVersion = "1.0",
-                swaggerVersion = SwaggerVersion,
-                basePath = _basePathResolver(),
-                apis = declarationLinks
+                ApiVersion = "1.0",
+                SwaggerVersion = SwaggerVersion,
+                Apis = declarationLinks
             };
         }
 
@@ -69,58 +68,53 @@ namespace Swashbuckle.Models
 
         private ApiDeclaration GenerateDeclaration(IGrouping<string, ApiDescription> apiDescriptionGroup)
         {
-            var modelSpecsBuilder = new ModelSpecsBuilder();
-
             // Group further by relative path - each group corresponds to an ApiSpec
             var apiSpecs = apiDescriptionGroup
                 .GroupBy(apiDesc => apiDesc.RelativePath)
-                .Select(apiDescGrp => GenerateApiSpec(apiDescGrp, modelSpecsBuilder))
+                .Select(GenerateApiSpec)
                 .ToList();
 
             return new ApiDeclaration
             {
-                apiVersion = "1.0",
-                swaggerVersion = SwaggerVersion,
-                basePath = _basePathResolver(),
-                resourcePath = apiDescriptionGroup.Key,
-                apis = apiSpecs,
-                models = modelSpecsBuilder.Build()
+                ApiVersion = "1.0",
+                SwaggerVersion = SwaggerVersion,
+                BasePath = _basePathResolver(),
+                ResourcePath = apiDescriptionGroup.Key,
+                Apis = apiSpecs,
+                //Models = modelSpecsBuilder.Build()
             };
         }
 
-        private ApiSpec GenerateApiSpec(IGrouping<string, ApiDescription> apiDescriptionGroup, ModelSpecsBuilder modelSpecsBuilder)
+        private ApiSpec GenerateApiSpec(IGrouping<string, ApiDescription> apiDescriptionGroup)
         {
             var operationSpecs = apiDescriptionGroup
-                .Select(apiDesc => GenerateOperationSpec(apiDesc, modelSpecsBuilder))
+                .Select(GenerateOperationSpec)
                 .ToList();
 
             return new ApiSpec
             {
-                path = "/" + apiDescriptionGroup.Key.Split('?').First(),
-                operations = operationSpecs
+                Path = "/" + apiDescriptionGroup.Key.Split('?').First(),
+                Operations = operationSpecs
             };
         }
 
-        private ApiOperationSpec GenerateOperationSpec(ApiDescription apiDescription, ModelSpecsBuilder modelSpecsBuilder)
+        private OperationSpec GenerateOperationSpec(ApiDescription apiDescription)
         {
-            modelSpecsBuilder.AddType(apiDescription.ActionDescriptor.ReturnType);
-
-
             var apiPath = apiDescription.RelativePath.Split('?').First();
             var paramSpecs = apiDescription.ParameterDescriptions
-                .Select(paramDesc => GenerateParameterSpec(paramDesc, apiPath, modelSpecsBuilder))
+                .Select(paramDesc => GenerateParameterSpec(paramDesc, apiPath))
                 .ToList();
 
-            var operationSpec = new ApiOperationSpec
+            var operationSpec = new OperationSpec
             {
-                httpMethod = apiDescription.HttpMethod.Method,
-                nickname = String.Format("{0}_{1}",
+                Method = apiDescription.HttpMethod.Method,
+                Nickname = String.Format("{0}_{1}",
                     apiDescription.ActionDescriptor.ControllerDescriptor.ControllerName,
                     apiDescription.ActionDescriptor.ActionName),
-                parameters = paramSpecs,
-                responseClass = apiDescription.ActionDescriptor.ReturnType.ToSwaggerType(),
-                summary = apiDescription.Documentation,
-                errorResponses = new List<ApiErrorResponseSpec>()
+                Summary = apiDescription.Documentation,
+                Type = apiDescription.ActionDescriptor.ReturnType.ToSwaggerType(),
+                Parameters = paramSpecs,
+                ResponseMessages = new List<ResponseMessageSpec>()
             };
 
             foreach (var filter in _operationSpecFilters)
@@ -131,10 +125,8 @@ namespace Swashbuckle.Models
             return operationSpec;
         }
 
-        private ApiParameterSpec GenerateParameterSpec(ApiParameterDescription parameterDescription, string apiPath, ModelSpecsBuilder modelSpecsBuilder)
+        private ParameterSpec GenerateParameterSpec(ApiParameterDescription parameterDescription, string apiPath)
         {
-            modelSpecsBuilder.AddType(parameterDescription.ParameterDescriptor.ParameterType);
-
             var paramType = "";
             switch (parameterDescription.Source)
             {
@@ -146,14 +138,13 @@ namespace Swashbuckle.Models
                     break;
             }
 
-            return new ApiParameterSpec
+            return new ParameterSpec
             {
-                paramType = paramType,
-                name = parameterDescription.Name,
-                description = parameterDescription.Documentation,
-                dataType = parameterDescription.ParameterDescriptor.ParameterType.ToSwaggerType(),
-                required = !parameterDescription.ParameterDescriptor.IsOptional,
-                allowableValues = parameterDescription.ParameterDescriptor.ParameterType.AllowableValues()
+                ParamType = paramType,
+                Name = parameterDescription.Name,
+                Description = parameterDescription.Documentation,
+                Required = !parameterDescription.ParameterDescriptor.IsOptional,
+                Type = parameterDescription.ParameterDescriptor.ParameterType.ToSwaggerType(),
             };
         }
     }

@@ -7,7 +7,7 @@ namespace Swashbuckle.Models
 {
     public interface IOperationSpecFilter
     {
-        void Apply(ApiDescription apiDescription, ApiOperationSpec operationSpec);
+        void Apply(ApiDescription apiDescription, OperationSpec operationSpec);
     }
 
     public class SwaggerSpecConfig

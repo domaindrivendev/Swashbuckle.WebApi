@@ -96,30 +96,30 @@ namespace Swashbuckle.Models
             return false;
         }
 
-        internal static AllowableValuesSpec AllowableValues(this Type type)
-        {
-            Type innerType;
-            if (type.IsNullableType(out innerType))
-                return innerType.AllowableValues();
-
-            if (!type.IsEnum)
-                return null;
-
-            return new EnumeratedValuesSpec
-                {
-                    values = type.GetEnumNames()
-                };
-        }
-
-        internal static ModelPropertySpec ToModelPropertySpec(this Type type)
-        {
-            return new ModelPropertySpec
-                {
-                    type = type.ToSwaggerType(),
-                    required = true,
-                    allowableValues = type.AllowableValues()
-                };
-        }
+//        internal static AllowableValuesSpec AllowableValues(this Type type)
+//        {
+//            Type innerType;
+//            if (type.IsNullableType(out innerType))
+//                return innerType.AllowableValues();
+//
+//            if (!type.IsEnum)
+//                return null;
+//
+//            return new EnumeratedValuesSpec
+//                {
+//                    values = type.GetEnumNames()
+//                };
+//        }
+//
+//        internal static ModelPropertySpec ToModelPropertySpec(this Type type)
+//        {
+//            return new ModelPropertySpec
+//                {
+//                    type = type.ToSwaggerType(),
+//                    required = true,
+//                    allowableValues = type.AllowableValues()
+//                };
+//        }
 
         private static Type AsGenericType(this Type type, Type genericType)
         {
