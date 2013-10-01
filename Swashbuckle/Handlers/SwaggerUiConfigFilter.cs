@@ -33,9 +33,11 @@ namespace Swashbuckle.Handlers
                 .Replace("%(ApiKeyName)", String.Format("\"{0}\"", _swaggerUiConfig.ApiKeyName))
                 .Replace("%(ApiKey)", String.Format("\"{0}\"", _swaggerUiConfig.ApiKey))
                 .Replace("%(SupportHeaderParams)", _swaggerUiConfig.SupportHeaderParams.ToString().ToLower())
-                .Replace("%(SupportedSubmitMethods)", String.Format("[{0}]", _swaggerUiConfig.SupportedSubmitMethods.ToCommaList()))
+                .Replace("%(SupportedSubmitMethods)",
+                         String.Format("[{0}]", _swaggerUiConfig.SupportedSubmitMethods.ToCommaList()))
                 .Replace("%(DocExpansion)", String.Format("\"{0}\"", _swaggerUiConfig.DocExpansion.ToString().ToLower()))
-                .Replace("%(OnCompleteScript)", _swaggerUiConfig.OnCompleteScripts.ToScriptIncludes());
+                .Replace("%(OnCompleteScript)", _swaggerUiConfig.OnCompleteScripts.ToScriptIncludes())
+                .Replace("%(EmbeddedStylesheet)", _swaggerUiConfig.EmbeddedStylesheets.ToStylesheetIncludes());
 
             _ouputStream.Write(Encoding.UTF8.GetBytes(filteredText), offset, Encoding.UTF8.GetByteCount(filteredText));
         }
@@ -48,12 +50,22 @@ namespace Swashbuckle.Handlers
             return String.Join(",", submitMethods.Select(m => String.Format("'{0}'", m.Method.ToLower())));
         }
 
-        public static string ToScriptIncludes(this IEnumerable<EmbeddedScriptDescriptor> scriptDescriptors)
+        public static string ToScriptIncludes(this IEnumerable<EmbeddedElementDescriptor> scriptDescriptors)
+        {
+            return FormatIncludes("$.getScript('{0}');\r\n", scriptDescriptors);
+        }
+
+        public static string ToStylesheetIncludes(this IEnumerable<EmbeddedElementDescriptor> stylesheetDescriptors)
+        {
+            return FormatIncludes("<link href='{0}' rel='stylesheet' type='text/css'/>\r\n", stylesheetDescriptors);
+        }
+
+        private static string FormatIncludes(string format, IEnumerable<EmbeddedElementDescriptor> elementDescriptors)
         {
             var includesBuilder = new StringBuilder();
-            foreach (var descriptor in scriptDescriptors)
+            foreach (var descriptor in elementDescriptors)
             {
-                includesBuilder.AppendFormat("$.getScript('{0}');\r\n", descriptor.RelativePath);
+                includesBuilder.AppendFormat(format, descriptor.RelativePath);
             }
             return includesBuilder.ToString();
         }

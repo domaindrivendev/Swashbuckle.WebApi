@@ -22,6 +22,7 @@ namespace Swashbuckle.TestApp.App_Start
                     c.DocExpansion = DocExpansion.Full;
                     c.SupportedSubmitMethods = new[] {HttpMethod.Get, HttpMethod.Post, HttpMethod.Put, HttpMethod.Head};
                     c.AddOnCompleteScript(typeof (SwaggerConfig).Assembly, "Swashbuckle.TestApp.swagger_ui.ext.onComplete.js");
+                    c.AddStylesheet(typeof(SwaggerConfig).Assembly, "Swashbuckle.TestApp.swagger_ui.ext.embeddedStylesheet.css");
                 });
         }
     }

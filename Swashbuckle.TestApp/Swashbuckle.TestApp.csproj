@@ -125,6 +125,7 @@
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Content Include="Global.asax" />
     <EmbeddedResource Include="swagger-ui\ext\onComplete.js" />
+    <EmbeddedResource Include="swagger-ui\ext\embeddedStylesheet.css" />
     <Content Include="Web.config" />
     <Content Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
