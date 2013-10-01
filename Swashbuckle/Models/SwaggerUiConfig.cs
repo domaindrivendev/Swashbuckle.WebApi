@@ -23,8 +23,8 @@ namespace Swashbuckle.Models
             SupportHeaderParams = false;
             SupportedSubmitMethods = new[] {HttpMethod.Get, HttpMethod.Post, HttpMethod.Put};
             DocExpansion = DocExpansion.None;
-            OnCompleteScripts = new List<EmbeddedElementDescriptor>();
-            EmbeddedStylesheets = new List<EmbeddedElementDescriptor>();
+            OnCompleteScripts = new List<InjectedResourceDescriptor>();
+            CustomStylesheets = new List<InjectedResourceDescriptor>();
         }
 
         public string ApiKeyName { get; set; }
@@ -32,8 +32,8 @@ namespace Swashbuckle.Models
         public bool SupportHeaderParams { get; set; }
         public IEnumerable<HttpMethod> SupportedSubmitMethods { get; set; }
         public DocExpansion DocExpansion { get; set; }
-        internal IList<EmbeddedElementDescriptor> OnCompleteScripts { get; private set; }
-        internal IList<EmbeddedElementDescriptor> EmbeddedStylesheets { get; private set; }
+        internal IList<InjectedResourceDescriptor> OnCompleteScripts { get; private set; }
+        internal IList<InjectedResourceDescriptor> CustomStylesheets { get; private set; }
 
         public static void Customize(Action<SwaggerUiConfig> customize)
         {
@@ -42,21 +42,17 @@ namespace Swashbuckle.Models
 
         public void AddOnCompleteScript(Assembly resourceAssembly, string resourceName)
         {
-            OnCompleteScripts.AddEmbeddedElement(resourceAssembly, resourceName);
+            OnCompleteScripts.Add(new InjectedResourceDescriptor
+                {
+                    RelativePath = String.Format("ext/{0}", resourceName),
+                    ResourceAssembly = resourceAssembly,
+                    ResourceName = resourceName,
+                });
         }
 
         public void AddStylesheet(Assembly resourceAssembly, string resourceName)
         {
-            EmbeddedStylesheets.AddEmbeddedElement(resourceAssembly, resourceName);
-        }
-    }
-
-    internal static class Extensions
-    {
-        public static void AddEmbeddedElement(this IList<EmbeddedElementDescriptor> targetCollection,
-                                        Assembly resourceAssembly, string resourceName)
-        {
-            targetCollection.Add(new EmbeddedElementDescriptor
+            CustomStylesheets.Add(new InjectedResourceDescriptor
             {
                 RelativePath = String.Format("ext/{0}", resourceName),
                 ResourceAssembly = resourceAssembly,
@@ -65,7 +61,7 @@ namespace Swashbuckle.Models
         }
     }
 
-    internal class EmbeddedElementDescriptor
+    internal class InjectedResourceDescriptor
     {
         public string RelativePath { get; set; }
 

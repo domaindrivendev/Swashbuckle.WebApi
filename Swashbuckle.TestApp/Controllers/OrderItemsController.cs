@@ -25,7 +25,7 @@ namespace Swashbuckle.TestApp.Controllers
         /// <response code="200">OK</response>
         /// <response code="401">Unauthorized</response>
         /// <returns></returns>
-        public IEnumerable<OrderItem> GetAll(int orderId, ProductCategory? category)
+        public IEnumerable<OrderItem> GetAll(int orderId, ProductCategory? category = null)
         {
             return new[]
                 {

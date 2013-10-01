@@ -2,11 +2,11 @@
 
 namespace Swashbuckle.Models
 {
-    public interface ISwaggerSpec
+    public class SwaggerSpec
     {
-        ResourceListing GetResourceListing();
+        public ResourceListing Listing { get; set; }
 
-        ApiDeclaration GetApiDeclaration(string resourcePath);
+        public Dictionary<string, ApiDeclaration> Declarations { get; set; } 
     }
 
     public class ResourceListing

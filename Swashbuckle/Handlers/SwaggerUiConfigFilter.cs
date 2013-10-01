@@ -37,7 +37,7 @@ namespace Swashbuckle.Handlers
                          String.Format("[{0}]", _swaggerUiConfig.SupportedSubmitMethods.ToCommaList()))
                 .Replace("%(DocExpansion)", String.Format("\"{0}\"", _swaggerUiConfig.DocExpansion.ToString().ToLower()))
                 .Replace("%(OnCompleteScript)", _swaggerUiConfig.OnCompleteScripts.ToScriptIncludes())
-                .Replace("%(EmbeddedStylesheet)", _swaggerUiConfig.EmbeddedStylesheets.ToStylesheetIncludes());
+                .Replace("%(EmbeddedStylesheet)", _swaggerUiConfig.CustomStylesheets.ToStylesheetIncludes());
 
             _ouputStream.Write(Encoding.UTF8.GetBytes(filteredText), offset, Encoding.UTF8.GetByteCount(filteredText));
         }
@@ -50,17 +50,17 @@ namespace Swashbuckle.Handlers
             return String.Join(",", submitMethods.Select(m => String.Format("'{0}'", m.Method.ToLower())));
         }
 
-        public static string ToScriptIncludes(this IEnumerable<EmbeddedElementDescriptor> scriptDescriptors)
+        public static string ToScriptIncludes(this IEnumerable<InjectedResourceDescriptor> scriptDescriptors)
         {
             return FormatIncludes("$.getScript('{0}');\r\n", scriptDescriptors);
         }
 
-        public static string ToStylesheetIncludes(this IEnumerable<EmbeddedElementDescriptor> stylesheetDescriptors)
+        public static string ToStylesheetIncludes(this IEnumerable<InjectedResourceDescriptor> stylesheetDescriptors)
         {
             return FormatIncludes("<link href='{0}' rel='stylesheet' type='text/css'/>\r\n", stylesheetDescriptors);
         }
 
-        private static string FormatIncludes(string format, IEnumerable<EmbeddedElementDescriptor> elementDescriptors)
+        private static string FormatIncludes(string format, IEnumerable<InjectedResourceDescriptor> elementDescriptors)
         {
             var includesBuilder = new StringBuilder();
             foreach (var descriptor in elementDescriptors)

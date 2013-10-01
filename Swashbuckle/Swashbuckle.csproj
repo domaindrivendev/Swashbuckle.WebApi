@@ -89,10 +89,7 @@
   <ItemGroup>
     <Compile Include="Handlers\EmbeddedResourceHttpHandler.cs" />
     <Compile Include="Handlers\SwaggerUiConfigFilter.cs" />
-    <Compile Include="Models\ApiExplorerAdapter.cs" />
-    <Compile Include="Models\ISwaggerSpec.cs" />
     <Compile Include="Models\ModelSpecsBuilder.cs" />
-    <Compile Include="Models\SwaggerSpecFactory.cs" />
     <Compile Include="Models\SwaggerSpecConfig.cs" />
     <Compile Include="Models\SwaggerUiConfig.cs" />
     <Compile Include="Controllers\ApiDocsController.cs" />
@@ -101,6 +98,8 @@
     <Compile Include="Handlers\RedirectRouteHandler.cs" />
     <Compile Include="SwaggerAreaRegistration.cs" />
     <Compile Include="Handlers\SwaggerUiRouteHandler.cs" />
+    <Compile Include="Models\SwaggerGenerator.cs" />
+    <Compile Include="Models\SwaggerSpec.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="packages.config" />

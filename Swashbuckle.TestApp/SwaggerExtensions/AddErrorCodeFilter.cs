@@ -1,7 +1,7 @@
 ﻿using System.Web.Http.Description;
 using Swashbuckle.Models;
 
-namespace Swashbuckle.TestApp.SwaggerFilters
+namespace Swashbuckle.TestApp.SwaggerExtensions
 {
     public class AddErrorCodeFilter : IOperationSpecFilter
     {

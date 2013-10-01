@@ -25,13 +25,15 @@ namespace Swashbuckle.Tests
                     c.DocExpansion = DocExpansion.Full;
                     c.AddOnCompleteScript(GetType().Assembly, "Swashbuckle.Tests.Support.testScript1.js");
                     c.AddOnCompleteScript(GetType().Assembly, "Swashbuckle.Tests.Support.testScript2.js");
+                    c.AddStylesheet(GetType().Assembly, "Swashbuckle.Tests.Support.testStyles1.css");
+                    c.AddStylesheet(GetType().Assembly, "Swashbuckle.Tests.Support.testStyles2.css");
                 });
 
             _routeHandler = new SwaggerUiRouteHandler();
         }
 
         [Test]
-        public void ItShouldCustomizeTheSwaggerUiIndex()
+        public void It_should_customize_the_swagger_ui_index()
         {
             var responseText = ExecuteRequest("index.html");
 
@@ -41,18 +43,33 @@ namespace Swashbuckle.Tests
             Assert.IsTrue(responseText.Contains("supportedSubmitMethods: ['get','post','put','head']"), "supportedSubmitMethods not customized");
             Assert.IsTrue(responseText.Contains("docExpansion: \"full\""), "docExpansion not customized");
             Assert.IsTrue(responseText.Contains(
-                "$.getScript('ext/Swashbuckle.Tests.Support.testScript1.js');\r\n$.getScript('ext/Swashbuckle.Tests.Support.testScript2.js');"),
-                "onComplete not customized");
+                "$.getScript('ext/Swashbuckle.Tests.Support.testScript1.js');\r\n" +
+                "$.getScript('ext/Swashbuckle.Tests.Support.testScript2.js');"),
+                "OnCompleteScripts not included");
+            Assert.IsTrue(responseText.Contains(
+                "<link href='ext/Swashbuckle.Tests.Support.testStyles1.css' rel='stylesheet' type='text/css'/>\r\n" +
+                "<link href='ext/Swashbuckle.Tests.Support.testStyles2.css' rel='stylesheet' type='text/css'/>"),
+                "Stylesheets not included");
         }
 
         [Test]
-        public void ItShouldServeOnCompleteScripts()
+        public void It_should_serve_on_complete_scripts()
         {
             var responseText = ExecuteRequest("ext/Swashbuckle.Tests.Support.testScript1.js");
             Assert.IsTrue(responseText.StartsWith("var testVal = '1';"));
 
             responseText = ExecuteRequest("ext/Swashbuckle.Tests.Support.testScript2.js");
             Assert.IsTrue(responseText.StartsWith("var testVal = '2';"));
+        }
+
+        [Test]
+        public void It_should_serve_custom_stylesheets()
+        {
+            var responseText = ExecuteRequest("ext/Swashbuckle.Tests.Support.testStyles1.css");
+            Assert.IsTrue(responseText.StartsWith("body {"));
+
+            responseText = ExecuteRequest("ext/Swashbuckle.Tests.Support.testStyles2.css");
+            Assert.IsTrue(responseText.StartsWith("h1 {"));
         }
 
         private string ExecuteRequest(string routePath)

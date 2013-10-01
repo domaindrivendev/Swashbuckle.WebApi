@@ -21,22 +21,20 @@ namespace Swashbuckle.Models
 
         private SwaggerSpecConfig()
         {
-            PostFilters = new List<IOperationSpecFilter>();
+            DeclarationKeySelector = DefaultDeclarationKeySelector;
             BasePathResolver = DefaultBasePathResolver;
+            OperationSpecFilters = new List<IOperationSpecFilter>();
         }
 
-        internal ICollection<IOperationSpecFilter> PostFilters { get; private set; }
-        internal Func<string> BasePathResolver { get; private set; } 
+        internal Func<ApiDescription, string> DeclarationKeySelector { get; set; }
+        internal Func<string> BasePathResolver { get; private set; }
+        internal ICollection<IOperationSpecFilter> OperationSpecFilters { get; private set; }
 
-        public void PostFilter(IOperationSpecFilter operationSpecFilter)
+        public void GroupDeclarationsBy(Func<ApiDescription, string> declarationKeySelector)
         {
-            PostFilters.Add(operationSpecFilter);
-        }
-
-        public void PostFilter<TFilter>()
-            where TFilter : IOperationSpecFilter, new()
-        {
-            PostFilters.Add(new TFilter());
+            if (declarationKeySelector == null)
+                throw new ArgumentNullException("declarationKeySelector");
+            DeclarationKeySelector = declarationKeySelector;
         }
 
         public void ResolveBasePath(Func<string> resolver)
@@ -44,6 +42,22 @@ namespace Swashbuckle.Models
             if(resolver == null)
                 throw new ArgumentNullException("resolver");
             BasePathResolver = resolver;
+        }
+
+        public void PostFilter(IOperationSpecFilter operationSpecFilter)
+        {
+            OperationSpecFilters.Add(operationSpecFilter);
+        }
+
+        public void PostFilter<TFilter>()
+            where TFilter : IOperationSpecFilter, new()
+        {
+            OperationSpecFilters.Add(new TFilter());
+        }
+
+        private string DefaultDeclarationKeySelector(ApiDescription apiDescription)
+        {
+            return apiDescription.ActionDescriptor.ControllerDescriptor.ControllerName;
         }
 
         private string DefaultBasePathResolver()

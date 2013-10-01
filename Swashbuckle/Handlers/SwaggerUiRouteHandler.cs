@@ -12,13 +12,15 @@ namespace Swashbuckle.Handlers
             var swaggerUiConfig = SwaggerUiConfig.Instance;
 
             var routePath = requestContext.RouteData.Values["path"].ToString();
-            var includes =
-                swaggerUiConfig.EmbeddedStylesheets.Union(swaggerUiConfig.OnCompleteScripts)
-                               .FirstOrDefault(e => e.RelativePath == routePath);
+            var resourceAssembly = GetType().Assembly;
+            var resourceName = routePath;
 
-
-            var resourceAssembly = includes != null ? includes.ResourceAssembly : GetType().Assembly;
-            var resourceName = includes != null ? includes.ResourceName : routePath;
+            InjectedResourceDescriptor injectedResourceDescriptor;
+            if (RequestIsForInjectedResource(routePath, swaggerUiConfig, out injectedResourceDescriptor))
+            {
+                resourceAssembly = injectedResourceDescriptor.ResourceAssembly;
+                resourceName = injectedResourceDescriptor.ResourceName;
+            }
 
             if (resourceName == "index.html")
             {
@@ -27,6 +29,15 @@ namespace Swashbuckle.Handlers
             }
 
             return new EmbeddedResourceHttpHandler(resourceAssembly, r => resourceName);
+        }
+
+        private bool RequestIsForInjectedResource(string routePath, SwaggerUiConfig swaggerUiConfig, out InjectedResourceDescriptor injectedResourceDescriptor)
+        {
+            injectedResourceDescriptor = swaggerUiConfig.OnCompleteScripts
+                .Union(swaggerUiConfig.CustomStylesheets)
+                .FirstOrDefault(desc => desc.RelativePath == routePath);
+
+            return injectedResourceDescriptor != null;
         }
     }
 }

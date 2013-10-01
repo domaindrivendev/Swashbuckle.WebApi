@@ -4,7 +4,7 @@ using System.Xml;
 using System.Xml.Linq;
 using Swashbuckle.Models;
 
-namespace Swashbuckle.TestApp.SwaggerFilters
+namespace Swashbuckle.TestApp.SwaggerExtensions
 {
     public class AddXmlCommentsParsingFilter : IOperationSpecFilter
     {

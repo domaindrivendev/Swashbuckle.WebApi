@@ -58,7 +58,7 @@
   <ItemGroup>
     <Compile Include="Support\FakeHttpContext.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ApiExplorerAdapterTests.cs" />
+    <Compile Include="SwaggerGeneratorTests.cs" />
     <Compile Include="SwaggerUiRouteHandlerTests.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -79,6 +79,10 @@
       <Project>{d08956c3-4831-4623-93fd-cb256953bca1}</Project>
       <Name>Swashbuckle</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Support\testStyles2.css" />
+    <EmbeddedResource Include="Support\testStyles1.css" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\nuget.targets" />
