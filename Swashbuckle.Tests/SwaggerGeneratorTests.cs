@@ -118,6 +118,9 @@ namespace Swashbuckle.Tests
                             Assert.AreEqual("Documentation for 'Post'.", operation.Summary);
                             Assert.IsNull(operation.Notes);
                             Assert.AreEqual("Order", operation.Type);
+                            Assert.IsNull(operation.Format);
+                            Assert.IsNull(operation.Items);
+                            Assert.IsNull(operation.Enum);
                         });
 
                     OperationSpec(api, "GET", operation =>
@@ -125,7 +128,10 @@ namespace Swashbuckle.Tests
                             Assert.AreEqual("Orders_GetAll", operation.Nickname);
                             Assert.AreEqual("Documentation for 'GetAll'.", operation.Summary);
                             Assert.IsNull(operation.Notes);
-                            Assert.AreEqual("List[Order]", operation.Type);
+                            Assert.AreEqual("array", operation.Type);
+                            Assert.AreEqual("Order", operation.Items.Ref);
+                            Assert.IsNull(operation.Format);
+                            Assert.IsNull(operation.Enum);
                         });
                 });
 
@@ -139,7 +145,10 @@ namespace Swashbuckle.Tests
                             Assert.AreEqual("Orders_GetByParams", operation.Nickname);
                             Assert.AreEqual("Documentation for 'GetByParams'.", operation.Summary);
                             Assert.IsNull(operation.Notes);
-                            Assert.AreEqual("List[Order]", operation.Type);
+                            Assert.AreEqual("array", operation.Type);
+                            Assert.AreEqual("Order", operation.Items.Ref);
+                            Assert.IsNull(operation.Format);
+                            Assert.IsNull(operation.Enum);
                         });
                 });
 
@@ -154,6 +163,9 @@ namespace Swashbuckle.Tests
                             Assert.AreEqual("Documentation for 'Delete'.", operation.Summary);
                             Assert.IsNull(operation.Notes);
                             Assert.AreEqual("void", operation.Type);
+                            Assert.IsNull(operation.Items);
+                            Assert.IsNull(operation.Format);
+                            Assert.IsNull(operation.Enum);
                         });
                 });
 
@@ -168,6 +180,9 @@ namespace Swashbuckle.Tests
                             Assert.AreEqual("Documentation for 'GetById'.", operation.Summary);
                             Assert.IsNull(operation.Notes);
                             Assert.AreEqual("OrderItem", operation.Type);
+                            Assert.IsNull(operation.Format);
+                            Assert.IsNull(operation.Items);
+                            Assert.IsNull(operation.Enum);
                         });
                 });
 
@@ -181,7 +196,10 @@ namespace Swashbuckle.Tests
                             Assert.AreEqual("OrderItems_GetAll", operation.Nickname);
                             Assert.AreEqual("Documentation for 'GetAll'.", operation.Summary);
                             Assert.IsNull(operation.Notes);
-                            Assert.AreEqual("List[OrderItem]", operation.Type);
+                            Assert.AreEqual("array", operation.Type);
+                            Assert.AreEqual("OrderItem", operation.Items.Ref);
+                            Assert.IsNull(operation.Format);
+                            Assert.IsNull(operation.Enum);
                         });
                 });
 
@@ -196,6 +214,9 @@ namespace Swashbuckle.Tests
                             Assert.AreEqual("Documentation for 'GetAll'.", operation.Summary);
                             Assert.IsNull(operation.Notes);
                             Assert.IsNull(operation.Type);
+                            Assert.IsNull(operation.Format);
+                            Assert.IsNull(operation.Items);
+                            Assert.IsNull(operation.Enum);
                         });
                 });
         }
@@ -213,6 +234,9 @@ namespace Swashbuckle.Tests
                             Assert.AreEqual("Documentation for 'order'.", parameter.Description);
                             Assert.AreEqual(true, parameter.Required);
                             Assert.AreEqual("Order", parameter.Type);
+                            Assert.IsNull(parameter.Format);
+                            Assert.IsNull(parameter.Items);
+                            Assert.IsNull(parameter.Enum);
                         });
                 });
 
@@ -229,6 +253,9 @@ namespace Swashbuckle.Tests
                             Assert.AreEqual("Documentation for 'foo'.", parameter.Description);
                             Assert.AreEqual(true, parameter.Required);
                             Assert.AreEqual("string", parameter.Type);
+                            Assert.IsNull(parameter.Format);
+                            Assert.IsNull(parameter.Items);
+                            Assert.IsNull(parameter.Enum);
                         });
 
                     ParameterSpec(operation, "bar", parameter =>
@@ -237,6 +264,9 @@ namespace Swashbuckle.Tests
                             Assert.AreEqual("Documentation for 'bar'.", parameter.Description);
                             Assert.AreEqual(true, parameter.Required);
                             Assert.AreEqual("string", parameter.Type);
+                            Assert.IsNull(parameter.Format);
+                            Assert.IsNull(parameter.Items);
+                            Assert.IsNull(parameter.Enum);
                         });
                 });
 
@@ -249,7 +279,10 @@ namespace Swashbuckle.Tests
                             Assert.AreEqual("path", parameter.ParamType);
                             Assert.AreEqual("Documentation for 'id'.", parameter.Description);
                             Assert.AreEqual(true, parameter.Required);
-                            Assert.AreEqual("int", parameter.Type);
+                            Assert.AreEqual("integer", parameter.Type);
+                            Assert.AreEqual("int32", parameter.Format);
+                            Assert.IsNull(parameter.Items);
+                            Assert.IsNull(parameter.Enum);
                         });
                 });
 
@@ -262,7 +295,10 @@ namespace Swashbuckle.Tests
                             Assert.AreEqual("path", parameter.ParamType);
                             Assert.AreEqual("Documentation for 'orderId'.", parameter.Description);
                             Assert.AreEqual(true, parameter.Required);
-                            Assert.AreEqual("int", parameter.Type);
+                            Assert.AreEqual("integer", parameter.Type);
+                            Assert.AreEqual("int32", parameter.Format);
+                            Assert.IsNull(parameter.Items);
+                            Assert.IsNull(parameter.Enum);
                         });
 
                     ParameterSpec(operation, "id", parameter =>
@@ -270,7 +306,10 @@ namespace Swashbuckle.Tests
                             Assert.AreEqual("path", parameter.ParamType);
                             Assert.AreEqual("Documentation for 'id'.", parameter.Description);
                             Assert.AreEqual(true, parameter.Required);
-                            Assert.AreEqual("int", parameter.Type);
+                            Assert.AreEqual("integer", parameter.Type);
+                            Assert.AreEqual("int32", parameter.Format);
+                            Assert.IsNull(parameter.Items);
+                            Assert.IsNull(parameter.Enum);
                         });
                 });
 
@@ -283,7 +322,10 @@ namespace Swashbuckle.Tests
                             Assert.AreEqual("path", parameter.ParamType);
                             Assert.AreEqual("Documentation for 'orderId'.", parameter.Description);
                             Assert.AreEqual(true, parameter.Required);
-                            Assert.AreEqual("int", parameter.Type);
+                            Assert.AreEqual("integer", parameter.Type);
+                            Assert.AreEqual("int32", parameter.Format);
+                            Assert.IsNull(parameter.Items);
+                            Assert.IsNull(parameter.Enum);
                         });
 
                     ParameterSpec(operation, "category", parameter =>
@@ -292,6 +334,10 @@ namespace Swashbuckle.Tests
                             Assert.AreEqual("Documentation for 'category'.", parameter.Description);
                             Assert.AreEqual(false, parameter.Required);
                             Assert.AreEqual("string", parameter.Type);
+                            Assert.IsNotNull(parameter.Enum);
+                            Assert.IsTrue(parameter.Enum.SequenceEqual(new[] {"Category1", "Category2", "Category3"}));
+                            Assert.IsNull(parameter.Format);
+                            Assert.IsNull(parameter.Items);
                         });
                 });
 
@@ -299,76 +345,84 @@ namespace Swashbuckle.Tests
                 Assert.AreEqual(0, operation.Parameters.Count));
         }
 
-//        [Test]
-//        public void It_should_generate_a_model_spec_for_all_complex_types_in_a_declaration()
-//        {
-//            ApiDeclaration("/Orders", dec =>
-//            {
-//                // 1: Order
-//                Assert.AreEqual(1, dec.Models.Count);
-//
-//                Model(dec, "Order", model =>
-//                    {
-//                        ModelProperty(model, "Id", property =>
-//                            {
-//                                Assert.AreEqual("int", property.type);
-//                                Assert.AreEqual(true, property.required);
-//                            });
-//                        ModelProperty(model, "Description", property =>
-//                            {
-//                                Assert.AreEqual("string", property.type);
-//                                Assert.AreEqual(true, property.required);
-//                            });
-//                        ModelProperty(model, "Total", property =>
-//                            {
-//                                Assert.AreEqual("double", property.type);
-//                                Assert.AreEqual(true, property.required);
-//                            });
-//                    });
-//            });
-//
-//            ApiDeclaration("/OrderItems", dec =>
-//                {
-//                    // 1: OrderItem
-//                    Assert.AreEqual(1, dec.Models.Count);
-//
-//                    Model(dec, "OrderItem", model =>
-//                        {
-//                            ModelProperty(model, "LineNo", property =>
-//                            {
-//                                Assert.AreEqual("int", property.type);
-//                                Assert.AreEqual(true, property.required);
-//                            });
-//                            
-//                            ModelProperty(model, "Product", property =>
-//                            {
-//                                Assert.AreEqual("string", property.type);
-//                                Assert.AreEqual(true, property.required);
-//                            });
-//                            
-//                            ModelProperty(model, "Category", property =>
-//                            {
-//                                Assert.AreEqual("string", property.type);
-//                                Assert.AreEqual(true, property.required);
-//                                Assert.AreEqual("LIST", property.allowableValues.valueType);
-//                            
-//                                Assert.IsInstanceOf<EnumeratedValuesSpec>(property.allowableValues);
-//                                var values = (property.allowableValues as EnumeratedValuesSpec).values.ToArray();
-//                                Assert.AreEqual("Category1", values[0]);
-//                                Assert.AreEqual("Category2", values[1]);
-//                                Assert.AreEqual("Category3", values[2]);
-//                            });
-//                            
-//                            ModelProperty(model, "Quantity", property =>
-//                            {
-//                                Assert.AreEqual("int", property.type);
-//                                Assert.AreEqual(true, property.required);
-//                            });
-//                        });
-//                });
-//
-//            ApiDeclaration("/Customers", dec => Assert.AreEqual(0, dec.Models.Count));
-//        }
+        [Test]
+        public void It_should_generate_a_model_spec_for_all_complex_types_in_a_declaration()
+        {
+            ApiDeclaration("/Orders", dec =>
+            {
+                // 1: Order
+                Assert.AreEqual(1, dec.Models.Count);
+
+                Model(dec, "Order", model =>
+                    {
+                        ModelProperty(model, "Id", property =>
+                            {
+                                Assert.AreEqual("integer", property.Type);
+                                Assert.AreEqual("int32", property.Format);
+                                Assert.IsNull(property.Items);
+                                Assert.IsNull(property.Enum);
+                            });
+                        ModelProperty(model, "Description", property =>
+                            {
+                                Assert.AreEqual("string", property.Type);
+                                Assert.IsNull(property.Format);
+                                Assert.IsNull(property.Items);
+                                Assert.IsNull(property.Enum);
+                            });
+                        ModelProperty(model, "Total", property =>
+                            {
+                                Assert.AreEqual("number", property.Type);
+                                Assert.AreEqual("double", property.Format);
+                                Assert.IsNull(property.Items);
+                                Assert.IsNull(property.Enum);
+                            });
+                    });
+            });
+
+            ApiDeclaration("/OrderItems", dec =>
+                {
+                    // 1: OrderItem
+                    Assert.AreEqual(1, dec.Models.Count);
+
+                    Model(dec, "OrderItem", model =>
+                        {
+                            ModelProperty(model, "LineNo", property =>
+                            {
+                                Assert.AreEqual("integer", property.Type);
+                                Assert.AreEqual("int32", property.Format);
+                                Assert.IsNull(property.Items);
+                                Assert.IsNull(property.Enum);
+                            });
+                            
+                            ModelProperty(model, "Product", property =>
+                            {
+                                Assert.AreEqual("string", property.Type);
+                                Assert.IsNull(property.Format);
+                                Assert.IsNull(property.Items);
+                                Assert.IsNull(property.Enum);
+                            });
+                            
+                            ModelProperty(model, "Category", property =>
+                            {
+                                Assert.AreEqual("string", property.Type);
+                                Assert.IsNotNull(property.Enum);
+                                Assert.IsTrue(property.Enum.SequenceEqual(new[] { "Category1", "Category2", "Category3" }));
+                                Assert.IsNull(property.Format);
+                                Assert.IsNull(property.Items);
+                            });
+                            
+                            ModelProperty(model, "Quantity", property =>
+                            {
+                                Assert.AreEqual("integer", property.Type);
+                                Assert.AreEqual("int32", property.Format);
+                                Assert.IsNull(property.Items);
+                                Assert.IsNull(property.Enum);
+                            });
+                        });
+                });
+
+            ApiDeclaration("/Customers", dec => Assert.AreEqual(0, dec.Models.Count));
+        }
 
         [Test]
         public void It_should_apply_any_provided_operation_spec_filters()
@@ -432,6 +486,18 @@ namespace Swashbuckle.Tests
         {
             var parameterSpec = operation.Parameters.Single(param => param.Name == name);
             applyAssertions(parameterSpec);
+        }
+
+        private void Model(ApiDeclaration declaration, string id, Action<ModelSpec> applyAssertions)
+        {
+            var modelSpec = declaration.Models[id];
+            applyAssertions(modelSpec);
+        }
+
+        private void ModelProperty(ModelSpec model, string name, Action<ModelSpec> applyAssertions)
+        {
+            var modelPropertySpec = model.Properties[name];
+            applyAssertions(modelPropertySpec);
         }
     }
 }

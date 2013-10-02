@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Web.Http.Description;
 
 namespace Swashbuckle.Models
@@ -68,11 +69,17 @@ namespace Swashbuckle.Models
 
         private ApiDeclaration GenerateDeclaration(IGrouping<string, ApiDescription> apiDescriptionGroup)
         {
+            var modelSpecMap = new ModelSpecMap();
+
             // Group further by relative path - each group corresponds to an ApiSpec
             var apiSpecs = apiDescriptionGroup
                 .GroupBy(apiDesc => apiDesc.RelativePath)
-                .Select(GenerateApiSpec)
+                .Select(apiDescGrp => GenerateApiSpec(apiDescGrp, modelSpecMap))
                 .ToList();
+
+            var complexModelSpecs = modelSpecMap.GetAll()
+                .Where(modelSpec => modelSpec.Type == "object")
+                .ToDictionary(modelSpec => modelSpec.Id, modelSpec => modelSpec);
 
             return new ApiDeclaration
             {
@@ -81,14 +88,14 @@ namespace Swashbuckle.Models
                 BasePath = _basePathResolver(),
                 ResourcePath = apiDescriptionGroup.Key,
                 Apis = apiSpecs,
-                //Models = modelSpecsBuilder.Build()
+                Models = complexModelSpecs
             };
         }
 
-        private ApiSpec GenerateApiSpec(IGrouping<string, ApiDescription> apiDescriptionGroup)
+        private ApiSpec GenerateApiSpec(IGrouping<string, ApiDescription> apiDescriptionGroup, ModelSpecMap modelSpecMap)
         {
             var operationSpecs = apiDescriptionGroup
-                .Select(GenerateOperationSpec)
+                .Select(apiDesc => GenerateOperationSpec(apiDesc, modelSpecMap))
                 .ToList();
 
             return new ApiSpec
@@ -98,11 +105,11 @@ namespace Swashbuckle.Models
             };
         }
 
-        private OperationSpec GenerateOperationSpec(ApiDescription apiDescription)
+        private OperationSpec GenerateOperationSpec(ApiDescription apiDescription, ModelSpecMap modelSpecMap)
         {
             var apiPath = apiDescription.RelativePath.Split('?').First();
             var paramSpecs = apiDescription.ParameterDescriptions
-                .Select(paramDesc => GenerateParameterSpec(paramDesc, apiPath))
+                .Select(paramDesc => GenerateParameterSpec(paramDesc, apiPath, modelSpecMap))
                 .ToList();
 
             var operationSpec = new OperationSpec
@@ -112,10 +119,30 @@ namespace Swashbuckle.Models
                     apiDescription.ActionDescriptor.ControllerDescriptor.ControllerName,
                     apiDescription.ActionDescriptor.ActionName),
                 Summary = apiDescription.Documentation,
-                Type = apiDescription.ActionDescriptor.ReturnType.ToSwaggerType(),
                 Parameters = paramSpecs,
                 ResponseMessages = new List<ResponseMessageSpec>()
             };
+
+            var returnType = apiDescription.ActionDescriptor.ReturnType;
+            if (returnType == null)
+            {
+                operationSpec.Type = "void";
+            }
+            else if (returnType != typeof(HttpResponseMessage))
+            {
+                var modelSpec = modelSpecMap.FindOrCreateFor(returnType);
+                if (modelSpec.Type == "object")
+                {
+                    operationSpec.Type = modelSpec.Id;
+                }
+                else
+                {
+                    operationSpec.Type = modelSpec.Type;
+                    operationSpec.Format = modelSpec.Format;
+                    operationSpec.Items = modelSpec.Items;
+                    operationSpec.Enum = modelSpec.Enum;
+                }
+            }
 
             foreach (var filter in _operationSpecFilters)
             {
@@ -125,7 +152,7 @@ namespace Swashbuckle.Models
             return operationSpec;
         }
 
-        private ParameterSpec GenerateParameterSpec(ApiParameterDescription parameterDescription, string apiPath)
+        private ParameterSpec GenerateParameterSpec(ApiParameterDescription parameterDescription, string apiPath, ModelSpecMap modelSpecMap)
         {
             var paramType = "";
             switch (parameterDescription.Source)
@@ -138,14 +165,28 @@ namespace Swashbuckle.Models
                     break;
             }
 
-            return new ParameterSpec
+            var paramSpec = new ParameterSpec
             {
                 ParamType = paramType,
                 Name = parameterDescription.Name,
                 Description = parameterDescription.Documentation,
-                Required = !parameterDescription.ParameterDescriptor.IsOptional,
-                Type = parameterDescription.ParameterDescriptor.ParameterType.ToSwaggerType(),
+                Required = !parameterDescription.ParameterDescriptor.IsOptional
             };
+
+            var modelSpec = modelSpecMap.FindOrCreateFor(parameterDescription.ParameterDescriptor.ParameterType);
+            if (modelSpec.Type == "object")
+            {
+                paramSpec.Type = modelSpec.Id;
+            }
+            else
+            {
+                paramSpec.Type = modelSpec.Type;
+                paramSpec.Format = modelSpec.Format;
+                paramSpec.Items = modelSpec.Items;
+                paramSpec.Enum = modelSpec.Enum;
+            }
+
+            return paramSpec;
         }
     }
 }
