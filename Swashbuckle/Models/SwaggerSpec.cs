@@ -72,6 +72,7 @@ namespace Swashbuckle.Models
 
     public class ModelSpec
     {
+        public string Ref { get; set; }
         public string Id { get; set; }
         public string Type { get; set; }
         public string Format { get; set; }
