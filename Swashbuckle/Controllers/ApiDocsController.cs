@@ -1,7 +1,6 @@
 ﻿using System.Web.Http;
 using System.Web.Mvc;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
 using Swashbuckle.Models;
 
 namespace Swashbuckle.Controllers
@@ -18,8 +17,7 @@ namespace Swashbuckle.Controllers
 
             _serializerSettings = new JsonSerializerSettings
                 {
-                    NullValueHandling = NullValueHandling.Ignore,
-                    ContractResolver = new CamelCasePropertyNamesContractResolver()
+                    NullValueHandling = NullValueHandling.Ignore
                 };
         }
 

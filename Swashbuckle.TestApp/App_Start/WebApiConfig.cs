@@ -1,8 +1,4 @@
-﻿using System;
-using System.IO;
-using System.Web;
-using System.Web.Http;
-using System.Web.Http.Description;
+﻿using System.Web.Http;
 
 namespace Swashbuckle.TestApp.App_Start
 {
@@ -38,7 +34,7 @@ namespace Swashbuckle.TestApp.App_Start
             config.Routes.MapHttpRoute(
                 name: "CustomersApi",
                 routeTemplate: "api/customers",
-                defaults: new { controller = "Customers" }
+                defaults: new {controller = "Customers"}
                 );
         }
     }

@@ -29,7 +29,7 @@ namespace Swashbuckle.Handlers
             var text = Encoding.UTF8.GetString(buffer);
 
             var filteredText = text
-                .Replace("%(DiscoveryUrl)", "window.location.href.replace('ui/index.html', 'api-docs')")
+                .Replace("%(DiscoveryUrl)", "window.location.href.replace(/ui\\/index\\.html.*/, 'api-docs')")
                 .Replace("%(ApiKeyName)", String.Format("\"{0}\"", _swaggerUiConfig.ApiKeyName))
                 .Replace("%(ApiKey)", String.Format("\"{0}\"", _swaggerUiConfig.ApiKey))
                 .Replace("%(SupportHeaderParams)", _swaggerUiConfig.SupportHeaderParams.ToString().ToLower())

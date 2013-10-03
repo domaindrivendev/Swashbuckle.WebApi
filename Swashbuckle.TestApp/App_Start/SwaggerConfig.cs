@@ -19,7 +19,7 @@ namespace Swashbuckle.TestApp.App_Start
             SwaggerUiConfig.Customize(c =>
                 {
                     c.SupportHeaderParams = true;
-                    c.DocExpansion = DocExpansion.Full;
+                    c.DocExpansion = DocExpansion.List;
                     c.SupportedSubmitMethods = new[] {HttpMethod.Get, HttpMethod.Post, HttpMethod.Put, HttpMethod.Head};
                     c.AddOnCompleteScript(typeof (SwaggerConfig).Assembly, "Swashbuckle.TestApp.SwaggerExtensions.onComplete.js");
                     c.AddStylesheet(typeof(SwaggerConfig).Assembly, "Swashbuckle.TestApp.SwaggerExtensions.customStyles.css");
