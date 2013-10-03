@@ -1,13 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Web.Http.Description;
 
 namespace Swashbuckle.Models
 {
     public class SwaggerGenerator
     {
-        protected const string SwaggerVersion = "1.1";
+        protected const string SwaggerVersion = "1.2";
 
         static SwaggerGenerator()
         {
@@ -36,7 +37,7 @@ namespace Swashbuckle.Models
         public SwaggerSpec Generate(IApiExplorer apiExplorer)
         {
             var apiDescriptionGroups = apiExplorer.ApiDescriptions
-                .GroupBy(apiDesc => "/swagger/api-docs/" + _declarationKeySelector(apiDesc))
+                .GroupBy(apiDesc => "/" + _declarationKeySelector(apiDesc))
                 .ToArray();
 
             return new SwaggerSpec
@@ -49,15 +50,14 @@ namespace Swashbuckle.Models
         private ResourceListing GenerateListing(IEnumerable<IGrouping<string, ApiDescription>> apiDescriptionGroups)
         {
             var declarationLinks = apiDescriptionGroups
-                .Select(apiDescGrp => new ApiDeclarationLink { path = apiDescGrp.Key })
+                .Select(apiDescGrp => new ApiDeclarationLink { Path = apiDescGrp.Key })
                 .ToArray();
 
             return new ResourceListing
             {
-                apiVersion = "1.0",
-                swaggerVersion = SwaggerVersion,
-                basePath = _basePathResolver(),
-                apis = declarationLinks
+                ApiVersion = "1.0",
+                SwaggerVersion = SwaggerVersion,
+                Apis = declarationLinks
             };
         }
 
@@ -69,59 +69,80 @@ namespace Swashbuckle.Models
 
         private ApiDeclaration GenerateDeclaration(IGrouping<string, ApiDescription> apiDescriptionGroup)
         {
-            var modelSpecsBuilder = new ModelSpecsBuilder();
+            var modelSpecMap = new ModelSpecMap();
 
             // Group further by relative path - each group corresponds to an ApiSpec
             var apiSpecs = apiDescriptionGroup
                 .GroupBy(apiDesc => apiDesc.RelativePath)
-                .Select(apiDescGrp => GenerateApiSpec(apiDescGrp, modelSpecsBuilder))
+                .Select(apiDescGrp => GenerateApiSpec(apiDescGrp, modelSpecMap))
                 .ToList();
+
+            var complexModelSpecs = modelSpecMap.GetAll()
+                .Where(modelSpec => modelSpec.Type == "object")
+                .ToDictionary(modelSpec => modelSpec.Id, modelSpec => modelSpec);
 
             return new ApiDeclaration
             {
-                apiVersion = "1.0",
-                swaggerVersion = SwaggerVersion,
-                basePath = _basePathResolver(),
-                resourcePath = apiDescriptionGroup.Key,
-                apis = apiSpecs,
-                models = modelSpecsBuilder.Build()
+                ApiVersion = "1.0",
+                SwaggerVersion = SwaggerVersion,
+                BasePath = _basePathResolver(),
+                ResourcePath = apiDescriptionGroup.Key,
+                Apis = apiSpecs,
+                Models = complexModelSpecs
             };
         }
 
-        private ApiSpec GenerateApiSpec(IGrouping<string, ApiDescription> apiDescriptionGroup, ModelSpecsBuilder modelSpecsBuilder)
+        private ApiSpec GenerateApiSpec(IGrouping<string, ApiDescription> apiDescriptionGroup, ModelSpecMap modelSpecMap)
         {
             var operationSpecs = apiDescriptionGroup
-                .Select(apiDesc => GenerateOperationSpec(apiDesc, modelSpecsBuilder))
+                .Select(apiDesc => GenerateOperationSpec(apiDesc, modelSpecMap))
                 .ToList();
 
             return new ApiSpec
             {
-                path = "/" + apiDescriptionGroup.Key.Split('?').First(),
-                operations = operationSpecs
+                Path = "/" + apiDescriptionGroup.Key.Split('?').First(),
+                Operations = operationSpecs
             };
         }
 
-        private ApiOperationSpec GenerateOperationSpec(ApiDescription apiDescription, ModelSpecsBuilder modelSpecsBuilder)
+        private OperationSpec GenerateOperationSpec(ApiDescription apiDescription, ModelSpecMap modelSpecMap)
         {
-            modelSpecsBuilder.AddType(apiDescription.ActionDescriptor.ReturnType);
-
-
             var apiPath = apiDescription.RelativePath.Split('?').First();
             var paramSpecs = apiDescription.ParameterDescriptions
-                .Select(paramDesc => GenerateParameterSpec(paramDesc, apiPath, modelSpecsBuilder))
+                .Select(paramDesc => GenerateParameterSpec(paramDesc, apiPath, modelSpecMap))
                 .ToList();
 
-            var operationSpec = new ApiOperationSpec
+            var operationSpec = new OperationSpec
             {
-                httpMethod = apiDescription.HttpMethod.Method,
-                nickname = String.Format("{0}_{1}",
+                Method = apiDescription.HttpMethod.Method,
+                Nickname = String.Format("{0}_{1}",
                     apiDescription.ActionDescriptor.ControllerDescriptor.ControllerName,
                     apiDescription.ActionDescriptor.ActionName),
-                parameters = paramSpecs,
-                responseClass = apiDescription.ActionDescriptor.ReturnType.ToSwaggerType(),
-                summary = apiDescription.Documentation,
-                errorResponses = new List<ApiErrorResponseSpec>()
+                Summary = apiDescription.Documentation,
+                Parameters = paramSpecs,
+                ResponseMessages = new List<ResponseMessageSpec>()
             };
+
+            var returnType = apiDescription.ActionDescriptor.ReturnType;
+            if (returnType == null)
+            {
+                operationSpec.Type = "void";
+            }
+            else if (returnType != typeof(HttpResponseMessage))
+            {
+                var modelSpec = modelSpecMap.FindOrCreateFor(returnType);
+                if (modelSpec.Type == "object")
+                {
+                    operationSpec.Type = modelSpec.Id;
+                }
+                else
+                {
+                    operationSpec.Type = modelSpec.Type;
+                    operationSpec.Format = modelSpec.Format;
+                    operationSpec.Items = modelSpec.Items;
+                    operationSpec.Enum = modelSpec.Enum;
+                }
+            }
 
             foreach (var filter in _operationSpecFilters)
             {
@@ -131,10 +152,8 @@ namespace Swashbuckle.Models
             return operationSpec;
         }
 
-        private ApiParameterSpec GenerateParameterSpec(ApiParameterDescription parameterDescription, string apiPath, ModelSpecsBuilder modelSpecsBuilder)
+        private ParameterSpec GenerateParameterSpec(ApiParameterDescription parameterDescription, string apiPath, ModelSpecMap modelSpecMap)
         {
-            modelSpecsBuilder.AddType(parameterDescription.ParameterDescriptor.ParameterType);
-
             var paramType = "";
             switch (parameterDescription.Source)
             {
@@ -146,15 +165,28 @@ namespace Swashbuckle.Models
                     break;
             }
 
-            return new ApiParameterSpec
+            var paramSpec = new ParameterSpec
             {
-                paramType = paramType,
-                name = parameterDescription.Name,
-                description = parameterDescription.Documentation,
-                dataType = parameterDescription.ParameterDescriptor.ParameterType.ToSwaggerType(),
-                required = !parameterDescription.ParameterDescriptor.IsOptional,
-                allowableValues = parameterDescription.ParameterDescriptor.ParameterType.AllowableValues()
+                ParamType = paramType,
+                Name = parameterDescription.Name,
+                Description = parameterDescription.Documentation,
+                Required = !parameterDescription.ParameterDescriptor.IsOptional
             };
+
+            var modelSpec = modelSpecMap.FindOrCreateFor(parameterDescription.ParameterDescriptor.ParameterType);
+            if (modelSpec.Type == "object")
+            {
+                paramSpec.Type = modelSpec.Id;
+            }
+            else
+            {
+                paramSpec.Type = modelSpec.Type;
+                paramSpec.Format = modelSpec.Format;
+                paramSpec.Items = modelSpec.Items;
+                paramSpec.Enum = modelSpec.Enum;
+            }
+
+            return paramSpec;
         }
     }
 }

@@ -14,9 +14,9 @@ namespace Swashbuckle.TestApp.SwaggerExtensions
             _reason = reason;
         }
 
-        public void Apply(ApiDescription apiDescription, ApiOperationSpec operationSpec)
+        public void Apply(ApiDescription apiDescription, OperationSpec operationSpec)
         {
-            operationSpec.errorResponses.Add(new ApiErrorResponseSpec {code = _code, reason = _reason});
+            operationSpec.ResponseMessages.Add(new ResponseMessageSpec {Code = _code, Message = _reason});
         }
     }
 }

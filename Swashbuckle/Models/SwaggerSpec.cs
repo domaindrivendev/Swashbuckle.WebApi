@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Newtonsoft.Json;
 
 namespace Swashbuckle.Models
 {
@@ -11,98 +12,145 @@ namespace Swashbuckle.Models
 
     public class ResourceListing
     {
-        public string apiVersion { get; set; }
-        public string swaggerVersion { get; set; }
-        public string basePath { get; set; }
-        public ICollection<ApiDeclarationLink> apis { get; set; }
+        [JsonProperty("swaggerVersion")]
+        public string SwaggerVersion { get; set; }
+
+        [JsonProperty("apiVersion")]
+        public string ApiVersion { get; set; }
+
+        [JsonProperty("apis")]
+        public ICollection<ApiDeclarationLink> Apis { get; set; }
     }
 
     public class ApiDeclarationLink
     {
-        public string path { get; set; }
+        [JsonProperty("path")]
+        public string Path { get; set; }
     }
 
     public class ApiDeclaration
     {
-        public string apiVersion { get; set; }
-        public string swaggerVersion { get; set; }
-        public string basePath { get; set; }
-        public string resourcePath { get; set; }
-        public ICollection<ApiSpec> apis { get; set; }
-        public Dictionary<string, ModelSpec> models { get; set; }
+        [JsonProperty("swaggerVersion")]
+        public string SwaggerVersion { get; set; }
+
+        [JsonProperty("apiVersion")]
+        public string ApiVersion { get; set; }
+
+        [JsonProperty("basePath")]
+        public string BasePath { get; set; }
+
+        [JsonProperty("resourcePath")]
+        public string ResourcePath { get; set; }
+
+        [JsonProperty("apis")]
+        public ICollection<ApiSpec> Apis { get; set; }
+
+        [JsonProperty("models")]
+        public Dictionary<string, ModelSpec> Models { get; set; }
     }
 
     public class ApiSpec
     {
-        public string path { get; set; }
-        public string description { get; set; }
-        public ICollection<ApiOperationSpec> operations { get; set; }
+        [JsonProperty("path")]
+        public string Path { get; set; }
+
+        [JsonProperty("description")]
+        public string Description { get; set; }
+
+        [JsonProperty("operations")]
+        public ICollection<OperationSpec> Operations { get; set; }
     }
 
-    public class ApiOperationSpec
+    public class OperationSpec
     {
-        public string httpMethod { get; set; }
-        public string nickname { get; set; }
-        public string notes { get; set; }
-        public string summary { get; set; }
-        public string responseClass { get; set; }
-        public ICollection<ApiParameterSpec> parameters { get; set; }
-        public ICollection<ApiErrorResponseSpec> errorResponses { get; set; }
+        [JsonProperty("method")]
+        public string Method { get; set; }
+
+        [JsonProperty("nickname")]
+        public string Nickname { get; set; }
+
+        [JsonProperty("summary")]
+        public string Summary { get; set; }
+
+        [JsonProperty("notes")]
+        public string Notes { get; set; }
+
+        [JsonProperty("type")]
+        public string Type { get; set; }
+
+        [JsonProperty("format")]
+        public string Format { get; set; }
+
+        [JsonProperty("items")]
+        public ModelSpec Items { get; set; }
+
+        [JsonProperty("enum")]
+        public ICollection<string> Enum { get; set; }
+
+        [JsonProperty("parameters")]
+        public ICollection<ParameterSpec> Parameters { get; set; }
+
+        [JsonProperty("responseMessages")]
+        public ICollection<ResponseMessageSpec> ResponseMessages { get; set; }
     }
 
-    public class ApiParameterSpec
+    public class ParameterSpec
     {
-        public string paramType { get; set; }
-        public string name { get; set; }
-        public string description { get; set; }
-        public string dataType { get; set; }
-        public bool required { get; set; }
-        public bool allowMultiple { get; set; }
-        public AllowableValuesSpec allowableValues { get; set; }
+        [JsonProperty("paramType")]
+        public string ParamType { get; set; }
+
+        [JsonProperty("name")]
+        public string Name { get; set; }
+
+        [JsonProperty("description")]
+        public string Description { get; set; }
+
+        [JsonProperty("required")]
+        public bool Required { get; set; }
+
+        [JsonProperty("type")]
+        public string Type { get; set; }
+
+        [JsonProperty("format")]
+        public string Format { get; set; }
+
+        [JsonProperty("items")]
+        public ModelSpec Items { get; set; }
+
+        [JsonProperty("enum")]
+        public ICollection<string> Enum { get; set; }
     }
 
-    public class ApiErrorResponseSpec
+    public class ResponseMessageSpec
     {
-        public int code { get; set; }
-        public string reason { get; set; }
+        [JsonProperty("code")]
+        public int Code { get; set; }
+
+        [JsonProperty("message")]
+        public string Message { get; set; }
     }
 
     public class ModelSpec
     {
-        public string id { get; set; }
-        public Dictionary<string, ModelPropertySpec> properties { get; set; }
-    }
+        [JsonProperty("$ref")]
+        public string Ref { get; set; }
 
-    public class ModelPropertySpec
-    {
-        public string type { get; set; }
-        public bool required { get; set; }
-        public AllowableValuesSpec allowableValues { get; set; }
-    }
+        [JsonProperty("id")]
+        public string Id { get; set; }
 
-    public abstract class AllowableValuesSpec
-    {
-        public abstract string valueType { get; }
-    }
+        [JsonProperty("type")]
+        public string Type { get; set; }
 
-    public class EnumeratedValuesSpec : AllowableValuesSpec
-    {
-        public override string valueType
-        {
-            get { return "LIST"; }
-        }
+        [JsonProperty("format")]
+        public string Format { get; set; }
 
-        public ICollection<string> values { get; set; }
-    }
+        [JsonProperty("items")]
+        public ModelSpec Items { get; set; }
 
-    public class RangeValuesSpec : AllowableValuesSpec
-    {
-        public override string valueType
-        {
-            get { return "RANGE"; }
-        }
+        [JsonProperty("enum")]
+        public ICollection<string> Enum { get; set; }
 
-        public int min { get; set; }
-        public int max { get; set; }
+        [JsonProperty("properties")]
+        public Dictionary<string, ModelSpec> Properties { get; set; }
     }
 }
