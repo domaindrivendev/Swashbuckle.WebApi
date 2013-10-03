@@ -22,7 +22,7 @@ namespace Swashbuckle
             context.Routes.MapRoute(
                 "Swagger_show",
                 "swagger/api-docs/{resourceName}",
-                new { controller = "ApiDocs", action = "Show" });
+                new {controller = "ApiDocs", action = "Show" });
 
             context.Routes.Add(new Route(
                 "swagger",
