@@ -2,6 +2,14 @@ Swashbuckle
 =========
 Seamlessly adds a [Swagger](https://developers.helloreverb.com/swagger) to WebApi projects! Uses a combination of ApiExplorer and Swagger/Swagger-UI to provide a rich discovery and documentation experience for consumers.
 
+The library comes packaged with the neccessary UI components including HTML files, JavaScript and CSS. This reduces unnecessary noise and maintenance in your WebApi project, leaving you free to focus on implementating an awesome API!   
+
+And that's not all ...
+
+Once you have a Web API that can describe itself in Swagger, you've opened the treasure chest of Swagger-based tools including a client generator that can be targetted to a wide range of popular platforms. See [Swagger-Codegen](https://github.com/wordnik/swagger-codegen) for more details.
+
+**UPDATE:** As of version 3.0 (Nuget), Swashbuckle emits version 1.2 of the Swagger Spec. See [Swagger 1.2](https://github.com/wordnik/swagger-core/wiki/1.2-transition) for a list of changes.
+
 Getting Started
 --------------------
 
@@ -11,18 +19,35 @@ To start exposing auto-generated Swagger docs and a Swagger UI, simply install t
 
 This will add a reference to Swashbuckle.dll which contains an embedded "Area" for Swagger. The Area includes the following enpoints for the raw swagger docs and ui respectively:
 
-swagger/api-docs
+*swagger/api-docs*
 
-swagger
-
-NOTE: The Swagger spec groups endpoints by resource (Resource Listing). When generating the Swagger spec, Swashbuckle creates this grouping by controller name. This affects the way API's are grouped in the UI. For the majority of cases, where the controller-per-resource convention is used, this amounts to the same thing. For other cases, it's worth noting that the grouping may not correspond exactly to the resource. 
+*swagger*
 
 Extensibility
 --------------------
 
-Swashbuckle automtically generates a Swagger spec and UI based off the WebApi ApiExplorer. The out-of-the-box generator caters for the majority of WebApi implementations but also includes some extensibility points for application-specific needs ...
+Swashbuckle automtically generates a Swagger spec based off the WebApi ApiExplorer. The out-of-the-box generator caters for the majority of WebApi implementations but also includes some extensibility points for application-specific needs:
 
-## swagger-ui customizations
+1. Customize the way in which api's are grouped into "ApiDeclaration's"
+2. Provide a custom strategy for determining the "basePath" of a given service 
+3. After initial generation, hook into the process and modify "operation" spec's directly
+
+In addition, the [Swagger-UI](https://github.com/wordnik/swagger-ui) supports a number of options to customize it's appearance and behavior. All of these config options are exposed through Swashbuckle.
+
+Finally, Swashbuckle also provides a facility to inject custom CSS and JavaScript into the Swagger-UI help/sandbox pages
+
+See below for some samples.
+
+### Group ApiDeclarations by base resource ###
+
+By default, Swashbuckle will group api's into ApiDeclaration's by controller name. If the controller-per-resource convention is adhered to, this will amount to an ApiDeclaration per resource as suggested by the Swagger Spec. However, this convention doesn't always make sense, particularly when default WebApi routing isn't being used. To get around this, you can provide a custom stratgey for assigning api's to ApiDeclaration's:
+
+    
+
+
+The Spec is the source of
+
+# swagger-ui customizations
 
 The Swagger UI supports a number of customizations that can be applied by modifying the JavaScript in index.html. Each setting is explained in the [documentation](https://github.com/wordnik/swagger-ui).
 
