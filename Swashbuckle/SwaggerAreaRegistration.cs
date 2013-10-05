@@ -1,4 +1,5 @@
 ﻿using System.Web;
+using System.Web.Http;
 using System.Web.Mvc;
 using System.Web.Routing;
 using Swashbuckle.Handlers;
@@ -14,15 +15,11 @@ namespace Swashbuckle
 
         public override void RegisterArea(AreaRegistrationContext context)
         {
-            context.Routes.MapRoute(
-                "Swagger_index",
-                "swagger/api-docs",
-                new {controller = "ApiDocs", action = "Index"});
-
-            context.Routes.MapRoute(
-                "Swagger_show",
+            context.Routes.MapHttpRoute(
+                "Swagger_listing",
                 "swagger/api-docs/{resourceName}",
-                new {controller = "ApiDocs", action = "Show" });
+                new { controller = "ApiDocs", resourceName = RouteParameter.Optional }
+                );
 
             context.Routes.Add(new Route(
                 "swagger",

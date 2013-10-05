@@ -37,6 +37,7 @@ namespace Swashbuckle.Models
         public SwaggerSpec Generate(IApiExplorer apiExplorer)
         {
             var apiDescriptionGroups = apiExplorer.ApiDescriptions
+                .Where(apiDesc => apiDesc.ActionDescriptor.ControllerDescriptor.ControllerName != "ApiDocs") // Exclude the Swagger controller
                 .GroupBy(apiDesc => "/" + _declarationKeySelector(apiDesc))
                 .ToArray();
 
@@ -85,7 +86,7 @@ namespace Swashbuckle.Models
             {
                 ApiVersion = "1.0",
                 SwaggerVersion = SwaggerVersion,
-                BasePath = _basePathResolver(),
+                BasePath = _basePathResolver().TrimEnd('/'),
                 ResourcePath = apiDescriptionGroup.Key,
                 Apis = apiSpecs,
                 Models = complexModelSpecs

@@ -1,11 +1,12 @@
-﻿using System.Web.Http;
-using System.Web.Mvc;
+﻿using System.Net;
+using System.Net.Http;
+using System.Web.Http;
 using Newtonsoft.Json;
 using Swashbuckle.Models;
 
 namespace Swashbuckle.Controllers
 {
-    public class ApiDocsController : Controller
+    public class ApiDocsController : ApiController
     {
         private readonly SwaggerSpec _swaggerSpec;
         private readonly JsonSerializerSettings _serializerSettings;
@@ -21,17 +22,25 @@ namespace Swashbuckle.Controllers
                 };
         }
 
-        public ContentResult Index()
+        public HttpResponseMessage GetListing()
         {
             var jsonContent = JsonConvert.SerializeObject(_swaggerSpec.Listing, _serializerSettings);
-            return Content(jsonContent, "application/json");
+
+            return new HttpResponseMessage(HttpStatusCode.OK)
+                {
+                    Content = new StringContent(jsonContent)
+                };
         }
 
-        public ContentResult Show(string resourceName)
+        public HttpResponseMessage GetDeclaration(string resourceName)
         {
             var resourcePath = "/" + resourceName;
             var jsonContent = JsonConvert.SerializeObject(_swaggerSpec.Declarations[resourcePath], _serializerSettings);
-            return Content(jsonContent, "application/json");
+
+            return new HttpResponseMessage(HttpStatusCode.OK)
+            {
+                Content = new StringContent(jsonContent)
+            };
         }
     }
 }
