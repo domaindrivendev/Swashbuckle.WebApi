@@ -2,7 +2,7 @@ Swashbuckle
 =========
 Seamlessly adds a [Swagger](https://developers.helloreverb.com/swagger) to WebApi projects! Uses a combination of ApiExplorer and Swagger/Swagger-UI to provide a rich discovery and documentation experience for consumers.
 
-The library comes packaged with the neccessary UI components including HTML files, JavaScript and CSS. This reduces unnecessary noise and maintenance in your WebApi project, leaving you free to focus on implementating an awesome API!   
+The library comes packaged with the neccessary UI components including HTML files, JavaScript and CSS. This reduces unnecessary noise and maintenance in your WebApi project, leaving you free to focus on building an awesome API!   
 
 And that's not all ...
 
@@ -28,9 +28,9 @@ Extensibility
 
 Swashbuckle automtically generates a Swagger spec based off the WebApi ApiExplorer. The out-of-the-box generator caters for the majority of WebApi implementations but also includes some extensibility points for application-specific needs:
 
-1. Customize the way in which api's are grouped into "ApiDeclaration's"
+1. Customize the way in which api's are grouped into "api declaration's"
 2. Provide a custom strategy for determining the "basePath" of a given service 
-3. After initial generation, hook into the process and modify "operation" spec's directly
+3. After initial generation, hook into the process and modify "operation spec's" directly
 
 In addition, the [Swagger-UI](https://github.com/wordnik/swagger-ui) supports a number of options to customize it's appearance and behavior. All of these config options are exposed through Swashbuckle.
 
@@ -38,14 +38,30 @@ Finally, Swashbuckle also provides a facility to inject custom CSS and JavaScrip
 
 See below for some samples.
 
-### Group ApiDeclarations by base resource ###
+### Group ApiDeclarations by root resource ###
 
 By default, Swashbuckle will group api's into ApiDeclaration's by controller name. If the controller-per-resource convention is adhered to, this will amount to an ApiDeclaration per resource as suggested by the Swagger Spec. However, this convention doesn't always make sense, particularly when default WebApi routing isn't being used. To get around this, you can provide a custom stratgey for assigning api's to ApiDeclaration's:
 
+    namespace Swashbuckle.TestApp.App_Start
+    {
+        public class SwaggerConfig
+        {
+            public static void Customize()
+            {
+                SwaggerSpecConfig.Customize(c =>
+                    {
+                        c.GroupDeclarationsBy(GetRootResource);
+                    });
+            }
     
-
-
-The Spec is the source of
+            private static string GetRootResource(ApiDescription apiDescription)
+            {
+                var path = apiDescription.RelativePath.Replace("api/", "");
+                var cutoffIndex = path.Contains("/") ? path.IndexOf('/') : path.IndexOf('?');
+                return (cutoffIndex < 0) ? path : path.Substring(0, cutoffIndex);
+            }
+        }
+    }
 
 # swagger-ui customizations
 
