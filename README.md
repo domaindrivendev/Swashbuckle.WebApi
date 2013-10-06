@@ -26,42 +26,81 @@ This will add a reference to Swashbuckle.dll which contains an embedded "Area" f
 Extensibility
 --------------------
 
-Swashbuckle automtically generates a Swagger spec based off the WebApi ApiExplorer. The out-of-the-box generator caters for the majority of WebApi implementations but also includes some extensibility points for application-specific needs:
+Swashbuckle automatically generates a Swagger spec based off the WebApi ApiExplorer. The out-of-the-box generator caters for the majority of WebApi implementations but also includes some extensibility points for application-specific needs:
 
-1. Customize the way in which api's are grouped into "api declaration's"
-2. Provide a custom strategy for determining the "basePath" of a given service 
-3. After initial generation, hook into the process and modify "operation spec's" directly
+    SwaggerSpecConfig.Customize(c =>
+        {
+            c.GroupDeclarationsBy(GetRootResource);
+            c.PostFilter(new AddErrorCodeFilter(200, "It's all good!"));
+            c.PostFilter(new AddErrorCodeFilter(400, "Something's up!"));
+        });
 
 In addition, the [Swagger-UI](https://github.com/wordnik/swagger-ui) supports a number of options to customize it's appearance and behavior. All of these config options are exposed through Swashbuckle.
 
-Finally, Swashbuckle also provides a facility to inject custom CSS and JavaScript into the Swagger-UI help/sandbox pages
-
-See below for some samples.
-
-### Group ApiDeclarations by root resource ###
-
-By default, Swashbuckle will group api's into ApiDeclaration's by controller name. If the controller-per-resource convention is adhered to, this will amount to an ApiDeclaration per resource as suggested by the Swagger Spec. However, this convention doesn't always make sense, particularly when default WebApi routing isn't being used. To get around this, you can provide a custom stratgey for assigning api's to ApiDeclaration's:
-
-    namespace Swashbuckle.TestApp.App_Start
-    {
-        public class SwaggerConfig
+    SwaggerUiConfig.Customize(c =>
         {
-            public static void Customize()
+            c.SupportHeaderParams = true;
+            c.DocExpansion = DocExpansion.List;
+            c.SupportedSubmitMethods = new[] {HttpMethod.Get, HttpMethod.Post, HttpMethod.Put, HttpMethod.Head};
+            c.AddOnCompleteScript(typeof (SwaggerConfig).Assembly, "Swashbuckle.TestApp.SwaggerExtensions.onComplete.js");
+            c.AddStylesheet(typeof(SwaggerConfig).Assembly, "Swashbuckle.TestApp.SwaggerExtensions.customStyles.css");
+        });
+
+See below for some common examples ...
+
+### 1. Group api declarations by root resource ###
+
+By default, Swashbuckle will group api's into ApiDeclaration's by controller name. If the controller-per-resource convention is adhered to, this will amount to an ApiDeclaration per resource as suggested by the Swagger documentation. However, this convention doesn't always make sense, particularly when default WebApi routing isn't being used. To get around this, you can provide a custom stratgey for assigning api's to ApiDeclaration's:
+
+    public static void Customize()
+    {
+        SwaggerSpecConfig.Customize(c =>
             {
-                SwaggerSpecConfig.Customize(c =>
-                    {
-                        c.GroupDeclarationsBy(GetRootResource);
-                    });
-            }
+                c.GroupDeclarationsBy(GetRootResource);
+            });
+    }
+
+    private static string GetRootResource(ApiDescription apiDescription)
+    {
+        var path = apiDescription.RelativePath.Replace("api/", "");
+        var cutoffIndex = path.Contains("/") ? path.IndexOf('/') : path.IndexOf('?');
+        return (cutoffIndex < 0) ? path : path.Substring(0, cutoffIndex);
+    }
     
-            private static string GetRootResource(ApiDescription apiDescription)
+### 2. Ammend the generated spec with error codes ###
+
+To ammend OperationSpec's after initial generation, you can implement and apply one or more "OperationSpecFilter's".
+
+For example, consider an API that requires Basic Authorization. In WebApi, this can be implemented in a number of ways, but typically requires that the client sends credentials via the HTTP Authorization header. Then restricted actions are decorated with the AuthorizeAttribute.
+
+To account for this, the OperationSpec for any restricted action should be updated accordingly. This means indicating the additional parameter (i.e. the Authorization header), and describing the potential error codes. This can be done with OperationSpecFilter's as follows:
+
+    SwaggerSpecConfig.Customize(c =>
+    {
+        c.PostFilter<AddAuthorizationHeaderParameter>();
+        c.PostFilter<AddAuthorizationErrorCodes>();
+    });
+
+The filters can inspect the action for the presence of the AuthorizeAttribute and update the OperationSpec accordingly.
+
+    public class AddAuthorizationErrorCodes : IOperationSpecFilter
+    {
+        public void Apply(ApiDescription apiDescription, OperationSpec operationSpec)
+        {
+            if (apiDescription.ActionDescriptor.GetFilters().OfType<AuthorizeAttribute>().Any())
             {
-                var path = apiDescription.RelativePath.Replace("api/", "");
-                var cutoffIndex = path.Contains("/") ? path.IndexOf('/') : path.IndexOf('?');
-                return (cutoffIndex < 0) ? path : path.Substring(0, cutoffIndex);
+                operationSpec.ResponseMessages.Add(new ResponseMessageSpec
+                {
+                    Code = (int)HttpStatusCode.Unauthorized,
+                    Message = "Basic Auth required"
+                });
             }
         }
     }
+
+### 2. Provide summary and notes using XML comments ###
+
+TODO:
 
 # swagger-ui customizations
 
