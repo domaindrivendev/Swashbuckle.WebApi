@@ -12,8 +12,9 @@ namespace Swashbuckle.TestApp.App_Start
                 {
                     c.PostFilter<AddStandardErrorCodes>();
                     c.PostFilter<AddAuthorizationErrorCodes>();
-                    // uncomment this to parse documentation field when using XmlCommentDocumentationProvider
-                    //c.PostFilter(new AddXmlCommentsParsingFilter());
+
+                    // Uncomment below to support documentation from Xml Comments
+                    // c.PostFilter(new ExtractXmlComments());
                 });
 
             SwaggerUiConfig.Customize(c =>

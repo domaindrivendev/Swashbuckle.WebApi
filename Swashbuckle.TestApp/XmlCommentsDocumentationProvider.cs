@@ -13,13 +13,13 @@ namespace Swashbuckle.TestApp
     /// Accesses the XML doc blocks written in code to further document the API.
     /// A modified version taken from Swagger.NET
     /// </summary>
-    public class XmlCommentDocumentationProvider : IDocumentationProvider
+    public class XmlCommentsDocumentationProvider : IDocumentationProvider
     {
         readonly XPathNavigator _documentNavigator;
         private const string MethodExpression = "/doc/members/member[@name='M:{0}']";
         private static readonly Regex NullableTypeNameRegex = new Regex(@"(.*\.Nullable)" + Regex.Escape("`1[[") + "([^,]*),.*");
 
-        public XmlCommentDocumentationProvider(string documentPath)
+        public XmlCommentsDocumentationProvider(string documentPath)
         {
             var xpath = new XPathDocument(documentPath);
             _documentNavigator = xpath.CreateNavigator();

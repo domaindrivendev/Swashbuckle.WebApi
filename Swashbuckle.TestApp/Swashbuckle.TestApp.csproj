@@ -42,6 +42,8 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <DocumentationFile>bin\Swashbuckle.TestApp.XML</DocumentationFile>
+    <NoWarn>1591</NoWarn>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.CSharp" />
@@ -120,8 +122,8 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SwaggerExtensions\AddAuthorizationErrorCodes.cs" />
     <Compile Include="SwaggerExtensions\AddStandardErrorCodes.cs" />
-    <Compile Include="SwaggerExtensions\AddXmlCommentsParsingFilter.cs" />
-    <Compile Include="XmlCommentDocumentationProvider.cs" />
+    <Compile Include="SwaggerExtensions\ExtractXmlComments.cs" />
+    <Compile Include="XmlCommentsDocumentationProvider.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="App_Start\WebApiConfig.cs" />
