@@ -26,7 +26,101 @@ This will add a reference to Swashbuckle.dll which contains an embedded "Area" f
 Extensibility
 --------------------
 
-Swashbuckle automatically generates a Swagger spec based off the WebApi ApiExplorer. The out-of-the-box generator caters for the majority of WebApi implementations but also includes some extensibility points for application-specific needs:
+Swashbuckle automtically generates a Swagger spec and UI based off the WebApi ApiExplorer. The out-of-the-box generator caters for the majority of WebApi implementations but also includes some extensibility points for application-specific needs ..
+
+### Customize spec generation ###
+
+For example you can customize the auto-generated spec by applying several (optional) config options at App startup ...
+
+    SwaggerSpecConfig.Customize(c =>
+        {
+            c.GroupDeclarationsBy(GetRootResource);
+            c.PostFilter<AddStandardResponseMessages>();
+            c.PostFilter<AddAuthorizationResponseMessages>();
+        });
+        
+#### GroupDeclarationsBy ####
+
+This option accepts a lambda as a strategy for grouping api's into ApiDeclarations. The default uses controller name as the grouping key. 
+
+#### PostFilter ####
+
+You can use this option to apply any number of filters that modify "OperationSpec's" after initial generation. For example ...
+
+A filter that enhances the spec with standard response code descriptions:
+
+    public class AddStandardResponseMessages : IOperationSpecFilter
+    {
+        public void Apply(ApiDescription apiDescription, OperationSpec operationSpec)
+        {
+            operationSpec.ResponseMessages.Add(new ResponseMessageSpec
+                {
+                    Code = (int) HttpStatusCode.OK,
+                    Message = "It's all good!"
+                });
+
+            operationSpec.ResponseMessages.Add(new ResponseMessageSpec
+            {
+                Code = (int)HttpStatusCode.InternalServerError,
+                Message = "Somethings up!"
+            });
+        }
+    }
+    
+Or, a filter that adds an authorization response code description to actions that are decorated with the AuthorizeAttribute:
+
+    public class AddAuthorizationResponseMessages : IOperationSpecFilter
+    {
+        public void Apply(ApiDescription apiDescription, OperationSpec operationSpec)
+        {
+            if (apiDescription.ActionDescriptor.GetFilters().OfType<AuthorizeAttribute>().Any())
+            {
+                operationSpec.ResponseMessages.Add(new ResponseMessageSpec
+                    {
+                        Code = (int) HttpStatusCode.Unauthorized,
+                        Message = "Authentication required"
+                    });
+            }
+        }
+    }
+
+__NOTE:__ See Appendix A for another example that uses an IOperationSpecFilter as part of a solution for providing richer documentation with XML Comments.
+
+##### 1) Describe additional parameters and/or response messages #####
+
+Consider an API that controls access to certain actions by requiring it's callers to authenticate themeselves. WebApi provides a number of 
+
+
+
+The client must send additional data to authenticate themeselves (often in the HTTP Authorization header). So, to describe the API accurately
+
+
+To account for this, the OperationSpec for any restricted action should be updated accordingly. This means indicating the additional parameter (i.e. the Authorization header), and describing the potential error codes. This can be done with OperationSpecFilter's as follows:
+
+    SwaggerSpecConfig.Customize(c =>
+    {
+        c.PostFilter<AddAuthorizationHeaderParameter>();
+        c.PostFilter<AddAuthorizationErrorCodes>();
+    });
+
+The filters can inspect the action for the presence of the AuthorizeAttribute and update the OperationSpec accordingly.
+
+    public class AddAuthorizationErrorCodes : IOperationSpecFilter
+    {
+        public void Apply(ApiDescription apiDescription, OperationSpec operationSpec)
+        {
+            if (apiDescription.ActionDescriptor.GetFilters().OfType<AuthorizeAttribute>().Any())
+            {
+                operationSpec.ResponseMessages.Add(new ResponseMessageSpec
+                {
+                    Code = (int)HttpStatusCode.Unauthorized,
+                    Message = "Basic Auth required"
+                });
+            }
+        }
+    }
+
+There may be cases when certain behavior
 
     SwaggerSpecConfig.Customize(c =>
         {
