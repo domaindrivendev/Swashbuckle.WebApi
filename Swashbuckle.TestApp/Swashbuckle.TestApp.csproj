@@ -33,6 +33,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <DocumentationFile>bin\Swashbuckle.TestApp.XML</DocumentationFile>
+    <NoWarn>1591</NoWarn>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -117,7 +118,8 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SwaggerExtensions\AddErrorCodeFilter.cs" />
+    <Compile Include="SwaggerExtensions\AddAuthorizationErrorCodes.cs" />
+    <Compile Include="SwaggerExtensions\AddStandardErrorCodes.cs" />
     <Compile Include="SwaggerExtensions\AddXmlCommentsParsingFilter.cs" />
     <Compile Include="XmlCommentDocumentationProvider.cs" />
   </ItemGroup>

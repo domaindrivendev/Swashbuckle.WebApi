@@ -6,6 +6,7 @@ namespace Swashbuckle.TestApp.Controllers
 {
     public class CustomersController : ApiController
     {
+        [Authorize]
         public HttpResponseMessage GetAll()
         {
             return new HttpResponseMessage(HttpStatusCode.OK);

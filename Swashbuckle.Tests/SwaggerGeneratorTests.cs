@@ -19,8 +19,8 @@ namespace Swashbuckle.Tests
             SwaggerSpecConfig.Customize(c =>
                 {
                     c.ResolveBasePath(() => "http://tempuri.org");
-                    c.PostFilter(new AddErrorCodeFilter(200, "It's all good!"));
-                    c.PostFilter(new AddErrorCodeFilter(400, "Something's up!"));
+                    c.PostFilter<AddStandardErrorCodes>();
+                    c.PostFilter<AddAuthorizationErrorCodes>();
                 });
 
             // Get ApiExplorer for TestApp
@@ -427,18 +427,26 @@ namespace Swashbuckle.Tests
         [Test]
         public void It_should_apply_any_provided_operation_spec_filters()
         {
-            // e.g. error code filters (see Setup)
-            var resourceListing = _swaggerSpec.Listing;
-            foreach (var path in resourceListing.Apis.Select(a => a.Path))
-            {
-                foreach (var api in _swaggerSpec.Declarations[path].Apis)
-                {
-                    foreach (var operation in api.Operations)
-                    {
-                        Assert.AreEqual(2, operation.ResponseMessages.Count);
-                    }
-                }
-            }
+            OperationSpec("/Orders", "/api/orders", 0, "POST", operation =>
+                Assert.AreEqual(2, operation.ResponseMessages.Count));
+
+            OperationSpec("/Orders", "/api/orders", 0, "GET", operation =>
+                Assert.AreEqual(2, operation.ResponseMessages.Count));
+
+            OperationSpec("/Orders", "/api/orders", 1, "GET", operation =>
+                Assert.AreEqual(2, operation.ResponseMessages.Count));
+
+            OperationSpec("/Orders", "/api/orders/{id}", 0, "DELETE", operation =>
+                Assert.AreEqual(2, operation.ResponseMessages.Count));
+
+            OperationSpec("/OrderItems", "/api/orders/{orderId}/items/{id}", 0, "GET", operation =>
+                Assert.AreEqual(2, operation.ResponseMessages.Count));
+
+            OperationSpec("/OrderItems", "/api/orders/{orderId}/items", 0, "GET", operation =>
+                Assert.AreEqual(2, operation.ResponseMessages.Count));
+
+            OperationSpec("/Customers", "/api/customers", 0, "GET", operation =>
+                Assert.AreEqual(3, operation.ResponseMessages.Count));
         }
 
         private void ApiDeclaration(string resourcePath, Action<ApiDeclaration> applyAssertions)

@@ -10,8 +10,8 @@ namespace Swashbuckle.TestApp.App_Start
         {
             SwaggerSpecConfig.Customize(c =>
                 {
-                    c.PostFilter(new AddErrorCodeFilter(200, "It's all good!"));
-                    c.PostFilter(new AddErrorCodeFilter(400, "Something's up!"));
+                    c.PostFilter<AddStandardErrorCodes>();
+                    c.PostFilter<AddAuthorizationErrorCodes>();
                     // uncomment this to parse documentation field when using XmlCommentDocumentationProvider
                     //c.PostFilter(new AddXmlCommentsParsingFilter());
                 });
