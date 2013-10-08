@@ -36,8 +36,8 @@ namespace Swashbuckle.Handlers
                 .Replace("%(SupportedSubmitMethods)",
                          String.Format("[{0}]", _swaggerUiConfig.SupportedSubmitMethods.ToCommaList()))
                 .Replace("%(DocExpansion)", String.Format("\"{0}\"", _swaggerUiConfig.DocExpansion.ToString().ToLower()))
-                .Replace("%(OnCompleteScript)", _swaggerUiConfig.OnCompleteScripts.ToScriptIncludes())
-                .Replace("%(EmbeddedStylesheet)", _swaggerUiConfig.CustomStylesheets.ToStylesheetIncludes());
+                .Replace("%(CustomScripts)", _swaggerUiConfig.CustomScripts.ToScriptIncludes())
+                .Replace("%(CustomStylesheets)", _swaggerUiConfig.CustomStylesheets.ToStylesheetIncludes());
 
             _ouputStream.Write(Encoding.UTF8.GetBytes(filteredText), offset, Encoding.UTF8.GetByteCount(filteredText));
         }

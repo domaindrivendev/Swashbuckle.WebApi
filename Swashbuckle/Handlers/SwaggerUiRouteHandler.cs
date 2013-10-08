@@ -33,7 +33,7 @@ namespace Swashbuckle.Handlers
 
         private bool RequestIsForInjectedResource(string routePath, SwaggerUiConfig swaggerUiConfig, out InjectedResourceDescriptor injectedResourceDescriptor)
         {
-            injectedResourceDescriptor = swaggerUiConfig.OnCompleteScripts
+            injectedResourceDescriptor = swaggerUiConfig.CustomScripts
                 .Union(swaggerUiConfig.CustomStylesheets)
                 .FirstOrDefault(desc => desc.RelativePath == routePath);
 

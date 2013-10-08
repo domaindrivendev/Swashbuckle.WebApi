@@ -23,7 +23,7 @@ namespace Swashbuckle.Models
             SupportHeaderParams = false;
             SupportedSubmitMethods = new[] {HttpMethod.Get, HttpMethod.Post, HttpMethod.Put};
             DocExpansion = DocExpansion.None;
-            OnCompleteScripts = new List<InjectedResourceDescriptor>();
+            CustomScripts = new List<InjectedResourceDescriptor>();
             CustomStylesheets = new List<InjectedResourceDescriptor>();
         }
 
@@ -32,7 +32,7 @@ namespace Swashbuckle.Models
         public bool SupportHeaderParams { get; set; }
         public IEnumerable<HttpMethod> SupportedSubmitMethods { get; set; }
         public DocExpansion DocExpansion { get; set; }
-        internal IList<InjectedResourceDescriptor> OnCompleteScripts { get; private set; }
+        internal IList<InjectedResourceDescriptor> CustomScripts { get; private set; }
         internal IList<InjectedResourceDescriptor> CustomStylesheets { get; private set; }
 
         public static void Customize(Action<SwaggerUiConfig> customize)
@@ -42,7 +42,7 @@ namespace Swashbuckle.Models
 
         public void AddOnCompleteScript(Assembly resourceAssembly, string resourceName)
         {
-            OnCompleteScripts.Add(new InjectedResourceDescriptor
+            CustomScripts.Add(new InjectedResourceDescriptor
                 {
                     RelativePath = String.Format("ext/{0}", resourceName),
                     ResourceAssembly = resourceAssembly,

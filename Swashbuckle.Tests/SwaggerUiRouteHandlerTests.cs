@@ -45,7 +45,7 @@ namespace Swashbuckle.Tests
             Assert.IsTrue(responseText.Contains(
                 "$.getScript('ext/Swashbuckle.Tests.Support.testScript1.js');\r\n" +
                 "$.getScript('ext/Swashbuckle.Tests.Support.testScript2.js');"),
-                "OnCompleteScripts not included");
+                "CustomScripts not included");
             Assert.IsTrue(responseText.Contains(
                 "<link href='ext/Swashbuckle.Tests.Support.testStyles1.css' rel='stylesheet' type='text/css'/>\r\n" +
                 "<link href='ext/Swashbuckle.Tests.Support.testStyles2.css' rel='stylesheet' type='text/css'/>"),
