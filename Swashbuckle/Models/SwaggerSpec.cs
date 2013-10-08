@@ -19,7 +19,7 @@ namespace Swashbuckle.Models
         public string ApiVersion { get; set; }
 
         [JsonProperty("apis")]
-        public ICollection<ApiDeclarationLink> Apis { get; set; }
+        public IList<ApiDeclarationLink> Apis { get; set; }
     }
 
     public class ApiDeclarationLink
@@ -43,10 +43,10 @@ namespace Swashbuckle.Models
         public string ResourcePath { get; set; }
 
         [JsonProperty("apis")]
-        public ICollection<ApiSpec> Apis { get; set; }
+        public IList<ApiSpec> Apis { get; set; }
 
         [JsonProperty("models")]
-        public Dictionary<string, ModelSpec> Models { get; set; }
+        public IDictionary<string, ModelSpec> Models { get; set; }
     }
 
     public class ApiSpec
@@ -58,7 +58,7 @@ namespace Swashbuckle.Models
         public string Description { get; set; }
 
         [JsonProperty("operations")]
-        public ICollection<OperationSpec> Operations { get; set; }
+        public IList<OperationSpec> Operations { get; set; }
     }
 
     public class OperationSpec
@@ -85,13 +85,13 @@ namespace Swashbuckle.Models
         public ModelSpec Items { get; set; }
 
         [JsonProperty("enum")]
-        public ICollection<string> Enum { get; set; }
+        public IList<string> Enum { get; set; }
 
         [JsonProperty("parameters")]
-        public ICollection<ParameterSpec> Parameters { get; set; }
+        public IList<ParameterSpec> Parameters { get; set; }
 
         [JsonProperty("responseMessages")]
-        public ICollection<ResponseMessageSpec> ResponseMessages { get; set; }
+        public IList<ResponseMessageSpec> ResponseMessages { get; set; }
     }
 
     public class ParameterSpec
@@ -118,7 +118,7 @@ namespace Swashbuckle.Models
         public ModelSpec Items { get; set; }
 
         [JsonProperty("enum")]
-        public ICollection<string> Enum { get; set; }
+        public IList<string> Enum { get; set; }
     }
 
     public class ResponseMessageSpec
@@ -148,9 +148,9 @@ namespace Swashbuckle.Models
         public ModelSpec Items { get; set; }
 
         [JsonProperty("enum")]
-        public ICollection<string> Enum { get; set; }
+        public IList<string> Enum { get; set; }
 
         [JsonProperty("properties")]
-        public Dictionary<string, ModelSpec> Properties { get; set; }
+        public IDictionary<string, ModelSpec> Properties { get; set; }
     }
 }

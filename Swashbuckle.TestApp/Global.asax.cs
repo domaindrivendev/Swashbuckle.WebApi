@@ -11,9 +11,9 @@ namespace Swashbuckle.TestApp
     {
         protected void Application_Start()
         {
-            AreaRegistration.RegisterAllAreas();
-
             WebApiConfig.Register(GlobalConfiguration.Configuration);
+
+            AreaRegistration.RegisterAllAreas();
 
             SwaggerConfig.Customize();
         }

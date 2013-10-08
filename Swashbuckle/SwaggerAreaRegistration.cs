@@ -18,8 +18,9 @@ namespace Swashbuckle
             context.Routes.MapHttpRoute(
                 "Swagger_listing",
                 "swagger/api-docs/{resourceName}",
-                new { controller = "ApiDocs", resourceName = RouteParameter.Optional }
-                );
+                new {resourceName = UrlParameter.Optional},
+                new {constraint = new RouteDirectionConstraint(RouteDirection.IncomingRequest)},
+                new ApiDocsMessageHandler());
 
             context.Routes.Add(new Route(
                 "swagger",
@@ -45,7 +46,7 @@ namespace Swashbuckle
         }
 
         public bool Match(HttpContextBase httpContext, Route route, string parameterName,
-                          RouteValueDictionary values, RouteDirection routeDirection)
+            RouteValueDictionary values, RouteDirection routeDirection)
         {
             return routeDirection == _direction;
         }
