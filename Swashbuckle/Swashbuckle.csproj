@@ -87,7 +87,7 @@
     <Reference Include="System.Xml.Linq" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Handlers\ApiDocsMessageHandler.cs" />
+    <Compile Include="Controllers\ApiDocsController.cs" />
     <Compile Include="Handlers\EmbeddedResourceHttpHandler.cs" />
     <Compile Include="Handlers\SwaggerUiConfigFilter.cs" />
     <Compile Include="Models\SwaggerSpecConfig.cs" />
