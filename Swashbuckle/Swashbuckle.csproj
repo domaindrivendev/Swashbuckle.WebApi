@@ -90,6 +90,7 @@
     <Compile Include="Controllers\ApiDocsController.cs" />
     <Compile Include="Handlers\EmbeddedResourceHttpHandler.cs" />
     <Compile Include="Handlers\SwaggerUiConfigFilter.cs" />
+    <Compile Include="Models\LinqExtensions.cs" />
     <Compile Include="Models\SwaggerSpecConfig.cs" />
     <Compile Include="Models\SwaggerUiConfig.cs" />
     <Compile Include="Models\TypeExtensions.cs" />

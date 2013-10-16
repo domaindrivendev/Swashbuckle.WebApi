@@ -7,9 +7,9 @@ namespace Swashbuckle.Models
 {
     public class ModelSpecMap
     {
-        private readonly Dictionary<Type, ModelSpec> _mappings = new Dictionary<Type, ModelSpec>();
+        private readonly Dictionary<Type, ModelSpec> _cache = new Dictionary<Type, ModelSpec>();
 
-        private static readonly Dictionary<Type, ModelSpec> PrimitiveTypeMap =
+        private readonly Dictionary<Type, ModelSpec> _predefinedTypeMap =
             new Dictionary<Type, ModelSpec>
                 {
                     {typeof(Int32), new ModelSpec{ Type = "integer", Format = "int32"}},
@@ -25,25 +25,33 @@ namespace Swashbuckle.Models
                     {typeof(DateTime), new ModelSpec{ Type = "string", Format = "date-time"}}
                 };
 
+        public ModelSpecMap() : this(null) {}
+
+        public ModelSpecMap(IDictionary<Type,ModelSpec> customTypeMappings)
+        {
+            if (customTypeMappings != null)
+                _predefinedTypeMap.MergeWith(customTypeMappings);
+        }
+
         public ModelSpec FindOrCreateFor(Type type)
         {
             // Create mapping if it doesn't exist
-            if (!_mappings.ContainsKey(type))
-                _mappings[type] = CreateModelSpec(type);
+            if (!_cache.ContainsKey(type))
+                _cache[type] = CreateModelSpec(type);
 
-            return _mappings[type];
+            return _cache[type];
         }
 
         public IEnumerable<ModelSpec> GetAll()
         {
-            return _mappings.Values;
+            return _cache.Values;
         }
 
         private ModelSpec CreateModelSpec(Type type)
         {
             // Primitives, incl. enums
-            if (PrimitiveTypeMap.ContainsKey(type))
-                return PrimitiveTypeMap[type];
+            if (_predefinedTypeMap.ContainsKey(type))
+                return _predefinedTypeMap[type];
 
             if (type.IsEnum)
                 return new ModelSpec
