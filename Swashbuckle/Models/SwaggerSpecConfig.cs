@@ -7,7 +7,7 @@ namespace Swashbuckle.Models
 {
     public interface IOperationSpecFilter
     {
-        void Apply(ApiDescription apiDescription, OperationSpec operationSpec);
+        void Apply(ApiDescription apiDescription, OperationSpec operationSpec, ModelSpecMap modelSpecMap);
     }
 
     public class SwaggerSpecConfig
@@ -24,11 +24,13 @@ namespace Swashbuckle.Models
             DeclarationKeySelector = DefaultDeclarationKeySelector;
             BasePathResolver = DefaultBasePathResolver;
             OperationSpecFilters = new List<IOperationSpecFilter>();
+            CustomTypeMappings = new Dictionary<Type, ModelSpec>();
         }
 
         internal Func<ApiDescription, string> DeclarationKeySelector { get; set; }
         internal Func<string> BasePathResolver { get; private set; }
         internal ICollection<IOperationSpecFilter> OperationSpecFilters { get; private set; }
+        internal IDictionary<Type,ModelSpec> CustomTypeMappings { get; private set; } 
 
         public void GroupDeclarationsBy(Func<ApiDescription, string> declarationKeySelector)
         {
@@ -53,6 +55,11 @@ namespace Swashbuckle.Models
             where TFilter : IOperationSpecFilter, new()
         {
             OperationSpecFilters.Add(new TFilter());
+        }
+
+        public void MapType<T>(ModelSpec modelSpec)
+        {
+            CustomTypeMappings[typeof (T)] = modelSpec;
         }
 
         private string DefaultDeclarationKeySelector(ApiDescription apiDescription)
