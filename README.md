@@ -37,6 +37,7 @@ For example you can customize the auto-generated spec by applying the following 
             c.GroupDeclarationsBy(GetRootResource);
             c.PostFilter<AddStandardResponseMessages>();
             c.PostFilter<AddAuthorizationResponseMessages>();
+            c.MapType<MySerializableType>(new ModelSpec { Type = "string" });
         });
         
 #### GroupDeclarationsBy ####
@@ -51,7 +52,7 @@ A filter that enhances the spec with standard response code descriptions:
 
     public class AddStandardResponseMessages : IOperationSpecFilter
     {
-        public void Apply(ApiDescription apiDescription, OperationSpec operationSpec)
+        public void Apply(ApiDescription apiDescription, OperationSpec operationSpec, ModelSpecMap modelSpecMap)
         {
             operationSpec.ResponseMessages.Add(new ResponseMessageSpec
                 {
@@ -71,7 +72,7 @@ Or, a filter that adds an authorization response code description to actions tha
 
     public class AddAuthorizationResponseMessages : IOperationSpecFilter
     {
-        public void Apply(ApiDescription apiDescription, OperationSpec operationSpec)
+        public void Apply(ApiDescription apiDescription, OperationSpec operationSpec, ModelSpecMap modelSpecMap)
         {
             if (apiDescription.ActionDescriptor.GetFilters().OfType<AuthorizeAttribute>().Any())
             {
@@ -83,6 +84,10 @@ Or, a filter that adds an authorization response code description to actions tha
             }
         }
     }
+
+#### MapType ####
+
+This option accepts a Type and a ModelSpec. It allows you to customize the ModelSpec for a given Type. 
 
 ### Customize the swagger-ui ###
 
@@ -121,7 +126,7 @@ However, Swagger also provides a second "notes" field for providing additional i
 
     public class ExtractXmlComments : IOperationSpecFilter
     {
-        public void Apply(ApiDescription apiDescription, OperationSpec operationSpec)
+        public void Apply(ApiDescription apiDescription, OperationSpec operationSpec, ModelSpecMap modelSpecMap)
         {
             var descriptionXml = XElement.Parse(apiDescription.Documentation);
 

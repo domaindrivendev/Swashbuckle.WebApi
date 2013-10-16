@@ -15,7 +15,8 @@ namespace Swashbuckle.Models
             Instance = new SwaggerGenerator(
                 SwaggerSpecConfig.Instance.DeclarationKeySelector,
                 SwaggerSpecConfig.Instance.BasePathResolver,
-                SwaggerSpecConfig.Instance.OperationSpecFilters);
+                SwaggerSpecConfig.Instance.OperationSpecFilters,
+                SwaggerSpecConfig.Instance.CustomTypeMappings);
         }
 
         public static SwaggerGenerator Instance { get; private set; }
@@ -23,15 +24,17 @@ namespace Swashbuckle.Models
         private readonly Func<ApiDescription, string> _declarationKeySelector;
         private readonly Func<string> _basePathResolver;
         private readonly IEnumerable<IOperationSpecFilter> _operationSpecFilters;
+        private readonly IDictionary<Type, ModelSpec> _customTypeMappings; 
 
         private SwaggerGenerator(
             Func<ApiDescription, string> declarationKeySelector,
             Func<string> basePathResolver,
-            IEnumerable<IOperationSpecFilter> operationSpecFilters)
+            IEnumerable<IOperationSpecFilter> operationSpecFilters, IDictionary<Type, ModelSpec> customTypeMappings)
         {
             _declarationKeySelector = declarationKeySelector;
             _basePathResolver = basePathResolver;
             _operationSpecFilters = operationSpecFilters;
+            _customTypeMappings = customTypeMappings;
         }
 
         public SwaggerSpec Generate(IApiExplorer apiExplorer)
@@ -70,7 +73,7 @@ namespace Swashbuckle.Models
 
         private ApiDeclaration GenerateDeclaration(IGrouping<string, ApiDescription> apiDescriptionGroup)
         {
-            var modelSpecMap = new ModelSpecMap();
+            var modelSpecMap = new ModelSpecMap(_customTypeMappings);
 
             // Group further by relative path - each group corresponds to an ApiSpec
             var apiSpecs = apiDescriptionGroup
@@ -147,7 +150,7 @@ namespace Swashbuckle.Models
 
             foreach (var filter in _operationSpecFilters)
             {
-                filter.Apply(apiDescription, operationSpec);
+                filter.Apply(apiDescription, operationSpec, modelSpecMap);
             }
 
             return operationSpec;
