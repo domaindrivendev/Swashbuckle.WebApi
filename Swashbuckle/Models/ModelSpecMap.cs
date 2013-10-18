@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Text;
 
 namespace Swashbuckle.Models
 {
@@ -90,7 +91,7 @@ namespace Swashbuckle.Models
         {
             var modelSpec = new ModelSpec
             {
-                Id = type.Name.Split('.').First(),
+                Id = GetUniqueTypeIdentifier(type),
                 Type = "object",
                 Properties = new Dictionary<string, ModelSpec>()
             };
@@ -106,6 +107,25 @@ namespace Swashbuckle.Models
             }
 
             return modelSpec;
+        }
+
+        private string GetUniqueTypeIdentifier(Type type)
+        {
+            if (type.IsGenericType)
+            {
+                var genericArguments = type.GetGenericArguments()
+                    .Select(GetUniqueTypeIdentifier)
+                    .ToArray();
+
+                var builder = new StringBuilder(type.ShortName());
+
+                return builder
+                    .Replace(String.Format("`{0}", genericArguments.Count()), String.Empty)
+                    .Append(String.Format("[{0}]", String.Join(",", genericArguments).TrimEnd(',')))
+                    .ToString();
+            }
+
+            return type.ShortName();
         }
     }
 

@@ -351,7 +351,7 @@ namespace Swashbuckle.Tests
             ApiDeclaration("/Orders", dec =>
             {
                 // 1: Order
-                Assert.AreEqual(1, dec.Models.Count);
+                Assert.AreEqual(3, dec.Models.Count);
 
                 Model(dec, "Order", model =>
                     {
@@ -377,6 +377,24 @@ namespace Swashbuckle.Tests
                                 Assert.IsNull(property.Enum);
                             });
                     });
+
+                Model(dec, "MyGenericType[OrderItem]", model =>
+                    ModelProperty(model, "TypeName", property =>
+                    {
+                        Assert.AreEqual("string", property.Type);
+                        Assert.IsNull(property.Format);
+                        Assert.IsNull(property.Items);
+                        Assert.IsNull(property.Enum);
+                    }));
+
+                Model(dec, "MyGenericType[ProductCategory]", model =>
+                    ModelProperty(model, "TypeName", property =>
+                    {
+                        Assert.AreEqual("string", property.Type);
+                        Assert.IsNull(property.Format);
+                        Assert.IsNull(property.Items);
+                        Assert.IsNull(property.Enum);
+                    }));
             });
 
             ApiDeclaration("/OrderItems", dec =>
