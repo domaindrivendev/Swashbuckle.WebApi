@@ -112,6 +112,7 @@
   <ItemGroup>
     <Compile Include="App_Start\SwaggerConfig.cs" />
     <Compile Include="Controllers\CustomersController.cs" />
+    <Compile Include="Models\Customer.cs" />
     <Compile Include="Models\MyGenericType.cs" />
     <Compile Include="Models\OrderItem.cs" />
     <Compile Include="Controllers\OrderItemsController.cs" />

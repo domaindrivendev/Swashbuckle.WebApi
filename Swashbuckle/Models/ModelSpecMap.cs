@@ -1,120 +1,154 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Reflection;
 using System.Text;
+using Newtonsoft.Json.Linq;
 
 namespace Swashbuckle.Models
 {
     public class ModelSpecMap
     {
-        private readonly Dictionary<Type, ModelSpec> _cache = new Dictionary<Type, ModelSpec>();
-
-        private readonly Dictionary<Type, ModelSpec> _predefinedTypeMap =
-            new Dictionary<Type, ModelSpec>
-                {
-                    {typeof(Int32), new ModelSpec{ Type = "integer", Format = "int32"}},
-                    {typeof(UInt32), new ModelSpec{ Type = "integer", Format = "int32"}},
-                    {typeof(Int64), new ModelSpec{ Type = "integer", Format = "int64"}},
-                    {typeof(UInt64), new ModelSpec{ Type = "integer", Format = "int64"}},
-                    {typeof(Single), new ModelSpec{ Type = "number", Format = "float"}},
-                    {typeof(Double), new ModelSpec{ Type = "number", Format = "double"}},
-                    {typeof(Decimal), new ModelSpec{ Type = "number", Format = "double"}},
-                    {typeof(String), new ModelSpec{ Type = "string", Format = null}},
-                    {typeof(Byte), new ModelSpec{ Type = "string", Format = "byte"}},
-                    {typeof(Boolean), new ModelSpec{ Type = "boolean", Format = null}},
-                    {typeof(DateTime), new ModelSpec{ Type = "string", Format = "date-time"}}
-                };
+        private readonly Dictionary<Type, ModelSpec> _mappings = new Dictionary<Type, ModelSpec>()
+            {
+                {typeof (Int32), new ModelSpec {Type = "integer", Format = "int32"}},
+                {typeof (UInt32), new ModelSpec {Type = "integer", Format = "int32"}},
+                {typeof (Int64), new ModelSpec {Type = "integer", Format = "int64"}},
+                {typeof (UInt64), new ModelSpec {Type = "integer", Format = "int64"}},
+                {typeof (Single), new ModelSpec {Type = "number", Format = "float"}},
+                {typeof (Double), new ModelSpec {Type = "number", Format = "double"}},
+                {typeof (Decimal), new ModelSpec {Type = "number", Format = "double"}},
+                {typeof (String), new ModelSpec {Type = "string", Format = null}},
+                {typeof (Char), new ModelSpec {Type = "string", Format = null}},
+                {typeof (Byte), new ModelSpec {Type = "string", Format = "byte"}},
+                {typeof (Boolean), new ModelSpec {Type = "boolean", Format = null}},
+                {typeof (DateTime), new ModelSpec {Type = "string", Format = "date-time"}},
+                {typeof (HttpResponseMessage), new ModelSpec()},
+                {typeof (JObject), new ModelSpec {Type = "string"}}
+            };
 
         public ModelSpecMap() : this(null) {}
 
-        public ModelSpecMap(IDictionary<Type,ModelSpec> customTypeMappings)
+        public ModelSpecMap(IDictionary<Type, ModelSpec> customTypeMappings)
         {
             if (customTypeMappings != null)
-                _predefinedTypeMap.MergeWith(customTypeMappings);
+                _mappings.MergeWith(customTypeMappings);
         }
 
         public ModelSpec FindOrCreateFor(Type type)
         {
-            // Create mapping if it doesn't exist
-            if (!_cache.ContainsKey(type))
-                _cache[type] = CreateModelSpec(type);
-
-            return _cache[type];
+            // Track any mappings that are currently being created to avoid infinite recursive loop
+            var wip = new Stack<Type>();
+            return FindOrCreateSpecFor(type, wip);
         }
 
         public IEnumerable<ModelSpec> GetAll()
         {
-            return _cache.Values;
+            return _mappings.Values;
         }
 
-        private ModelSpec CreateModelSpec(Type type)
+        private ModelSpec FindOrCreateSpecFor(Type type, Stack<Type> wip)
         {
-            // Primitives, incl. enums
-            if (_predefinedTypeMap.ContainsKey(type))
-                return _predefinedTypeMap[type];
+            wip.Push(type);
 
-            if (type.IsEnum)
-                return new ModelSpec
-                    {
-                        Type = "string",
-                        Enum = type.GetEnumNames()
-                    };
+            if (!_mappings.ContainsKey(type))
+            {
+                Type enumerableTypeArgument;
+                Type nullableTypeArgument;
 
-            Type enumerableTypeArgument;
-            if (type.IsEnumerable(out enumerableTypeArgument))
-                return CreateContainerSpec(enumerableTypeArgument);
+                if (type.IsEnum)
+                {
+                    _mappings.Add(type, CreateEnumSpecFor(type));
+                }
+                else if (type.IsEnumerable(out enumerableTypeArgument))
+                {
+                    _mappings.Add(type, CreateContainerSpecFor(enumerableTypeArgument, wip));
+                }
+                else if (type.IsNullable(out nullableTypeArgument))
+                {
+                    _mappings.Add(type, FindOrCreateSpecFor(nullableTypeArgument, wip));
+                }
+                else
+                {
+                    _mappings.Add(type, CreateComplexSpecFor(type, wip));  
+                }
+            }
 
-            Type nullableTypeArgument;
-            if (type.IsNullable(out nullableTypeArgument))
-                return FindOrCreateFor(nullableTypeArgument);
+            wip.Pop();
 
-            return CreateComplexSpec(type);
+            return _mappings[type];
         }
 
-        private ModelSpec CreateContainerSpec(Type containedType)
+        private ModelSpec CreateEnumSpecFor(Type type)
         {
-            var containedModelSpec = FindOrCreateFor(containedType);
+            return new ModelSpec
+                {
+                    Type = "string",
+                    Enum = type.GetEnumNames()
+                };
+        }
+
+        private ModelSpec CreateContainerSpecFor(Type containedType, Stack<Type> wip)
+        {
+            if (wip.Contains(containedType) && !_mappings.ContainsKey(containedType))
+            {
+                // Safe to assume contained type is complex
+                var id = GetIdentifierFor(containedType);
+                return new ModelSpec {Ref = id};
+            }
+
+            var itemsSpec = FindOrCreateSpecFor(containedType, wip);
             var modelSpec = new ModelSpec
             {
                 Type = "array",
-                Items = containedModelSpec
+                Items = itemsSpec
             };
 
-            if (containedModelSpec.Type == "object")
-                modelSpec.Items = new ModelSpec { Ref = containedModelSpec.Id };
+            if (itemsSpec.Type == "object")
+                modelSpec.Items = new ModelSpec { Ref = itemsSpec.Id };
 
             return modelSpec;
         }
 
-        private ModelSpec CreateComplexSpec(Type type)
+        private ModelSpec CreateComplexSpecFor(Type type, Stack<Type> wip)
         {
             var modelSpec = new ModelSpec
             {
-                Id = GetUniqueTypeIdentifier(type),
+                Id = GetIdentifierFor(type),
                 Type = "object",
                 Properties = new Dictionary<string, ModelSpec>()
             };
 
             foreach (var propInfo in type.GetProperties(BindingFlags.Instance | BindingFlags.Public))
             {
-                var propModelSpec = FindOrCreateFor(propInfo.PropertyType);
+                var propType = propInfo.PropertyType;
+                if (wip.Contains(propType) && !_mappings.ContainsKey(propType))
+                {
+                    // Safe to assume contained type is complex
+                    var id = GetIdentifierFor(propType);
+                    modelSpec.Properties.Add(propInfo.Name, new ModelSpec { Ref = id });
+                }
+                else
+                {
+                    var propSpec = FindOrCreateSpecFor(propType, wip);
 
-                if (propModelSpec.Type == "object")
-                    propModelSpec = new ModelSpec { Ref = propModelSpec.Id };
+                    if (propSpec.Type == "object")
+                        propSpec = new ModelSpec { Ref = propSpec.Id };
 
-                modelSpec.Properties.Add(propInfo.Name, propModelSpec);
+                    modelSpec.Properties.Add(propInfo.Name, propSpec);    
+                }
             }
 
             return modelSpec;
         }
 
-        private string GetUniqueTypeIdentifier(Type type)
+        private string GetIdentifierFor(Type type)
         {
             if (type.IsGenericType)
             {
                 var genericArguments = type.GetGenericArguments()
-                    .Select(GetUniqueTypeIdentifier)
+                    .Select(GetIdentifierFor)
                     .ToArray();
 
                 var builder = new StringBuilder(type.ShortName());

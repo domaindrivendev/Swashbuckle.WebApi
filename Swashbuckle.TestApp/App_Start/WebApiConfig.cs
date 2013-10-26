@@ -1,4 +1,6 @@
-﻿using System.Web.Http;
+﻿using System.Net.Http;
+using System.Web.Http;
+using System.Web.Http.Routing;
 
 namespace Swashbuckle.TestApp.App_Start
 {
@@ -7,22 +9,23 @@ namespace Swashbuckle.TestApp.App_Start
         public static void Register(HttpConfiguration config)
         {
             config.Routes.MapHttpRoute(
-                name: "OrdersApi",
+                name: "Orders_default",
                 routeTemplate: "api/orders/{id}",
                 defaults: new {controller = "Orders", id = RouteParameter.Optional}
                 );
 
             config.Routes.MapHttpRoute(
-                name: "OrderItemsApi",
+                name: "OrderItems_default",
                 routeTemplate: "api/orders/{orderId}/items/{id}",
                 defaults: new {controller = "OrderItems", id = RouteParameter.Optional}
                 );
 
             config.Routes.MapHttpRoute(
-                name: "CustomersApi",
-                routeTemplate: "api/customers",
-                defaults: new {controller = "Customers"}
+                name: "Customers_default",
+                routeTemplate: "api/customers/{id}",
+                defaults: new {controller = "Customers", id = RouteParameter.Optional}
                 );
+
 
             // Uncomment below to support documentation from Xml Comments
 //            try
