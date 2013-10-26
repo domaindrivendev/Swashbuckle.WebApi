@@ -132,7 +132,7 @@ namespace Swashbuckle.Models
             {
                 operationSpec.Type = "void";
             }
-            else if (returnType != typeof(HttpResponseMessage))
+            else
             {
                 var modelSpec = modelSpecMap.FindOrCreateFor(returnType);
                 if (modelSpec.Type == "object")

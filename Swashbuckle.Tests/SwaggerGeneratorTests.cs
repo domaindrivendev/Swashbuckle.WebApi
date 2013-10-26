@@ -97,10 +97,11 @@ namespace Swashbuckle.Tests
 
             ApiDeclaration("/Customers", dec =>
                 {
-                    // 2: /api/customers
-                    Assert.AreEqual(1, dec.Apis.Count);
+                    // 2: /api/customers, /api/customers/{id}
+                    Assert.AreEqual(2, dec.Apis.Count);
 
                     ApiSpec(dec, "/api/customers", 0, api => Assert.IsNull(api.Description));
+                    ApiSpec(dec, "/api/customers/{id}", 0, api => Assert.IsNull(api.Description));
                 });
         }
 
@@ -204,20 +205,48 @@ namespace Swashbuckle.Tests
                 });
 
             ApiSpec("/Customers", "/api/customers", 0, api =>
+            {
+                // 1: POST /api/customers
+                Assert.AreEqual(1, api.Operations.Count);
+
+                OperationSpec(api, "POST", operation =>
                 {
-                    // 1: GET /api/customers
-                    Assert.AreEqual(1, api.Operations.Count);
+                    Assert.AreEqual("Customers_Post", operation.Nickname);
+                    Assert.AreEqual("Documentation for 'Post'.", operation.Summary);
+                    Assert.IsNull(operation.Notes);
+                    Assert.AreEqual("string", operation.Type);
+                    Assert.IsNull(operation.Format);
+                    Assert.IsNull(operation.Items);
+                    Assert.IsNull(operation.Enum);
+                });
+            });
+
+            ApiSpec("/Customers", "/api/customers/{id}", 0, api =>
+                {
+                    // 1: GET /api/customers/{id}, DELETE /api/customers/{id}
+                    Assert.AreEqual(2, api.Operations.Count);
 
                     OperationSpec(api, "GET", operation =>
                         {
-                            Assert.AreEqual("Customers_GetAll", operation.Nickname);
-                            Assert.AreEqual("Documentation for 'GetAll'.", operation.Summary);
+                            Assert.AreEqual("Customers_Get", operation.Nickname);
+                            Assert.AreEqual("Documentation for 'Get'.", operation.Summary);
                             Assert.IsNull(operation.Notes);
-                            Assert.IsNull(operation.Type);
+                            Assert.AreEqual("Customer", operation.Type);
                             Assert.IsNull(operation.Format);
                             Assert.IsNull(operation.Items);
                             Assert.IsNull(operation.Enum);
                         });
+
+                    OperationSpec(api, "DELETE", operation =>
+                    {
+                        Assert.AreEqual("Customers_Delete", operation.Nickname);
+                        Assert.AreEqual("Documentation for 'Delete'.", operation.Summary);
+                        Assert.IsNull(operation.Notes);
+                        Assert.IsNull(operation.Type);
+                        Assert.IsNull(operation.Format);
+                        Assert.IsNull(operation.Items);
+                        Assert.IsNull(operation.Enum);
+                    });
                 });
         }
 
@@ -341,8 +370,53 @@ namespace Swashbuckle.Tests
                         });
                 });
 
-            OperationSpec("/Customers", "/api/customers", 0, "GET", operation =>
-                Assert.AreEqual(0, operation.Parameters.Count));
+            OperationSpec("/Customers", "/api/customers", 0, "POST", operation =>
+                {
+                    Assert.AreEqual(1, operation.Parameters.Count);
+
+                    ParameterSpec(operation, "customer", parameter =>
+                        {
+                            Assert.AreEqual("body", parameter.ParamType);
+                            Assert.AreEqual("Documentation for 'customer'.", parameter.Description);
+                            Assert.AreEqual(true, parameter.Required);
+                            Assert.AreEqual("string", parameter.Type);
+                            Assert.IsNull(parameter.Format);
+                            Assert.IsNull(parameter.Items);
+                            Assert.IsNull(parameter.Enum);
+                        });
+                });
+
+            OperationSpec("/Customers", "/api/customers/{id}", 0, "GET", operation =>
+                {
+                    Assert.AreEqual(1, operation.Parameters.Count);
+
+                    ParameterSpec(operation, "id", parameter =>
+                        {
+                            Assert.AreEqual("path", parameter.ParamType);
+                            Assert.AreEqual("Documentation for 'id'.", parameter.Description);
+                            Assert.AreEqual(true, parameter.Required);
+                            Assert.AreEqual("integer", parameter.Type);
+                            Assert.AreEqual("int32", parameter.Format);
+                            Assert.IsNull(parameter.Items);
+                            Assert.IsNull(parameter.Enum);
+                        });
+                });
+
+            OperationSpec("/Customers", "/api/customers/{id}", 0, "DELETE", operation =>
+            {
+                Assert.AreEqual(1, operation.Parameters.Count);
+
+                ParameterSpec(operation, "id", parameter =>
+                {
+                    Assert.AreEqual("path", parameter.ParamType);
+                    Assert.AreEqual("Documentation for 'id'.", parameter.Description);
+                    Assert.AreEqual(true, parameter.Required);
+                    Assert.AreEqual("integer", parameter.Type);
+                    Assert.AreEqual("int32", parameter.Format);
+                    Assert.IsNull(parameter.Items);
+                    Assert.IsNull(parameter.Enum);
+                });
+            });
         }
 
         [Test]
@@ -439,7 +513,7 @@ namespace Swashbuckle.Tests
                         });
                 });
 
-            ApiDeclaration("/Customers", dec => Assert.AreEqual(0, dec.Models.Count));
+            ApiDeclaration("/Customers", dec => Assert.AreEqual(1, dec.Models.Count));
         }
 
         [Test]
@@ -463,7 +537,10 @@ namespace Swashbuckle.Tests
             OperationSpec("/OrderItems", "/api/orders/{orderId}/items", 0, "GET", operation =>
                 Assert.AreEqual(2, operation.ResponseMessages.Count));
 
-            OperationSpec("/Customers", "/api/customers", 0, "GET", operation =>
+            OperationSpec("/Customers", "/api/customers/{id}", 0, "GET", operation =>
+                Assert.AreEqual(3, operation.ResponseMessages.Count));
+
+            OperationSpec("/Customers", "/api/customers/{id}", 0, "DELETE", operation =>
                 Assert.AreEqual(3, operation.ResponseMessages.Count));
         }
 
