@@ -95,7 +95,11 @@ namespace Swashbuckle.Models
             {
                 // Safe to assume contained type is complex
                 var id = GetIdentifierFor(containedType);
-                return new ModelSpec {Ref = id};
+                return new ModelSpec
+                    {
+                        Type = "array",
+                        Items = new ModelSpec {Ref = id}
+                    };
             }
 
             var itemsSpec = FindOrCreateSpecFor(containedType, wip);
