@@ -8,7 +8,7 @@ using Swashbuckle.WebApi.TestApp.Models;
 
 namespace Swashbuckle.WebApi.TestApp.Controller
 {
-    public class OrdersControllers : ApiController
+    public class OrdersController : ApiController
     {
         public Order Post(Order order)
         {

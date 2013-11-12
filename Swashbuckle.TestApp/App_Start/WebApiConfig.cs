@@ -24,6 +24,12 @@ namespace Swashbuckle.TestApp.App_Start
                 defaults: new {controller = "Customers"}
                 );
 
+            config.Routes.MapHttpRoute(
+                name: "ValuesApi",
+                routeTemplate: "api/values",
+                defaults: new { controller = "Values" }
+                );
+
             // Uncomment below to support documentation from Xml Comments
 //            try
 //            {

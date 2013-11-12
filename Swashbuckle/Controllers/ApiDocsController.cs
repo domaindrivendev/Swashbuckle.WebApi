@@ -13,6 +13,7 @@ namespace Swashbuckle.Controllers
         public ApiDocsController()
         {
             var apiExplorer = GlobalConfiguration.Configuration.Services.GetApiExplorer();
+            System.Diagnostics.Debug.WriteLine(apiExplorer.ApiDescriptions.Count);
             _swaggerSpec = SwaggerGenerator.Instance.Generate(apiExplorer);
 
             _serializerSettings = new JsonSerializerSettings

@@ -16,6 +16,15 @@ namespace Swashbuckle.WebApi.TestApp.App_Start
             //    defaults: new { id = RouteParameter.Optional }
             //);
 
+
+                            
+
+            config.Routes.MapHttpRoute(
+                name: "CustomersApi",
+                routeTemplate: "api/customers",
+                defaults: new { controller = "Customers" }
+                );
+
             config.Routes.MapHttpRoute(
                 name: "OrdersApi",
                 routeTemplate: "api/orders/{id}",
@@ -25,14 +34,17 @@ namespace Swashbuckle.WebApi.TestApp.App_Start
             config.Routes.MapHttpRoute(
                 name: "OrderItemsApi",
                 routeTemplate: "api/orders/{orderId}/items/{id}",
-                defaults: new { controller = "OrderItems", id = RouteParameter.Optional }
+                defaults: new {controller = "OrderItems", id = RouteParameter.Optional}
                 );
 
+
+
             config.Routes.MapHttpRoute(
-                name: "CustomersApi",
-                routeTemplate: "api/customers",
-                defaults: new { controller = "Customers" }
+                name: "ValuesApi",
+                routeTemplate: "api/values",
+                defaults: new { controller = "Values" }
                 );
+
         }
     }
 }

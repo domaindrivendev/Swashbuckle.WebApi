@@ -2,9 +2,9 @@
 using System.Net;
 using System.Web.Http;
 using System.Web.Http.Description;
-using Swashbuckle.Models;
+using Swashbuckle.Core.Models;
 
-namespace Swashbuckle.TestApp.Api.SwaggerExtensions
+namespace Swashbuckle.WebApi.TestApp.SwaggerExtensions
 {
     public class AddAuthorizationErrorCodes : IOperationSpecFilter
     {

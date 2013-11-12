@@ -1,7 +1,7 @@
 ﻿using System.Net.Http;
 using Swashbuckle.Core.Models;
 using Swashbuckle.Models;
-using Swashbuckle.TestApp.SwaggerExtensions;
+using Swashbuckle.WebApi.TestApp.SwaggerExtensions;
 
 namespace Swashbuckle.TestApp.App_Start
 {
@@ -23,8 +23,8 @@ namespace Swashbuckle.TestApp.App_Start
                     c.SupportHeaderParams = true;
                     c.DocExpansion = DocExpansion.List;
                     c.SupportedSubmitMethods = new[] {HttpMethod.Get, HttpMethod.Post, HttpMethod.Put, HttpMethod.Head};
-                    //c.AddOnCompleteScript(typeof (SwaggerConfig).Assembly, "Swashbuckle.TestApp.SwaggerExtensions.onComplete.js");
-                    c.AddStylesheet(typeof(SwaggerConfig).Assembly, "Swashbuckle.TestApp.SwaggerExtensions.customStyles.css");
+                    //c.AddOnCompleteScript(typeof (SwaggerConfig).Assembly, "Swashbuckle.WebApi.TestApp.SwaggerExtensions.onComplete.js");
+                    c.AddStylesheet(typeof(SwaggerConfig).Assembly, "Swashbuckle.WebApi.TestApp.SwaggerExtensions.customStyles.css");
                 });
         }
     }

@@ -42,10 +42,7 @@ namespace SwashBuckle.WebApi.Register
 
         public static void PostStart()
         {
-            //var config = GlobalConfiguration.Configuration;
-
-            //var swaggerUiConfig = SwaggerUiConfig.Instance;
-            //config.Filters.Add(new SwaggerUiConfigFilterAttribute(swaggerUiConfig));
+            // Nothing to do
         }
     }
 }

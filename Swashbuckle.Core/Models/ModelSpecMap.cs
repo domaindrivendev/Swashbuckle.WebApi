@@ -82,7 +82,7 @@ namespace Swashbuckle.Core.Models
         {
             var modelSpec = new ModelSpec
             {
-                Id = type.Name.Split('.').First(),
+                Id = GetNameForComplexType(type),
                 Type = "object",
                 Properties = new Dictionary<string, ModelSpec>()
             };
@@ -98,6 +98,18 @@ namespace Swashbuckle.Core.Models
             }
 
             return modelSpec;
+        }
+
+        private string GetNameForComplexType(Type type)
+        {
+            var typeName =type.Name.Split('.').First();
+            
+            if (type.IsGenericType)
+            {
+                var genericName = type.GetGenericArguments().First().Name.Split('.').First();
+                typeName = string.Format("{0}-{1}", typeName, genericName);
+            }
+            return typeName;
         }
     }
 

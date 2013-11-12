@@ -6,6 +6,7 @@ using System.Web.Http;
 using System.Web.Routing;
 using System.Web.Security;
 using System.Web.SessionState;
+using Swashbuckle.TestApp.App_Start;
 using Swashbuckle.WebApi.TestApp.App_Start;
 
 namespace Swashbuckle.WebApi.TestApp
@@ -16,7 +17,7 @@ namespace Swashbuckle.WebApi.TestApp
         protected void Application_Start(object sender, EventArgs e)
         {
             WebApiConfig.Register(GlobalConfiguration.Configuration);
-            //SwaggerRoutes.Register(GlobalConfiguration.Configuration);
+            SwaggerConfig.Customize();
             
         }
 

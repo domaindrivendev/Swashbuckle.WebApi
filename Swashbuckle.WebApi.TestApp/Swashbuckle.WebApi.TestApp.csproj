@@ -31,6 +31,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <DocumentationFile>bin\Swashbuckle.WebApi.TestApp.XML</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -79,20 +80,26 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Global.asax" />
+    <EmbeddedResource Include="SwaggerExtensions\customStyles.css" />
+    <EmbeddedResource Include="SwaggerExtensions\onComplete.js" />
     <Content Include="Web.config" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="App_Start\SwaggerRoutes.cs" />
+    <Compile Include="App_Start\SwaggerConfig.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
-    <Compile Include="Controller\CustomersController.cs" />
-    <Compile Include="Controller\OrdersControllers.cs" />
-    <Compile Include="Controller\OrderItemsController.cs" />
+    <Compile Include="Controlla\CustomersController.cs" />
+    <Compile Include="Controlla\OrdersController.cs" />
+    <Compile Include="Controlla\OrderItemsController.cs" />
+    <Compile Include="Controlla\ValuesController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
-    <Compile Include="Models\Order.cs" />
-    <Compile Include="Models\OrderItem.cs" />
+    <Compile Include="Moda\Order.cs" />
+    <Compile Include="Moda\OrderItem.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SwaggerExtensions\AddAuthorizationErrorCodes.cs" />
+    <Compile Include="SwaggerExtensions\AddStandardErrorCodes.cs" />
+    <Compile Include="SwaggerExtensions\ExtractXmlComments.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="packages.config" />
@@ -126,9 +133,9 @@
         <WebProjectProperties>
           <UseIIS>True</UseIIS>
           <AutoAssignPort>True</AutoAssignPort>
-          <DevelopmentServerPort>0</DevelopmentServerPort>
+          <DevelopmentServerPort>64402</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
-          <IISUrl>http://localhost:58344/</IISUrl>
+          <IISUrl>http://localhost:58344</IISUrl>
           <NTLMAuthentication>False</NTLMAuthentication>
           <UseCustomServer>False</UseCustomServer>
           <CustomServerUrl>

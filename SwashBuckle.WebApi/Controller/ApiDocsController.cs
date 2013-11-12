@@ -17,6 +17,7 @@ namespace SwashBuckle.WebApi.Controller
         public ApiDocsController()
         {
             var apiExplorer = GlobalConfiguration.Configuration.Services.GetApiExplorer();
+            System.Diagnostics.Debug.WriteLine(apiExplorer.ApiDescriptions.Count);
             _swaggerSpec = SwaggerGenerator.Instance.Generate(apiExplorer);
         }
 

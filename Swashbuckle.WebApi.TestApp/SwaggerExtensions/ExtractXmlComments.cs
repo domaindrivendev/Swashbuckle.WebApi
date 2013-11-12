@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Web.Http.Description;
 using System.Xml.Linq;
-using Swashbuckle.Models;
+using Swashbuckle.Core.Models;
 
-namespace Swashbuckle.TestApp.Api.SwaggerExtensions
+namespace Swashbuckle.WebApi.TestApp.SwaggerExtensions
 {
     public class ExtractXmlComments : IOperationSpecFilter
     {
