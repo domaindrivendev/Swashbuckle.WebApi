@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Web.Http.Description;
+using Swashbuckle.Core.Models;
 
-namespace Swashbuckle.Models
+namespace Swashbuckle.Core.Models
 {
     public class SwaggerGenerator
     {

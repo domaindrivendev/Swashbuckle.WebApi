@@ -14,7 +14,7 @@ namespace Swashbuckle.Models
 
     public class SwaggerUiConfig
     {
-        internal static readonly SwaggerUiConfig Instance = new SwaggerUiConfig();
+        public static readonly SwaggerUiConfig Instance = new SwaggerUiConfig();
 
         private SwaggerUiConfig()
         {
@@ -32,8 +32,8 @@ namespace Swashbuckle.Models
         public bool SupportHeaderParams { get; set; }
         public IEnumerable<HttpMethod> SupportedSubmitMethods { get; set; }
         public DocExpansion DocExpansion { get; set; }
-        internal IList<InjectedResourceDescriptor> CustomScripts { get; private set; }
-        internal IList<InjectedResourceDescriptor> CustomStylesheets { get; private set; }
+        public IList<InjectedResourceDescriptor> CustomScripts { get; private set; }
+        public IList<InjectedResourceDescriptor> CustomStylesheets { get; private set; }
 
         public static void Customize(Action<SwaggerUiConfig> customize)
         {
@@ -61,7 +61,7 @@ namespace Swashbuckle.Models
         }
     }
 
-    internal class InjectedResourceDescriptor
+    public class InjectedResourceDescriptor
     {
         public string RelativePath { get; set; }
 

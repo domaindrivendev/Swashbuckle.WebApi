@@ -3,7 +3,7 @@ using System.Linq;
 using System.Web.Http;
 using System.Web.Http.Description;
 using NUnit.Framework;
-using Swashbuckle.Models;
+using Swashbuckle.Core.Models;
 using Swashbuckle.TestApp.App_Start;
 using Swashbuckle.TestApp.SwaggerExtensions;
 

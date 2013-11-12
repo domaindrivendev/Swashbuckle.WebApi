@@ -2,7 +2,7 @@
 using System.Web.Http.Description;
 using System.Xml;
 using System.Xml.Linq;
-using Swashbuckle.Models;
+using Swashbuckle.Core.Models;
 
 namespace Swashbuckle.TestApp.SwaggerExtensions
 {

@@ -1,7 +1,7 @@
 ﻿using System.Web.Http;
 using System.Web.Mvc;
 using Newtonsoft.Json;
-using Swashbuckle.Models;
+using Swashbuckle.Core.Models;
 
 namespace Swashbuckle.Controllers
 {

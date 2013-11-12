@@ -3,7 +3,7 @@ using System.IO;
 using System.Reflection;
 using System.Web;
 
-namespace Swashbuckle.Handlers
+namespace Swashbuckle.Core.Handlers
 {
     public class EmbeddedResourceHttpHandler : IHttpHandler
     {

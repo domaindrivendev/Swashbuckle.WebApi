@@ -1,9 +1,10 @@
 ﻿using System.Linq;
 using System.Web;
 using System.Web.Routing;
+using Swashbuckle.Core.Filter;
 using Swashbuckle.Models;
 
-namespace Swashbuckle.Handlers
+namespace Swashbuckle.Core.Handlers
 {
     public class SwaggerUiRouteHandler : IRouteHandler
     {

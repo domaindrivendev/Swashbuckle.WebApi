@@ -1,8 +1,8 @@
 ﻿using System.Web;
 using System.Web.Routing;
-using Swashbuckle.Models;
+using Swashbuckle.Core.Models;
 
-namespace Swashbuckle.Handlers
+namespace Swashbuckle.Core.Handlers
 {
     public class RedirectRouteHandler : IRouteHandler
     {
@@ -18,6 +18,8 @@ namespace Swashbuckle.Handlers
             return new RedirectHttpHandler(_redirectUrl);
         }
     }
+
+   
 
     public class RedirectHttpHandler : IHttpHandler
     {
@@ -45,4 +47,21 @@ namespace Swashbuckle.Handlers
             get { return false; }
         }
     }
+
+    public class RouteDirectionConstraint : IRouteConstraint
+    {
+        private readonly RouteDirection _direction;
+
+        public RouteDirectionConstraint(RouteDirection direction)
+        {
+            _direction = direction;
+        }
+
+        public bool Match(HttpContextBase httpContext, Route route, string parameterName,
+            RouteValueDictionary values, RouteDirection routeDirection)
+        {
+            return routeDirection == _direction;
+        }
+    }
+    
 }

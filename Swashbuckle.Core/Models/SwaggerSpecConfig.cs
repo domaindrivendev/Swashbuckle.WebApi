@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Web;
 using System.Web.Http.Description;
 
-namespace Swashbuckle.Models
+namespace Swashbuckle.Core.Models
 {
     public interface IOperationSpecFilter
     {
@@ -12,7 +12,11 @@ namespace Swashbuckle.Models
 
     public class SwaggerSpecConfig
     {
-        internal static readonly SwaggerSpecConfig Instance = new SwaggerSpecConfig();
+        private static SwaggerSpecConfig _instance;
+        public static  SwaggerSpecConfig Instance
+        {
+            get { return _instance ?? (_instance = new SwaggerSpecConfig()); }
+        }
 
         public static void Customize(Action<SwaggerSpecConfig> customize)
         {
@@ -27,7 +31,7 @@ namespace Swashbuckle.Models
         }
 
         internal Func<ApiDescription, string> DeclarationKeySelector { get; set; }
-        internal Func<string> BasePathResolver { get; private set; }
+        public Func<string> BasePathResolver { get; private set; }
         internal ICollection<IOperationSpecFilter> OperationSpecFilters { get; private set; }
 
         public void GroupDeclarationsBy(Func<ApiDescription, string> declarationKeySelector)

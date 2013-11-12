@@ -6,7 +6,7 @@ using System.Net.Http;
 using System.Text;
 using Swashbuckle.Models;
 
-namespace Swashbuckle.Handlers
+namespace Swashbuckle.Filter
 {
     /// <summary>
     /// NOTE: This filter may produce unexpected results when responses are buffered.

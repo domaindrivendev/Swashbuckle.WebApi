@@ -88,21 +88,14 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Controllers\ApiDocsController.cs" />
-    <Compile Include="Handlers\EmbeddedResourceHttpHandler.cs" />
-    <Compile Include="Handlers\SwaggerUiConfigFilter.cs" />
-    <Compile Include="Models\SwaggerSpecConfig.cs" />
-    <Compile Include="Models\SwaggerUiConfig.cs" />
-    <Compile Include="Models\TypeExtensions.cs" />
-    <Compile Include="Models\ModelSpecMap.cs" />
+    <Compile Include="Filter\SwaggerUiConfigFilter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Handlers\RedirectRouteHandler.cs" />
     <Compile Include="SwaggerAreaRegistration.cs" />
-    <Compile Include="Handlers\SwaggerUiRouteHandler.cs" />
-    <Compile Include="Models\SwaggerGenerator.cs" />
-    <Compile Include="Models\SwaggerSpec.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="packages.config" />
+    <Content Include="packages.config">
+      <SubType>Designer</SubType>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <Content Include="Swashbuckle.nuspec">
@@ -115,6 +108,16 @@
       <LogicalName>$([System.String]::Copy('%(RecursiveDir)%(FileName)%(Extension)').Replace('\', '/'))</LogicalName>
       <InProject>false</InProject>
     </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Swashbuckle.Core\Swashbuckle.Core.csproj">
+      <Project>{824b42da-d3e5-4888-a775-d5651d3e0e45}</Project>
+      <Name>Swashbuckle.Core</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Handlers\" />
+    <Folder Include="Models\" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

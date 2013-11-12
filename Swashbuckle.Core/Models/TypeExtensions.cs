@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 
-namespace Swashbuckle.Models
+namespace Swashbuckle.Core.Models
 {
     public static class TypeExtensions
     {

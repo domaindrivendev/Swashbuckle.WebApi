@@ -1,4 +1,5 @@
 ﻿using System.Net.Http;
+using Swashbuckle.Core.Models;
 using Swashbuckle.Models;
 using Swashbuckle.TestApp.SwaggerExtensions;
 
