@@ -2,7 +2,7 @@
 using System.Net.Http;
 using System.Web.Routing;
 using NUnit.Framework;
-using Swashbuckle.Handlers;
+using Swashbuckle.Core.Handlers;
 using Swashbuckle.Models;
 using Swashbuckle.Tests.Support;
 

@@ -1,7 +1,7 @@
 ﻿using System.Web;
 using System.Web.Mvc;
 using System.Web.Routing;
-using Swashbuckle.Handlers;
+using Swashbuckle.Core.Handlers;
 
 namespace Swashbuckle
 {
@@ -38,19 +38,5 @@ namespace Swashbuckle
         }
     }
 
-    public class RouteDirectionConstraint : IRouteConstraint
-    {
-        private readonly RouteDirection _direction;
-
-        public RouteDirectionConstraint(RouteDirection direction)
-        {
-            _direction = direction;
-        }
-
-        public bool Match(HttpContextBase httpContext, Route route, string parameterName,
-            RouteValueDictionary values, RouteDirection routeDirection)
-        {
-            return routeDirection == _direction;
-        }
-    }
+    
 }

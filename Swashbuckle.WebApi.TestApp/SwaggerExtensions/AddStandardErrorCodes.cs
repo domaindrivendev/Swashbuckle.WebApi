@@ -2,7 +2,7 @@
 using System.Web.Http.Description;
 using Swashbuckle.Core.Models;
 
-namespace Swashbuckle.TestApp.SwaggerExtensions
+namespace Swashbuckle.WebApi.TestApp.SwaggerExtensions
 {
     public class AddStandardErrorCodes : IOperationSpecFilter
     {

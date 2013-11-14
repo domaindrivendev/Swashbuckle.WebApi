@@ -1,7 +1,7 @@
 ﻿using System.Web.Http;
 using System.Web.Mvc;
 using Newtonsoft.Json;
-using Swashbuckle.Models;
+using Swashbuckle.Core.Models;
 
 namespace Swashbuckle.Controllers
 {
@@ -13,6 +13,7 @@ namespace Swashbuckle.Controllers
         public ApiDocsController()
         {
             var apiExplorer = GlobalConfiguration.Configuration.Services.GetApiExplorer();
+            System.Diagnostics.Debug.WriteLine(apiExplorer.ApiDescriptions.Count);
             _swaggerSpec = SwaggerGenerator.Instance.Generate(apiExplorer);
 
             _serializerSettings = new JsonSerializerSettings
