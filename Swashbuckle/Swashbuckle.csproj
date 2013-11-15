@@ -90,11 +90,13 @@
     <Compile Include="Controllers\ApiDocsController.cs" />
     <Compile Include="Handlers\EmbeddedResourceHttpHandler.cs" />
     <Compile Include="Handlers\SwaggerUiConfigFilter.cs" />
+    <Compile Include="Models\ModelSpecRegistrar.cs" />
+    <Compile Include="Models\OperationSpecGenerator.cs" />
     <Compile Include="Models\LinqExtensions.cs" />
     <Compile Include="Models\SwaggerSpecConfig.cs" />
     <Compile Include="Models\SwaggerUiConfig.cs" />
     <Compile Include="Models\TypeExtensions.cs" />
-    <Compile Include="Models\ModelSpecMap.cs" />
+    <Compile Include="Models\ModelSpecGenerator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Handlers\RedirectRouteHandler.cs" />
     <Compile Include="SwaggerAreaRegistration.cs" />

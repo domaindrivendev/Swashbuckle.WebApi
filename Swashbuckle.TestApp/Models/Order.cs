@@ -1,4 +1,6 @@
-﻿namespace Swashbuckle.TestApp.Models
+﻿using System.Collections.Generic;
+
+namespace Swashbuckle.TestApp.Models
 {
     public class Order
     {
