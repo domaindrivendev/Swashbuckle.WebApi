@@ -7,18 +7,19 @@ namespace Swashbuckle.Models
 {
     public class OperationSpecGenerator
     {
-        private readonly ModelSpecGenerator _modelSpecGenerator;
         private readonly IEnumerable<IOperationFilter> _operationFilters;
         private readonly IEnumerable<IOperationSpecFilter> _operationSpecFilters;
+        private readonly ModelSpecGenerator _modelSpecGenerator;
 
         public OperationSpecGenerator(
-            ModelSpecGenerator modelSpecGenerator,
+            IDictionary<Type, ModelSpec> customTypeMappings,
             IEnumerable<IOperationFilter> operationFilters,
             IEnumerable<IOperationSpecFilter> operationSpecFilters)
         {
-            _modelSpecGenerator = modelSpecGenerator;
             _operationFilters = operationFilters;
             _operationSpecFilters = operationSpecFilters;
+
+            _modelSpecGenerator = new ModelSpecGenerator(customTypeMappings);
         }
 
         public OperationSpec From(ApiDescription apiDescription, ModelSpecRegistrar modelSpecRegistrar)
