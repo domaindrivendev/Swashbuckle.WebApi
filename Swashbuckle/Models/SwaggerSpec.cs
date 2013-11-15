@@ -8,17 +8,12 @@ namespace Swashbuckle.Models
     {
         public static SwaggerSpec CreateFrom(IApiExplorer apiExplorer)
         {
-            var modelSpecGenerator = new ModelSpecGenerator(SwaggerSpecConfig.Instance.CustomTypeMappings);
-
-            var operationSpecGenerator = new OperationSpecGenerator(
-                modelSpecGenerator,
-                SwaggerSpecConfig.Instance.OperationFilters,
-                SwaggerSpecConfig.Instance.OperationSpecFilters);
-
             var swaggerGenerator = new SwaggerGenerator(
                 SwaggerSpecConfig.Instance.DeclarationKeySelector,
                 SwaggerSpecConfig.Instance.BasePathResolver,
-                operationSpecGenerator);
+                SwaggerSpecConfig.Instance.CustomTypeMappings,
+                SwaggerSpecConfig.Instance.OperationFilters,
+                SwaggerSpecConfig.Instance.OperationSpecFilters);
 
             // TODO: Implement as Singleton - there is only one spec and it should only be generated once
 

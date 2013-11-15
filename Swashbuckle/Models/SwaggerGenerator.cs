@@ -16,11 +16,14 @@ namespace Swashbuckle.Models
         public SwaggerGenerator(
             Func<ApiDescription, string> declarationKeySelector,
             Func<string> basePathResolver,
-            OperationSpecGenerator operationSpecGenerator)
+            IDictionary<Type, ModelSpec> customTypeMappings,
+            IEnumerable<IOperationFilter> operationFilters,
+            IEnumerable<IOperationSpecFilter> operationSpecFilters)
         {
             _declarationKeySelector = declarationKeySelector;
             _basePathResolver = basePathResolver;
-            _operationSpecGenerator = operationSpecGenerator;
+
+            _operationSpecGenerator = new OperationSpecGenerator(customTypeMappings, operationFilters, operationSpecFilters);
         }
 
         public SwaggerSpec From(IApiExplorer apiExplorer)
