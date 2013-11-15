@@ -28,7 +28,7 @@ namespace Swashbuckle.Tests
             WebApiConfig.Register(httpConfiguration);
             var apiExplorer = new ApiExplorer(httpConfiguration);
 
-            _swaggerSpec = SwaggerGenerator.Instance.Generate(apiExplorer);
+            _swaggerSpec = SwaggerSpec.CreateFrom(apiExplorer);
         }
 
         [Test]
@@ -214,7 +214,7 @@ namespace Swashbuckle.Tests
                     Assert.AreEqual("Customers_Post", operation.Nickname);
                     Assert.AreEqual("Documentation for 'Post'.", operation.Summary);
                     Assert.IsNull(operation.Notes);
-                    Assert.AreEqual("string", operation.Type);
+                    Assert.AreEqual("Object", operation.Type);
                     Assert.IsNull(operation.Format);
                     Assert.IsNull(operation.Items);
                     Assert.IsNull(operation.Enum);
@@ -242,7 +242,7 @@ namespace Swashbuckle.Tests
                         Assert.AreEqual("Customers_Delete", operation.Nickname);
                         Assert.AreEqual("Documentation for 'Delete'.", operation.Summary);
                         Assert.IsNull(operation.Notes);
-                        Assert.IsNull(operation.Type);
+                        Assert.AreEqual("Object", operation.Type);
                         Assert.IsNull(operation.Format);
                         Assert.IsNull(operation.Items);
                         Assert.IsNull(operation.Enum);
@@ -379,7 +379,7 @@ namespace Swashbuckle.Tests
                             Assert.AreEqual("body", parameter.ParamType);
                             Assert.AreEqual("Documentation for 'customer'.", parameter.Description);
                             Assert.AreEqual(true, parameter.Required);
-                            Assert.AreEqual("string", parameter.Type);
+                            Assert.AreEqual("Object", parameter.Type);
                             Assert.IsNull(parameter.Format);
                             Assert.IsNull(parameter.Items);
                             Assert.IsNull(parameter.Enum);
@@ -513,7 +513,32 @@ namespace Swashbuckle.Tests
                         });
                 });
 
-            ApiDeclaration("/Customers", dec => Assert.AreEqual(1, dec.Models.Count));
+            ApiDeclaration("/Customers", dec =>
+                {
+                    Assert.AreEqual(2, dec.Models.Count);
+
+                    Model(dec, "Object", model => Assert.AreEqual("object", model.Type));
+
+                    Model(dec, "Customer", model =>
+                        {
+                            ModelProperty(model, "Id", property =>
+                                {
+                                    Assert.AreEqual("integer", property.Type);
+                                    Assert.AreEqual("int32", property.Format);
+                                    Assert.IsNull(property.Items);
+                                    Assert.IsNull(property.Enum);    
+                                });
+
+                            ModelProperty(model, "Associates", property =>
+                                {
+                                    Assert.AreEqual("array", property.Type);
+                                    Assert.AreEqual("Customer", property.Items.Ref);
+                                    Assert.IsNull(property.Format);
+                                    Assert.IsNull(property.Enum);
+                                });
+                        });
+
+                });
         }
 
         [Test]
