@@ -6,7 +6,7 @@ using Swashbuckle.Models;
 namespace Swashbuckle.Tests
 {
     [TestFixture]
-    public class SwaggerUiRouteHandlerTests
+    public class SwaggerUiControllerTests
     {
         private SwaggerUiController _swaggerUiController;
 
