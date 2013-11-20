@@ -101,7 +101,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Swashbuckle.TestApp.Api\Swashbuckle.TestApp.Api.csproj">
-      <Project>{93ca97bc-9d17-4d06-bdba-eecc7f0e1f9d}</Project>
+      <Project>{aea91fac-3c34-4b8a-a8f4-25ddd4269158}</Project>
       <Name>Swashbuckle.TestApp.Api</Name>
     </ProjectReference>
   </ItemGroup>

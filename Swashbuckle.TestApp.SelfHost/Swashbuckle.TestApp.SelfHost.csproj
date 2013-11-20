@@ -4,7 +4,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{F256DD92-3BAF-47FA-8726-AA64D877AAE6}</ProjectGuid>
+    <ProjectGuid>{2A7DDF9F-30FE-42F3-B55A-071C4C4477D9}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Swashbuckle.TestApp.SelfHost</RootNamespace>
@@ -35,8 +35,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Newtonsoft.Json, Version=4.5.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
+    <Reference Include="Newtonsoft.Json">
       <HintPath>..\packages\Newtonsoft.Json.4.5.11\lib\net40\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="System" />
@@ -68,7 +67,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Swashbuckle.TestApp.Api\Swashbuckle.TestApp.Api.csproj">
-      <Project>{93CA97BC-9D17-4D06-BDBA-EECC7F0E1F9D}</Project>
+      <Project>{aea91fac-3c34-4b8a-a8f4-25ddd4269158}</Project>
       <Name>Swashbuckle.TestApp.Api</Name>
     </ProjectReference>
   </ItemGroup>

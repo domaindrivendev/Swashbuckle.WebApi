@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("Swashbuckle.TestApp.SelfHost")]
+[assembly: AssemblyTitle("Swashbuckle.TestApp.Api")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("Swashbuckle.TestApp.SelfHost")]
+[assembly: AssemblyProduct("Swashbuckle.TestApp.Api")]
 [assembly: AssemblyCopyright("Copyright ©  2013")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("6310c67e-8119-4ad0-87c4-0e566b5f2dc7")]
+[assembly: Guid("947ed8f4-3b86-4160-9064-fbc82fd3e7a9")]
 
 // Version information for an assembly consists of the following four values:
 //
