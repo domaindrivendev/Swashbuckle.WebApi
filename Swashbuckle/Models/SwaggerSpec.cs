@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Net.Http;
 using System.Web.Http.Description;
 using Newtonsoft.Json;
 
@@ -6,18 +7,20 @@ namespace Swashbuckle.Models
 {
     public class SwaggerSpec
     {
-        public static SwaggerSpec CreateFrom(IApiExplorer apiExplorer)
+        public static SwaggerSpec GetInstance(IApiExplorer apiExplorer, HttpRequestMessage request)
         {
+            var basePath = SwaggerSpecConfig.Instance.BasePathResolver(request);
+
             var swaggerGenerator = new SwaggerGenerator(
+                basePath,
                 SwaggerSpecConfig.Instance.DeclarationKeySelector,
-                SwaggerSpecConfig.Instance.BasePathResolver,
                 SwaggerSpecConfig.Instance.CustomTypeMappings,
                 SwaggerSpecConfig.Instance.OperationFilters,
                 SwaggerSpecConfig.Instance.OperationSpecFilters);
 
             // TODO: Implement as Singleton - there is only one spec and it should only be generated once
 
-            return swaggerGenerator.From(apiExplorer);
+            return swaggerGenerator.ApiExplorerToSwaggerSpec(apiExplorer);
         }
 
         public ResourceListing Listing { get; set; }

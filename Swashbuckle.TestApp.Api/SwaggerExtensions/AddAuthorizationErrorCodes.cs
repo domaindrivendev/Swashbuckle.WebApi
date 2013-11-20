@@ -8,7 +8,7 @@ namespace Swashbuckle.TestApp.Api.SwaggerExtensions
 {
     public class AddAuthorizationErrorCodes : IOperationSpecFilter
     {
-        public void Apply(ApiDescription apiDescription, OperationSpec operationSpec)
+        public void Apply(ApiDescription apiDescription, OperationSpec operationSpec, ModelSpecMap modelSpecMap)
         {
             if (apiDescription.ActionDescriptor.GetFilters().OfType<AuthorizeAttribute>().Any())
             {

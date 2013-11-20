@@ -42,7 +42,7 @@ namespace Swashbuckle.Models
             : this(new Dictionary<Type, ModelSpec>())
         {}
 
-        public ModelSpec From(Type type, ModelSpecRegistrar modelSpecRegistrar)
+        public ModelSpec TypeToModelSpec(Type type, ModelSpecRegistrar modelSpecRegistrar)
         {
             // Complex types are deferred, track progress
             var deferredMappings = new Dictionary<Type, ModelSpec>();

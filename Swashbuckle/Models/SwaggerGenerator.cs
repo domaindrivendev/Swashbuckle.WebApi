@@ -9,26 +9,29 @@ namespace Swashbuckle.Models
     {
         protected const string SwaggerVersion = "1.2";
 
+        private readonly string _basePath;
         private readonly Func<ApiDescription, string> _declarationKeySelector;
-        private readonly Func<string> _basePathResolver;
         private readonly OperationSpecGenerator _operationSpecGenerator;
 
         public SwaggerGenerator(
+            string basePath,
             Func<ApiDescription, string> declarationKeySelector,
-            Func<string> basePathResolver,
             IDictionary<Type, ModelSpec> customTypeMappings,
             IEnumerable<IOperationFilter> operationFilters,
             IEnumerable<IOperationSpecFilter> operationSpecFilters)
         {
+            _basePath = basePath;
             _declarationKeySelector = declarationKeySelector;
-            _basePathResolver = basePathResolver;
 
             _operationSpecGenerator = new OperationSpecGenerator(customTypeMappings, operationFilters, operationSpecFilters);
         }
 
-        public SwaggerSpec From(IApiExplorer apiExplorer)
+        public SwaggerSpec ApiExplorerToSwaggerSpec(IApiExplorer apiExplorer)
         {
             var apiDescriptionGroups = apiExplorer.ApiDescriptions
+                .Where(apiDesc =>
+                    apiDesc.ActionDescriptor.ControllerDescriptor.ControllerName != "SwaggerSpec"
+                    && apiDesc.ActionDescriptor.ControllerDescriptor.ControllerName != "SwaggerUi") // Ignore swagger endpoints
                 .GroupBy(apiDesc => "/" + _declarationKeySelector(apiDesc))
                 .ToArray();
 
@@ -73,7 +76,7 @@ namespace Swashbuckle.Models
             {
                 ApiVersion = "1.0",
                 SwaggerVersion = SwaggerVersion,
-                BasePath = _basePathResolver().TrimEnd('/'),
+                BasePath = _basePath.TrimEnd('/'),
                 ResourcePath = apiDescriptionGroup.Key,
                 Apis = apiSpecs,
                 Models = modelSpecRegistrar.ToDictionary()
@@ -83,7 +86,7 @@ namespace Swashbuckle.Models
         private ApiSpec CreateApiSpec(IGrouping<string, ApiDescription> apiDescriptionGroup, ModelSpecRegistrar modelSpecRegistrar)
         {
             var operationSpecs = apiDescriptionGroup
-                .Select(apiDesc => _operationSpecGenerator.From(apiDesc, modelSpecRegistrar))
+                .Select(apiDesc => _operationSpecGenerator.ApiDescriptionToOperationSpec(apiDesc, modelSpecRegistrar))
                 .ToList();
 
             return new ApiSpec

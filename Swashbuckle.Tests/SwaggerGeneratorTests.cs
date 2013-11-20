@@ -4,8 +4,8 @@ using System.Web.Http;
 using System.Web.Http.Description;
 using NUnit.Framework;
 using Swashbuckle.Models;
-using Swashbuckle.TestApp.App_Start;
-using Swashbuckle.TestApp.SwaggerExtensions;
+using Swashbuckle.TestApp.Api.App_Start;
+using Swashbuckle.TestApp.Api.SwaggerExtensions;
 
 namespace Swashbuckle.Tests
 {
@@ -18,7 +18,7 @@ namespace Swashbuckle.Tests
         {
             SwaggerSpecConfig.Customize(c =>
                 {
-                    c.ResolveBasePath(() => "http://tempuri.org");
+                    c.ResolveBasePath((request) => "http://tempuri.org");
                     c.PostFilter<AddStandardErrorCodes>();
                     c.PostFilter<AddAuthorizationErrorCodes>();
                 });
@@ -28,7 +28,7 @@ namespace Swashbuckle.Tests
             WebApiConfig.Register(httpConfiguration);
             var apiExplorer = new ApiExplorer(httpConfiguration);
 
-            _swaggerSpec = SwaggerSpec.CreateFrom(apiExplorer);
+            _swaggerSpec = SwaggerSpec.GetInstance(apiExplorer, null);
         }
 
         [Test]

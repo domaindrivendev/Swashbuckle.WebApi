@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Web;
+using System.Net.Http;
 using System.Web.Http.Description;
 
 namespace Swashbuckle.Models
@@ -24,7 +24,7 @@ namespace Swashbuckle.Models
         }
 
         internal Func<ApiDescription, string> DeclarationKeySelector { get; private set; }
-        internal Func<string> BasePathResolver { get; private set; }
+        internal Func<HttpRequestMessage, string> BasePathResolver { get; private set; }
         internal IDictionary<Type,ModelSpec> CustomTypeMappings { get; private set; }
         internal List<IOperationFilter> OperationFilters { get; private set; }
         internal List<IOperationSpecFilter> OperationSpecFilters { get; private set; }
@@ -36,11 +36,11 @@ namespace Swashbuckle.Models
             DeclarationKeySelector = declarationKeySelector;
         }
 
-        public void ResolveBasePath(Func<string> resolver)
+        public void ResolveBasePath(Func<HttpRequestMessage, string> basePathResolver)
         {
-            if(resolver == null)
-                throw new ArgumentNullException("resolver");
-            BasePathResolver = resolver;
+            if(basePathResolver == null)
+                throw new ArgumentNullException("basePathResolver");
+            BasePathResolver = basePathResolver;
         }
 
         public void OperationFilter(IOperationFilter operationFilter)
@@ -77,9 +77,12 @@ namespace Swashbuckle.Models
             return apiDescription.ActionDescriptor.ControllerDescriptor.ControllerName;
         }
 
-        private string DefaultBasePathResolver()
+        private string DefaultBasePathResolver(HttpRequestMessage request)
         {
-            return HttpContext.Current.Request.Url.GetLeftPart(UriPartial.Authority) + HttpRuntime.AppDomainAppVirtualPath;
+            var url = request.RequestUri.ToString();
+            var cutoffIndex = url.IndexOf("/swagger", StringComparison.InvariantCulture);
+
+            return url.Substring(0, cutoffIndex);
         }
     }
 
@@ -91,7 +94,11 @@ namespace Swashbuckle.Models
 
     public interface IOperationFilter
     {
-        void Apply(ApiDescription apiDescription, OperationSpec operationSpec, ModelSpecRegistrar modelSpecRegistrar, ModelSpecGenerator modelSpecGenerator);
+        void Apply(
+            ApiDescription apiDescription,
+            OperationSpec operationSpec,
+            ModelSpecRegistrar modelSpecRegistrar,
+            ModelSpecGenerator modelSpecGenerator);
     }
 
     public class ModelSpecMap
@@ -107,7 +114,7 @@ namespace Swashbuckle.Models
 
         public ModelSpec FindOrCreateFor(Type type)
         {
-            return _modelSpecGenerator.From(type, _modelSpecRegistrar);
+            return _modelSpecGenerator.TypeToModelSpec(type, _modelSpecRegistrar);
         }
     }
 }

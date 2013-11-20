@@ -2,7 +2,7 @@
 <package >
   <metadata>
     <id>$id$</id>
-    <version>3.1.1</version>
+    <version>3.2.0</version>
     <title>$title$</title>
     <authors>Richard Morris, GettyImages</authors>
     <licenseUrl>http://opensource.org/licenses/BSD-3-Clause</licenseUrl>
@@ -10,6 +10,6 @@
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>Seamlessly adds a Swagger to WebApi projects! Uses a combination of ApiExplorer and Swagger/Swagger-UI to provide a rich discovery and documentation experience for consumers</description>
     <copyright>Copyright 2013</copyright>
-    <tags>Swagger WebApi Documentation Discovery Help</tags>
+    <tags>Swagger Documentation Discovery Help WebApi AspNet AspNetWebApi Docs</tags>
   </metadata>
 </package>

@@ -22,7 +22,7 @@ namespace Swashbuckle.Models
             _modelSpecGenerator = new ModelSpecGenerator(customTypeMappings);
         }
 
-        public OperationSpec From(ApiDescription apiDescription, ModelSpecRegistrar modelSpecRegistrar)
+        public OperationSpec ApiDescriptionToOperationSpec(ApiDescription apiDescription, ModelSpecRegistrar modelSpecRegistrar)
         {
             var apiPath = apiDescription.RelativePath.Split('?').First();
             var paramSpecs = apiDescription.ParameterDescriptions
@@ -47,7 +47,7 @@ namespace Swashbuckle.Models
             }
             else
             {
-                var modelSpec = _modelSpecGenerator.From(returnType, modelSpecRegistrar);
+                var modelSpec = _modelSpecGenerator.TypeToModelSpec(returnType, modelSpecRegistrar);
 
                 if (modelSpec.Type == "object")
                 {
@@ -98,7 +98,7 @@ namespace Swashbuckle.Models
                 Required = !apiParamDesc.ParameterDescriptor.IsOptional
             };
 
-            var modelSpec = _modelSpecGenerator.From(apiParamDesc.ParameterDescriptor.ParameterType, modelSpecRegistrar);
+            var modelSpec = _modelSpecGenerator.TypeToModelSpec(apiParamDesc.ParameterDescriptor.ParameterType, modelSpecRegistrar);
 
             if (modelSpec.Type == "object")
             {

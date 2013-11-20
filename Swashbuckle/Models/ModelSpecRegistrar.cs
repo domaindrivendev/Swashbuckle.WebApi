@@ -29,7 +29,7 @@ namespace Swashbuckle.Models
             }
         }
 
-        public Dictionary<string, ModelSpec> ToDictionary()
+        internal Dictionary<string, ModelSpec> ToDictionary()
         {
             // Don't expose internal state - return a clone. Still shallow ... oh well!
             return _registeredSpecs

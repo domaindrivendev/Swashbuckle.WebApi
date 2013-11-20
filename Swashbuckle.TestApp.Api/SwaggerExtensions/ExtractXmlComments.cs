@@ -7,7 +7,7 @@ namespace Swashbuckle.TestApp.Api.SwaggerExtensions
 {
     public class ExtractXmlComments : IOperationSpecFilter
     {
-        public void Apply(ApiDescription apiDescription, OperationSpec operationSpec)
+        public void Apply(ApiDescription apiDescription, OperationSpec operationSpec, ModelSpecMap modelSpecMap)
         {
             var descriptionXml = XElement.Parse(apiDescription.Documentation);
 

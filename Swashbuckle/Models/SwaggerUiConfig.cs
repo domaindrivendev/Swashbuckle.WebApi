@@ -23,8 +23,8 @@ namespace Swashbuckle.Models
             SupportHeaderParams = false;
             SupportedSubmitMethods = new[] {HttpMethod.Get, HttpMethod.Post, HttpMethod.Put};
             DocExpansion = DocExpansion.None;
-            CustomScripts = new List<InjectedResourceDescriptor>();
-            CustomStylesheets = new List<InjectedResourceDescriptor>();
+            CustomScripts = new List<CustomResourceDescriptor>();
+            CustomStylesheets = new List<CustomResourceDescriptor>();
         }
 
         public string ApiKeyName { get; set; }
@@ -32,8 +32,8 @@ namespace Swashbuckle.Models
         public bool SupportHeaderParams { get; set; }
         public IEnumerable<HttpMethod> SupportedSubmitMethods { get; set; }
         public DocExpansion DocExpansion { get; set; }
-        internal IList<InjectedResourceDescriptor> CustomScripts { get; private set; }
-        internal IList<InjectedResourceDescriptor> CustomStylesheets { get; private set; }
+        internal IList<CustomResourceDescriptor> CustomScripts { get; private set; }
+        internal IList<CustomResourceDescriptor> CustomStylesheets { get; private set; }
 
         public static void Customize(Action<SwaggerUiConfig> customize)
         {
@@ -42,31 +42,25 @@ namespace Swashbuckle.Models
 
         public void AddOnCompleteScript(Assembly resourceAssembly, string resourceName)
         {
-            CustomScripts.Add(new InjectedResourceDescriptor
-                {
-                    RelativePath = String.Format("ext/{0}", resourceName),
-                    ResourceAssembly = resourceAssembly,
-                    ResourceName = resourceName,
-                });
+            CustomScripts.Add(new CustomResourceDescriptor(resourceAssembly, resourceName));
         }
 
         public void AddStylesheet(Assembly resourceAssembly, string resourceName)
         {
-            CustomStylesheets.Add(new InjectedResourceDescriptor
-            {
-                RelativePath = String.Format("ext/{0}", resourceName),
-                ResourceAssembly = resourceAssembly,
-                ResourceName = resourceName,
-            });
+            CustomStylesheets.Add(new CustomResourceDescriptor(resourceAssembly, resourceName));
         }
     }
 
-    internal class InjectedResourceDescriptor
+    internal class CustomResourceDescriptor
     {
-        public string RelativePath { get; set; }
+        public CustomResourceDescriptor(Assembly assembly, string name)
+        {
+            Assembly = assembly;
+            Name = name;
+        }
 
-        public Assembly ResourceAssembly { get; set; }
+        public Assembly Assembly { get; private set; }
 
-        public string ResourceName { get; set; }
+        public string Name { get; private set; }
     }
 }

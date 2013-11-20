@@ -137,12 +137,6 @@
     <Content Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Swashbuckle\Swashbuckle.csproj">
-      <Project>{d08956c3-4831-4623-93fd-cb256953bca1}</Project>
-      <Name>Swashbuckle</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <Content Include="Web.config" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
@@ -150,6 +144,12 @@
     <None Include="Web.Release.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Swashbuckle\Swashbuckle.csproj">
+      <Project>{d2dd1850-71b5-49e3-b23c-4d90a567a0b3}</Project>
+      <Name>Swashbuckle</Name>
+    </ProjectReference>
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

@@ -1,17 +1,14 @@
-﻿using System.IO;
-using System.Net.Http;
-using System.Web.Routing;
+﻿using System.Net.Http;
 using NUnit.Framework;
-using Swashbuckle.Handlers;
+using Swashbuckle.Controllers;
 using Swashbuckle.Models;
-using Swashbuckle.Tests.Support;
 
 namespace Swashbuckle.Tests
 {
     [TestFixture]
     public class SwaggerUiRouteHandlerTests
     {
-        private SwaggerUiRouteHandler _routeHandler;
+        private SwaggerUiController _swaggerUiController;
 
         [TestFixtureSetUp]
         public void FixtureSetup()
@@ -29,7 +26,7 @@ namespace Swashbuckle.Tests
                     c.AddStylesheet(GetType().Assembly, "Swashbuckle.Tests.Support.testStyles2.css");
                 });
 
-            _routeHandler = new SwaggerUiRouteHandler();
+            _swaggerUiController = new SwaggerUiController();
         }
 
         [Test]
@@ -40,15 +37,16 @@ namespace Swashbuckle.Tests
             Assert.IsTrue(responseText.Contains("apiKey: \"TestApiKey\""), "apiKey not customized");
             Assert.IsTrue(responseText.Contains("apiKeyName: \"TestApiKeyName\""), "apiKeyName not customized");
             Assert.IsTrue(responseText.Contains("supportHeaderParams: true"), "supportHeaderParams not customized");
-            Assert.IsTrue(responseText.Contains("supportedSubmitMethods: ['get','post','put','head']"), "supportedSubmitMethods not customized");
+            Assert.IsTrue(responseText.Contains("supportedSubmitMethods: ['GET','POST','PUT','HEAD']"),
+                "supportedSubmitMethods not customized");
             Assert.IsTrue(responseText.Contains("docExpansion: \"full\""), "docExpansion not customized");
             Assert.IsTrue(responseText.Contains(
                 "$.getScript('ext/Swashbuckle.Tests.Support.testScript1.js');\r\n" +
-                "$.getScript('ext/Swashbuckle.Tests.Support.testScript2.js');"),
+                    "$.getScript('ext/Swashbuckle.Tests.Support.testScript2.js');"),
                 "CustomScripts not included");
             Assert.IsTrue(responseText.Contains(
                 "<link href='ext/Swashbuckle.Tests.Support.testStyles1.css' rel='stylesheet' type='text/css'/>\r\n" +
-                "<link href='ext/Swashbuckle.Tests.Support.testStyles2.css' rel='stylesheet' type='text/css'/>"),
+                    "<link href='ext/Swashbuckle.Tests.Support.testStyles2.css' rel='stylesheet' type='text/css'/>"),
                 "Stylesheets not included");
         }
 
@@ -72,33 +70,11 @@ namespace Swashbuckle.Tests
             Assert.IsTrue(responseText.StartsWith("h1 {"));
         }
 
-        private string ExecuteRequest(string routePath)
+        private string ExecuteRequest(string path)
         {
-            var httpContext = new FakeHttpContext(routePath);
-            var sinkFilter = new MemoryStream();
-            httpContext.Response.Filter = sinkFilter;
+            var responseMessage = _swaggerUiController.GetResource(path);
 
-            var routeData = new RouteData();
-            routeData.Values.Add("path", routePath);
-            var requestContext = new RequestContext
-                {
-                    RouteData =  routeData,
-                    HttpContext = httpContext
-                };
-
-            var httpHandler = _routeHandler.GetHttpHandler(requestContext) as EmbeddedResourceHttpHandler;
-            httpHandler.ProcessRequest(httpContext);
-
-            // Simulate output filtering
-            var outputStream = httpContext.Response.OutputStream;
-            outputStream.Seek(0, SeekOrigin.Begin);
-            outputStream.CopyTo(httpContext.Response.Filter);
-
-            sinkFilter.Seek(0, SeekOrigin.Begin);
-            using (var reader = new StreamReader(sinkFilter))
-            {
-                return reader.ReadToEnd();
-            }
+            return responseMessage.Content.ReadAsStringAsync().Result;
         }
     }
 }
