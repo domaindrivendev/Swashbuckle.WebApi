@@ -1,7 +1,7 @@
 ﻿using System.Net.Http;
 using NUnit.Framework;
-using Swashbuckle.Controllers;
-using Swashbuckle.Models;
+using Swashbuckle.Core.Controllers;
+using Swashbuckle.Core.Models;
 
 namespace Swashbuckle.Tests
 {

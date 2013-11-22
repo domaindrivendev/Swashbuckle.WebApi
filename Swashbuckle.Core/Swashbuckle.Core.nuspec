@@ -1,0 +1,18 @@
+﻿<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>$id$</id>
+    <version>3.2.0</version>
+    <title>$title$</title>
+    <authors>Richard Morris, GettyImages</authors>
+    <licenseUrl>http://opensource.org/licenses/BSD-3-Clause</licenseUrl>
+    <projectUrl>https://github.com/domaindrivendev/Swashbuckle</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>This package contains the Core bits used by both Swashbuckle and Swashbuckle.SelfHost packages. If you're WebApi is hosted in IIS use Swashbuckle. Alternatively, if it's self-hosted use Swashbuckle.SelfHost</description>
+    <copyright>Copyright 2013</copyright>
+    <tags>Swagger Documentation Discovery Help WebApi AspNet AspNetWebApi Docs</tags>
+    <dependencies>
+      <dependency id="Microsoft.AspNet.WebApi.Core" version="4.0" />
+    </dependencies>
+  </metadata>
+</package>

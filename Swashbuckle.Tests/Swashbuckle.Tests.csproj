@@ -85,13 +85,13 @@
     <EmbeddedResource Include="Support\testStyles1.css" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Swashbuckle.Core\Swashbuckle.Core.csproj">
+      <Project>{d2dd1850-71b5-49e3-b23c-4d90a567a0b3}</Project>
+      <Name>Swashbuckle.Core</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Swashbuckle.TestApp.Api\Swashbuckle.TestApp.Api.csproj">
       <Project>{aea91fac-3c34-4b8a-a8f4-25ddd4269158}</Project>
       <Name>Swashbuckle.TestApp.Api</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Swashbuckle\Swashbuckle.csproj">
-      <Project>{d2dd1850-71b5-49e3-b23c-4d90a567a0b3}</Project>
-      <Name>Swashbuckle</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

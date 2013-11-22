@@ -1,5 +1,0 @@
-body #header
-{
-    background: -moz-linear-gradient(left, red, orange, yellow, green, blue, indigo, violet);
-    background: -webkit-gradient(linear, left center, right center, from(red), color-stop(14%, orange), color-stop(28%, yellow), color-stop(42%, green), color-stop(56%, blue), color-stop(70%, indigo), to(violet));
-}
