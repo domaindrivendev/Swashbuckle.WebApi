@@ -47,11 +47,15 @@ namespace Swashbuckle.Core.Models
             }
             else
             {
-                var modelSpec = _modelSpecGenerator.TypeToModelSpec(returnType, modelSpecRegistrar);
+                IEnumerable<ModelSpec> referencedSpecs;
+                var modelSpec = _modelSpecGenerator.TypeToModelSpec(returnType, out referencedSpecs);
 
+                modelSpecRegistrar.RegisterMany(referencedSpecs);
+                
                 if (modelSpec.Type == "object")
                 {
                     operationSpec.Type = modelSpec.Id;
+                    modelSpecRegistrar.Register(modelSpec);
                 }
                 else
                 {
@@ -98,11 +102,15 @@ namespace Swashbuckle.Core.Models
                 Required = !apiParamDesc.ParameterDescriptor.IsOptional
             };
 
-            var modelSpec = _modelSpecGenerator.TypeToModelSpec(apiParamDesc.ParameterDescriptor.ParameterType, modelSpecRegistrar);
+            IEnumerable<ModelSpec> referencedSpecs;
+            var modelSpec = _modelSpecGenerator.TypeToModelSpec(apiParamDesc.ParameterDescriptor.ParameterType, out referencedSpecs);
+            
+            modelSpecRegistrar.RegisterMany(referencedSpecs);
 
             if (modelSpec.Type == "object")
             {
                 paramSpec.Type = modelSpec.Id;
+                modelSpecRegistrar.Register(modelSpec);
             }
             else
             {

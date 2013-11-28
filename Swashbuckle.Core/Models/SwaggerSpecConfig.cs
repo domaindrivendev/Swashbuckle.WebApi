@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Web.Http.Description;
@@ -114,7 +115,15 @@ namespace Swashbuckle.Core.Models
 
         public ModelSpec FindOrCreateFor(Type type)
         {
-            return _modelSpecGenerator.TypeToModelSpec(type, _modelSpecRegistrar);
+            IEnumerable<ModelSpec> referencedSpecs;
+            var modelSpec = _modelSpecGenerator.TypeToModelSpec(type, out referencedSpecs);
+
+            _modelSpecRegistrar.RegisterMany(referencedSpecs);
+
+            if (modelSpec.Type == "object")
+                _modelSpecRegistrar.Register(modelSpec);
+
+            return modelSpec;
         }
     }
 }
