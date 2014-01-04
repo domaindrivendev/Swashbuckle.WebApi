@@ -23,6 +23,31 @@ This will add a reference to Swashbuckle.dll which contains an embedded "Area" f
 
 *swagger*
 
+Troubleshooting
+--------------------
+
+If you've installed the Nuget package but still don't see the auto-generated swagger/swagger-ui, then try the following steps ...
+
+### Ensure MVC Areas are registered at application startup ###
+
+The swagger routes are wired-up as an MVC Area. For MVC projects, Areas are usually registered at application startup. If the code to do this is not present in your Global.asax.cs, you'll need to add it manually:
+
+    protected void Application_Start()
+    {
+        // Other boot-strapping ...
+        
+        AreaRegistration.RegisterAllAreas();
+    }
+    
+### Ensure All Managed Modules are run for all requests ###
+
+The [swagger-ui](https://github.com/wordnik/swagger-ui) is a single page application (SPA) consisting of html, JavaScript and CSS. To serve up these files (.html, .js and .css extensions), you're web server must execute the ASP.NET Routing Module on all requests (as opposed to extensionless only). If the setting for this is not present in your Web.config, you'll need to add it manually:
+
+    <system.webServer>
+        <modules runAllManagedModulesForAllRequests="true" />
+        <!-- Other web server settings -->
+    </system.webServer>
+
 Extensibility
 --------------------
 
