@@ -28,6 +28,18 @@ Troubleshooting
 
 If you've installed the Nuget package but still don't see the auto-generated swagger/swagger-ui, then try the following steps ...
 
+### Issues with VS 2013 ###
+
+VS 2103 ships with a new feature - Browser Link that improves the web development workflow by setting up a channel between the IDE and pages being previewed in a local browser. It does this by dynamically injecting JavaScript into your files.
+
+Although this JavaScript SHOULD have no affect on your production code, it appears to be breaking the swagger-ui.
+
+I hope to find a permanent fix but in the meantime, you'll need to workaround this isuse by disabling the feature in your web.config:
+
+    <appSettings>
+        <add key="vs:EnableBrowserLink" value="false"/>
+    </appSettings>< appSettings>
+
 ### Ensure MVC Areas are registered at application startup ###
 
 The swagger routes are wired-up as an MVC Area. For MVC projects, Areas are usually registered at application startup. If the code to do this is not present in your Global.asax.cs, you'll need to add it manually:
