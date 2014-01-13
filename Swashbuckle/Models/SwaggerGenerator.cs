@@ -30,6 +30,7 @@ namespace Swashbuckle.Models
         {
             var apiDescriptionGroups = apiExplorer.ApiDescriptions
                 .GroupBy(apiDesc => "/" + _declarationKeySelector(apiDesc))
+                .OrderBy(group => group.Key)
                 .ToArray();
 
             return new SwaggerSpec
