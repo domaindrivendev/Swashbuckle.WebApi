@@ -1,0 +1,10 @@
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003" DefaultTargets="Build" ToolsVersion="4.0">
+    <PropertyGroup>
+        <Configuration Condition="$(Configuration)==''">Debug</Configuration>
+    </PropertyGroup>
+
+    <Target Name="Build">
+        <MSBuild Projects="Swashbuckle.sln" />
+    </Target>
+
+	</Project>

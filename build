@@ -1,0 +1,4 @@
+#!/bin/sh
+
+$SYSTEMROOT/System32/cmd.exe /c "build.bat $*"
+exit $?
