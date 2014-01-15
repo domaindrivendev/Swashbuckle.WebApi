@@ -33,8 +33,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{67E5A2
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Swashbuckle.TestApp.WebHost", "Swashbuckle.TestApp.WebHost\Swashbuckle.TestApp.WebHost.csproj", "{FD8B7552-2373-45AB-AAE2-45B6EE7A4DA1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Swashbuckle.TestApp.Api", "Swashbuckle.TestApp.Api\Swashbuckle.TestApp.Api.csproj", "{AEA91FAC-3C34-4B8A-A8F4-25DDD4269158}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Swashbuckle.TestApp.SelfHost", "Swashbuckle.TestApp.SelfHost\Swashbuckle.TestApp.SelfHost.csproj", "{2A7DDF9F-30FE-42F3-B55A-071C4C4477D9}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{5674EF25-51F0-40CC-8CD1-44BDBB691999}"
@@ -44,6 +42,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Swashbuckle.WebHost", "Swashbuckle.WebHost\Swashbuckle.WebHost.csproj", "{8D27C195-02FB-43AD-A862-068E2E8D7AD1}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Swashbuckle.SelfHost", "Swashbuckle.SelfHost\Swashbuckle.SelfHost.csproj", "{9C0B0249-7493-424C-8B64-D6D73372A9A7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Swashbuckle.TestApp.Api", "Swashbuckle.TestApp.Api\Swashbuckle.TestApp.Api.csproj", "{5B66B6BB-F6C9-435E-B997-F870659F714F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -63,10 +63,6 @@ Global
 		{FD8B7552-2373-45AB-AAE2-45B6EE7A4DA1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FD8B7552-2373-45AB-AAE2-45B6EE7A4DA1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FD8B7552-2373-45AB-AAE2-45B6EE7A4DA1}.Release|Any CPU.Build.0 = Release|Any CPU
-		{AEA91FAC-3C34-4B8A-A8F4-25DDD4269158}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{AEA91FAC-3C34-4B8A-A8F4-25DDD4269158}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{AEA91FAC-3C34-4B8A-A8F4-25DDD4269158}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{AEA91FAC-3C34-4B8A-A8F4-25DDD4269158}.Release|Any CPU.Build.0 = Release|Any CPU
 		{2A7DDF9F-30FE-42F3-B55A-071C4C4477D9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{2A7DDF9F-30FE-42F3-B55A-071C4C4477D9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2A7DDF9F-30FE-42F3-B55A-071C4C4477D9}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -83,14 +79,18 @@ Global
 		{9C0B0249-7493-424C-8B64-D6D73372A9A7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9C0B0249-7493-424C-8B64-D6D73372A9A7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9C0B0249-7493-424C-8B64-D6D73372A9A7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5B66B6BB-F6C9-435E-B997-F870659F714F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5B66B6BB-F6C9-435E-B997-F870659F714F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5B66B6BB-F6C9-435E-B997-F870659F714F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5B66B6BB-F6C9-435E-B997-F870659F714F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{FD8B7552-2373-45AB-AAE2-45B6EE7A4DA1} = {5674EF25-51F0-40CC-8CD1-44BDBB691999}
-		{AEA91FAC-3C34-4B8A-A8F4-25DDD4269158} = {5674EF25-51F0-40CC-8CD1-44BDBB691999}
 		{2A7DDF9F-30FE-42F3-B55A-071C4C4477D9} = {5674EF25-51F0-40CC-8CD1-44BDBB691999}
 		{2F5D233D-F779-473E-9EEC-ACC58AC266ED} = {5674EF25-51F0-40CC-8CD1-44BDBB691999}
+		{5B66B6BB-F6C9-435E-B997-F870659F714F} = {5674EF25-51F0-40CC-8CD1-44BDBB691999}
 	EndGlobalSection
 EndGlobal

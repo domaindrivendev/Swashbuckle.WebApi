@@ -69,7 +69,7 @@
     <Compile Include="Support\FakeHttpContext.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SwaggerGeneratorTests.cs" />
-    <Compile Include="SwaggerUiControllerTests.cs" />
+    <Compile Include="SwaggerUiHandlerTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -90,7 +90,7 @@
       <Name>Swashbuckle.Core</Name>
     </ProjectReference>
     <ProjectReference Include="..\Swashbuckle.TestApp.Api\Swashbuckle.TestApp.Api.csproj">
-      <Project>{aea91fac-3c34-4b8a-a8f4-25ddd4269158}</Project>
+      <Project>{5b66b6bb-f6c9-435e-b997-f870659f714f}</Project>
       <Name>Swashbuckle.TestApp.Api</Name>
     </ProjectReference>
   </ItemGroup>

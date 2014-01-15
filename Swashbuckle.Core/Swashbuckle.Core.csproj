@@ -57,8 +57,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Bootstrapper.cs" />
-    <Compile Include="Controllers\SwaggerSpecController.cs" />
-    <Compile Include="Controllers\SwaggerUiController.cs" />
     <Compile Include="Models\ModelSpecGenerator.cs" />
     <Compile Include="Models\ModelSpecRegistrar.cs" />
     <Compile Include="Models\OperationSpecGenerator.cs" />
@@ -66,6 +64,8 @@
     <Compile Include="Models\SwaggerSpec.cs" />
     <Compile Include="Models\SwaggerSpecConfig.cs" />
     <Compile Include="Models\SwaggerUiConfig.cs" />
+    <Compile Include="Handlers\SwaggerSpecHandler.cs" />
+    <Compile Include="Handlers\SwaggerUiHandler.cs" />
     <Compile Include="TypeExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -84,6 +84,7 @@
       <InProject>false</InProject>
     </EmbeddedResource>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

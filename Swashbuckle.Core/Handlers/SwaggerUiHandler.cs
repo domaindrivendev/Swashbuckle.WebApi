@@ -1,47 +1,57 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
-using System.Web.Http;
-using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using Swashbuckle.Core.Models;
 
-namespace Swashbuckle.Core.Controllers
+namespace Swashbuckle.Core.Handlers
 {
-    public class SwaggerUiController : ApiController
+    public class SwaggerUiHandler : HttpMessageHandler
     {
         private readonly SwaggerSpecConfig _swaggerSpecConfig;
         private readonly SwaggerUiConfig _swaggerUiConfig;
 
-        public SwaggerUiController()
+        public SwaggerUiHandler()
         {
             _swaggerSpecConfig = SwaggerSpecConfig.Instance;
             _swaggerUiConfig = SwaggerUiConfig.Instance;
         }
 
-        [HttpGet]
-        public HttpResponseMessage Default()
+        protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
         {
-            var basePath = _swaggerSpecConfig.BasePathResolver(Request);
+            var path = request.GetRouteData().Values["path"];
 
-            var response = Request.CreateResponse(HttpStatusCode.Moved);
+            var responseMessage = (path == null) ? RedirectResponse(request) : UiResourceResponse(path.ToString());
+
+            return Task.Factory.StartNew(() => responseMessage);
+        }
+
+        private HttpResponseMessage RedirectResponse(HttpRequestMessage request)
+        {
+            var basePath = _swaggerSpecConfig.BasePathResolver(request);
+
+            var response = request.CreateResponse(HttpStatusCode.Moved);
             response.Headers.Location = new Uri(String.Format("{0}/swagger/ui/index.html", basePath.Trim('/')));
+
             return response;
         }
 
-        public HttpResponseMessage GetResource(string path)
+        private HttpResponseMessage UiResourceResponse(string path)
         {
-            var resourceStream = path.StartsWith("ext/")
-                ? GetCustomResourceStream(path.Substring(4))
-                : GetType().Assembly.GetManifestResourceStream(path);
+            var resourceStream = path.StartsWith("ui/ext/")
+                ? GetCustomResourceStream(path.Substring(7))
+                : GetType().Assembly.GetManifestResourceStream(path.Substring(3));
 
             HttpContent content = new StreamContent(resourceStream);
-            if (path == "index.html")
+            if (path == "ui/index.html")
                 content = CustomizeIndexContent(content);
 
             content.Headers.ContentType = new MediaTypeHeaderValue(MediaTypeFor(path));
-            return new HttpResponseMessage {Content = content};
+            return new HttpResponseMessage { Content = content };
         }
 
         private Stream GetCustomResourceStream(string resourceName)
