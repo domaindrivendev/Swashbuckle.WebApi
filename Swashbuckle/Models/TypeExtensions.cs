@@ -6,11 +6,6 @@ namespace Swashbuckle.Models
 {
     public static class TypeExtensions
     {
-        public static string ShortName(this Type type)
-        {
-            return type.Name.Split('.').Last();
-        }
-
         public static bool IsNullable(this Type type, out Type nullableTypeArgument)
         {
             nullableTypeArgument = null;

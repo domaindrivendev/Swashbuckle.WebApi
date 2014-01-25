@@ -11,7 +11,7 @@ namespace Swashbuckle.Models
 {
     public class ModelSpecGenerator
     {
-        private static readonly Dictionary<Type, ModelSpec> PrimitiveMappings = new Dictionary<Type, ModelSpec>()
+        private static readonly Dictionary<Type, ModelSpec> StaticMappings = new Dictionary<Type, ModelSpec>()
             {
                 {typeof (Int32), new ModelSpec {Type = "integer", Format = "int32"}},
                 {typeof (UInt32), new ModelSpec {Type = "integer", Format = "int32"}},
@@ -25,8 +25,8 @@ namespace Swashbuckle.Models
                 {typeof (Byte), new ModelSpec {Type = "string", Format = "byte"}},
                 {typeof (Boolean), new ModelSpec {Type = "boolean", Format = null}},
                 {typeof (DateTime), new ModelSpec {Type = "string", Format = "date-time"}},
-                {typeof (HttpResponseMessage), new ModelSpec{Id = "Object", Type="object"}},
-                {typeof (JObject), new ModelSpec{Id = "Object", Type="object"}}
+                {typeof (HttpResponseMessage), new ModelSpec{Id = "Object", Type="object", Required = new List<string>()}},
+                {typeof (JObject), new ModelSpec{Id = "Object", Type="object", Required = new List<string>()}}
             };
 
         private readonly IDictionary<Type, ModelSpec> _customMappings;
@@ -43,63 +43,65 @@ namespace Swashbuckle.Models
             : this(new Dictionary<Type, ModelSpec>())
         { }
 
-        public ModelSpec TypeToModelSpec(Type type, out IEnumerable<ModelSpec> referencedSpecs)
+        public ModelSpec TypeToModelSpec(Type type, out IEnumerable<ModelSpec> complexSpecs)
         {
-            // Track progress in a dictionary, deferred type->spec generation is indicated with a null Value
-            var referencedTypes = new Dictionary<Type, ModelSpec>();
+            // Track progress, any complex types with a spec that is pending generation will have a null entry
+            var complexTypes = new Dictionary<Type, ModelSpec>();
 
-            var rootSpec = CreateSpecFor(type, false, referencedTypes);
+            var rootSpec = CreateSpecFor(type, false, complexTypes);
 
-            while (referencedTypes.ContainsValue(null))
+            while (complexTypes.ContainsValue(null))
             {
-                var referencedType = referencedTypes.First(kvp => kvp.Value == null).Key;
-                var spec = CreateSpecFor(referencedType, false, referencedTypes);
-                referencedTypes[referencedType] = spec;
+                var complexType = complexTypes.First(kvp => kvp.Value == null).Key;
+                var spec = CreateSpecFor(complexType, false, complexTypes);
+                complexTypes[complexType] = spec;
             }
 
-            referencedSpecs = referencedTypes.Select(kvp => kvp.Value);
+            complexSpecs = complexTypes.Select(kvp => kvp.Value)
+                .Union(rootSpec.Type == "object" ? new[] {rootSpec} : new ModelSpec[]{});
+
             return rootSpec;
         }
 
-        private ModelSpec CreateSpecFor(Type type, bool deferIfComplex, IDictionary<Type, ModelSpec> referencedTypes)
+        private ModelSpec CreateSpecFor(Type type, bool deferIfComplex, IDictionary<Type, ModelSpec> complexTypes)
         {
             if (_customMappings.ContainsKey(type))
                 return _customMappings[type];
 
-            if (PrimitiveMappings.ContainsKey(type))
-                return PrimitiveMappings[type];
+            if (StaticMappings.ContainsKey(type))
+                return StaticMappings[type];
 
             if (type.IsEnum)
                 return new ModelSpec { Type = "string", Enum = type.GetEnumNames() };
 
             Type innerType;
             if (type.IsNullable(out innerType))
-                return CreateSpecFor(innerType, deferIfComplex, referencedTypes);
+                return CreateSpecFor(innerType, deferIfComplex, complexTypes);
 
             Type itemType;
             if (type.IsEnumerable(out itemType))
-                return new ModelSpec { Type = "array", Items = CreateSpecFor(itemType, true, referencedTypes) };
+                return new ModelSpec { Type = "array", Items = CreateSpecFor(itemType, true, complexTypes) };
 
             // Anthing else is complex
 
             if (deferIfComplex)
             {
-                if (!referencedTypes.ContainsKey(type))
-                    referencedTypes.Add(type, null);
+                if (!complexTypes.ContainsKey(type))
+                    complexTypes.Add(type, null);
 
                 // Just return a reference for now
                 return new ModelSpec { Ref = UniqueIdFor(type) };
             }
 
-            return CreateComplexSpecFor(type, referencedTypes);
+            return CreateComplexSpecFor(type, complexTypes);
         }
 
-        private ModelSpec CreateComplexSpecFor(Type type, IDictionary<Type, ModelSpec> referencedTypes)
+        private ModelSpec CreateComplexSpecFor(Type type, IDictionary<Type, ModelSpec> complexTypes)
         {
             var propInfos = type.GetProperties(BindingFlags.Instance | BindingFlags.Public);
 
             var propSpecs = propInfos
-                .ToDictionary(propInfo => propInfo.Name, propInfo => CreateSpecFor(propInfo.PropertyType, true, referencedTypes));
+                .ToDictionary(propInfo => propInfo.Name, propInfo => CreateSpecFor(propInfo.PropertyType, true, complexTypes));
 
             var required = propInfos.Where(propInfo => Attribute.IsDefined(propInfo, typeof (RequiredAttribute)))
                 .Select(propInfo => propInfo.Name)
@@ -122,7 +124,7 @@ namespace Swashbuckle.Models
                     .Select(UniqueIdFor)
                     .ToArray();
 
-                var builder = new StringBuilder(type.ShortName());
+                var builder = new StringBuilder(type.Name);
 
                 return builder
                     .Replace(String.Format("`{0}", genericArguments.Count()), String.Empty)
@@ -130,7 +132,7 @@ namespace Swashbuckle.Models
                     .ToString();
             }
 
-            return type.ShortName();
+            return type.Name;
         }
     }
 }

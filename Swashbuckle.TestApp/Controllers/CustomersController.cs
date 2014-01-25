@@ -4,6 +4,7 @@ using System.Net.Http;
 using System.Web.Http;
 using Newtonsoft.Json.Linq;
 using Swashbuckle.TestApp.Models;
+using Swashbuckle.TestApp.SwaggerExtensions;
 
 namespace Swashbuckle.TestApp.Controllers
 {
@@ -24,6 +25,7 @@ namespace Swashbuckle.TestApp.Controllers
         }
 
         [Authorize]
+        [ResponseType(typeof(Confirmation))]
         public HttpResponseMessage Delete(int id)
         {
             return new HttpResponseMessage(HttpStatusCode.OK);

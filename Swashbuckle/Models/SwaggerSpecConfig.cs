@@ -113,10 +113,10 @@ namespace Swashbuckle.Models
 
         public ModelSpec FindOrCreateFor(Type type)
         {
-            IEnumerable<ModelSpec> referencedSpecs;
-            var modelSpec = _modelSpecGenerator.TypeToModelSpec(type, out referencedSpecs);
+            IEnumerable<ModelSpec> complexSpecs;
+            var modelSpec = _modelSpecGenerator.TypeToModelSpec(type, out complexSpecs);
 
-            _modelSpecRegistrar.RegisterMany(referencedSpecs);
+            _modelSpecRegistrar.RegisterMany(complexSpecs);
 
             if (modelSpec.Type == "object")
                 _modelSpecRegistrar.Register(modelSpec);

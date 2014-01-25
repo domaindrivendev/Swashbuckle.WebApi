@@ -47,8 +47,10 @@ namespace Swashbuckle.Models
             }
             else
             {
-                IEnumerable<ModelSpec> referencedSpecs;
-                var modelSpec = _modelSpecGenerator.TypeToModelSpec(returnType, out referencedSpecs);
+                IEnumerable<ModelSpec> complexSpecs;
+                var modelSpec = _modelSpecGenerator.TypeToModelSpec(returnType, out complexSpecs);
+
+                modelSpecRegistrar.RegisterMany(complexSpecs);
 
                 if (modelSpec.Type == "object")
                 {
@@ -61,7 +63,6 @@ namespace Swashbuckle.Models
                     operationSpec.Items = modelSpec.Items;
                     operationSpec.Enum = modelSpec.Enum;
                 }
-                modelSpecRegistrar.RegisterMany(referencedSpecs);
             }
 
             foreach (var filter in _operationFilters)
@@ -100,8 +101,10 @@ namespace Swashbuckle.Models
                 Required = !apiParamDesc.ParameterDescriptor.IsOptional
             };
 
-            IEnumerable<ModelSpec> referencedSpecs;
-            var modelSpec = _modelSpecGenerator.TypeToModelSpec(apiParamDesc.ParameterDescriptor.ParameterType, out referencedSpecs);
+            IEnumerable<ModelSpec> complexSpecs;
+            var modelSpec = _modelSpecGenerator.TypeToModelSpec(apiParamDesc.ParameterDescriptor.ParameterType, out complexSpecs);
+            
+            modelSpecRegistrar.RegisterMany(complexSpecs);
 
             if (modelSpec.Type == "object")
             {
@@ -114,7 +117,6 @@ namespace Swashbuckle.Models
                 paramSpec.Items = modelSpec.Items;
                 paramSpec.Enum = modelSpec.Enum;
             }
-            modelSpecRegistrar.RegisterMany(referencedSpecs);
 
             return paramSpec;
         }

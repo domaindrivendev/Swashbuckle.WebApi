@@ -12,6 +12,7 @@ namespace Swashbuckle.TestApp.App_Start
                 {
                     c.PostFilter<AddStandardErrorCodes>();
                     c.PostFilter<AddAuthorizationErrorCodes>();
+                    c.OperationFilter<ApplyCustomResponseTypes>();
 
                     // Uncomment below to support documentation from Xml Comments
                     // c.PostFilter(new ExtractXmlComments());
