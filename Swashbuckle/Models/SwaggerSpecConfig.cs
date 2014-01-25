@@ -1,7 +1,9 @@
-﻿using System;
+﻿﻿using System;
+using System.Collections;
 using System.Collections.Generic;
-using System.Web;
-using System.Web.Http.Description;
+using System.Net.Http;
+﻿using System.Web;
+﻿using System.Web.Http.Description;
 
 namespace Swashbuckle.Models
 {
@@ -25,7 +27,7 @@ namespace Swashbuckle.Models
 
         internal Func<ApiDescription, string> DeclarationKeySelector { get; private set; }
         internal Func<string> BasePathResolver { get; private set; }
-        internal IDictionary<Type,ModelSpec> CustomTypeMappings { get; private set; }
+        internal IDictionary<Type, ModelSpec> CustomTypeMappings { get; private set; }
         internal List<IOperationFilter> OperationFilters { get; private set; }
         internal List<IOperationSpecFilter> OperationSpecFilters { get; private set; }
 
@@ -36,11 +38,11 @@ namespace Swashbuckle.Models
             DeclarationKeySelector = declarationKeySelector;
         }
 
-        public void ResolveBasePath(Func<string> resolver)
+        public void ResolveBasePath(Func<string> basePathResolver)
         {
-            if(resolver == null)
-                throw new ArgumentNullException("resolver");
-            BasePathResolver = resolver;
+            if (basePathResolver == null)
+                throw new ArgumentNullException("basePathResolver");
+            BasePathResolver = basePathResolver;
         }
 
         public void OperationFilter(IOperationFilter operationFilter)
@@ -69,7 +71,7 @@ namespace Swashbuckle.Models
 
         public void MapType<T>(ModelSpec modelSpec)
         {
-            CustomTypeMappings[typeof (T)] = modelSpec;
+            CustomTypeMappings[typeof(T)] = modelSpec;
         }
 
         private string DefaultDeclarationKeySelector(ApiDescription apiDescription)
@@ -91,7 +93,11 @@ namespace Swashbuckle.Models
 
     public interface IOperationFilter
     {
-        void Apply(ApiDescription apiDescription, OperationSpec operationSpec, ModelSpecRegistrar modelSpecRegistrar, ModelSpecGenerator modelSpecGenerator);
+        void Apply(
+            ApiDescription apiDescription,
+            OperationSpec operationSpec,
+            ModelSpecRegistrar modelSpecRegistrar,
+            ModelSpecGenerator modelSpecGenerator);
     }
 
     public class ModelSpecMap
@@ -107,7 +113,15 @@ namespace Swashbuckle.Models
 
         public ModelSpec FindOrCreateFor(Type type)
         {
-            return _modelSpecGenerator.From(type, _modelSpecRegistrar);
+            IEnumerable<ModelSpec> referencedSpecs;
+            var modelSpec = _modelSpecGenerator.TypeToModelSpec(type, out referencedSpecs);
+
+            _modelSpecRegistrar.RegisterMany(referencedSpecs);
+
+            if (modelSpec.Type == "object")
+                _modelSpecRegistrar.Register(modelSpec);
+
+            return modelSpec;
         }
     }
 }

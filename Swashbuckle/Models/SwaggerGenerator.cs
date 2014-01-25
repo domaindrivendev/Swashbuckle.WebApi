@@ -26,7 +26,7 @@ namespace Swashbuckle.Models
             _operationSpecGenerator = new OperationSpecGenerator(customTypeMappings, operationFilters, operationSpecFilters);
         }
 
-        public SwaggerSpec From(IApiExplorer apiExplorer)
+        public SwaggerSpec ApiExplorerToSwaggerSpec(IApiExplorer apiExplorer)
         {
             var apiDescriptionGroups = apiExplorer.ApiDescriptions
                 .GroupBy(apiDesc => "/" + _declarationKeySelector(apiDesc))
@@ -83,7 +83,7 @@ namespace Swashbuckle.Models
         private ApiSpec CreateApiSpec(IGrouping<string, ApiDescription> apiDescriptionGroup, ModelSpecRegistrar modelSpecRegistrar)
         {
             var operationSpecs = apiDescriptionGroup
-                .Select(apiDesc => _operationSpecGenerator.From(apiDesc, modelSpecRegistrar))
+                .Select(apiDesc => _operationSpecGenerator.ApiDescriptionToOperationSpec(apiDesc, modelSpecRegistrar))
                 .ToList();
 
             return new ApiSpec

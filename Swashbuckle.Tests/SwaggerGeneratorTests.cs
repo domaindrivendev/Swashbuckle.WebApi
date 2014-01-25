@@ -527,9 +527,7 @@ namespace Swashbuckle.Tests
 
             ApiDeclaration("/Customers", dec =>
                 {
-                    Assert.AreEqual(2, dec.Models.Count);
-
-                    Model(dec, "Object", model => Assert.AreEqual("object", model.Type));
+                    Assert.AreEqual(1, dec.Models.Count);
 
                     Model(dec, "Customer", model =>
                         {

@@ -22,7 +22,7 @@ namespace Swashbuckle.Models
             _modelSpecGenerator = new ModelSpecGenerator(customTypeMappings);
         }
 
-        public OperationSpec From(ApiDescription apiDescription, ModelSpecRegistrar modelSpecRegistrar)
+        public OperationSpec ApiDescriptionToOperationSpec(ApiDescription apiDescription, ModelSpecRegistrar modelSpecRegistrar)
         {
             var apiPath = apiDescription.RelativePath.Split('?').First();
             var paramSpecs = apiDescription.ParameterDescriptions
@@ -47,7 +47,8 @@ namespace Swashbuckle.Models
             }
             else
             {
-                var modelSpec = _modelSpecGenerator.From(returnType, modelSpecRegistrar);
+                IEnumerable<ModelSpec> referencedSpecs;
+                var modelSpec = _modelSpecGenerator.TypeToModelSpec(returnType, out referencedSpecs);
 
                 if (modelSpec.Type == "object")
                 {
@@ -60,6 +61,7 @@ namespace Swashbuckle.Models
                     operationSpec.Items = modelSpec.Items;
                     operationSpec.Enum = modelSpec.Enum;
                 }
+                modelSpecRegistrar.RegisterMany(referencedSpecs);
             }
 
             foreach (var filter in _operationFilters)
@@ -98,7 +100,8 @@ namespace Swashbuckle.Models
                 Required = !apiParamDesc.ParameterDescriptor.IsOptional
             };
 
-            var modelSpec = _modelSpecGenerator.From(apiParamDesc.ParameterDescriptor.ParameterType, modelSpecRegistrar);
+            IEnumerable<ModelSpec> referencedSpecs;
+            var modelSpec = _modelSpecGenerator.TypeToModelSpec(apiParamDesc.ParameterDescriptor.ParameterType, out referencedSpecs);
 
             if (modelSpec.Type == "object")
             {
@@ -111,6 +114,7 @@ namespace Swashbuckle.Models
                 paramSpec.Items = modelSpec.Items;
                 paramSpec.Enum = modelSpec.Enum;
             }
+            modelSpecRegistrar.RegisterMany(referencedSpecs);
 
             return paramSpec;
         }

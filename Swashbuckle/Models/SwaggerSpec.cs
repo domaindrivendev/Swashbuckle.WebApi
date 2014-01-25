@@ -17,7 +17,7 @@ namespace Swashbuckle.Models
 
             // TODO: Implement as Singleton - there is only one spec and it should only be generated once
 
-            return swaggerGenerator.From(apiExplorer);
+            return swaggerGenerator.ApiExplorerToSwaggerSpec(apiExplorer);
         }
 
         public ResourceListing Listing { get; set; }

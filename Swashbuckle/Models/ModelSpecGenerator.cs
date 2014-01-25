@@ -1,7 +1,7 @@
-﻿using System;
+﻿﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
+﻿using System.ComponentModel.DataAnnotations;
+﻿using System.Linq;
 using System.Net.Http;
 using System.Reflection;
 using System.Text;
@@ -41,32 +41,27 @@ namespace Swashbuckle.Models
 
         public ModelSpecGenerator()
             : this(new Dictionary<Type, ModelSpec>())
-        {}
+        { }
 
-        public ModelSpec From(Type type, ModelSpecRegistrar modelSpecRegistrar)
+        public ModelSpec TypeToModelSpec(Type type, out IEnumerable<ModelSpec> referencedSpecs)
         {
-            // Complex types are deferred, track progress
-            var deferredMappings = new Dictionary<Type, ModelSpec>();
+            // Track progress in a dictionary, deferred type->spec generation is indicated with a null Value
+            var referencedTypes = new Dictionary<Type, ModelSpec>();
 
-            var rootSpec = CreateSpecFor(type, false, deferredMappings);
+            var rootSpec = CreateSpecFor(type, false, referencedTypes);
 
-            // All complex specs (including root) should be added to the registrar
-            if (rootSpec.Type == "object")
-                modelSpecRegistrar.Register(rootSpec);
-
-            while (deferredMappings.ContainsValue(null))
+            while (referencedTypes.ContainsValue(null))
             {
-                var deferredType = deferredMappings.First(kvp => kvp.Value == null).Key;
-                var spec = CreateSpecFor(deferredType, false, deferredMappings);
-                deferredMappings[deferredType] = spec;
-
-                modelSpecRegistrar.Register(spec);
+                var referencedType = referencedTypes.First(kvp => kvp.Value == null).Key;
+                var spec = CreateSpecFor(referencedType, false, referencedTypes);
+                referencedTypes[referencedType] = spec;
             }
-            
+
+            referencedSpecs = referencedTypes.Select(kvp => kvp.Value);
             return rootSpec;
         }
 
-        private ModelSpec CreateSpecFor(Type type, bool deferIfComplex, Dictionary<Type, ModelSpec> deferredMappings)
+        private ModelSpec CreateSpecFor(Type type, bool deferIfComplex, IDictionary<Type, ModelSpec> referencedTypes)
         {
             if (_customMappings.ContainsKey(type))
                 return _customMappings[type];
@@ -75,48 +70,48 @@ namespace Swashbuckle.Models
                 return PrimitiveMappings[type];
 
             if (type.IsEnum)
-                return new ModelSpec {Type = "string", Enum = type.GetEnumNames()};
+                return new ModelSpec { Type = "string", Enum = type.GetEnumNames() };
 
             Type innerType;
             if (type.IsNullable(out innerType))
-                return CreateSpecFor(innerType, deferIfComplex, deferredMappings);
+                return CreateSpecFor(innerType, deferIfComplex, referencedTypes);
 
             Type itemType;
             if (type.IsEnumerable(out itemType))
-                return new ModelSpec { Type = "array", Items = CreateSpecFor(itemType, true, deferredMappings) };
+                return new ModelSpec { Type = "array", Items = CreateSpecFor(itemType, true, referencedTypes) };
 
             // Anthing else is complex
 
             if (deferIfComplex)
             {
-                if (!deferredMappings.ContainsKey(type))
-                    deferredMappings.Add(type, null);
-                
+                if (!referencedTypes.ContainsKey(type))
+                    referencedTypes.Add(type, null);
+
                 // Just return a reference for now
-                return new ModelSpec {Ref = UniqueIdFor(type)};
+                return new ModelSpec { Ref = UniqueIdFor(type) };
             }
 
-            return CreateComplexSpecFor(type, deferredMappings);
+            return CreateComplexSpecFor(type, referencedTypes);
         }
 
-        private ModelSpec CreateComplexSpecFor(Type type, Dictionary<Type, ModelSpec> deferredMappings)
+        private ModelSpec CreateComplexSpecFor(Type type, IDictionary<Type, ModelSpec> referencedTypes)
         {
             var propInfos = type.GetProperties(BindingFlags.Instance | BindingFlags.Public);
 
             var propSpecs = propInfos
-                .ToDictionary(propInfo => propInfo.Name, propInfo => CreateSpecFor(propInfo.PropertyType, true, deferredMappings));
+                .ToDictionary(propInfo => propInfo.Name, propInfo => CreateSpecFor(propInfo.PropertyType, true, referencedTypes));
 
             var required = propInfos.Where(propInfo => Attribute.IsDefined(propInfo, typeof (RequiredAttribute)))
                 .Select(propInfo => propInfo.Name)
                 .ToList();
 
             return new ModelSpec
-                {
-                    Id = UniqueIdFor(type),
-                    Type = "object",
-                    Properties = propSpecs,
-                    Required = required 
-                };
+            {
+                Id = UniqueIdFor(type),
+                Type = "object",
+                Properties = propSpecs,
+                Required = required
+            };
         }
 
         private static string UniqueIdFor(Type type)

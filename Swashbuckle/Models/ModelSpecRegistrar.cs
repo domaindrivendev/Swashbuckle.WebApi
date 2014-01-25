@@ -1,4 +1,4 @@
-﻿using System;
+﻿﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -10,14 +10,14 @@ namespace Swashbuckle.Models
 
         public ModelSpecRegistrar()
         {
-            _registeredSpecs = new Dictionary<string, ModelSpec>(); 
+            _registeredSpecs = new Dictionary<string, ModelSpec>();
         }
 
         public void Register(ModelSpec modelSpec)
         {
             if (modelSpec.Id == null || modelSpec.Type != "object")
                 throw new InvalidOperationException("Registrar expects complex models only - must have non-null Id and Type = \"object\"");
-            
+
             _registeredSpecs[modelSpec.Id] = modelSpec;
         }
 
@@ -29,7 +29,7 @@ namespace Swashbuckle.Models
             }
         }
 
-        public Dictionary<string, ModelSpec> ToDictionary()
+        internal Dictionary<string, ModelSpec> ToDictionary()
         {
             // Don't expose internal state - return a clone. Still shallow ... oh well!
             return _registeredSpecs
