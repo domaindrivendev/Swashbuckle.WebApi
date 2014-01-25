@@ -1,9 +1,13 @@
-﻿namespace Swashbuckle.TestApp.Models
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace Swashbuckle.TestApp.Models
 {
     public class OrderItem
     {
+        [Required]
         public int LineNo { get; set; }
 
+        [Required]
         public string Product { get; set; }
 
         public ProductCategory Category { get; set; }

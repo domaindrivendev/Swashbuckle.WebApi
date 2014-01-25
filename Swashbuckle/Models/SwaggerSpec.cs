@@ -167,5 +167,8 @@ namespace Swashbuckle.Models
 
         [JsonProperty("properties")]
         public IDictionary<string, ModelSpec> Properties { get; set; }
+
+        [JsonProperty("required")]
+        public IList<string> Required { get; set; }
     }
 }

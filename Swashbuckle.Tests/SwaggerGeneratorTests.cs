@@ -429,6 +429,8 @@ namespace Swashbuckle.Tests
 
                 Model(dec, "Order", model =>
                     {
+                        CollectionAssert.AreEqual(new []{"Id", "Total"}, model.Required);
+
                         ModelProperty(model, "Id", property =>
                             {
                                 Assert.AreEqual("integer", property.Type);
@@ -453,22 +455,30 @@ namespace Swashbuckle.Tests
                     });
 
                 Model(dec, "MyGenericType[OrderItem]", model =>
-                    ModelProperty(model, "TypeName", property =>
                     {
-                        Assert.AreEqual("string", property.Type);
-                        Assert.IsNull(property.Format);
-                        Assert.IsNull(property.Items);
-                        Assert.IsNull(property.Enum);
-                    }));
+                        CollectionAssert.IsEmpty(model.Required);
+
+                        ModelProperty(model, "TypeName", property =>
+                            {
+                                Assert.AreEqual("string", property.Type);
+                                Assert.IsNull(property.Format);
+                                Assert.IsNull(property.Items);
+                                Assert.IsNull(property.Enum);
+                            });
+                    });
 
                 Model(dec, "MyGenericType[ProductCategory]", model =>
-                    ModelProperty(model, "TypeName", property =>
                     {
-                        Assert.AreEqual("string", property.Type);
-                        Assert.IsNull(property.Format);
-                        Assert.IsNull(property.Items);
-                        Assert.IsNull(property.Enum);
-                    }));
+                        CollectionAssert.IsEmpty(model.Required);
+
+                        ModelProperty(model, "TypeName", property =>
+                            {
+                                Assert.AreEqual("string", property.Type);
+                                Assert.IsNull(property.Format);
+                                Assert.IsNull(property.Items);
+                                Assert.IsNull(property.Enum);
+                            });
+                    });
             });
 
             ApiDeclaration("/OrderItems", dec =>
@@ -478,6 +488,8 @@ namespace Swashbuckle.Tests
 
                     Model(dec, "OrderItem", model =>
                         {
+                            CollectionAssert.AreEqual(new[] {"LineNo", "Product"}, model.Required);
+
                             ModelProperty(model, "LineNo", property =>
                             {
                                 Assert.AreEqual("integer", property.Type);
@@ -521,6 +533,8 @@ namespace Swashbuckle.Tests
 
                     Model(dec, "Customer", model =>
                         {
+                            CollectionAssert.IsEmpty(model.Required);
+
                             ModelProperty(model, "Id", property =>
                                 {
                                     Assert.AreEqual("integer", property.Type);
