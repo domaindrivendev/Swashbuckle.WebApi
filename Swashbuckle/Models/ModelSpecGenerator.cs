@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Net.Http;
 using System.Reflection;
@@ -100,14 +101,21 @@ namespace Swashbuckle.Models
 
         private ModelSpec CreateComplexSpecFor(Type type, Dictionary<Type, ModelSpec> deferredMappings)
         {
-            var propSpecs = type.GetProperties(BindingFlags.Instance | BindingFlags.Public)
+            var propInfos = type.GetProperties(BindingFlags.Instance | BindingFlags.Public);
+
+            var propSpecs = propInfos
                 .ToDictionary(propInfo => propInfo.Name, propInfo => CreateSpecFor(propInfo.PropertyType, true, deferredMappings));
+
+            var required = propInfos.Where(propInfo => Attribute.IsDefined(propInfo, typeof (RequiredAttribute)))
+                .Select(propInfo => propInfo.Name)
+                .ToList();
 
             return new ModelSpec
                 {
                     Id = UniqueIdFor(type),
                     Type = "object",
-                    Properties = propSpecs
+                    Properties = propSpecs,
+                    Required = required 
                 };
         }
 
