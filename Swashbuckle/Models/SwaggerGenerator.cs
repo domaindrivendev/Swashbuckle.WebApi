@@ -30,6 +30,7 @@ namespace Swashbuckle.Models
         {
             var apiDescriptionGroups = apiExplorer.ApiDescriptions
                 .GroupBy(apiDesc => "/" + _declarationKeySelector(apiDesc))
+                .OrderBy(group => group.Key)
                 .ToArray();
 
             return new SwaggerSpec
@@ -65,8 +66,9 @@ namespace Swashbuckle.Models
 
             // Group further by relative path - each group corresponds to an ApiSpec
             var apiSpecs = apiDescriptionGroup
-                .GroupBy(apiDesc => apiDesc.RelativePath)
+                .GroupBy(RelativePathSansQueryString)
                 .Select(apiDescGrp => CreateApiSpec(apiDescGrp, modelSpecRegistrar))
+                .OrderBy(apiSpec => apiSpec.Path)
                 .ToList();
 
             return new ApiDeclaration
@@ -84,13 +86,19 @@ namespace Swashbuckle.Models
         {
             var operationSpecs = apiDescriptionGroup
                 .Select(apiDesc => _operationSpecGenerator.ApiDescriptionToOperationSpec(apiDesc, modelSpecRegistrar))
+                .OrderBy(operationSpec => operationSpec.Method)
                 .ToList();
 
             return new ApiSpec
             {
-                Path = "/" + apiDescriptionGroup.Key.Split('?').First(),
+                Path = "/" + apiDescriptionGroup.Key,
                 Operations = operationSpecs
             };
+        }
+
+        private static string RelativePathSansQueryString(ApiDescription apiDescription)
+        {
+            return apiDescription.RelativePath.Split('?').First();
         }
     }
 }
