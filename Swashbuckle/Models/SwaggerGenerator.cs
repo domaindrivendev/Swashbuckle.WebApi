@@ -66,7 +66,7 @@ namespace Swashbuckle.Models
 
             // Group further by relative path - each group corresponds to an ApiSpec
             var apiSpecs = apiDescriptionGroup
-                .GroupBy(RelativePathSansQueryString)
+                .GroupBy(apiDesc => apiDesc.RelativePathSansQueryString())
                 .Select(apiDescGrp => CreateApiSpec(apiDescGrp, modelSpecRegistrar))
                 .OrderBy(apiSpec => apiSpec.Path)
                 .ToList();
@@ -94,11 +94,6 @@ namespace Swashbuckle.Models
                 Path = "/" + apiDescriptionGroup.Key,
                 Operations = operationSpecs
             };
-        }
-
-        private static string RelativePathSansQueryString(ApiDescription apiDescription)
-        {
-            return apiDescription.RelativePath.Split('?').First();
         }
     }
 }

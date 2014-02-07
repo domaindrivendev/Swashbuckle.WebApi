@@ -24,7 +24,7 @@ namespace Swashbuckle.Models
 
         public OperationSpec ApiDescriptionToOperationSpec(ApiDescription apiDescription, ModelSpecRegistrar modelSpecRegistrar)
         {
-            var apiPath = apiDescription.RelativePath.Split('?').First();
+            var apiPath = apiDescription.RelativePathSansQueryString();
             var paramSpecs = apiDescription.ParameterDescriptions
                 .Select(paramDesc => CreateParameterSpec(paramDesc, apiPath, modelSpecRegistrar))
                 .ToList();
@@ -32,9 +32,7 @@ namespace Swashbuckle.Models
             var operationSpec = new OperationSpec
             {
                 Method = apiDescription.HttpMethod.Method,
-                Nickname = String.Format("{0}_{1}",
-                    apiDescription.ActionDescriptor.ControllerDescriptor.ControllerName,
-                    apiDescription.ActionDescriptor.ActionName),
+                Nickname = apiDescription.Nickname(),
                 Summary = apiDescription.Documentation,
                 Parameters = paramSpecs,
                 ResponseMessages = new List<ResponseMessageSpec>()
