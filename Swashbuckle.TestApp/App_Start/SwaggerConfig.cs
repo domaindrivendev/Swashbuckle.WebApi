@@ -10,6 +10,7 @@ namespace Swashbuckle.TestApp.App_Start
         {
             SwaggerSpecConfig.Customize(c =>
                 {
+                    c.IgnoreObsoleteActions = true;
                     c.PostFilter<AddStandardErrorCodes>();
                     c.PostFilter<AddAuthorizationErrorCodes>();
                     c.OperationFilter<ApplyCustomResponseTypes>();

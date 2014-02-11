@@ -17,5 +17,10 @@ namespace Swashbuckle.Models
         {
             return apiDesc.RelativePath.Split('?').First();
         }
+
+        public static bool IsMarkedObsolete(this ApiDescription apiDesc)
+        {
+            return apiDesc.ActionDescriptor.GetCustomAttributes<ObsoleteAttribute>().Any();
+        }
     }
 }

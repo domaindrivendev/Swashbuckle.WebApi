@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Web.Http;
 using Swashbuckle.TestApp.Models;
 
@@ -31,6 +32,12 @@ namespace Swashbuckle.TestApp.Controllers
 
         public void Delete(int id)
         {    
+        }
+
+        [Obsolete]
+        public void DeleteAll()
+        {
+            throw new NotImplementedException();
         }
     }
 }

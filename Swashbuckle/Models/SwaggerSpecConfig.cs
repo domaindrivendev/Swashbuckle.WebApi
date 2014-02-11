@@ -18,31 +18,33 @@ namespace Swashbuckle.Models
 
         private SwaggerSpecConfig()
         {
-            DeclarationKeySelector = DefaultDeclarationKeySelector;
+            IgnoreObsoleteActions = false;
             BasePathResolver = DefaultBasePathResolver;
+            DeclarationKeySelector = DefaultDeclarationKeySelector;
             CustomTypeMappings = new Dictionary<Type, ModelSpec>();
             OperationFilters = new List<IOperationFilter>();
             OperationSpecFilters = new List<IOperationSpecFilter>();
         }
 
-        internal Func<ApiDescription, string> DeclarationKeySelector { get; private set; }
+        public bool IgnoreObsoleteActions { get; set; }
         internal Func<string> BasePathResolver { get; private set; }
+        internal Func<ApiDescription, string> DeclarationKeySelector { get; private set; }
         internal IDictionary<Type, ModelSpec> CustomTypeMappings { get; private set; }
         internal List<IOperationFilter> OperationFilters { get; private set; }
         internal List<IOperationSpecFilter> OperationSpecFilters { get; private set; }
-
-        public void GroupDeclarationsBy(Func<ApiDescription, string> declarationKeySelector)
-        {
-            if (declarationKeySelector == null)
-                throw new ArgumentNullException("declarationKeySelector");
-            DeclarationKeySelector = declarationKeySelector;
-        }
 
         public void ResolveBasePath(Func<string> basePathResolver)
         {
             if (basePathResolver == null)
                 throw new ArgumentNullException("basePathResolver");
             BasePathResolver = basePathResolver;
+        }
+
+        public void GroupDeclarationsBy(Func<ApiDescription, string> declarationKeySelector)
+        {
+            if (declarationKeySelector == null)
+                throw new ArgumentNullException("declarationKeySelector");
+            DeclarationKeySelector = declarationKeySelector;
         }
 
         public void OperationFilter(IOperationFilter operationFilter)
