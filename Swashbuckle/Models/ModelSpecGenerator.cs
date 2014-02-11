@@ -98,7 +98,7 @@ namespace Swashbuckle.Models
 
         private ModelSpec CreateComplexSpecFor(Type type, IDictionary<Type, ModelSpec> complexTypes)
         {
-            var propInfos = type.GetProperties(BindingFlags.Instance | BindingFlags.Public);
+            var propInfos = type.GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.DeclaredOnly);
 
             var propSpecs = propInfos
                 .ToDictionary(propInfo => propInfo.Name, propInfo => CreateSpecFor(propInfo.PropertyType, true, complexTypes));
@@ -107,12 +107,18 @@ namespace Swashbuckle.Models
                 .Select(propInfo => propInfo.Name)
                 .ToList();
 
+            var subTypes = type.DirectSubTypes()
+                .Select(subType => CreateSpecFor(subType, true, complexTypes))
+                .Select(subTypeSpec => subTypeSpec.Ref)
+                .ToList();
+
             return new ModelSpec
             {
                 Id = UniqueIdFor(type),
                 Type = "object",
                 Properties = propSpecs,
-                Required = required
+                Required = required,
+                SubTypes = subTypes
             };
         }
 

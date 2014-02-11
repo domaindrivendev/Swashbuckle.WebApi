@@ -9,17 +9,20 @@ namespace Swashbuckle.Models
     {
         protected const string SwaggerVersion = "1.2";
 
-        private readonly Func<ApiDescription, string> _declarationKeySelector;
+        private readonly bool _ignoreObsoleteActions;
         private readonly Func<string> _basePathResolver;
+        private readonly Func<ApiDescription, string> _declarationKeySelector;
         private readonly OperationSpecGenerator _operationSpecGenerator;
 
         public SwaggerGenerator(
-            Func<ApiDescription, string> declarationKeySelector,
+            bool ignoreObsoleteActions,
             Func<string> basePathResolver,
+            Func<ApiDescription, string> declarationKeySelector,
             IDictionary<Type, ModelSpec> customTypeMappings,
             IEnumerable<IOperationFilter> operationFilters,
             IEnumerable<IOperationSpecFilter> operationSpecFilters)
         {
+            _ignoreObsoleteActions = ignoreObsoleteActions;
             _declarationKeySelector = declarationKeySelector;
             _basePathResolver = basePathResolver;
 
@@ -29,6 +32,7 @@ namespace Swashbuckle.Models
         public SwaggerSpec ApiExplorerToSwaggerSpec(IApiExplorer apiExplorer)
         {
             var apiDescriptionGroups = apiExplorer.ApiDescriptions
+                .Where(apiDesc => !_ignoreObsoleteActions || !apiDesc.IsMarkedObsolete())
                 .GroupBy(apiDesc => "/" + _declarationKeySelector(apiDesc))
                 .OrderBy(group => group.Key)
                 .ToArray();

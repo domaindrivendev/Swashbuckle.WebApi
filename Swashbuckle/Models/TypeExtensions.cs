@@ -32,5 +32,10 @@ namespace Swashbuckle.Models
 
             return enumerableType != null;
         }
+
+        public static IEnumerable<Type> DirectSubTypes(this Type baseType)
+        {
+            return baseType.Assembly.GetTypes().Where(type => type.BaseType == baseType);
+        }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Web.Http;
 using System.Web.Http.Description;
@@ -16,19 +17,20 @@ namespace Swashbuckle.Tests
         [SetUp]
         public void Setup()
         {
-            SwaggerSpecConfig.Customize(c =>
-                {
-                    c.ResolveBasePath(() => "http://tempuri.org");
-                    c.PostFilter<AddStandardErrorCodes>();
-                    c.PostFilter<AddAuthorizationErrorCodes>();
-                });
+            var swaggerGenerator = new SwaggerGenerator(
+                true,
+                () => "http://tempuri.org",
+                apiDesc => apiDesc.ActionDescriptor.ControllerDescriptor.ControllerName,
+                new Dictionary<Type, ModelSpec>(),
+                new IOperationFilter[]{}, 
+                new IOperationSpecFilter[]{new AddStandardErrorCodes(), new AddAuthorizationErrorCodes()});
 
             // Get ApiExplorer for TestApp
             var httpConfiguration = new HttpConfiguration();
             WebApiConfig.Register(httpConfiguration);
             var apiExplorer = new ApiExplorer(httpConfiguration);
 
-            _swaggerSpec = SwaggerSpec.CreateFrom(apiExplorer);
+            _swaggerSpec = swaggerGenerator.ApiExplorerToSwaggerSpec(apiExplorer);
         }
 
         [Test]
@@ -38,7 +40,7 @@ namespace Swashbuckle.Tests
             var resourceListing = _swaggerSpec.Listing;
             Assert.AreEqual("1.0", resourceListing.ApiVersion);
             Assert.AreEqual("1.2", resourceListing.SwaggerVersion);
-            Assert.AreEqual(3, resourceListing.Apis.Count());
+            Assert.AreEqual(4, resourceListing.Apis.Count());
 
             Assert.IsTrue(resourceListing.Apis.Any(a => a.Path == "/Orders"),
                 "Orders declaration not listed");
@@ -46,6 +48,8 @@ namespace Swashbuckle.Tests
                 "OrderItems declaration not listed");
             Assert.IsTrue(resourceListing.Apis.Any(a => a.Path == "/Customers"),
                 "Customers declaration not listed");
+            Assert.IsTrue(resourceListing.Apis.Any(a => a.Path == "/Products"),
+                "Products declaration not listed");
         }
 
         [Test]
@@ -112,7 +116,7 @@ namespace Swashbuckle.Tests
                     // 3: POST /api/orders, GET /api/orders, GET /api/orders?foo={foo}&bar={bar}
                     Assert.AreEqual(3, api.Operations.Count);
 
-                    OperationSpec(api, 0, "POST", operation =>
+                    OperationSpec(api, "POST", 0, operation =>
                         {
                             Assert.AreEqual("Orders_Post", operation.Nickname);
                             Assert.AreEqual("Documentation for 'Post'.", operation.Summary);
@@ -123,7 +127,7 @@ namespace Swashbuckle.Tests
                             Assert.IsNull(operation.Enum);
                         });
 
-                    OperationSpec(api, 0, "GET", operation =>
+                    OperationSpec(api, "GET", 0, operation =>
                         {
                             Assert.AreEqual("Orders_GetAll", operation.Nickname);
                             Assert.AreEqual("Documentation for 'GetAll'.", operation.Summary);
@@ -134,16 +138,16 @@ namespace Swashbuckle.Tests
                             Assert.IsNull(operation.Enum);
                         });
 
-                    OperationSpec(api, 1, "GET", operation =>
-                    {
-                        Assert.AreEqual("Orders_GetByParams", operation.Nickname);
-                        Assert.AreEqual("Documentation for 'GetByParams'.", operation.Summary);
-                        Assert.IsNull(operation.Notes);
-                        Assert.AreEqual("array", operation.Type);
-                        Assert.AreEqual("Order", operation.Items.Ref);
-                        Assert.IsNull(operation.Format);
-                        Assert.IsNull(operation.Enum);
-                    });
+                    OperationSpec(api, "GET", 1, operation =>
+                        {
+                            Assert.AreEqual("Orders_GetByParams", operation.Nickname);
+                            Assert.AreEqual("Documentation for 'GetByParams'.", operation.Summary);
+                            Assert.IsNull(operation.Notes);
+                            Assert.AreEqual("array", operation.Type);
+                            Assert.AreEqual("Order", operation.Items.Ref);
+                            Assert.IsNull(operation.Format);
+                            Assert.IsNull(operation.Enum);
+                        });
                 });
 
             ApiSpec("/Orders", "/api/orders/{id}", api =>
@@ -151,7 +155,7 @@ namespace Swashbuckle.Tests
                     // 1: DELETE /api/orders/{id}
                     Assert.AreEqual(1, api.Operations.Count);
 
-                    OperationSpec(api, 0, "DELETE", operation =>
+                    OperationSpec(api, "DELETE", 0, operation =>
                         {
                             Assert.AreEqual("Orders_Delete", operation.Nickname);
                             Assert.AreEqual("Documentation for 'Delete'.", operation.Summary);
@@ -168,7 +172,7 @@ namespace Swashbuckle.Tests
                     // 1: GET /api/orders/{orderId}/items/{id}
                     Assert.AreEqual(1, api.Operations.Count);
 
-                    OperationSpec(api, 0, "GET", operation =>
+                    OperationSpec(api, "GET", 0, operation =>
                         {
                             Assert.AreEqual("OrderItems_GetById", operation.Nickname);
                             Assert.AreEqual("Documentation for 'GetById'.", operation.Summary);
@@ -185,7 +189,7 @@ namespace Swashbuckle.Tests
                     // 1: GET /api/orders/{orderId}/items?category={category}
                     Assert.AreEqual(1, api.Operations.Count);
 
-                    OperationSpec(api, 0, "GET", operation =>
+                    OperationSpec(api, "GET", 0, operation =>
                         {
                             Assert.AreEqual("OrderItems_GetAll", operation.Nickname);
                             Assert.AreEqual("Documentation for 'GetAll'.", operation.Summary);
@@ -202,16 +206,16 @@ namespace Swashbuckle.Tests
                 // 1: POST /api/customers
                 Assert.AreEqual(1, api.Operations.Count);
 
-                OperationSpec(api, 0, "POST", operation =>
-                {
-                    Assert.AreEqual("Customers_Post", operation.Nickname);
-                    Assert.AreEqual("Documentation for 'Post'.", operation.Summary);
-                    Assert.IsNull(operation.Notes);
-                    Assert.AreEqual("Object", operation.Type);
-                    Assert.IsNull(operation.Format);
-                    Assert.IsNull(operation.Items);
-                    Assert.IsNull(operation.Enum);
-                });
+                OperationSpec(api, "POST", 0, operation =>
+                    {
+                        Assert.AreEqual("Customers_Post", operation.Nickname);
+                        Assert.AreEqual("Documentation for 'Post'.", operation.Summary);
+                        Assert.IsNull(operation.Notes);
+                        Assert.AreEqual("Object", operation.Type);
+                        Assert.IsNull(operation.Format);
+                        Assert.IsNull(operation.Items);
+                        Assert.IsNull(operation.Enum);
+                    });
             });
 
             ApiSpec("/Customers", "/api/customers/{id}", api =>
@@ -219,7 +223,7 @@ namespace Swashbuckle.Tests
                     // 1: GET /api/customers/{id}, DELETE /api/customers/{id}
                     Assert.AreEqual(2, api.Operations.Count);
 
-                    OperationSpec(api, 0, "GET", operation =>
+                    OperationSpec(api, "GET", 0, operation =>
                         {
                             Assert.AreEqual("Customers_Get", operation.Nickname);
                             Assert.AreEqual("Documentation for 'Get'.", operation.Summary);
@@ -230,17 +234,23 @@ namespace Swashbuckle.Tests
                             Assert.IsNull(operation.Enum);
                         });
 
-                    OperationSpec(api, 0, "DELETE", operation =>
-                    {
-                        Assert.AreEqual("Customers_Delete", operation.Nickname);
-                        Assert.AreEqual("Documentation for 'Delete'.", operation.Summary);
-                        Assert.IsNull(operation.Notes);
-                        Assert.AreEqual("Object", operation.Type);
-                        Assert.IsNull(operation.Format);
-                        Assert.IsNull(operation.Items);
-                        Assert.IsNull(operation.Enum);
-                    });
+                    OperationSpec(api, "DELETE", 0, operation =>
+                        {
+                            Assert.AreEqual("Customers_Delete", operation.Nickname);
+                            Assert.AreEqual("Documentation for 'Delete'.", operation.Summary);
+                            Assert.IsNull(operation.Notes);
+                            Assert.AreEqual("Object", operation.Type);
+                            Assert.IsNull(operation.Format);
+                            Assert.IsNull(operation.Items);
+                            Assert.IsNull(operation.Enum);
+                        });
                 });
+        }
+
+        [Test]
+        public void It_should_omit_operation_specs_for_actions_marked_obsolete_if_configured()
+        {
+            ApiSpec("/Orders", "/api/orders", api => CollectionAssert.IsEmpty(api.Operations.Where(op => op.Nickname == "Orders_DeleteAll")));
         }
 
         [Test]
@@ -413,7 +423,7 @@ namespace Swashbuckle.Tests
         }
 
         [Test]
-        public void It_should_generate_a_model_spec_for_all_complex_types_in_a_declaration()
+        public void It_should_generate_model_specs_for_all_complex_types_in_a_declaration_including_sub_types()
         {
             ApiDeclaration("/Orders", dec =>
             {
@@ -546,6 +556,92 @@ namespace Swashbuckle.Tests
                         });
 
                 });
+
+            ApiDeclaration("/Products", dec =>
+            {
+                Assert.AreEqual(6, dec.Models.Count);
+
+                Model(dec, "Product", model =>
+                {
+                    ModelProperty(model, "Id", property =>
+                    {
+                        Assert.AreEqual("integer", property.Type);
+                        Assert.AreEqual("int32", property.Format);
+                        Assert.IsNull(property.Items);
+                        Assert.IsNull(property.Enum);
+                    });
+
+                    ModelProperty(model, "Price", property =>
+                    {
+                        Assert.AreEqual("number", property.Type);
+                        Assert.AreEqual("double", property.Format);
+                        Assert.IsNull(property.Items);
+                        Assert.IsNull(property.Enum);
+                    });
+
+                    CollectionAssert.AreEqual(new[] { "Book", "Album", "Service" }, model.SubTypes);
+                });
+
+                Model(dec, "Book", model =>
+                {
+                    ModelProperty(model, "Title", property =>
+                    {
+                        Assert.AreEqual("string", property.Type);
+                        Assert.IsNull(property.Format);
+                        Assert.IsNull(property.Items);
+                        Assert.IsNull(property.Enum);
+                    });
+
+                    ModelProperty(model, "Author", property =>
+                    {
+                        Assert.AreEqual("string", property.Type);
+                        Assert.IsNull(property.Format);
+                        Assert.IsNull(property.Items);
+                        Assert.IsNull(property.Enum);
+                    });
+
+                    CollectionAssert.IsEmpty(model.SubTypes);
+                });
+
+                Model(dec, "Album", model =>
+                {
+                    ModelProperty(model, "Name", property =>
+                    {
+                        Assert.AreEqual("string", property.Type);
+                        Assert.IsNull(property.Format);
+                        Assert.IsNull(property.Items);
+                        Assert.IsNull(property.Enum);
+                    });
+
+                    ModelProperty(model, "Artist", property =>
+                    {
+                        Assert.AreEqual("string", property.Type);
+                        Assert.IsNull(property.Format);
+                        Assert.IsNull(property.Items);
+                        Assert.IsNull(property.Enum);
+                    });
+
+                    CollectionAssert.IsEmpty(model.SubTypes);
+                });
+
+                Model(dec, "Service", model =>
+                {
+                    CollectionAssert.IsEmpty(model.Properties);
+                    CollectionAssert.AreEqual(new[] { "Shipping", "Packaging" }, model.SubTypes);
+                });
+
+                Model(dec, "Shipping", model =>
+                {
+                    CollectionAssert.IsEmpty(model.Properties);
+                    CollectionAssert.IsEmpty(model.SubTypes);
+                });
+
+                Model(dec, "Packaging", model =>
+                {
+                    CollectionAssert.IsEmpty(model.Properties);
+                    CollectionAssert.IsEmpty(model.SubTypes);
+                });
+            });
         }
 
         [Test]
@@ -598,7 +694,7 @@ namespace Swashbuckle.Tests
             applyAssertions(apiSpec);
         }
 
-        private void OperationSpec(ApiSpec api, int index, string httpMethod, Action<OperationSpec> applyAssertions)
+        private void OperationSpec(ApiSpec api, string httpMethod, int index, Action<OperationSpec> applyAssertions)
         {
             var operationSpec = api.Operations.Where(op => op.Method == httpMethod).ElementAt(index);
             applyAssertions(operationSpec);
@@ -610,7 +706,7 @@ namespace Swashbuckle.Tests
             var apiSpec = _swaggerSpec.Declarations[resourcePath].Apis
                 .Single(api => api.Path == apiPath);
 
-            OperationSpec(apiSpec, index, httpMethod, applyAssertions);
+            OperationSpec(apiSpec, httpMethod, index, applyAssertions);
         }
 
         private void ParameterSpec(OperationSpec operation, string name, Action<ParameterSpec> applyAssertions)
