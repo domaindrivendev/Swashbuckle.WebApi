@@ -11,6 +11,7 @@ Once you have a Web API that can describe itself in Swagger, you've opened the t
 **Core Features:**
 
 * Auto-generated swagger according to the Swagger 1.2 spec
+* Seamlessly embeds swagger-ui into your service
 * In addition to the basic spec, also generates swagger data-type/model descriptions
 * Support for polymorphic, complex models using the "subTypes" property
     * Currently no swagger-ui support see https://groups.google.com/forum/#!topic/swagger-swaggersocket/kE4bL1xkSoQ
