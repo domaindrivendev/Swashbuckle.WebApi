@@ -78,12 +78,17 @@ For example you can customize the auto-generated spec by applying the following 
 
     SwaggerSpecConfig.Customize(c =>
         {
+            c.IgnoreObsoleteActions = true;
             c.GroupDeclarationsBy(GetRootResource);
             c.PostFilter<AddStandardResponseMessages>();
             c.PostFilter<AddAuthorizationResponseMessages>();
             c.MapType<MySerializableType>(new ModelSpec { Type = "string" });
         });
-        
+
+#### IgnoreObsoleteActions ####
+
+Set this option if you'd like to exclude any WebApi actions decorated with the System.ObsoleteAttribute from your swagger spec and UI
+
 #### GroupDeclarationsBy ####
 
 This option accepts a lambda as a strategy for grouping api's into ApiDeclarations. The default implementation groups by controller name. 
