@@ -8,7 +8,13 @@ And that's not all ...
 
 Once you have a Web API that can describe itself in Swagger, you've opened the treasure chest of Swagger-based tools including a client generator that can be targetted to a wide range of popular platforms. See [Swagger-Codegen](https://github.com/wordnik/swagger-codegen) for more details.
 
-**UPDATE:** As of version 3.0 (Nuget), Swashbuckle emits version 1.2 of the Swagger Spec. See [Swagger 1.2](https://github.com/wordnik/swagger-core/wiki/1.2-transition) for a list of changes.
+**Core Features:**
+
+* Auto-generated swagger according to the Swagger 1.2 spec
+* In addition to the basic spec, also generates swagger data-type/model descriptions
+* Support for polymorphic, complex models using the "subTypes" property
+    * Currently no swagger-ui support see https://groups.google.com/forum/#!topic/swagger-swaggersocket/kE4bL1xkSoQ
+* Extensibility hooks for customizing the generated spec AND the swagger-ui
 
 Getting Started
 --------------------
