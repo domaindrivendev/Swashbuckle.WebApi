@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 using System.Web.Http.Description;
 using Newtonsoft.Json;
 
@@ -170,5 +171,8 @@ namespace Swashbuckle.Models
 
         [JsonProperty("required")]
         public IList<string> Required { get; set; }
+
+        [JsonProperty("subTypes")]
+        public IList<string> SubTypes { get; set; }
     }
 }

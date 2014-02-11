@@ -38,7 +38,7 @@ namespace Swashbuckle.Tests
             var resourceListing = _swaggerSpec.Listing;
             Assert.AreEqual("1.0", resourceListing.ApiVersion);
             Assert.AreEqual("1.2", resourceListing.SwaggerVersion);
-            Assert.AreEqual(3, resourceListing.Apis.Count());
+            Assert.AreEqual(4, resourceListing.Apis.Count());
 
             Assert.IsTrue(resourceListing.Apis.Any(a => a.Path == "/Orders"),
                 "Orders declaration not listed");
@@ -46,6 +46,8 @@ namespace Swashbuckle.Tests
                 "OrderItems declaration not listed");
             Assert.IsTrue(resourceListing.Apis.Any(a => a.Path == "/Customers"),
                 "Customers declaration not listed");
+            Assert.IsTrue(resourceListing.Apis.Any(a => a.Path == "/Products"),
+                "Products declaration not listed");
         }
 
         [Test]
@@ -413,7 +415,7 @@ namespace Swashbuckle.Tests
         }
 
         [Test]
-        public void It_should_generate_a_model_spec_for_all_complex_types_in_a_declaration()
+        public void It_should_generate_model_specs_for_all_complex_types_in_a_declaration_including_sub_types()
         {
             ApiDeclaration("/Orders", dec =>
             {
@@ -546,6 +548,92 @@ namespace Swashbuckle.Tests
                         });
 
                 });
+
+            ApiDeclaration("/Products", dec =>
+            {
+                Assert.AreEqual(6, dec.Models.Count);
+
+                Model(dec, "Product", model =>
+                {
+                    ModelProperty(model, "Id", property =>
+                    {
+                        Assert.AreEqual("integer", property.Type);
+                        Assert.AreEqual("int32", property.Format);
+                        Assert.IsNull(property.Items);
+                        Assert.IsNull(property.Enum);
+                    });
+
+                    ModelProperty(model, "Price", property =>
+                    {
+                        Assert.AreEqual("number", property.Type);
+                        Assert.AreEqual("double", property.Format);
+                        Assert.IsNull(property.Items);
+                        Assert.IsNull(property.Enum);
+                    });
+
+                    CollectionAssert.AreEqual(new[] { "Book", "Album", "Service" }, model.SubTypes);
+                });
+
+                Model(dec, "Book", model =>
+                {
+                    ModelProperty(model, "Title", property =>
+                    {
+                        Assert.AreEqual("string", property.Type);
+                        Assert.IsNull(property.Format);
+                        Assert.IsNull(property.Items);
+                        Assert.IsNull(property.Enum);
+                    });
+
+                    ModelProperty(model, "Author", property =>
+                    {
+                        Assert.AreEqual("string", property.Type);
+                        Assert.IsNull(property.Format);
+                        Assert.IsNull(property.Items);
+                        Assert.IsNull(property.Enum);
+                    });
+
+                    CollectionAssert.IsEmpty(model.SubTypes);
+                });
+
+                Model(dec, "Album", model =>
+                {
+                    ModelProperty(model, "Name", property =>
+                    {
+                        Assert.AreEqual("string", property.Type);
+                        Assert.IsNull(property.Format);
+                        Assert.IsNull(property.Items);
+                        Assert.IsNull(property.Enum);
+                    });
+
+                    ModelProperty(model, "Artist", property =>
+                    {
+                        Assert.AreEqual("string", property.Type);
+                        Assert.IsNull(property.Format);
+                        Assert.IsNull(property.Items);
+                        Assert.IsNull(property.Enum);
+                    });
+
+                    CollectionAssert.IsEmpty(model.SubTypes);
+                });
+
+                Model(dec, "Service", model =>
+                {
+                    CollectionAssert.IsEmpty(model.Properties);
+                    CollectionAssert.AreEqual(new[] { "Shipping", "Packaging" }, model.SubTypes);
+                });
+
+                Model(dec, "Shipping", model =>
+                {
+                    CollectionAssert.IsEmpty(model.Properties);
+                    CollectionAssert.IsEmpty(model.SubTypes);
+                });
+
+                Model(dec, "Packaging", model =>
+                {
+                    CollectionAssert.IsEmpty(model.Properties);
+                    CollectionAssert.IsEmpty(model.SubTypes);
+                });
+            });
         }
 
         [Test]
