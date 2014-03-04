@@ -87,7 +87,7 @@ namespace Swashbuckle.Models
                     paramType = "body";
                     break;
                 case ApiParameterSource.FromUri:
-                    paramType = apiPath.Contains(apiParamDesc.Name) ? "path" : "query";
+                    paramType = apiPath.Contains(String.Format("{{{0}}}", apiParamDesc.Name)) ? "path" : "query";
                     break;
             }
 
