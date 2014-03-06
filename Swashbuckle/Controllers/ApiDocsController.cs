@@ -7,21 +7,13 @@ namespace Swashbuckle.Controllers
 {
     public class ApiDocsController : Controller
     {
-        private readonly SwaggerGenerator _swaggerGenerator;
+        private static readonly object SyncRoot = new object();
+        private static SwaggerSpec _swaggerSpec;
+
         private readonly JsonSerializerSettings _serializerSettings;
 
         public ApiDocsController()
         {
-            var config = SwaggerSpecConfig.Instance;
-
-            _swaggerGenerator = new SwaggerGenerator(
-                config.IgnoreObsoleteActions,
-                config.BasePathResolver,
-                config.DeclarationKeySelector,
-                config.CustomTypeMappings,
-                config.OperationFilters,
-                config.OperationSpecFilters);
-
             _serializerSettings = new JsonSerializerSettings
             {
                 NullValueHandling = NullValueHandling.Ignore
@@ -43,10 +35,17 @@ namespace Swashbuckle.Controllers
 
         public SwaggerSpec SwaggerSpec()
         {
-            // TODO: implement caching - should only be generated once
+            lock (SyncRoot)
+            {
+                if (_swaggerSpec == null)
+                {
+                    var swaggerGenerator = new SwaggerGenerator();
+                    var apiExplorer = GlobalConfiguration.Configuration.Services.GetApiExplorer();
+                    _swaggerSpec = swaggerGenerator.ApiExplorerToSwaggerSpec(apiExplorer);
+                }
+            }
 
-            var apiExplorer = GlobalConfiguration.Configuration.Services.GetApiExplorer();
-            return _swaggerGenerator.ApiExplorerToSwaggerSpec(apiExplorer);
+            return _swaggerSpec;
         }
     }
 }

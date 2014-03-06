@@ -13,13 +13,14 @@ namespace Swashbuckle.Models
 
         public OperationSpecGenerator(
             IDictionary<Type, ModelSpec> customTypeMappings,
+            Dictionary<Type, IEnumerable<Type>> subTypesLookup,
             IEnumerable<IOperationFilter> operationFilters,
             IEnumerable<IOperationSpecFilter> operationSpecFilters)
         {
             _operationFilters = operationFilters;
             _operationSpecFilters = operationSpecFilters;
 
-            _modelSpecGenerator = new ModelSpecGenerator(customTypeMappings);
+            _modelSpecGenerator = new ModelSpecGenerator(customTypeMappings, subTypesLookup);
         }
 
         public OperationSpec ApiDescriptionToOperationSpec(ApiDescription apiDescription, ModelSpecRegistrar modelSpecRegistrar)

@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Web.Http.Description;
 
@@ -9,31 +8,28 @@ namespace Swashbuckle.Models
     {
         protected const string SwaggerVersion = "1.2";
 
-        private readonly bool _ignoreObsoleteActions;
-        private readonly Func<string> _basePathResolver;
-        private readonly Func<ApiDescription, string> _declarationKeySelector;
+        private readonly SwaggerSpecConfig _config;
         private readonly OperationSpecGenerator _operationSpecGenerator;
 
-        public SwaggerGenerator(
-            bool ignoreObsoleteActions,
-            Func<string> basePathResolver,
-            Func<ApiDescription, string> declarationKeySelector,
-            IDictionary<Type, ModelSpec> customTypeMappings,
-            IEnumerable<IOperationFilter> operationFilters,
-            IEnumerable<IOperationSpecFilter> operationSpecFilters)
-        {
-            _ignoreObsoleteActions = ignoreObsoleteActions;
-            _declarationKeySelector = declarationKeySelector;
-            _basePathResolver = basePathResolver;
+        public SwaggerGenerator()
+            : this(SwaggerSpecConfig.StaticInstance)
+        {}
 
-            _operationSpecGenerator = new OperationSpecGenerator(customTypeMappings, operationFilters, operationSpecFilters);
+        public SwaggerGenerator(SwaggerSpecConfig config)
+        {
+            _config = config;
+            _operationSpecGenerator = new OperationSpecGenerator(
+                config.CustomTypeMappings,
+                config.SubTypesLookup,
+                config.OperationFilters,
+                config.OperationSpecFilters);
         }
 
         public SwaggerSpec ApiExplorerToSwaggerSpec(IApiExplorer apiExplorer)
         {
             var apiDescriptionGroups = apiExplorer.ApiDescriptions
-                .Where(apiDesc => !_ignoreObsoleteActions || !apiDesc.IsMarkedObsolete())
-                .GroupBy(apiDesc => "/" + _declarationKeySelector(apiDesc))
+                .Where(apiDesc => !_config.IgnoreObsoleteActions || !apiDesc.IsMarkedObsolete())
+                .GroupBy(apiDesc => "/" + _config.DeclarationKeySelector(apiDesc))
                 .OrderBy(group => group.Key)
                 .ToArray();
 
@@ -79,7 +75,7 @@ namespace Swashbuckle.Models
             {
                 ApiVersion = "1.0",
                 SwaggerVersion = SwaggerVersion,
-                BasePath = _basePathResolver().TrimEnd('/'),
+                BasePath = _config.BasePathResolver().TrimEnd('/'),
                 ResourcePath = apiDescriptionGroup.Key,
                 Apis = apiSpecs,
                 Models = modelSpecRegistrar.ToDictionary()

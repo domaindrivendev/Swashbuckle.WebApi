@@ -1,5 +1,6 @@
 ﻿using System.Net.Http;
 using Swashbuckle.Models;
+using Swashbuckle.TestApp.Models;
 using Swashbuckle.TestApp.SwaggerExtensions;
 
 namespace Swashbuckle.TestApp.App_Start
@@ -11,6 +12,16 @@ namespace Swashbuckle.TestApp.App_Start
             SwaggerSpecConfig.Customize(c =>
                 {
                     c.IgnoreObsoleteActions = true;
+
+                    c.SubTypesOf<Product>()
+                        .Include<Book>()
+                        .Include<Album>()
+                        .Include<Service>();
+
+                    c.SubTypesOf<Service>()
+                        .Include<Shipping>()
+                        .Include<Packaging>();
+
                     c.PostFilter<AddStandardErrorCodes>();
                     c.PostFilter<AddAuthorizationErrorCodes>();
                     c.OperationFilter<ApplyCustomResponseTypes>();
