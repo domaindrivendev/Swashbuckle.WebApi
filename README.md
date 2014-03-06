@@ -1,20 +1,20 @@
 Swashbuckle
 =========
-Seamlessly adds a [Swagger](https://developers.helloreverb.com/swagger) to WebApi projects! Uses a combination of ApiExplorer and Swagger/Swagger-UI to provide a rich discovery and documentation experience for consumers.
+Seamlessly adds a [swagger](https://developers.helloreverb.com/swagger) to WebApi projects! Uses a combination of ApiExplorer and swagger/swagger-UI to provide a rich discovery and documentation experience for consumers.
 
 The library comes packaged with the neccessary UI components including HTML files, JavaScript and CSS. This reduces unnecessary noise and maintenance in your WebApi project, leaving you free to focus on building an awesome API!   
 
 And that's not all ...
 
-Once you have a Web API that can describe itself in Swagger, you've opened the treasure chest of Swagger-based tools including a client generator that can be targetted to a wide range of popular platforms. See [Swagger-Codegen](https://github.com/wordnik/swagger-codegen) for more details.
+Once you have a Web API that can describe itself in Swagger, you've opened the treasure chest of Swagger-based tools including a client generator that can be targetted to a wide range of popular platforms. See [swagger-codegen](https://github.com/wordnik/swagger-codegen) for more details.
 
 **Core Features:**
 
-* Auto-generated swagger according to the Swagger 1.2 spec
+* Auto-generated swagger according to the swagger 1.2 spec
 * Seamlessly embeds swagger-ui into your service
 * In addition to the basic spec, also generates swagger data-type/model descriptions
-* Support for polymorphic, complex models using the "subTypes" property
-    * Currently no swagger-ui support see https://groups.google.com/forum/#!topic/swagger-swaggersocket/kE4bL1xkSoQ
+* Optional support for describing polymorphic models using the "subTypes" property
+    * Currently no UI support see https://groups.google.com/forum/#!topic/swagger-swaggersocket/kE4bL1xkSoQ
 * Extensibility hooks for customizing the generated spec AND the swagger-ui
 
 Getting Started
@@ -24,7 +24,7 @@ To start exposing auto-generated Swagger docs and a Swagger UI, simply install t
 
     Install-Package Swashbuckle
 
-This will add a reference to Swashbuckle.dll which contains an embedded "Area" for Swagger. The Area includes the following enpoints for the raw swagger docs and ui respectively:
+This will add a reference to Swashbuckle.dll which contains an embedded "Area" for Swagger. The Area includes the following routes for the raw Swagger docs and UI respectively:
 
 *swagger/api-docs*
 
@@ -33,7 +33,7 @@ This will add a reference to Swashbuckle.dll which contains an embedded "Area" f
 Troubleshooting
 --------------------
 
-If you've installed the Nuget package but still don't see the auto-generated swagger/swagger-ui, then try the following steps ...
+If you've installed the Nuget package but still can't access the above routes, then try the following steps ...
 
 ### Issues with VS 2013 ###
 
@@ -49,7 +49,7 @@ I hope to find a permanent fix but in the meantime, you'll need to workaround th
 
 ### Ensure MVC Areas are registered at application startup ###
 
-The swagger routes are wired-up as an MVC Area. For MVC projects, Areas are usually registered at application startup. If the code to do this is not present in your Global.asax.cs, you'll need to add it manually:
+The Swagger routes are wired-up as an MVC Area. For MVC projects, Areas are usually registered at application startup. If the code to do this is not present in your Global.asax.cs, you'll need to add it manually:
 
     protected void Application_Start()
     {
@@ -70,11 +70,11 @@ The [swagger-ui](https://github.com/wordnik/swagger-ui) is a single page applica
 Extensibility
 --------------------
 
-Swashbuckle automtically generates a Swagger spec and UI based off the WebApi ApiExplorer. The out-of-the-box generator caters for the majority of WebApi implementations but also includes some extensibility points for application-specific needs ..
+Swashbuckle automatically generates a Swagger spec and UI based off the WebApi ApiExplorer. The out-of-the-box generator caters for the majority of WebApi implementations but also includes some extensibility points for application-specific needs ..
 
 ### Customize spec generation ###
 
-For example you can customize the auto-generated spec by applying the following config options at App startup ...
+You can customize the auto-generated spec by applying the following config options at App startup ...
 
     SwaggerSpecConfig.Customize(c =>
         {
@@ -83,6 +83,15 @@ For example you can customize the auto-generated spec by applying the following 
             c.PostFilter<AddStandardResponseMessages>();
             c.PostFilter<AddAuthorizationResponseMessages>();
             c.MapType<MySerializableType>(new ModelSpec { Type = "string" });
+            
+            c.SubTypesOf<Product>()
+               .Include<Book>()
+               .Include<Album>()
+               .Include<Service>();
+
+            c.SubTypesOf<Service>()
+               .Include<Shipping>()
+               .Include<Packaging>();
         });
 
 #### IgnoreObsoleteActions ####
@@ -91,7 +100,7 @@ Set this option if you'd like to exclude any WebApi actions decorated with the S
 
 #### GroupDeclarationsBy ####
 
-This option accepts a lambda as a strategy for grouping api's into ApiDeclarations. The default implementation groups by controller name. 
+This option accepts a lambda as a strategy for grouping actions into ApiDeclarations. The default implementation groups by controller name. 
 
 #### PostFilter ####
 
@@ -136,7 +145,30 @@ Or, a filter that adds an authorization response code description to actions tha
 
 #### MapType ####
 
-This option accepts a Type and a ModelSpec. It allows you to customize the ModelSpec for a given Type. 
+This option accepts a Type and a ModelSpec. It allows you to customize the ModelSpec for a given Type.
+
+#### SubTypesOf ####
+
+The latest Swagger spec supports description of polymorphic models using a subTypes property. This can be applied to any complex model to indicate sub-types that are part of the API. However, coresponding support in the Swagger tools, including swagger-ui, is currently very limited.
+
+That said, if you'd still like to describe polymorphic models in your raw spec, you can explicitly call out the sub-types for a given type using the "SubTypesOf" API as shown above. This will generate an additional complex model for each sub-type and bind them to the base model via the subTypes property:
+
+     "Product": {
+       "id": "Product",
+       "type": "object",
+       "properties": {
+         "Id": {
+           "type": "integer",
+           "format": "int32"
+         },
+         "Price": {
+           "type": "number",
+           "format": "double"
+         }
+       },
+       "required": [],
+       "subTypes": [ "Book", "Album", "Service" ]
+     }
 
 ### Customize the swagger-ui ###
 
@@ -161,13 +193,15 @@ __TIP__: When you add an embedded resource (Right-click in Solution Explorer -> 
 
 \<Project Default Namespace>.\<Escaped Folder Path>.\<File Name>
 
-For example, if your app's default namespace is "Swashbuckle.TestApp", and you want to include a script at the following path within your project - "SwaggerExtensions/onComplete.js", then it will be assigned the following Logical Name at build time:
+For example, if your app's default namespace is "Swashbuckle.TestApp", and you have a custom script - "SwaggerExtensions/onComplete.js", then it will be assigned the following Logical Name at build time:
 
 "Swashbuckle.TestApp.SwaggerExtensions.onComplete.js"
 
+Then, to inject the script, this name, along with the containing Assembly, would be passed to the AddOnCompleteScript call.
+
 ### Extract documentation from XML Comments ###
 
-WebApi ships with an [ApiExplorer](http://msdn.microsoft.com/en-us/library/system.web.http.description.apiexplorer.aspx) component that provides a service description based off routes, controllers and actions. Swashbuckle then uses this to generate a corresponding Swagger spec.
+WebApi ships with an [ApiExplorer](http://msdn.microsoft.com/en-us/library/system.web.http.description.apiexplorer.aspx) component that provides a service description based off routes, controllers and actions. Swashbuckle uses this to generate a corresponding Swagger spec.
 
 So, to have Swashbuckle pull descriptive fields from XML Comments in code, you'll need to start by wiring up this functionailty in ApiExplorer. This is done by implementing a custom IDocumentationProvider. Step 3) in this [blog](http://blogs.msdn.com/b/yaohuang1/archive/2012/05/21/asp-net-web-api-generating-a-web-api-help-page-using-apiexplorer.aspx) provides more details. The implementation described here extracts the "summary" node from XML Comments and ApiExplorer in turn set's this value on the ApiDescription.Documentation field. Finally, Swashbuckle maps this value to the "summary" field of the corresponding OperationSpec.
 
