@@ -30,7 +30,7 @@ namespace Swashbuckle.Handlers
 
         public void ProcessRequest(HttpContext context)
         {
-            var baseUrl = SwaggerSpecConfig.Instance.BasePathResolver();
+            var baseUrl = SwaggerSpecConfig.StaticInstance.BasePathResolver();
             if (!baseUrl.EndsWith("/"))
                 baseUrl += "/";
             var relativeUrl = _redirectUrl;

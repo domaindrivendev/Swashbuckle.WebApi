@@ -1,6 +1,7 @@
 ﻿﻿using System;
 using System.Collections.Generic;
 ﻿using System.ComponentModel.DataAnnotations;
+﻿using System.Dynamic;
 ﻿using System.Linq;
 using System.Net.Http;
 using System.Reflection;
@@ -25,23 +26,23 @@ namespace Swashbuckle.Models
                 {typeof (Byte), new ModelSpec {Type = "string", Format = "byte"}},
                 {typeof (Boolean), new ModelSpec {Type = "boolean", Format = null}},
                 {typeof (DateTime), new ModelSpec {Type = "string", Format = "date-time"}},
-                {typeof (HttpResponseMessage), new ModelSpec{Id = "Object", Type="object", Required = new List<string>()}},
-                {typeof (JObject), new ModelSpec{Id = "Object", Type="object", Required = new List<string>()}}
+                {typeof (Object), new ModelSpec{Id = "Object", Type="object", Required = new List<string>()}},
+                {typeof (ExpandoObject), new ModelSpec{Id = "Object", Type="object", Required = new List<string>()}},
+                {typeof (JObject), new ModelSpec{Id = "Object", Type="object", Required = new List<string>()}},
+                {typeof (HttpResponseMessage), new ModelSpec{Id = "Object", Type="object", Required = new List<string>()}}
             };
 
         private readonly IDictionary<Type, ModelSpec> _customMappings;
+        private readonly Dictionary<Type, IEnumerable<Type>> _subTypesLookup;
 
-        public ModelSpecGenerator(IDictionary<Type, ModelSpec> customMappings)
+        public ModelSpecGenerator(IDictionary<Type, ModelSpec> customMappings, Dictionary<Type, IEnumerable<Type>> subTypesLookup)
         {
             if (customMappings == null)
                 throw new ArgumentNullException("customMappings");
 
             _customMappings = customMappings;
+            _subTypesLookup = subTypesLookup;
         }
-
-        public ModelSpecGenerator()
-            : this(new Dictionary<Type, ModelSpec>())
-        { }
 
         public ModelSpec TypeToModelSpec(Type type, out IEnumerable<ModelSpec> complexSpecs)
         {
@@ -107,7 +108,11 @@ namespace Swashbuckle.Models
                 .Select(propInfo => propInfo.Name)
                 .ToList();
 
-            var subTypes = type.DirectSubTypes()
+            var subTypes = _subTypesLookup.ContainsKey(type)
+                ? _subTypesLookup[type]
+                : new Type[]{};
+
+            var subTypeSpecs = subTypes
                 .Select(subType => CreateSpecFor(subType, true, complexTypes))
                 .Select(subTypeSpec => subTypeSpec.Ref)
                 .ToList();
@@ -118,7 +123,7 @@ namespace Swashbuckle.Models
                 Type = "object",
                 Properties = propSpecs,
                 Required = required,
-                SubTypes = subTypes
+                SubTypes = subTypeSpecs
             };
         }
 
