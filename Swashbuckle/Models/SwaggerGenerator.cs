@@ -48,7 +48,7 @@ namespace Swashbuckle.Models
 
             return new ResourceListing
             {
-                ApiVersion = "1.0",
+                ApiVersion = _config.ApiVersion,
                 SwaggerVersion = SwaggerVersion,
                 Apis = declarationLinks
             };
@@ -73,7 +73,7 @@ namespace Swashbuckle.Models
 
             return new ApiDeclaration
             {
-                ApiVersion = "1.0",
+                ApiVersion = _config.ApiVersion,
                 SwaggerVersion = SwaggerVersion,
                 BasePath = _config.BasePathResolver().TrimEnd('/'),
                 ResourcePath = apiDescriptionGroup.Key,
