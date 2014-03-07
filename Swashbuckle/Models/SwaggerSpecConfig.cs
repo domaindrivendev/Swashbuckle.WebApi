@@ -18,6 +18,7 @@ namespace Swashbuckle.Models
         public SwaggerSpecConfig()
         {
             IgnoreObsoleteActions = false;
+            ApiVersion = "1.0";
             BasePathResolver = DefaultBasePathResolver;
             DeclarationKeySelector = DefaultDeclarationKeySelector;
             CustomTypeMappings = new Dictionary<Type, ModelSpec>();
@@ -27,6 +28,7 @@ namespace Swashbuckle.Models
         }
 
         public bool IgnoreObsoleteActions { get; set; }
+        public string ApiVersion { get; set; }
         internal Func<string> BasePathResolver { get; private set; }
         internal Func<ApiDescription, string> DeclarationKeySelector { get; private set; }
         internal IDictionary<Type, ModelSpec> CustomTypeMappings { get; private set; }
