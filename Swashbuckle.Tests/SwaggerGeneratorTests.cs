@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Web.Http;
 using System.Web.Http.Description;
@@ -452,7 +451,7 @@ namespace Swashbuckle.Tests
             ApiDeclaration(swaggerSpec, "/Orders", dec =>
             {
                 // 1: Order
-                Assert.AreEqual(3, dec.Models.Count);
+                Assert.AreEqual(4, dec.Models.Count);
 
                 Model(dec, "Order", model =>
                     {
@@ -506,6 +505,12 @@ namespace Swashbuckle.Tests
                                 Assert.IsNull(property.Enum);
                             });
                     });
+
+                Model(dec, "MyTypeWithIndexers", model =>
+                {
+                    CollectionAssert.IsEmpty(model.Required);
+                    CollectionAssert.IsEmpty(model.Properties);
+                });
             });
 
             ApiDeclaration(swaggerSpec, "/OrderItems", dec =>
