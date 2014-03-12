@@ -14,6 +14,8 @@ namespace Swashbuckle.Models
     {
         private static readonly Dictionary<Type, ModelSpec> StaticMappings = new Dictionary<Type, ModelSpec>()
             {
+                {typeof (Int16), new ModelSpec {Type = "integer", Format = "int32"}},
+                {typeof (UInt16), new ModelSpec {Type = "integer", Format = "int32"}},
                 {typeof (Int32), new ModelSpec {Type = "integer", Format = "int32"}},
                 {typeof (UInt32), new ModelSpec {Type = "integer", Format = "int32"}},
                 {typeof (Int64), new ModelSpec {Type = "integer", Format = "int64"}},
@@ -99,7 +101,9 @@ namespace Swashbuckle.Models
 
         private ModelSpec CreateComplexSpecFor(Type type, IDictionary<Type, ModelSpec> complexTypes)
         {
-            var propInfos = type.GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.DeclaredOnly);
+            var propInfos = type.GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.DeclaredOnly)
+                .Where(propInfo => !propInfo.GetIndexParameters().Any())    // Ignore indexer properties
+                .ToArray();
 
             var propSpecs = propInfos
                 .ToDictionary(propInfo => propInfo.Name, propInfo => CreateSpecFor(propInfo.PropertyType, true, complexTypes));
