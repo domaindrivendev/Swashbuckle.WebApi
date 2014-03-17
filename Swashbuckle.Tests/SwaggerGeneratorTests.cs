@@ -34,7 +34,6 @@ namespace Swashbuckle.Tests
             _config.GroupDeclarationsBy(apiDesc => apiDesc.ActionDescriptor.ControllerDescriptor.ControllerName);
             var swaggerSpec = new SwaggerGenerator(_config).ApiExplorerToSwaggerSpec(_apiExplorer);
 
-            // e.g. Uses ControllerName by default
             var resourceListing = swaggerSpec.Listing;
             Assert.AreEqual("1.0", resourceListing.ApiVersion);
             Assert.AreEqual("1.2", resourceListing.SwaggerVersion);
