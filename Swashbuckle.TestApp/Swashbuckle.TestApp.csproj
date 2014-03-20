@@ -127,6 +127,7 @@
     <Compile Include="Models\Product.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SwaggerExtensions\AddAuthorizationErrorCodes.cs" />
+    <Compile Include="SwaggerExtensions\ApplyCustomModelDescriptions.cs" />
     <Compile Include="SwaggerExtensions\ApplyCustomResponseTypes.cs" />
     <Compile Include="SwaggerExtensions\AddStandardErrorCodes.cs" />
     <Compile Include="SwaggerExtensions\ExtractXmlComments.cs" />

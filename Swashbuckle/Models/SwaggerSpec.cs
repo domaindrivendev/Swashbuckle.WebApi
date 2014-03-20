@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
 using Newtonsoft.Json;
+using System.Linq;
+using System;
 
 namespace Swashbuckle.Models
 {
@@ -130,7 +132,7 @@ namespace Swashbuckle.Models
         public string Message { get; set; }
     }
 
-    public class ModelSpec
+    public class ModelSpec : ICloneable
     {
         [JsonProperty("$ref")]
         public string Ref { get; set; }
@@ -158,5 +160,31 @@ namespace Swashbuckle.Models
 
         [JsonProperty("subTypes")]
         public IList<string> SubTypes { get; set; }
+
+        [JsonProperty("description")]
+        public string Description { get; set; }
+
+        public ModelSpec Clone()
+        {
+            ModelSpec clone = (ModelSpec)this.MemberwiseClone();
+
+            //Create deep copies of properties which are not immutable types
+            if(Items != null) clone.Items = Items.Clone();
+            if (Enum != null) clone.Enum = Enum.ToList();
+            if (Properties != null) clone.Properties = Properties.ToDictionary(kvp => kvp.Key, kvp => kvp.Value.Clone());
+            if (Required != null) clone.Required = Required.ToList();
+            if (SubTypes != null) clone.SubTypes = SubTypes.ToList();
+
+            return clone;
+        }
+
+        #region ICloneable Members
+
+        object ICloneable.Clone()
+        {
+            return Clone();
+        }
+
+        #endregion
     }
 }

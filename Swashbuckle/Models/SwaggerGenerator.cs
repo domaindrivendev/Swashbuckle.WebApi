@@ -21,6 +21,7 @@ namespace Swashbuckle.Models
             _operationSpecGenerator = new OperationSpecGenerator(
                 config.CustomTypeMappings,
                 config.SubTypesLookup,
+                config.ModelFilters,
                 config.OperationFilters,
                 config.OperationSpecFilters);
         }

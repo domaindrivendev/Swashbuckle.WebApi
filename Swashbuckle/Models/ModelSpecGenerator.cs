@@ -36,14 +36,18 @@ namespace Swashbuckle.Models
 
         private readonly IDictionary<Type, ModelSpec> _customMappings;
         private readonly Dictionary<Type, IEnumerable<Type>> _subTypesLookup;
+        private readonly IEnumerable<IModelFilter> _modelFilters;
 
-        public ModelSpecGenerator(IDictionary<Type, ModelSpec> customMappings, Dictionary<Type, IEnumerable<Type>> subTypesLookup)
+        public ModelSpecGenerator(IDictionary<Type, ModelSpec> customMappings,
+            Dictionary<Type, IEnumerable<Type>> subTypesLookup,
+            IEnumerable<IModelFilter> modelFilters)
         {
             if (customMappings == null)
                 throw new ArgumentNullException("customMappings");
 
             _customMappings = customMappings;
             _subTypesLookup = subTypesLookup;
+            _modelFilters = modelFilters;
         }
 
         public ModelSpec TypeToModelSpec(Type type, out IEnumerable<ModelSpec> complexSpecs)
@@ -105,8 +109,9 @@ namespace Swashbuckle.Models
                 .Where(propInfo => !propInfo.GetIndexParameters().Any())    // Ignore indexer properties
                 .ToArray();
 
+            //Clone ModelSpec for property so that alterations to the property (such as description) do not affect the originating ModelSpec
             var propSpecs = propInfos
-                .ToDictionary(propInfo => propInfo.Name, propInfo => CreateSpecFor(propInfo.PropertyType, true, complexTypes));
+                .ToDictionary(propInfo => propInfo.Name, propInfo => CreateSpecFor(propInfo.PropertyType, true, complexTypes).Clone());
 
             var required = propInfos.Where(propInfo => Attribute.IsDefined(propInfo, typeof (RequiredAttribute)))
                 .Select(propInfo => propInfo.Name)
@@ -121,7 +126,7 @@ namespace Swashbuckle.Models
                 .Select(subTypeSpec => subTypeSpec.Ref)
                 .ToList();
 
-            return new ModelSpec
+            var modelSpec = new ModelSpec
             {
                 Id = UniqueIdFor(type),
                 Type = "object",
@@ -129,6 +134,14 @@ namespace Swashbuckle.Models
                 Required = required,
                 SubTypes = subTypeSpecs
             };
+            
+            //Apply model filters
+            foreach (var filter in _modelFilters)
+            {
+                filter.Apply(type, modelSpec);
+            }
+
+            return modelSpec;
         }
 
         private static string UniqueIdFor(Type type)

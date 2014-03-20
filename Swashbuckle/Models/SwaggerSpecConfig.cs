@@ -24,6 +24,7 @@ namespace Swashbuckle.Models
             CustomTypeMappings = new Dictionary<Type, ModelSpec>();
             SubTypesLookup = new Dictionary<Type, IEnumerable<Type>>();
             OperationFilters = new List<IOperationFilter>();
+            ModelFilters = new List<IModelFilter>();
             OperationSpecFilters = new List<IOperationSpecFilter>();
         }
 
@@ -34,6 +35,7 @@ namespace Swashbuckle.Models
         internal IDictionary<Type, ModelSpec> CustomTypeMappings { get; private set; }
         internal Dictionary<Type, IEnumerable<Type>> SubTypesLookup { get; set; }
         internal List<IOperationFilter> OperationFilters { get; private set; }
+        internal List<IModelFilter> ModelFilters { get; private set; }
         internal List<IOperationSpecFilter> OperationSpecFilters { get; private set; }
 
         public SwaggerSpecConfig ResolveBasePath(Func<string> basePathResolver)
@@ -82,6 +84,18 @@ namespace Swashbuckle.Models
             where TFilter : IOperationFilter, new()
         {
             return OperationFilter(new TFilter());
+        }
+
+        public SwaggerSpecConfig ModelFilter(IModelFilter modelFilter)
+        {
+            ModelFilters.Add(modelFilter);
+            return this;
+        }
+
+        public SwaggerSpecConfig ModelFilter<TFilter>()
+            where TFilter : IModelFilter, new()
+        {
+            return ModelFilter(new TFilter());
         }
 
         [Obsolete("Use OperationFilter and port any custom filters from IOperationSpecFilter to IOperationFilter")]
@@ -141,6 +155,16 @@ namespace Swashbuckle.Models
             OperationSpec operationSpec,
             ModelSpecRegistrar modelSpecRegistrar,
             ModelSpecGenerator modelSpecGenerator);
+    }
+
+    /// <summary>
+    /// Filter complex model specs
+    /// </summary>
+    public interface IModelFilter
+    {
+        void Apply(
+            Type type,
+            ModelSpec modelSpec);
     }
 
     [Obsolete("Use new interface - IOperationFilter. It provides additional parameters for generating/registering custom ModelSpecs")]
