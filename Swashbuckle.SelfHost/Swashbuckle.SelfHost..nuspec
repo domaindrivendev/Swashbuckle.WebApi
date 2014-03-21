@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>$id$</id>
+    <version>4.0-beta</version>
+    <title>$title$</title>
+    <authors>Richard Morris, GettyImages</authors>
+    <licenseUrl>http://opensource.org/licenses/BSD-3-Clause</licenseUrl>
+    <projectUrl>https://github.com/domaindrivendev/Swashbuckle</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>Seamlessly adds a Swagger to WebApi projects! Uses a combination of ApiExplorer and Swagger/Swagger-UI to provide a rich discovery and documentation experience for consumers. If you're WebApi is self-hosted use this package. Alternatively, if it's hosted in IIS use Swashbuckle</description>
+    <copyright>Copyright 2013</copyright>
+    <tags>Swagger Documentation Discovery Help WebApi AspNet AspNetWebApi Docs SelfHost</tags>
+    <dependencies>
+      <dependency id="Microsoft.AspNet.WebApi.SelfHost" version="4.0" />
+    </dependencies>
+  </metadata>
+  <files>
+    <file src="bin\$configuration$\Swashbuckle.Core.dll" target="lib\net40\" />
+    <file src="App_Start\SwaggerConfig.cs.pp" target="content\App_Start" />
+  </files>
+</package>
