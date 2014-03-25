@@ -2,7 +2,7 @@
 <package >
   <metadata>
     <id>Swashbuckle.Core</id>
-    <version>4.0-beta</version>
+    <version>4.0-alpha</version>
     <title>$title$</title>
     <authors>Richard Morris, GettyImages</authors>
     <licenseUrl>http://opensource.org/licenses/BSD-3-Clause</licenseUrl>
