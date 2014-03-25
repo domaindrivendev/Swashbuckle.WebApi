@@ -41,11 +41,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Swashbuckle.TestApp.Core", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Swashbuckle.TestApp.SelfHost", "Swashbuckle.TestApp.SelfHost\Swashbuckle.TestApp.SelfHost.csproj", "{E3C75713-3208-47E1-994E-F0B495F04953}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Swashbuckle.WebHost", "Swashbuckle.WebHost\Swashbuckle.WebHost.csproj", "{FE974ABE-021C-415C-BF57-041A42136AA1}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Swashbuckle.SelfHost", "Swashbuckle.SelfHost\Swashbuckle.SelfHost.csproj", "{47CFC9DB-292A-4E64-AF89-CC4296A67867}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Swashbuckle.TestApp2", "Swashbuckle.TestApp2\Swashbuckle.TestApp2.csproj", "{15125FAE-9014-412A-885A-692BF849FACF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Swashbuckle.WebHost", "Swashbuckle.WebHost\Swashbuckle.WebHost.csproj", "{FE974ABE-021C-415C-BF57-041A42136AA1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -77,18 +75,14 @@ Global
 		{E3C75713-3208-47E1-994E-F0B495F04953}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E3C75713-3208-47E1-994E-F0B495F04953}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E3C75713-3208-47E1-994E-F0B495F04953}.Release|Any CPU.Build.0 = Release|Any CPU
-		{FE974ABE-021C-415C-BF57-041A42136AA1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{FE974ABE-021C-415C-BF57-041A42136AA1}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{FE974ABE-021C-415C-BF57-041A42136AA1}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{FE974ABE-021C-415C-BF57-041A42136AA1}.Release|Any CPU.Build.0 = Release|Any CPU
-		{47CFC9DB-292A-4E64-AF89-CC4296A67867}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{47CFC9DB-292A-4E64-AF89-CC4296A67867}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{47CFC9DB-292A-4E64-AF89-CC4296A67867}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{47CFC9DB-292A-4E64-AF89-CC4296A67867}.Release|Any CPU.Build.0 = Release|Any CPU
 		{15125FAE-9014-412A-885A-692BF849FACF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{15125FAE-9014-412A-885A-692BF849FACF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{15125FAE-9014-412A-885A-692BF849FACF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{15125FAE-9014-412A-885A-692BF849FACF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FE974ABE-021C-415C-BF57-041A42136AA1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FE974ABE-021C-415C-BF57-041A42136AA1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FE974ABE-021C-415C-BF57-041A42136AA1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FE974ABE-021C-415C-BF57-041A42136AA1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -101,10 +101,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Swashbuckle.Core\Swashbuckle.Core.csproj">
-      <Project>{d50a26ff-02c6-4c16-ba94-4cd7d43efbb3}</Project>
-      <Name>Swashbuckle.Core</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Swashbuckle.TestApp.Core\Swashbuckle.TestApp.Core.csproj">
       <Project>{c0b9c2e1-6878-4808-935b-438a5c26a9dc}</Project>
       <Name>Swashbuckle.TestApp.Core</Name>
