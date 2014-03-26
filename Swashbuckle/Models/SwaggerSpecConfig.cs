@@ -21,7 +21,7 @@ namespace Swashbuckle.Models
             ApiVersion = "1.0";
             BasePathResolver = DefaultBasePathResolver;
             DeclarationKeySelector = DefaultDeclarationKeySelector;
-            CustomTypeMappings = new Dictionary<Type, ModelSpec>();
+            CustomTypeMappings = new Dictionary<Type, Func<ModelSpec>>();
             SubTypesLookup = new Dictionary<Type, IEnumerable<Type>>();
             OperationFilters = new List<IOperationFilter>();
             ModelFilters = new List<IModelFilter>();
@@ -32,7 +32,7 @@ namespace Swashbuckle.Models
         public string ApiVersion { get; set; }
         internal Func<string> BasePathResolver { get; private set; }
         internal Func<ApiDescription, string> DeclarationKeySelector { get; private set; }
-        internal IDictionary<Type, ModelSpec> CustomTypeMappings { get; private set; }
+        internal IDictionary<Type, Func<ModelSpec>> CustomTypeMappings { get; private set; }
         internal Dictionary<Type, IEnumerable<Type>> SubTypesLookup { get; set; }
         internal List<IOperationFilter> OperationFilters { get; private set; }
         internal List<IModelFilter> ModelFilters { get; private set; }
@@ -54,9 +54,16 @@ namespace Swashbuckle.Models
             return this;
         }
 
+        public SwaggerSpecConfig ModelSpecFor<T>(Func<ModelSpec> modelSpecCreator)
+        {
+            CustomTypeMappings[typeof(T)] = modelSpecCreator;
+            return this;
+        }
+
+        [Obsolete("Use ModelSpecFor with a Func that generates a ModelSpec")]
         public SwaggerSpecConfig MapType<T>(ModelSpec modelSpec)
         {
-            CustomTypeMappings[typeof (T)] = modelSpec;
+            CustomTypeMappings[typeof (T)] = ()=>modelSpec.Clone();
             return this;
         }
 

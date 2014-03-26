@@ -12,7 +12,7 @@ namespace Swashbuckle.Models
         private readonly ModelSpecGenerator _modelSpecGenerator;
 
         public OperationSpecGenerator(
-            IDictionary<Type, ModelSpec> customTypeMappings,
+            IDictionary<Type, Func<ModelSpec>> customTypeMappings,
             Dictionary<Type, IEnumerable<Type>> subTypesLookup,
             IEnumerable<IModelFilter> modelFilters,
             IEnumerable<IOperationFilter> operationFilters,

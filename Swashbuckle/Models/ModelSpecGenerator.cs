@@ -12,31 +12,31 @@ namespace Swashbuckle.Models
 {
     public class ModelSpecGenerator
     {
-        private static readonly Dictionary<Type, ModelSpec> StaticMappings = new Dictionary<Type, ModelSpec>()
+        private static readonly Dictionary<Type, Func<ModelSpec>> StaticMappings = new Dictionary<Type, Func<ModelSpec>>()
             {
-                {typeof (Int32), new ModelSpec {Type = "integer", Format = "int32"}},
-                {typeof (UInt32), new ModelSpec {Type = "integer", Format = "int32"}},
-                {typeof (Int64), new ModelSpec {Type = "integer", Format = "int64"}},
-                {typeof (UInt64), new ModelSpec {Type = "integer", Format = "int64"}},
-                {typeof (Single), new ModelSpec {Type = "number", Format = "float"}},
-                {typeof (Double), new ModelSpec {Type = "number", Format = "double"}},
-                {typeof (Decimal), new ModelSpec {Type = "number", Format = "double"}},
-                {typeof (String), new ModelSpec {Type = "string", Format = null}},
-                {typeof (Char), new ModelSpec {Type = "string", Format = null}},
-                {typeof (Byte), new ModelSpec {Type = "string", Format = "byte"}},
-                {typeof (Boolean), new ModelSpec {Type = "boolean", Format = null}},
-                {typeof (DateTime), new ModelSpec {Type = "string", Format = "date-time"}},
-                {typeof (Object), new ModelSpec{Id = "Object", Type="object", Required = new List<string>()}},
-                {typeof (ExpandoObject), new ModelSpec{Id = "Object", Type="object", Required = new List<string>()}},
-                {typeof (JObject), new ModelSpec{Id = "Object", Type="object", Required = new List<string>()}},
-                {typeof (HttpResponseMessage), new ModelSpec{Id = "Object", Type="object", Required = new List<string>()}}
+                {typeof (Int32), ()=>new ModelSpec {Type = "integer", Format = "int32"}},
+                {typeof (UInt32), ()=>new ModelSpec {Type = "integer", Format = "int32"}},
+                {typeof (Int64), ()=>new ModelSpec {Type = "integer", Format = "int64"}},
+                {typeof (UInt64), ()=>new ModelSpec {Type = "integer", Format = "int64"}},
+                {typeof (Single), ()=>new ModelSpec {Type = "number", Format = "float"}},
+                {typeof (Double), ()=>new ModelSpec {Type = "number", Format = "double"}},
+                {typeof (Decimal), ()=>new ModelSpec {Type = "number", Format = "double"}},
+                {typeof (String), ()=>new ModelSpec {Type = "string", Format = null}},
+                {typeof (Char), ()=>new ModelSpec {Type = "string", Format = null}},
+                {typeof (Byte), ()=>new ModelSpec {Type = "string", Format = "byte"}},
+                {typeof (Boolean), ()=>new ModelSpec {Type = "boolean", Format = null}},
+                {typeof (DateTime), ()=>new ModelSpec {Type = "string", Format = "date-time"}},
+                {typeof (Object), ()=>new ModelSpec{Id = "Object", Type="object", Required = new List<string>()}},
+                {typeof (ExpandoObject), ()=>new ModelSpec{Id = "Object", Type="object", Required = new List<string>()}},
+                {typeof (JObject), ()=>new ModelSpec{Id = "Object", Type="object", Required = new List<string>()}},
+                {typeof (HttpResponseMessage), ()=>new ModelSpec{Id = "Object", Type="object", Required = new List<string>()}}
             };
 
-        private readonly IDictionary<Type, ModelSpec> _customMappings;
+        private readonly IDictionary<Type, Func<ModelSpec>> _customMappings;
         private readonly Dictionary<Type, IEnumerable<Type>> _subTypesLookup;
         private readonly IEnumerable<IModelFilter> _modelFilters;
 
-        public ModelSpecGenerator(IDictionary<Type, ModelSpec> customMappings,
+        public ModelSpecGenerator(IDictionary<Type, Func<ModelSpec>> customMappings,
             Dictionary<Type, IEnumerable<Type>> subTypesLookup,
             IEnumerable<IModelFilter> modelFilters)
         {
@@ -71,10 +71,10 @@ namespace Swashbuckle.Models
         private ModelSpec CreateSpecFor(Type type, bool deferIfComplex, IDictionary<Type, ModelSpec> complexTypes)
         {
             if (_customMappings.ContainsKey(type))
-                return _customMappings[type];
+                return _customMappings[type]();
 
             if (StaticMappings.ContainsKey(type))
-                return StaticMappings[type];
+                return StaticMappings[type]();
 
             if (type.IsEnum)
                 return new ModelSpec { Type = "string", Enum = type.GetEnumNames() };
@@ -105,9 +105,8 @@ namespace Swashbuckle.Models
         {
             var propInfos = type.GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.DeclaredOnly);
 
-            //Clone ModelSpec for property so that alterations to the property (such as description) do not affect the originating ModelSpec
             var propSpecs = propInfos
-                .ToDictionary(propInfo => propInfo.Name, propInfo => CreateSpecFor(propInfo.PropertyType, true, complexTypes).Clone());
+                .ToDictionary(propInfo => propInfo.Name, propInfo => CreateSpecFor(propInfo.PropertyType, true, complexTypes));
 
             var required = propInfos.Where(propInfo => Attribute.IsDefined(propInfo, typeof (RequiredAttribute)))
                 .Select(propInfo => propInfo.Name)
