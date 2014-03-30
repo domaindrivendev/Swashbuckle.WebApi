@@ -11,8 +11,6 @@ namespace Swashbuckle.Core.Application
 
         private SwaggerUiConfig()
         {
-            ApiKeyName = "special-key";
-            ApiKey = "special-key";
             SupportHeaderParams = false;
             SupportedSubmitMethods = new[] { HttpMethod.Get, HttpMethod.Post, HttpMethod.Put };
             DocExpansion = DocExpansion.None;
@@ -20,8 +18,6 @@ namespace Swashbuckle.Core.Application
             CustomStylesheets = new List<InjectedResourceDescriptor>();
         }
 
-        public string ApiKeyName { get; set; }
-        public string ApiKey { get; set; }
         public bool SupportHeaderParams { get; set; }
         public IEnumerable<HttpMethod> SupportedSubmitMethods { get; set; }
         public DocExpansion DocExpansion { get; set; }
