@@ -23,13 +23,13 @@ namespace Swashbuckle.Core.Swagger
             Func<ApiDescription, string> declarationKeySelector,
             Dictionary<Type, ModelSpec> customTypeMappings,
             Dictionary<Type, IEnumerable<Type>> subTypesLookup,
-            IEnumerable<IOperationSpecFilter> operationFilters)
+            IEnumerable<IOperationSpecFilter> operationSpecFilters)
         {
             _apiVersion = apiVersion;
             _basePath = basePath.TrimEnd('/');
             _ignoreObsoleteActions = ignoreObsoleteActions;
             _declarationKeySelector = declarationKeySelector;
-            _operationSpecGenerator = new OperationSpecGenerator(customTypeMappings, subTypesLookup, operationFilters);
+            _operationSpecGenerator = new OperationSpecGenerator(customTypeMappings, subTypesLookup, operationSpecFilters);
         }
 
         public SwaggerSpec ApiExplorerToSwaggerSpec(IApiExplorer apiExplorer)

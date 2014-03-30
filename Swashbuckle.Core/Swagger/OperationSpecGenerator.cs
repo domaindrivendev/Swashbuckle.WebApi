@@ -7,15 +7,15 @@ namespace Swashbuckle.Core.Swagger
 {
     public class OperationSpecGenerator
     {
-        private readonly IEnumerable<IOperationSpecFilter> _operationFilters;
+        private readonly IEnumerable<IOperationSpecFilter> _operationSpecFilters;
         private readonly ModelSpecGenerator _modelSpecGenerator;
 
         public OperationSpecGenerator(
             IDictionary<Type, ModelSpec> customTypeMappings,
             Dictionary<Type, IEnumerable<Type>> subTypesLookup,
-            IEnumerable<IOperationSpecFilter> operationFilters)
+            IEnumerable<IOperationSpecFilter> operationSpecFilters)
         {
-            _operationFilters = operationFilters;
+            _operationSpecFilters = operationSpecFilters;
             _modelSpecGenerator = new ModelSpecGenerator(customTypeMappings, subTypesLookup);
         }
 
@@ -60,9 +60,9 @@ namespace Swashbuckle.Core.Swagger
                 }
             }
 
-            foreach (var filter in _operationFilters)
+            foreach (var filter in _operationSpecFilters)
             {
-                filter.Apply(operationSpec, apiDescription, _modelSpecGenerator, complexModels);
+                filter.Apply(operationSpec, complexModels, _modelSpecGenerator, apiDescription);
             }
 
             return operationSpec;

@@ -9,11 +9,7 @@ namespace Swashbuckle.TestApp.Core.SwaggerExtensions
 {
     public class AddAuthorizationErrorCodes : IOperationSpecFilter
     {
-        public void Apply(
-            OperationSpec operationSpec,
-            ApiDescription apiDescription,
-            ModelSpecGenerator modelSpecGenerator,
-            Dictionary<string, ModelSpec> complexModels)
+        public void Apply(OperationSpec operationSpec, Dictionary<string, ModelSpec> complexModels, ModelSpecGenerator modelSpecGenerator, ApiDescription apiDescription)
         {
             if (apiDescription.ActionDescriptor.GetFilters().OfType<AuthorizeAttribute>().Any())
             {

@@ -7,11 +7,7 @@ namespace Swashbuckle.TestApp.Core.SwaggerExtensions
 {
     public class AddStandardErrorCodes : IOperationSpecFilter
     {
-        public void Apply(
-            OperationSpec operationSpec,
-            ApiDescription apiDescription,
-            ModelSpecGenerator modelSpecGenerator,
-            Dictionary<string, ModelSpec> complexModels)
+        public void Apply(OperationSpec operationSpec, Dictionary<string, ModelSpec> complexModels, ModelSpecGenerator modelSpecGenerator, ApiDescription apiDescription)
         {
             operationSpec.ResponseMessages.Add(new ResponseMessageSpec
             {

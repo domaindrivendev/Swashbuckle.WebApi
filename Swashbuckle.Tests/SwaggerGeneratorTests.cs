@@ -754,7 +754,7 @@ namespace Swashbuckle.Tests
                 declarationKeySelector: declarationKeySelector ?? (apiDesc => apiDesc.ActionDescriptor.ControllerDescriptor.ControllerName),
                 customTypeMappings: new Dictionary<Type, ModelSpec>(), 
                 subTypesLookup: subTypesLookup ?? new Dictionary<Type, IEnumerable<Type>>(), 
-                operationFilters: operationSpecFilters ?? new List<IOperationSpecFilter>(),
+                operationSpecFilters: operationSpecFilters ?? new List<IOperationSpecFilter>(),
                 ignoreObsoleteActions: ignoreObsoletetActions);
         }
 

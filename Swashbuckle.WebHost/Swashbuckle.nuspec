@@ -13,8 +13,9 @@
     <copyright>Copyright 2013</copyright>
     <tags>Swagger Documentation Discovery Help WebApi AspNet AspNetWebApi Docs WebHost IIS</tags>
     <dependencies>
-      <dependency id="Swashbuckle.Core" version="4.0-alpha" />
+      <dependency id="Microsoft.AspNet.WebApi.WebHost" version="4.0.20710" />
       <dependency id="WebActivatorEx" />
+      <dependency id="Swashbuckle.Core" version="4.0-alpha" />
     </dependencies>
   </metadata>
   <files>

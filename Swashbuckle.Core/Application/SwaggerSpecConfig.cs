@@ -56,6 +56,12 @@ namespace Swashbuckle.Core.Application
             return this;
         }
 
+        public SwaggerSpecConfig IgnoreObsoleteActions()
+        {
+            IgnoreObsoleteActionsFlag = true;
+            return this;
+        }
+
         public SwaggerSpecConfig MapType<T>(ModelSpec modelSpec)
         {
             CustomTypeMappings[typeof (T)] = modelSpec;
@@ -82,24 +88,17 @@ namespace Swashbuckle.Core.Application
             return OperationSpecFilter(new T());
         }
 
-        private SwaggerSpecConfig OperationSpecFilter(IOperationSpecFilter operationFilter)
+        public SwaggerSpecConfig OperationSpecFilter(IOperationSpecFilter operationSpecFilter)
         {
-            if (operationFilter == null) throw new ArgumentNullException("operationFilter");
-            OperationSpecFilters.Add(operationFilter);
+            if (operationSpecFilter == null) throw new ArgumentNullException("operationSpecFilter");
+            OperationSpecFilters.Add(operationSpecFilter);
             return this;
         }
 
-        public SwaggerSpecConfig IgnoreObsoleteActions()
+        private static string DefaultBasePathResolver(HttpRequestMessage request)
         {
-            IgnoreObsoleteActionsFlag = true;
-            return this;
-        }
-
-        private string DefaultBasePathResolver(HttpRequestMessage request)
-        {
-            var url = request.RequestUri.ToString();
-            var cutoffIndex = url.IndexOf("/swagger", StringComparison.InvariantCulture);
-            return url.Substring(0, cutoffIndex + 1);
+            var requestUri = request.RequestUri;
+            return requestUri.GetLeftPart(UriPartial.Authority) + request.GetConfiguration().VirtualPathRoot;
         }
     }
 

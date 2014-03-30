@@ -65,7 +65,7 @@ namespace Swashbuckle.Core.Application
                         declarationKeySelector: _config.DeclarationKeySelector,
                         customTypeMappings: _config.CustomTypeMappings,
                         subTypesLookup: _config.SubTypesLookup,
-                        operationFilters: _config.OperationSpecFilters,
+                        operationSpecFilters: _config.OperationSpecFilters,
                         ignoreObsoleteActions: _config.IgnoreObsoleteActionsFlag);
 
                     var apiExplorer = request.GetConfiguration().Services.GetApiExplorer();
