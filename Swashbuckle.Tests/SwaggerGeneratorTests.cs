@@ -1,38 +1,33 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Web.Http;
 using System.Web.Http.Description;
 using NUnit.Framework;
-using Swashbuckle.Models;
-using Swashbuckle.TestApp.App_Start;
-using Swashbuckle.TestApp.Models;
-using Swashbuckle.TestApp.SwaggerExtensions;
+using Swashbuckle.Core.Swagger;
+using Swashbuckle.TestApp.Core.Models;
+using Swashbuckle.TestApp.Core.SwaggerExtensions;
 
 namespace Swashbuckle.Tests
 {
     public class SwaggerGeneratorTests
     {
-        private SwaggerSpecConfig _config;
         private ApiExplorer _apiExplorer;
 
         [SetUp]
         public void Setup()
         {
-            // Basic config
-            _config = new SwaggerSpecConfig()
-                .ResolveBasePath(() => "http://tempuri.org");
-
             // Get ApiExplorer for TestApp
             var httpConfiguration = new HttpConfiguration();
-            WebApiConfig.Register(httpConfiguration);
+            TestApp.Core.WebApiConfig.Register(httpConfiguration);
             _apiExplorer = new ApiExplorer(httpConfiguration);
         }
 
         [Test]
         public void It_should_generate_a_listing_according_to_provided_strategy()
         {
-            _config.GroupDeclarationsBy(apiDesc => apiDesc.ActionDescriptor.ControllerDescriptor.ControllerName);
-            var swaggerSpec = new SwaggerGenerator(_config).ApiExplorerToSwaggerSpec(_apiExplorer);
+            var generator = CreateGenerator(declarationKeySelector: (apiDesc) => apiDesc.ActionDescriptor.ControllerDescriptor.ControllerName);
+            var swaggerSpec = generator.ApiExplorerToSwaggerSpec(_apiExplorer);
 
             var resourceListing = swaggerSpec.Listing;
             Assert.AreEqual("1.0", resourceListing.ApiVersion);
@@ -52,8 +47,8 @@ namespace Swashbuckle.Tests
         [Test]
         public void It_should_generate_declarations_according_to_provided_strategy()
         {
-            _config.GroupDeclarationsBy(apiDesc => apiDesc.ActionDescriptor.ControllerDescriptor.ControllerName);
-            var swaggerSpec = new SwaggerGenerator(_config).ApiExplorerToSwaggerSpec(_apiExplorer);
+            var generator = CreateGenerator(declarationKeySelector: (apiDesc) => apiDesc.ActionDescriptor.ControllerDescriptor.ControllerName);
+            var swaggerSpec = generator.ApiExplorerToSwaggerSpec(_apiExplorer);
 
             ApiDeclaration(swaggerSpec, "/Orders", dec =>
                 {
@@ -80,7 +75,8 @@ namespace Swashbuckle.Tests
         [Test]
         public void It_should_generate_an_api_spec_for_each_url_in_a_declaration()
         {
-            var swaggerSpec = new SwaggerGenerator(_config).ApiExplorerToSwaggerSpec(_apiExplorer);
+            var generator = CreateGenerator();
+            var swaggerSpec = generator.ApiExplorerToSwaggerSpec(_apiExplorer);
 
             ApiDeclaration(swaggerSpec, "/Orders", dec =>
                 {
@@ -113,7 +109,8 @@ namespace Swashbuckle.Tests
         [Test]
         public void It_should_generate_an_operation_spec_for_all_supported_methods_on_a_url()
         {
-            var swaggerSpec = new SwaggerGenerator(_config).ApiExplorerToSwaggerSpec(_apiExplorer);
+            var generator = CreateGenerator();
+            var swaggerSpec = generator.ApiExplorerToSwaggerSpec(_apiExplorer);
 
             ApiSpec(swaggerSpec, "/Orders", "/api/orders", api =>
                 {
@@ -265,8 +262,8 @@ namespace Swashbuckle.Tests
         [Test]
         public void It_should_honor_the_config_setting_to_ignore_obsolete_actions()
         {
-            _config.IgnoreObsoleteActions = true;
-            var swaggerSpec = new SwaggerGenerator(_config).ApiExplorerToSwaggerSpec(_apiExplorer);
+            var generator = CreateGenerator(ignoreObsoletetActions: true);
+            var swaggerSpec = generator.ApiExplorerToSwaggerSpec(_apiExplorer);
 
             ApiSpec(swaggerSpec, "/Orders", "/api/orders", api => CollectionAssert.IsEmpty(api.Operations.Where(op => op.Nickname == "Orders_DeleteAll")));
         }
@@ -274,7 +271,8 @@ namespace Swashbuckle.Tests
         [Test]
         public void It_should_generate_a_parameter_spec_for_each_parameter_in_a_given_operation()
         {
-            var swaggerSpec = new SwaggerGenerator(_config).ApiExplorerToSwaggerSpec(_apiExplorer);
+            var generator = CreateGenerator();
+            var swaggerSpec = generator.ApiExplorerToSwaggerSpec(_apiExplorer);
 
             OperationSpec(swaggerSpec, "/Orders", "/api/orders", 0, "POST", operation =>
                 {
@@ -445,7 +443,8 @@ namespace Swashbuckle.Tests
         [Test]
         public void It_should_generate_model_specs_for_complex_types_in_a_declaration()
         {
-            var swaggerSpec = new SwaggerGenerator(_config).ApiExplorerToSwaggerSpec(_apiExplorer);
+            var generator = CreateGenerator();
+            var swaggerSpec = generator.ApiExplorerToSwaggerSpec(_apiExplorer);
 
             ApiDeclaration(swaggerSpec, "/Orders", dec =>
             {
@@ -615,16 +614,14 @@ namespace Swashbuckle.Tests
         [Test]
         public void It_should_generate_model_specs_for_explicitly_configured_sub_types()
         {
-            _config.SubTypesOf<Product>()
-                .Include<Book>()
-                .Include<Album>()
-                .Include<Service>();
+            var configuredSubTypes = new Dictionary<Type, IEnumerable<Type>>
+                {
+                    {typeof (Product), new [] {typeof (Book), typeof (Album), typeof (Service)}},
+                    {typeof (Service), new [] {typeof (Shipping), typeof (Packaging)}}
+                };
 
-            _config.SubTypesOf<Service>()
-                .Include<Shipping>()
-                .Include<Packaging>();
-
-            var swaggerSpec = new SwaggerGenerator(_config).ApiExplorerToSwaggerSpec(_apiExplorer);
+            var generator = CreateGenerator(subTypesLookup: configuredSubTypes);
+            var swaggerSpec = generator.ApiExplorerToSwaggerSpec(_apiExplorer);
 
             ApiDeclaration(swaggerSpec, "/Products", dec =>
             {
@@ -716,11 +713,9 @@ namespace Swashbuckle.Tests
         [Test]
         public void It_should_apply_all_configured_operation_spec_filters()
         {
-            _config
-                .PostFilter<AddStandardErrorCodes>()
-                .PostFilter<AddAuthorizationErrorCodes>();
-
-            var swaggerSpec = new SwaggerGenerator(_config).ApiExplorerToSwaggerSpec(_apiExplorer);
+            var operationSpecFilters = new IOperationSpecFilter[] { new AddStandardErrorCodes(), new AddAuthorizationErrorCodes() };
+            var generator = CreateGenerator(operationSpecFilters: operationSpecFilters);
+            var swaggerSpec = generator.ApiExplorerToSwaggerSpec(_apiExplorer);
 
             OperationSpec(swaggerSpec, "/Orders", "/api/orders", 0, "POST", operation =>
                 Assert.AreEqual(2, operation.ResponseMessages.Count));
@@ -745,6 +740,22 @@ namespace Swashbuckle.Tests
 
             OperationSpec(swaggerSpec, "/Customers", "/api/customers/{id}", 0, "DELETE", operation =>
                 Assert.AreEqual(3, operation.ResponseMessages.Count));
+        }
+
+        private static SwaggerGenerator CreateGenerator(
+            Func<ApiDescription, string> declarationKeySelector = null,
+            Dictionary<Type, IEnumerable<Type>> subTypesLookup = null,
+            IEnumerable<IOperationSpecFilter> operationSpecFilters = null,
+            bool ignoreObsoletetActions = false)
+        {
+            return new SwaggerGenerator(
+                apiVersion: "1.0",
+                basePath: "http://tempuri.org",
+                declarationKeySelector: declarationKeySelector ?? (apiDesc => apiDesc.ActionDescriptor.ControllerDescriptor.ControllerName),
+                customTypeMappings: new Dictionary<Type, ModelSpec>(), 
+                subTypesLookup: subTypesLookup ?? new Dictionary<Type, IEnumerable<Type>>(), 
+                operationSpecFilters: operationSpecFilters ?? new List<IOperationSpecFilter>(),
+                ignoreObsoleteActions: ignoreObsoletetActions);
         }
 
         private static void ApiDeclaration(SwaggerSpec swaggerSpec, string resourcePath, Action<ApiDeclaration> applyAssertions)

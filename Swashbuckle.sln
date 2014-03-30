@@ -1,8 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Swashbuckle.TestApp", "Swashbuckle.TestApp\Swashbuckle.TestApp.csproj", "{BCE144C9-0658-4049-9C64-06577787B2B5}"
-EndProject
 Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "swagger-ui", "http://localhost:55139", "{DDE07B02-DD45-4ABF-96D3-A4FBB144BBA1}"
 	ProjectSection(WebsiteProperties) = preProject
 		UseIISExpress = "true"
@@ -26,8 +24,6 @@ Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "swagger-ui", "http://localh
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Swashbuckle.Tests", "Swashbuckle.Tests\Swashbuckle.Tests.csproj", "{2F5D233D-F779-473E-9EEC-ACC58AC266ED}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Swashbuckle", "Swashbuckle\Swashbuckle.csproj", "{D08956C3-4831-4623-93FD-CB256953BCA1}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{67E5A2D2-56E1-4195-AEAF-8F9812559F49}"
 	ProjectSection(SolutionItems) = preProject
 		.nuget\NuGet.Config = .nuget\NuGet.Config
@@ -35,16 +31,26 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{67E5A2
 		.nuget\NuGet.targets = .nuget\NuGet.targets
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Swashbuckle.Core", "Swashbuckle.Core\Swashbuckle.Core.csproj", "{D50A26FF-02C6-4C16-BA94-4CD7D43EFBB3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Swashbuckle.TestApp.WebHost", "Swashbuckle.TestApp.WebHost\Swashbuckle.TestApp.WebHost.csproj", "{24424626-225C-4A02-9768-19BF215D3DB0}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{6A2C69FA-6824-44F3-A1A5-1313050FA567}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Swashbuckle.TestApp.Core", "Swashbuckle.TestApp.Core\Swashbuckle.TestApp.Core.csproj", "{C0B9C2E1-6878-4808-935B-438A5C26A9DC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Swashbuckle.TestApp.SelfHost", "Swashbuckle.TestApp.SelfHost\Swashbuckle.TestApp.SelfHost.csproj", "{E3C75713-3208-47E1-994E-F0B495F04953}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Swashbuckle.TestApp2", "Swashbuckle.TestApp2\Swashbuckle.TestApp2.csproj", "{15125FAE-9014-412A-885A-692BF849FACF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Swashbuckle.WebHost", "Swashbuckle.WebHost\Swashbuckle.WebHost.csproj", "{FE974ABE-021C-415C-BF57-041A42136AA1}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{BCE144C9-0658-4049-9C64-06577787B2B5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{BCE144C9-0658-4049-9C64-06577787B2B5}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{BCE144C9-0658-4049-9C64-06577787B2B5}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{BCE144C9-0658-4049-9C64-06577787B2B5}.Release|Any CPU.Build.0 = Release|Any CPU
 		{DDE07B02-DD45-4ABF-96D3-A4FBB144BBA1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{DDE07B02-DD45-4ABF-96D3-A4FBB144BBA1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DDE07B02-DD45-4ABF-96D3-A4FBB144BBA1}.Release|Any CPU.ActiveCfg = Debug|Any CPU
@@ -53,12 +59,39 @@ Global
 		{2F5D233D-F779-473E-9EEC-ACC58AC266ED}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2F5D233D-F779-473E-9EEC-ACC58AC266ED}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2F5D233D-F779-473E-9EEC-ACC58AC266ED}.Release|Any CPU.Build.0 = Release|Any CPU
-		{D08956C3-4831-4623-93FD-CB256953BCA1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{D08956C3-4831-4623-93FD-CB256953BCA1}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{D08956C3-4831-4623-93FD-CB256953BCA1}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{D08956C3-4831-4623-93FD-CB256953BCA1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D50A26FF-02C6-4C16-BA94-4CD7D43EFBB3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D50A26FF-02C6-4C16-BA94-4CD7D43EFBB3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D50A26FF-02C6-4C16-BA94-4CD7D43EFBB3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D50A26FF-02C6-4C16-BA94-4CD7D43EFBB3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{24424626-225C-4A02-9768-19BF215D3DB0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{24424626-225C-4A02-9768-19BF215D3DB0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{24424626-225C-4A02-9768-19BF215D3DB0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{24424626-225C-4A02-9768-19BF215D3DB0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C0B9C2E1-6878-4808-935B-438A5C26A9DC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C0B9C2E1-6878-4808-935B-438A5C26A9DC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C0B9C2E1-6878-4808-935B-438A5C26A9DC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C0B9C2E1-6878-4808-935B-438A5C26A9DC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E3C75713-3208-47E1-994E-F0B495F04953}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E3C75713-3208-47E1-994E-F0B495F04953}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E3C75713-3208-47E1-994E-F0B495F04953}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E3C75713-3208-47E1-994E-F0B495F04953}.Release|Any CPU.Build.0 = Release|Any CPU
+		{15125FAE-9014-412A-885A-692BF849FACF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{15125FAE-9014-412A-885A-692BF849FACF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{15125FAE-9014-412A-885A-692BF849FACF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{15125FAE-9014-412A-885A-692BF849FACF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FE974ABE-021C-415C-BF57-041A42136AA1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FE974ABE-021C-415C-BF57-041A42136AA1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FE974ABE-021C-415C-BF57-041A42136AA1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FE974ABE-021C-415C-BF57-041A42136AA1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{24424626-225C-4A02-9768-19BF215D3DB0} = {6A2C69FA-6824-44F3-A1A5-1313050FA567}
+		{2F5D233D-F779-473E-9EEC-ACC58AC266ED} = {6A2C69FA-6824-44F3-A1A5-1313050FA567}
+		{C0B9C2E1-6878-4808-935B-438A5C26A9DC} = {6A2C69FA-6824-44F3-A1A5-1313050FA567}
+		{E3C75713-3208-47E1-994E-F0B495F04953} = {6A2C69FA-6824-44F3-A1A5-1313050FA567}
+		{15125FAE-9014-412A-885A-692BF849FACF} = {6A2C69FA-6824-44F3-A1A5-1313050FA567}
 	EndGlobalSection
 EndGlobal

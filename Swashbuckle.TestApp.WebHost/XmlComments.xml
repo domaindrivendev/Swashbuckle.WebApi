@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Swashbuckle.TestApp.Core</name>
+    </assembly>
+    <members>
+        <member name="M:Swashbuckle.TestApp.Core.Controllers.OrderItemsController.GetById(System.Int32,System.Int32)">
+            <summary>
+            Get order item by id
+            </summary>
+            <param name="orderId">The unique identifier of an order</param>
+            <param name="id">The unique identifier of something else</param>
+            <remarks>Ok, we're not 100% sure what this thing does at all, use at your own risk</remarks>
+            <returns></returns>
+        </member>
+        <member name="M:Swashbuckle.TestApp.Core.Controllers.OrderItemsController.GetAll(System.Int32,System.Nullable{Swashbuckle.TestApp.Core.Models.ProductCategory})">
+            <summary>
+            Get all order items
+            </summary>
+            <remarks>Returns all three order items we've got here</remarks>
+            <response code="200">OK</response>
+            <response code="401">Unauthorized</response>
+            <returns></returns>
+        </member>
+        <member name="T:Swashbuckle.TestApp.Core.XmlCommentsDocumentationProvider">
+            <summary>
+            Accesses the XML doc blocks written in code to further document the API.
+            A modified version taken from Swagger.NET
+            </summary>
+        </member>
+    </members>
+</doc>
