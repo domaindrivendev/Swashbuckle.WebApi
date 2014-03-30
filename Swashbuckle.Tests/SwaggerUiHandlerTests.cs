@@ -17,8 +17,6 @@ namespace Swashbuckle.Tests
         {
             SwaggerUiConfig.Customize(c =>
             {
-                c.ApiKey = "TestApiKey";
-                c.ApiKeyName = "TestApiKeyName";
                 c.SupportHeaderParams = true;
                 c.SupportedSubmitMethods = new[] { HttpMethod.Get, HttpMethod.Post, HttpMethod.Put, HttpMethod.Head };
                 c.DocExpansion = DocExpansion.Full;
@@ -36,8 +34,6 @@ namespace Swashbuckle.Tests
         {
             var responseText = ExecuteRequest("index.html");
 
-            Assert.IsTrue(responseText.Contains("apiKey: \"TestApiKey\""), "apiKey not customized");
-            Assert.IsTrue(responseText.Contains("apiKeyName: \"TestApiKeyName\""), "apiKeyName not customized");
             Assert.IsTrue(responseText.Contains("supportHeaderParams: true"), "supportHeaderParams not customized");
             Assert.IsTrue(responseText.Contains("supportedSubmitMethods: ['GET','POST','PUT','HEAD']"), "supportedSubmitMethods not customized");
             Assert.IsTrue(responseText.Contains("docExpansion: \"full\""), "docExpansion not customized");

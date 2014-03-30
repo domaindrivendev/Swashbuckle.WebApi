@@ -68,8 +68,6 @@ namespace Swashbuckle.Core.Application
 
             var customizedText = originalText
                 .Replace("%(DiscoveryUrl)", "window.location.href.replace(/ui\\/index\\.html.*/, 'api-docs')")
-                .Replace("%(ApiKeyName)", String.Format("\"{0}\"", _config.ApiKeyName))
-                .Replace("%(ApiKey)", String.Format("\"{0}\"", _config.ApiKey))
                 .Replace("%(SupportHeaderParams)", _config.SupportHeaderParams.ToString().ToLower())
                 .Replace("%(SupportedSubmitMethods)", String.Format("[{0}]", listOfSubmitMethods))
                 .Replace("%(DocExpansion)", String.Format("\"{0}\"", _config.DocExpansion.ToString().ToLower()))
