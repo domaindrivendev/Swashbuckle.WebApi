@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Web.Http;
 using Swashbuckle.TestApp.Core.Models;
 
@@ -9,9 +10,8 @@ namespace Swashbuckle.TestApp.Core.Controllers
         /// <summary>
         /// Get order item by id
         /// </summary>
-        /// <param name="orderId">The unique identifier of an order</param>
-        /// <param name="id">The unique identifier of something else</param>
-        /// <remarks>Ok, we're not 100% sure what this thing does at all, use at your own risk</remarks>
+        /// <param name="orderId">The identifier for the order</param>
+        /// <param name="id">The identifier for the requested order item</param>
         /// <returns></returns>
         public OrderItem GetById(int orderId, int id)
         {
@@ -33,6 +33,18 @@ namespace Swashbuckle.TestApp.Core.Controllers
                     new OrderItem {LineNo = 2, Product = "Test Product 2", Quantity = 4},
                     new OrderItem {LineNo = 3, Product = "Test Product 3", Quantity = 3}
                 };
+        }
+
+        /// <summary>
+        /// Retreive items in an order by property names and values
+        /// </summary>
+        /// <param name="orderId">The identifier for the order</param>
+        /// <param name="propertyValues">Dictionary of property names and values</param>
+        /// <returns></returns>
+        [HttpPut]
+        public IEnumerable<OrderItem> GetByPropertyValues(int orderId, Dictionary<string, string> propertyValues)
+        {
+            throw new NotImplementedException();
         }
     }
 }

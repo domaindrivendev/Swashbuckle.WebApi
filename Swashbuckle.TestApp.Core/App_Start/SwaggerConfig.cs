@@ -15,10 +15,6 @@ namespace Swashbuckle.TestApp.Core
         {
             Bootstrapper.Init(config);
 
-            // Capture XML comments on ApiExplorer
-            var xmlCommentsPath = GetXmlCommentsPath();
-            config.Services.Replace(typeof(IDocumentationProvider), new XmlCommentsDocumentationProvider(xmlCommentsPath));
-
             SwaggerSpecConfig.Customize(c =>
                 {
                     c.ResolveApiVersion((req) => "1.0");
@@ -35,7 +31,8 @@ namespace Swashbuckle.TestApp.Core
 
                     c.OperationSpecFilter<AddStandardErrorCodes>();
                     c.OperationSpecFilter<AddAuthorizationErrorCodes>();
-                    c.OperationSpecFilter<ExtractXmlComments>();
+
+                    c.IncludeXmlComments(GetXmlCommentsPath());
                 });
 
             SwaggerUiConfig.Customize(c =>

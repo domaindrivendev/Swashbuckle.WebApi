@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Web.Http.Description;
+using System.Xml.XPath;
 using Swashbuckle.Core.Swagger;
 
 namespace Swashbuckle.Core.Application
@@ -92,6 +93,13 @@ namespace Swashbuckle.Core.Application
         {
             if (operationSpecFilter == null) throw new ArgumentNullException("operationSpecFilter");
             OperationSpecFilters.Add(operationSpecFilter);
+            return this;
+        }
+
+        public SwaggerSpecConfig IncludeXmlComments(string xmlCommentsPath)
+        {
+            var xmlCommentsDoc = new XPathDocument(xmlCommentsPath);
+            OperationSpecFilters.Add(new ApplyActionXmlComments(xmlCommentsDoc));
             return this;
         }
 

@@ -67,6 +67,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ApiDescriptionExtensions.cs" />
     <Compile Include="DictionaryExtensions.cs" />
+    <Compile Include="Swagger\ApplyActionXmlComments.cs" />
     <Compile Include="Swagger\IOperationSpecFilter.cs" />
     <Compile Include="Swagger\ModelSpecGenerator.cs" />
     <Compile Include="Swagger\OperationSpecGenerator.cs" />
