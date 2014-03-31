@@ -8,9 +8,8 @@
             <summary>
             Get order item by id
             </summary>
-            <param name="orderId">The unique identifier of an order</param>
-            <param name="id">The unique identifier of something else</param>
-            <remarks>Ok, we're not 100% sure what this thing does at all, use at your own risk</remarks>
+            <param name="orderId">The identifier for the order</param>
+            <param name="id">The identifier for the requested order item</param>
             <returns></returns>
         </member>
         <member name="M:Swashbuckle.TestApp.Core.Controllers.OrderItemsController.GetAll(System.Int32,System.Nullable{Swashbuckle.TestApp.Core.Models.ProductCategory})">
@@ -22,11 +21,13 @@
             <response code="401">Unauthorized</response>
             <returns></returns>
         </member>
-        <member name="T:Swashbuckle.TestApp.Core.XmlCommentsDocumentationProvider">
+        <member name="M:Swashbuckle.TestApp.Core.Controllers.OrderItemsController.GetByPropertyValues(System.Int32,System.Collections.Generic.Dictionary{System.String,System.String})">
             <summary>
-            Accesses the XML doc blocks written in code to further document the API.
-            A modified version taken from Swagger.NET
+            Retreive items in an order by property names and values
             </summary>
+            <param name="orderId">The identifier for the order</param>
+            <param name="propertyValues">Dictionary of property names and values</param>
+            <returns></returns>
         </member>
     </members>
 </doc>
