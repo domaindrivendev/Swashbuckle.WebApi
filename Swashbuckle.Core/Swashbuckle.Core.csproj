@@ -71,6 +71,7 @@
     <Compile Include="Swagger\IOperationSpecFilter.cs" />
     <Compile Include="Swagger\ModelSpecGenerator.cs" />
     <Compile Include="Swagger\OperationSpecGenerator.cs" />
+    <Compile Include="PolymorphicType.cs" />
     <Compile Include="Swagger\SwaggerGenerator.cs" />
     <Compile Include="Swagger\SwaggerSpec.cs" />
     <Compile Include="TypeExtensions.cs" />

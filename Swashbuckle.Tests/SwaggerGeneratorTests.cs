@@ -4,7 +4,9 @@ using System.Linq;
 using System.Web.Http;
 using System.Web.Http.Description;
 using NUnit.Framework;
+using Swashbuckle.Core;
 using Swashbuckle.Core.Swagger;
+using Swashbuckle.TestApp.Core;
 using Swashbuckle.TestApp.Core.Models;
 using Swashbuckle.TestApp.Core.SwaggerExtensions;
 
@@ -19,7 +21,7 @@ namespace Swashbuckle.Tests
         {
             // Get ApiExplorer for TestApp
             var httpConfiguration = new HttpConfiguration();
-            TestApp.Core.WebApiConfig.Register(httpConfiguration);
+            WebApiConfig.Register(httpConfiguration);
             _apiExplorer = new ApiExplorer(httpConfiguration);
         }
 
@@ -49,7 +51,7 @@ namespace Swashbuckle.Tests
         {
             var generator = CreateGenerator(declarationKeySelector: (apiDesc) => apiDesc.ActionDescriptor.ControllerDescriptor.ControllerName);
             var swaggerSpec = generator.ApiExplorerToSwaggerSpec(_apiExplorer);
-            
+
             Assert.AreEqual(4, swaggerSpec.Declarations.Count());
 
             ApiDeclaration(swaggerSpec, "/Orders", dec =>
@@ -74,11 +76,11 @@ namespace Swashbuckle.Tests
                 });
 
             ApiDeclaration(swaggerSpec, "/Products", dec =>
-            {
-                Assert.AreEqual("1.2", dec.SwaggerVersion);
-                Assert.AreEqual("http://tempuri.org", dec.BasePath);
-                Assert.AreEqual("/Products", dec.ResourcePath);
-            });
+                {
+                    Assert.AreEqual("1.2", dec.SwaggerVersion);
+                    Assert.AreEqual("http://tempuri.org", dec.BasePath);
+                    Assert.AreEqual("/Products", dec.ResourcePath);
+                });
         }
 
         [Test]
@@ -160,15 +162,15 @@ namespace Swashbuckle.Tests
                         });
 
                     OperationSpec(api, "DELETE", 0, operation =>
-                    {
-                        Assert.AreEqual("Orders_DeleteAll", operation.Nickname);
-                        Assert.AreEqual("Documentation for 'DeleteAll'.", operation.Summary);
-                        Assert.IsNull(operation.Notes);
-                        Assert.AreEqual("void", operation.Type);
-                        Assert.IsNull(operation.Items);
-                        Assert.IsNull(operation.Format);
-                        Assert.IsNull(operation.Enum);
-                    });
+                        {
+                            Assert.AreEqual("Orders_DeleteAll", operation.Nickname);
+                            Assert.AreEqual("Documentation for 'DeleteAll'.", operation.Summary);
+                            Assert.IsNull(operation.Notes);
+                            Assert.AreEqual("void", operation.Type);
+                            Assert.IsNull(operation.Items);
+                            Assert.IsNull(operation.Format);
+                            Assert.IsNull(operation.Enum);
+                        });
                 });
 
             ApiSpec(swaggerSpec, "/Orders", "/api/orders/{id}", api =>
@@ -222,33 +224,33 @@ namespace Swashbuckle.Tests
                         });
 
                     OperationSpec(api, "PUT", 0, operation =>
-                    {
-                        Assert.AreEqual("OrderItems_GetByPropertyValues", operation.Nickname);
-                        Assert.AreEqual("Documentation for 'GetByPropertyValues'.", operation.Summary);
-                        Assert.IsNull(operation.Notes);
-                        Assert.AreEqual("array", operation.Type);
-                        Assert.AreEqual("OrderItem", operation.Items.Ref);
-                        Assert.IsNull(operation.Format);
-                        Assert.IsNull(operation.Enum);
-                    });
+                        {
+                            Assert.AreEqual("OrderItems_GetByPropertyValues", operation.Nickname);
+                            Assert.AreEqual("Documentation for 'GetByPropertyValues'.", operation.Summary);
+                            Assert.IsNull(operation.Notes);
+                            Assert.AreEqual("array", operation.Type);
+                            Assert.AreEqual("OrderItem", operation.Items.Ref);
+                            Assert.IsNull(operation.Format);
+                            Assert.IsNull(operation.Enum);
+                        });
                 });
 
             ApiSpec(swaggerSpec, "/Customers", "/api/customers", api =>
-            {
-                // 1: POST /api/customers
-                Assert.AreEqual(1, api.Operations.Count);
+                {
+                    // 1: POST /api/customers
+                    Assert.AreEqual(1, api.Operations.Count);
 
-                OperationSpec(api, "POST", 0, operation =>
-                    {
-                        Assert.AreEqual("Customers_Post", operation.Nickname);
-                        Assert.AreEqual("Documentation for 'Post'.", operation.Summary);
-                        Assert.IsNull(operation.Notes);
-                        Assert.AreEqual("Object", operation.Type);
-                        Assert.IsNull(operation.Format);
-                        Assert.IsNull(operation.Items);
-                        Assert.IsNull(operation.Enum);
-                    });
-            });
+                    OperationSpec(api, "POST", 0, operation =>
+                        {
+                            Assert.AreEqual("Customers_Post", operation.Nickname);
+                            Assert.AreEqual("Documentation for 'Post'.", operation.Summary);
+                            Assert.IsNull(operation.Notes);
+                            Assert.AreEqual("string", operation.Type);
+                            Assert.IsNull(operation.Format);
+                            Assert.IsNull(operation.Items);
+                            Assert.IsNull(operation.Enum);
+                        });
+                });
 
             ApiSpec(swaggerSpec, "/Customers", "/api/customers/{id}", api =>
                 {
@@ -271,7 +273,7 @@ namespace Swashbuckle.Tests
                             Assert.AreEqual("Customers_Delete", operation.Nickname);
                             Assert.AreEqual("Documentation for 'Delete'.", operation.Summary);
                             Assert.IsNull(operation.Notes);
-                            Assert.AreEqual("Object", operation.Type);
+                            Assert.AreEqual("string", operation.Type);
                             Assert.IsNull(operation.Format);
                             Assert.IsNull(operation.Items);
                             Assert.IsNull(operation.Enum);
@@ -279,21 +281,21 @@ namespace Swashbuckle.Tests
                 });
 
             ApiSpec(swaggerSpec, "/Products", "/api/products", api =>
-            {
-                // 1: GET /api/products
-                Assert.AreEqual(1, api.Operations.Count);
-
-                OperationSpec(api, "GET", 0, operation =>
                 {
-                    Assert.AreEqual("Products_GetAll", operation.Nickname);
-                    Assert.AreEqual("Documentation for 'GetAll'.", operation.Summary);
-                    Assert.IsNull(operation.Notes);
-                    Assert.AreEqual("array", operation.Type);
-                    Assert.AreEqual("Product", operation.Items.Ref);
-                    Assert.IsNull(operation.Format);
-                    Assert.IsNull(operation.Enum);
+                    // 1: GET /api/products
+                    Assert.AreEqual(1, api.Operations.Count);
+
+                    OperationSpec(api, "GET", 0, operation =>
+                        {
+                            Assert.AreEqual("Products_GetAll", operation.Nickname);
+                            Assert.AreEqual("Documentation for 'GetAll'.", operation.Summary);
+                            Assert.IsNull(operation.Notes);
+                            Assert.AreEqual("array", operation.Type);
+                            Assert.AreEqual("Product", operation.Items.Ref);
+                            Assert.IsNull(operation.Format);
+                            Assert.IsNull(operation.Enum);
+                        });
                 });
-            });
         }
 
         [Test]
@@ -422,38 +424,38 @@ namespace Swashbuckle.Tests
                             Assert.AreEqual(false, parameter.Required);
                             Assert.AreEqual("string", parameter.Type);
                             Assert.IsNotNull(parameter.Enum);
-                            Assert.IsTrue(parameter.Enum.SequenceEqual(new[] { "Category1", "Category2", "Category3" }));
+                            Assert.IsTrue(parameter.Enum.SequenceEqual(new[] {"Category1", "Category2", "Category3"}));
                             Assert.IsNull(parameter.Format);
                             Assert.IsNull(parameter.Items);
                         });
                 });
 
             OperationSpec(swaggerSpec, "/OrderItems", "/api/orders/{orderId}/items", 0, "PUT", operation =>
-            {
-                Assert.AreEqual(2, operation.Parameters.Count);
-
-                ParameterSpec(operation, "orderId", parameter =>
                 {
-                    Assert.AreEqual("path", parameter.ParamType);
-                    Assert.AreEqual("Documentation for 'orderId'.", parameter.Description);
-                    Assert.AreEqual(true, parameter.Required);
-                    Assert.AreEqual("integer", parameter.Type);
-                    Assert.AreEqual("int32", parameter.Format);
-                    Assert.IsNull(parameter.Items);
-                    Assert.IsNull(parameter.Enum);
-                });
+                    Assert.AreEqual(2, operation.Parameters.Count);
 
-                ParameterSpec(operation, "propertyValues", parameter =>
-                {
-                    Assert.AreEqual("body", parameter.ParamType);
-                    Assert.AreEqual("Documentation for 'propertyValues'.", parameter.Description);
-                    Assert.AreEqual(true, parameter.Required);
-                    Assert.AreEqual("array", parameter.Type);
-                    Assert.AreEqual("KeyValuePair[String,String]", parameter.Items.Ref);
-                    Assert.IsNull(operation.Format);
-                    Assert.IsNull(operation.Enum);
+                    ParameterSpec(operation, "orderId", parameter =>
+                        {
+                            Assert.AreEqual("path", parameter.ParamType);
+                            Assert.AreEqual("Documentation for 'orderId'.", parameter.Description);
+                            Assert.AreEqual(true, parameter.Required);
+                            Assert.AreEqual("integer", parameter.Type);
+                            Assert.AreEqual("int32", parameter.Format);
+                            Assert.IsNull(parameter.Items);
+                            Assert.IsNull(parameter.Enum);
+                        });
+
+                    ParameterSpec(operation, "propertyValues", parameter =>
+                        {
+                            Assert.AreEqual("body", parameter.ParamType);
+                            Assert.AreEqual("Documentation for 'propertyValues'.", parameter.Description);
+                            Assert.AreEqual(true, parameter.Required);
+                            Assert.AreEqual("array", parameter.Type);
+                            Assert.AreEqual("KeyValuePair[String,String]", parameter.Items.Ref);
+                            Assert.IsNull(operation.Format);
+                            Assert.IsNull(operation.Enum);
+                        });
                 });
-            });
 
             OperationSpec(swaggerSpec, "/Customers", "/api/customers", 0, "POST", operation =>
                 {
@@ -464,7 +466,7 @@ namespace Swashbuckle.Tests
                             Assert.AreEqual("body", parameter.ParamType);
                             Assert.AreEqual("Documentation for 'customer'.", parameter.Description);
                             Assert.AreEqual(true, parameter.Required);
-                            Assert.AreEqual("Object", parameter.Type);
+                            Assert.AreEqual("string", parameter.Type);
                             Assert.IsNull(parameter.Format);
                             Assert.IsNull(parameter.Items);
                             Assert.IsNull(parameter.Enum);
@@ -488,24 +490,24 @@ namespace Swashbuckle.Tests
                 });
 
             OperationSpec(swaggerSpec, "/Customers", "/api/customers/{id}", 0, "DELETE", operation =>
-            {
-                Assert.AreEqual(1, operation.Parameters.Count);
-
-                ParameterSpec(operation, "id", parameter =>
                 {
-                    Assert.AreEqual("path", parameter.ParamType);
-                    Assert.AreEqual("Documentation for 'id'.", parameter.Description);
-                    Assert.AreEqual(true, parameter.Required);
-                    Assert.AreEqual("integer", parameter.Type);
-                    Assert.AreEqual("int32", parameter.Format);
-                    Assert.IsNull(parameter.Items);
-                    Assert.IsNull(parameter.Enum);
+                    Assert.AreEqual(1, operation.Parameters.Count);
+
+                    ParameterSpec(operation, "id", parameter =>
+                        {
+                            Assert.AreEqual("path", parameter.ParamType);
+                            Assert.AreEqual("Documentation for 'id'.", parameter.Description);
+                            Assert.AreEqual(true, parameter.Required);
+                            Assert.AreEqual("integer", parameter.Type);
+                            Assert.AreEqual("int32", parameter.Format);
+                            Assert.IsNull(parameter.Items);
+                            Assert.IsNull(parameter.Enum);
+                        });
                 });
-            });
 
             OperationSpec(swaggerSpec, "/Products", "/api/products", 0, "GET", operation =>
                 CollectionAssert.IsEmpty(operation.Parameters)
-            );
+                );
         }
 
         [Test]
@@ -515,69 +517,98 @@ namespace Swashbuckle.Tests
             var swaggerSpec = generator.ApiExplorerToSwaggerSpec(_apiExplorer);
 
             ApiDeclaration(swaggerSpec, "/Orders", dec =>
-            {
-                // 1: Order
-                Assert.AreEqual(4, dec.Models.Count);
-
-                Model(dec, "Order", model =>
-                    {
-                        CollectionAssert.AreEqual(new[] { "Id", "Total" }, model.Required);
-
-                        ModelProperty(model, "Id", property =>
-                            {
-                                Assert.AreEqual("integer", property.Type);
-                                Assert.AreEqual("int32", property.Format);
-                                Assert.IsNull(property.Items);
-                                Assert.IsNull(property.Enum);
-                            });
-                        ModelProperty(model, "Description", property =>
-                            {
-                                Assert.AreEqual("string", property.Type);
-                                Assert.IsNull(property.Format);
-                                Assert.IsNull(property.Items);
-                                Assert.IsNull(property.Enum);
-                            });
-                        ModelProperty(model, "Total", property =>
-                            {
-                                Assert.AreEqual("number", property.Type);
-                                Assert.AreEqual("double", property.Format);
-                                Assert.IsNull(property.Items);
-                                Assert.IsNull(property.Enum);
-                            });
-                    });
-
-                Model(dec, "MyGenericType[OrderItem]", model =>
-                    {
-                        CollectionAssert.IsEmpty(model.Required);
-
-                        ModelProperty(model, "TypeName", property =>
-                            {
-                                Assert.AreEqual("string", property.Type);
-                                Assert.IsNull(property.Format);
-                                Assert.IsNull(property.Items);
-                                Assert.IsNull(property.Enum);
-                            });
-                    });
-
-                Model(dec, "MyGenericType[ProductCategory]", model =>
-                    {
-                        CollectionAssert.IsEmpty(model.Required);
-
-                        ModelProperty(model, "TypeName", property =>
-                            {
-                                Assert.AreEqual("string", property.Type);
-                                Assert.IsNull(property.Format);
-                                Assert.IsNull(property.Items);
-                                Assert.IsNull(property.Enum);
-                            });
-                    });
-
-                Model(dec, "MyTypeWithIndexers", model =>
                 {
-                    CollectionAssert.IsEmpty(model.Required);
-                    CollectionAssert.IsEmpty(model.Properties);
+                    // 1: Order
+                    Assert.AreEqual(4, dec.Models.Count);
+
+                    Model(dec, "Order", model =>
+                        {
+                            CollectionAssert.AreEqual(new[] {"Id", "Total"}, model.Required);
+                            Assert.AreEqual(6, model.Properties.Count);
+
+                            ModelProperty(model, "Id", property =>
+                                {
+                                    Assert.AreEqual("integer", property.Type);
+                                    Assert.AreEqual("int32", property.Format);
+                                    Assert.IsNull(property.Items);
+                                    Assert.IsNull(property.Enum);
+                                });
+
+                            ModelProperty(model, "Description", property =>
+                                {
+                                    Assert.AreEqual("string", property.Type);
+                                    Assert.IsNull(property.Format);
+                                    Assert.IsNull(property.Items);
+                                    Assert.IsNull(property.Enum);
+                                });
+
+                            ModelProperty(model, "Total", property =>
+                                {
+                                    Assert.AreEqual("number", property.Type);
+                                    Assert.AreEqual("double", property.Format);
+                                    Assert.IsNull(property.Items);
+                                    Assert.IsNull(property.Enum);
+                                });
+
+                            ModelProperty(model, "GenericType1", property =>
+                                {
+                                    Assert.IsNull(property.Type);
+                                    Assert.AreEqual("MyGenericType[OrderItem]", property.Ref);
+                                    Assert.IsNull(property.Format);
+                                    Assert.IsNull(property.Enum);
+                                });
+
+                            ModelProperty(model, "GenericType2", property =>
+                                {
+                                    Assert.IsNull(property.Type);
+                                    Assert.AreEqual("MyGenericType[ProductCategory]", property.Ref);
+                                    Assert.IsNull(property.Format);
+                                    Assert.IsNull(property.Enum);
+                                });
+
+                            ModelProperty(model, "TypeWithIndexers", property =>
+                                {
+                                    Assert.IsNull(property.Type);
+                                    Assert.AreEqual("MyTypeWithIndexers", property.Ref);
+                                    Assert.IsNull(property.Format);
+                                    Assert.IsNull(property.Enum);
+                                });
+                        });
+
+                    Model(dec, "MyGenericType[OrderItem]", model =>
+                        {
+                            CollectionAssert.IsEmpty(model.Required);
+                            Assert.AreEqual(1, model.Properties.Count);
+
+                            ModelProperty(model, "TypeName", property =>
+                                {
+                                    Assert.AreEqual("string", property.Type);
+                                    Assert.IsNull(property.Format);
+                                    Assert.IsNull(property.Items);
+                                    Assert.IsNull(property.Enum);
+                                });
+                        });
+
+                    Model(dec, "MyGenericType[ProductCategory]", model =>
+                        {
+                            CollectionAssert.IsEmpty(model.Required);
+                            Assert.AreEqual(1, model.Properties.Count);
+
+                            ModelProperty(model, "TypeName", property =>
+                                {
+                                    Assert.AreEqual("string", property.Type);
+                                    Assert.IsNull(property.Format);
+                                    Assert.IsNull(property.Items);
+                                    Assert.IsNull(property.Enum);
+                                });
+                        });
+
+                    Model(dec, "MyTypeWithIndexers", model =>
+                        {
+                            CollectionAssert.IsEmpty(model.Required);
+                            CollectionAssert.IsEmpty(model.Properties);
+                        });
                 });
-            });
 
             ApiDeclaration(swaggerSpec, "/OrderItems", dec =>
                 {
@@ -586,73 +617,74 @@ namespace Swashbuckle.Tests
 
                     Model(dec, "OrderItem", model =>
                         {
-                            CollectionAssert.AreEqual(new[] { "LineNo", "Product" }, model.Required);
+                            CollectionAssert.AreEqual(new[] {"LineNo", "Product"}, model.Required);
+                            Assert.AreEqual(4, model.Properties.Count);
 
                             ModelProperty(model, "LineNo", property =>
-                            {
-                                Assert.AreEqual("integer", property.Type);
-                                Assert.AreEqual("int32", property.Format);
-                                Assert.IsNull(property.Items);
-                                Assert.IsNull(property.Enum);
-                            });
+                                {
+                                    Assert.AreEqual("integer", property.Type);
+                                    Assert.AreEqual("int32", property.Format);
+                                    Assert.IsNull(property.Items);
+                                    Assert.IsNull(property.Enum);
+                                });
 
                             ModelProperty(model, "Product", property =>
-                            {
-                                Assert.AreEqual("string", property.Type);
-                                Assert.IsNull(property.Format);
-                                Assert.IsNull(property.Items);
-                                Assert.IsNull(property.Enum);
-                            });
+                                {
+                                    Assert.AreEqual("string", property.Type);
+                                    Assert.IsNull(property.Format);
+                                    Assert.IsNull(property.Items);
+                                    Assert.IsNull(property.Enum);
+                                });
 
                             ModelProperty(model, "Category", property =>
-                            {
-                                Assert.AreEqual("string", property.Type);
-                                Assert.IsNotNull(property.Enum);
-                                Assert.IsTrue(property.Enum.SequenceEqual(new[] { "Category1", "Category2", "Category3" }));
-                                Assert.IsNull(property.Format);
-                                Assert.IsNull(property.Items);
-                            });
+                                {
+                                    Assert.AreEqual("string", property.Type);
+                                    Assert.IsNotNull(property.Enum);
+                                    Assert.IsTrue(property.Enum.SequenceEqual(new[] {"Category1", "Category2", "Category3"}));
+                                    Assert.IsNull(property.Format);
+                                    Assert.IsNull(property.Items);
+                                });
 
                             ModelProperty(model, "Quantity", property =>
-                            {
-                                Assert.AreEqual("integer", property.Type);
-                                Assert.AreEqual("int32", property.Format);
-                                Assert.IsNull(property.Items);
-                                Assert.IsNull(property.Enum);
-                            });
+                                {
+                                    Assert.AreEqual("integer", property.Type);
+                                    Assert.AreEqual("int32", property.Format);
+                                    Assert.IsNull(property.Items);
+                                    Assert.IsNull(property.Enum);
+                                });
                         });
 
                     Model(dec, "KeyValuePair[String,String]", model =>
-                    {
-                        CollectionAssert.IsEmpty(model.Required);
-
-                        ModelProperty(model, "Key", property =>
                         {
-                            Assert.AreEqual("string", property.Type);
-                            Assert.IsNull(property.Format);
-                            Assert.IsNull(property.Items);
-                            Assert.IsNull(property.Enum);
-                        });
+                            CollectionAssert.IsEmpty(model.Required);
+                            Assert.AreEqual(2, model.Properties.Count);
 
-                        ModelProperty(model, "Value", property =>
-                        {
-                            Assert.AreEqual("string", property.Type);
-                            Assert.IsNull(property.Format);
-                            Assert.IsNull(property.Items);
-                            Assert.IsNull(property.Enum);
+                            ModelProperty(model, "Key", property =>
+                                {
+                                    Assert.AreEqual("string", property.Type);
+                                    Assert.IsNull(property.Format);
+                                    Assert.IsNull(property.Items);
+                                    Assert.IsNull(property.Enum);
+                                });
+
+                            ModelProperty(model, "Value", property =>
+                                {
+                                    Assert.AreEqual("string", property.Type);
+                                    Assert.IsNull(property.Format);
+                                    Assert.IsNull(property.Items);
+                                    Assert.IsNull(property.Enum);
+                                });
                         });
-                    });
                 });
 
             ApiDeclaration(swaggerSpec, "/Customers", dec =>
                 {
-                    Assert.AreEqual(2, dec.Models.Count);
-
-                    Model(dec, "Object", model => CollectionAssert.IsEmpty(model.Required));
+                    Assert.AreEqual(1, dec.Models.Count);
 
                     Model(dec, "Customer", model =>
                         {
                             CollectionAssert.IsEmpty(model.Required);
+                            Assert.AreEqual(2, model.Properties.Count);
 
                             ModelProperty(model, "Id", property =>
                                 {
@@ -670,139 +702,167 @@ namespace Swashbuckle.Tests
                                     Assert.IsNull(property.Enum);
                                 });
                         });
-
                 });
 
             ApiDeclaration(swaggerSpec, "/Products", dec =>
-            {
-                Assert.AreEqual(1, dec.Models.Count);
-
-                Model(dec, "Product", model =>
                 {
-                    ModelProperty(model, "Id", property =>
-                    {
-                        Assert.AreEqual("integer", property.Type);
-                        Assert.AreEqual("int32", property.Format);
-                        Assert.IsNull(property.Items);
-                        Assert.IsNull(property.Enum);
-                    });
+                    Assert.AreEqual(1, dec.Models.Count);
 
-                    ModelProperty(model, "Price", property =>
-                    {
-                        Assert.AreEqual("number", property.Type);
-                        Assert.AreEqual("double", property.Format);
-                        Assert.IsNull(property.Items);
-                        Assert.IsNull(property.Enum);
-                    });
+                    Model(dec, "Product", model =>
+                        {
+                            CollectionAssert.AreEqual(new[] {"Type"}, model.Required);
+                            Assert.AreEqual(3, model.Properties.Count);
 
-                    CollectionAssert.IsEmpty(model.SubTypes);
+                            ModelProperty(model, "Id", property =>
+                                {
+                                    Assert.AreEqual("integer", property.Type);
+                                    Assert.AreEqual("int32", property.Format);
+                                    Assert.IsNull(property.Items);
+                                    Assert.IsNull(property.Enum);
+                                });
+
+                            ModelProperty(model, "Price", property =>
+                                {
+                                    Assert.AreEqual("number", property.Type);
+                                    Assert.AreEqual("double", property.Format);
+                                    Assert.IsNull(property.Items);
+                                    Assert.IsNull(property.Enum);
+                                });
+
+                            ModelProperty(model, "Type", property =>
+                                {
+                                    Assert.AreEqual("string", property.Type);
+                                    Assert.IsNull(property.Format);
+                                    Assert.IsNull(property.Items);
+                                    Assert.IsNull(property.Enum);
+                                });
+
+                            CollectionAssert.IsEmpty(model.SubTypes);
+                        });
                 });
-            });
         }
 
         [Test]
         public void It_should_generate_model_specs_for_explicitly_configured_sub_types()
         {
-            var configuredSubTypes = new Dictionary<Type, IEnumerable<Type>>
-                {
-                    {typeof (Product), new [] {typeof (Book), typeof (Album), typeof (Service)}},
-                    {typeof (Service), new [] {typeof (Shipping), typeof (Packaging)}}
-                };
+            var productType = new PolymorphicType<Product>()
+                .DiscriminateBy(p => p.Type)
+                .SubType<Book>()
+                .SubType<Album>()
+                .SubType<Service>(s => s
+                    .SubType<Shipping>()
+                    .SubType<Packaging>());
 
-            var generator = CreateGenerator(subTypesLookup: configuredSubTypes);
+            var generator = CreateGenerator(polymorphicTypes: new PolymorphicType[] {productType});
             var swaggerSpec = generator.ApiExplorerToSwaggerSpec(_apiExplorer);
 
             ApiDeclaration(swaggerSpec, "/Products", dec =>
-            {
-                Assert.AreEqual(6, dec.Models.Count);
-
-                Model(dec, "Product", model =>
                 {
-                    ModelProperty(model, "Id", property =>
-                    {
-                        Assert.AreEqual("integer", property.Type);
-                        Assert.AreEqual("int32", property.Format);
-                        Assert.IsNull(property.Items);
-                        Assert.IsNull(property.Enum);
-                    });
+                    Assert.AreEqual(6, dec.Models.Count);
 
-                    ModelProperty(model, "Price", property =>
-                    {
-                        Assert.AreEqual("number", property.Type);
-                        Assert.AreEqual("double", property.Format);
-                        Assert.IsNull(property.Items);
-                        Assert.IsNull(property.Enum);
-                    });
+                    Model(dec, "Product", model =>
+                        {
+                            CollectionAssert.AreEqual(new[] {"Type"}, model.Required);
+                            Assert.AreEqual(3, model.Properties.Count);
 
-                    CollectionAssert.AreEqual(new[] { "Book", "Album", "Service" }, model.SubTypes);
+                            ModelProperty(model, "Id", property =>
+                                {
+                                    Assert.AreEqual("integer", property.Type);
+                                    Assert.AreEqual("int32", property.Format);
+                                    Assert.IsNull(property.Items);
+                                    Assert.IsNull(property.Enum);
+                                });
+
+                            ModelProperty(model, "Price", property =>
+                                {
+                                    Assert.AreEqual("number", property.Type);
+                                    Assert.AreEqual("double", property.Format);
+                                    Assert.IsNull(property.Items);
+                                    Assert.IsNull(property.Enum);
+                                });
+
+                            ModelProperty(model, "Type", property =>
+                                {
+                                    Assert.AreEqual("string", property.Type);
+                                    Assert.IsNull(property.Format);
+                                    Assert.IsNull(property.Items);
+                                    Assert.IsNull(property.Enum);
+                                });
+
+                            CollectionAssert.AreEqual(new[] {"Book", "Album", "Service"}, model.SubTypes);
+                            Assert.AreEqual("Type", model.Discriminator);
+                        });
+
+                    Model(dec, "Book", model =>
+                        {
+                            Assert.AreEqual(2, model.Properties.Count);
+
+                            ModelProperty(model, "Title", property =>
+                                {
+                                    Assert.AreEqual("string", property.Type);
+                                    Assert.IsNull(property.Format);
+                                    Assert.IsNull(property.Items);
+                                    Assert.IsNull(property.Enum);
+                                });
+
+                            ModelProperty(model, "Author", property =>
+                                {
+                                    Assert.AreEqual("string", property.Type);
+                                    Assert.IsNull(property.Format);
+                                    Assert.IsNull(property.Items);
+                                    Assert.IsNull(property.Enum);
+                                });
+
+                            CollectionAssert.IsEmpty(model.SubTypes);
+                        });
+
+                    Model(dec, "Album", model =>
+                        {
+                            Assert.AreEqual(2, model.Properties.Count);
+
+                            ModelProperty(model, "Name", property =>
+                                {
+                                    Assert.AreEqual("string", property.Type);
+                                    Assert.IsNull(property.Format);
+                                    Assert.IsNull(property.Items);
+                                    Assert.IsNull(property.Enum);
+                                });
+
+                            ModelProperty(model, "Artist", property =>
+                                {
+                                    Assert.AreEqual("string", property.Type);
+                                    Assert.IsNull(property.Format);
+                                    Assert.IsNull(property.Items);
+                                    Assert.IsNull(property.Enum);
+                                });
+
+                            CollectionAssert.IsEmpty(model.SubTypes);
+                        });
+
+                    Model(dec, "Service", model =>
+                        {
+                            CollectionAssert.IsEmpty(model.Properties);
+                            CollectionAssert.AreEqual(new[] {"Shipping", "Packaging"}, model.SubTypes);
+                        });
+
+                    Model(dec, "Shipping", model =>
+                        {
+                            CollectionAssert.IsEmpty(model.Properties);
+                            CollectionAssert.IsEmpty(model.SubTypes);
+                        });
+
+                    Model(dec, "Packaging", model =>
+                        {
+                            CollectionAssert.IsEmpty(model.Properties);
+                            CollectionAssert.IsEmpty(model.SubTypes);
+                        });
                 });
-
-                Model(dec, "Book", model =>
-                {
-                    ModelProperty(model, "Title", property =>
-                    {
-                        Assert.AreEqual("string", property.Type);
-                        Assert.IsNull(property.Format);
-                        Assert.IsNull(property.Items);
-                        Assert.IsNull(property.Enum);
-                    });
-
-                    ModelProperty(model, "Author", property =>
-                    {
-                        Assert.AreEqual("string", property.Type);
-                        Assert.IsNull(property.Format);
-                        Assert.IsNull(property.Items);
-                        Assert.IsNull(property.Enum);
-                    });
-
-                    CollectionAssert.IsEmpty(model.SubTypes);
-                });
-
-                Model(dec, "Album", model =>
-                {
-                    ModelProperty(model, "Name", property =>
-                    {
-                        Assert.AreEqual("string", property.Type);
-                        Assert.IsNull(property.Format);
-                        Assert.IsNull(property.Items);
-                        Assert.IsNull(property.Enum);
-                    });
-
-                    ModelProperty(model, "Artist", property =>
-                    {
-                        Assert.AreEqual("string", property.Type);
-                        Assert.IsNull(property.Format);
-                        Assert.IsNull(property.Items);
-                        Assert.IsNull(property.Enum);
-                    });
-
-                    CollectionAssert.IsEmpty(model.SubTypes);
-                });
-
-                Model(dec, "Service", model =>
-                {
-                    CollectionAssert.IsEmpty(model.Properties);
-                    CollectionAssert.AreEqual(new[] { "Shipping", "Packaging" }, model.SubTypes);
-                });
-
-                Model(dec, "Shipping", model =>
-                {
-                    CollectionAssert.IsEmpty(model.Properties);
-                    CollectionAssert.IsEmpty(model.SubTypes);
-                });
-
-                Model(dec, "Packaging", model =>
-                {
-                    CollectionAssert.IsEmpty(model.Properties);
-                    CollectionAssert.IsEmpty(model.SubTypes);
-                });
-            });
         }
 
         [Test]
         public void It_should_apply_all_configured_operation_spec_filters()
         {
-            var operationSpecFilters = new IOperationSpecFilter[] { new AddStandardErrorCodes(), new AddAuthorizationErrorCodes() };
+            var operationSpecFilters = new IOperationSpecFilter[] {new AddStandardErrorCodes(), new AddAuthorizationErrorCodes()};
             var generator = CreateGenerator(operationSpecFilters: operationSpecFilters);
             var swaggerSpec = generator.ApiExplorerToSwaggerSpec(_apiExplorer);
 
@@ -839,7 +899,7 @@ namespace Swashbuckle.Tests
 
         private static SwaggerGenerator CreateGenerator(
             Func<ApiDescription, string> declarationKeySelector = null,
-            Dictionary<Type, IEnumerable<Type>> subTypesLookup = null,
+            IEnumerable<PolymorphicType> polymorphicTypes = null,
             IEnumerable<IOperationSpecFilter> operationSpecFilters = null,
             bool ignoreObsoletetActions = false)
         {
@@ -847,8 +907,8 @@ namespace Swashbuckle.Tests
                 apiVersion: "1.0",
                 basePath: "http://tempuri.org",
                 declarationKeySelector: declarationKeySelector ?? (apiDesc => apiDesc.ActionDescriptor.ControllerDescriptor.ControllerName),
-                customTypeMappings: new Dictionary<Type, ModelSpec>(), 
-                subTypesLookup: subTypesLookup ?? new Dictionary<Type, IEnumerable<Type>>(), 
+                customTypeMappings: new Dictionary<Type, ModelSpec>(),
+                polymorphicTypes: polymorphicTypes ?? new List<PolymorphicType>(),
                 operationSpecFilters: operationSpecFilters ?? new List<IOperationSpecFilter>(),
                 ignoreObsoleteActions: ignoreObsoletetActions);
         }

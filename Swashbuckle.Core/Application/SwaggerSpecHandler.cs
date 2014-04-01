@@ -64,7 +64,7 @@ namespace Swashbuckle.Core.Application
                         basePath: _config.BasePathResolver(request),
                         declarationKeySelector: _config.DeclarationKeySelector,
                         customTypeMappings: _config.CustomTypeMappings,
-                        subTypesLookup: _config.SubTypesLookup,
+                        polymorphicTypes: _config.PolymorphicTypes,
                         operationSpecFilters: _config.OperationSpecFilters,
                         ignoreObsoleteActions: _config.IgnoreObsoleteActionsFlag);
 

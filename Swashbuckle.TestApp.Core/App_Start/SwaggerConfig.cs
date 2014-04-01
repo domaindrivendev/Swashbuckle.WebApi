@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Net.Http;
 using System.Web.Http;
-using System.Web.Http.Description;
 using Swashbuckle.Core;
 using Swashbuckle.Core.Application;
 using Swashbuckle.TestApp.Core.Models;
-using Swashbuckle.TestApp.Core.SwaggerExtensions;
 
 namespace Swashbuckle.TestApp.Core
 {
@@ -20,17 +18,13 @@ namespace Swashbuckle.TestApp.Core
                     c.ResolveApiVersion((req) => "1.0");
                     c.IgnoreObsoleteActions();
 
-                    c.SubTypesOf<Product>()
-                        .Include<Book>()
-                        .Include<Album>()
-                        .Include<Service>();
-
-                    c.SubTypesOf<Service>()
-                        .Include<Shipping>()
-                        .Include<Packaging>();
-
-                    c.OperationSpecFilter<AddStandardErrorCodes>();
-                    c.OperationSpecFilter<AddAuthorizationErrorCodes>();
+                    c.PolymorphicType<Product>(pc => pc
+                        .DiscriminateBy(p => p.Type)
+                        .SubType<Book>()
+                        .SubType<Album>()
+                        .SubType<Service>(sc => sc
+                            .SubType<Shipping>()
+                            .SubType<Packaging>()));
 
                     c.IncludeXmlComments(GetXmlCommentsPath());
                 });

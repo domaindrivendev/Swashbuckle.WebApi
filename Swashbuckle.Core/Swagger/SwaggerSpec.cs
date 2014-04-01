@@ -158,5 +158,8 @@ namespace Swashbuckle.Core.Swagger
 
         [JsonProperty("subTypes")]
         public IList<string> SubTypes { get; set; }
+
+        [JsonProperty("discriminator")]
+        public string Discriminator { get; set; }
     }
 }

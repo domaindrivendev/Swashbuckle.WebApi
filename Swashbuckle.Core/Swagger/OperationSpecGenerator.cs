@@ -12,11 +12,11 @@ namespace Swashbuckle.Core.Swagger
 
         public OperationSpecGenerator(
             IDictionary<Type, ModelSpec> customTypeMappings,
-            Dictionary<Type, IEnumerable<Type>> subTypesLookup,
+            IEnumerable<PolymorphicType> polymorphicTypes,
             IEnumerable<IOperationSpecFilter> operationSpecFilters)
         {
             _operationSpecFilters = operationSpecFilters;
-            _modelSpecGenerator = new ModelSpecGenerator(customTypeMappings, subTypesLookup);
+            _modelSpecGenerator = new ModelSpecGenerator(customTypeMappings, polymorphicTypes);
         }
 
         public OperationSpec ApiDescriptionToOperationSpec(ApiDescription apiDescription, Dictionary<string, ModelSpec> complexModels)

@@ -22,14 +22,14 @@ namespace Swashbuckle.Core.Swagger
             bool ignoreObsoleteActions,
             Func<ApiDescription, string> declarationKeySelector,
             Dictionary<Type, ModelSpec> customTypeMappings,
-            Dictionary<Type, IEnumerable<Type>> subTypesLookup,
+            IEnumerable<PolymorphicType> polymorphicTypes,
             IEnumerable<IOperationSpecFilter> operationSpecFilters)
         {
             _apiVersion = apiVersion;
             _basePath = basePath.TrimEnd('/');
             _ignoreObsoleteActions = ignoreObsoleteActions;
             _declarationKeySelector = declarationKeySelector;
-            _operationSpecGenerator = new OperationSpecGenerator(customTypeMappings, subTypesLookup, operationSpecFilters);
+            _operationSpecGenerator = new OperationSpecGenerator(customTypeMappings, polymorphicTypes, operationSpecFilters);
         }
 
         public SwaggerSpec ApiExplorerToSwaggerSpec(IApiExplorer apiExplorer)

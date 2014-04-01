@@ -1,10 +1,15 @@
-﻿namespace Swashbuckle.TestApp.Core.Models
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace Swashbuckle.TestApp.Core.Models
 {
     public abstract class Product
     {
         public int Id { get; set; }
 
         public decimal Price { get; set; }
+
+        [Required]
+        public string Type { get; set; }
     }
 
     public class Book : Product

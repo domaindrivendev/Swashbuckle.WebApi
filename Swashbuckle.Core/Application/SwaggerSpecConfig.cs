@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq.Expressions;
 using System.Net.Http;
 using System.Web.Http.Description;
 using System.Xml.XPath;
@@ -23,7 +24,7 @@ namespace Swashbuckle.Core.Application
             BasePathResolver = DefaultBasePathResolver;
             DeclarationKeySelector = (apiDesc) => apiDesc.ActionDescriptor.ControllerDescriptor.ControllerName;
             CustomTypeMappings = new Dictionary<Type, ModelSpec>();
-            SubTypesLookup = new Dictionary<Type, IEnumerable<Type>>();
+            PolymorphicTypes = new List<PolymorphicType>();
             OperationSpecFilters = new List<IOperationSpecFilter>();
             IgnoreObsoleteActionsFlag = false;
         }
@@ -32,7 +33,7 @@ namespace Swashbuckle.Core.Application
         internal Func<HttpRequestMessage, string> BasePathResolver { get; private set; }
         internal Func<ApiDescription, string> DeclarationKeySelector { get; private set; }
         internal Dictionary<Type, ModelSpec> CustomTypeMappings { get; private set; }
-        internal Dictionary<Type, IEnumerable<Type>> SubTypesLookup = new Dictionary<Type, IEnumerable<Type>>();
+        internal List<PolymorphicType> PolymorphicTypes { get; private set; }
         internal List<IOperationSpecFilter> OperationSpecFilters = new List<IOperationSpecFilter>();
         internal bool IgnoreObsoleteActionsFlag { get; private set; }
 
@@ -69,18 +70,12 @@ namespace Swashbuckle.Core.Application
             return this;
         }
 
-        public SubTypeList<TBase> SubTypesOf<TBase>(params Type[] subTypes)
+        public SwaggerSpecConfig PolymorphicType<TBase>(Action<PolymorphicType<TBase>> configure)
         {
-            var baseType = typeof(TBase);
-            IEnumerable<Type> subTypeList;
-
-            if (!SubTypesLookup.TryGetValue(baseType, out subTypeList))
-            {
-                subTypeList = new SubTypeList<TBase>();
-                SubTypesLookup.Add(baseType, subTypeList);
-            }
-
-            return (SubTypeList<TBase>)subTypeList;
+            var subTypeInfo = new PolymorphicType<TBase>();
+            configure(subTypeInfo);
+            PolymorphicTypes.Add(subTypeInfo);
+            return this;
         }
 
         public SwaggerSpecConfig OperationSpecFilter<T>()
@@ -107,6 +102,22 @@ namespace Swashbuckle.Core.Application
         {
             var requestUri = request.RequestUri;
             return requestUri.GetLeftPart(UriPartial.Authority) + request.GetConfiguration().VirtualPathRoot;
+        }
+
+        private string InferDescriminatorFrom<T>(Expression<Func<T, object>> expression)
+        {
+            MemberExpression memberExpression;
+
+            var unaryExpression = expression.Body as UnaryExpression;
+            if (unaryExpression != null)
+                memberExpression = unaryExpression.Operand as MemberExpression;
+            else
+                memberExpression = expression.Body as MemberExpression;
+
+            if (memberExpression == null)
+                throw new ArgumentException(String.Format("Failed to infer descriminator from provided expression - {0}", expression));
+
+            return memberExpression.Member.Name;
         }
     }
 

@@ -28,22 +28,22 @@ namespace Swashbuckle.Core.Swagger
                 {typeof (Byte), new ModelSpec {Type = "string", Format = "byte"}},
                 {typeof (Boolean), new ModelSpec {Type = "boolean", Format = null}},
                 {typeof (DateTime), new ModelSpec {Type = "string", Format = "date-time"}},
-                {typeof (Object), new ModelSpec{Id = "Object", Type="object", Required = new List<string>()}},
-                {typeof (ExpandoObject), new ModelSpec{Id = "Object", Type="object", Required = new List<string>()}},
-                {typeof (JObject), new ModelSpec{Id = "Object", Type="object", Required = new List<string>()}},
-                {typeof (HttpResponseMessage), new ModelSpec{Id = "Object", Type="object", Required = new List<string>()}}
+                {typeof (Object), new ModelSpec{Type="string", Format = null}},
+                {typeof (ExpandoObject), new ModelSpec{Type="string", Format = null}},
+                {typeof (JObject), new ModelSpec{Type="string", Format = null}},
+                {typeof (HttpResponseMessage), new ModelSpec{Type="string", Format = null}}
             };
 
         private readonly IDictionary<Type, ModelSpec> _customMappings;
-        private readonly Dictionary<Type, IEnumerable<Type>> _subTypesLookup;
-
-        public ModelSpecGenerator(IDictionary<Type, ModelSpec> customMappings, Dictionary<Type, IEnumerable<Type>> subTypesLookup)
+        private readonly IEnumerable<PolymorphicType> _polymorphicTypes;
+            
+        public ModelSpecGenerator(IDictionary<Type, ModelSpec> customMappings, IEnumerable<PolymorphicType> polymorphicTypes)
         {
             if (customMappings == null)
                 throw new ArgumentNullException("customMappings");
 
             _customMappings = customMappings;
-            _subTypesLookup = subTypesLookup;
+            _polymorphicTypes = polymorphicTypes;
         }
 
         public ModelSpec TypeToModelSpec(Type type, out IDictionary<string, ModelSpec> complexModels)
@@ -68,7 +68,7 @@ namespace Swashbuckle.Core.Swagger
             return rootSpec;
         }
 
-        private ModelSpec CreateSpecFor(Type type, bool deferIfComplex, IDictionary<Type, ModelSpec> complexModels)
+        private ModelSpec CreateSpecFor(Type type, bool deferIfComplex, IDictionary<Type, ModelSpec> complexTypeMappings)
         {
             if (_customMappings.ContainsKey(type))
                 return _customMappings[type];
@@ -81,45 +81,42 @@ namespace Swashbuckle.Core.Swagger
 
             Type innerType;
             if (type.IsNullable(out innerType))
-                return CreateSpecFor(innerType, deferIfComplex, complexModels);
+                return CreateSpecFor(innerType, deferIfComplex, complexTypeMappings);
 
             Type itemType;
             if (type.IsEnumerable(out itemType))
-                return new ModelSpec { Type = "array", Items = CreateSpecFor(itemType, true, complexModels) };
+                return new ModelSpec { Type = "array", Items = CreateSpecFor(itemType, true, complexTypeMappings) };
 
             // Anthing else is complex
 
             if (deferIfComplex)
             {
-                if (!complexModels.ContainsKey(type))
-                    complexModels.Add(type, null);
+                if (!complexTypeMappings.ContainsKey(type))
+                    complexTypeMappings.Add(type, null);
 
                 // Just return a reference for now
                 return new ModelSpec { Ref = UniqueIdFor(type) };
             }
 
-            return CreateComplexSpecFor(type, complexModels);
+            return CreateComplexSpecFor(type, complexTypeMappings);
         }
 
-        private ModelSpec CreateComplexSpecFor(Type type, IDictionary<Type, ModelSpec> complexTypes)
+        private ModelSpec CreateComplexSpecFor(Type type, IDictionary<Type, ModelSpec> complexTypeMappings)
         {
             var propInfos = type.GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.DeclaredOnly)
                 .Where(propInfo => !propInfo.GetIndexParameters().Any())    // Ignore indexer properties
                 .ToArray();
 
             var propSpecs = propInfos
-                .ToDictionary(propInfo => propInfo.Name, propInfo => CreateSpecFor(propInfo.PropertyType, true, complexTypes));
+                .ToDictionary(propInfo => propInfo.Name, propInfo => CreateSpecFor(propInfo.PropertyType, true, complexTypeMappings));
 
             var required = propInfos.Where(propInfo => Attribute.IsDefined(propInfo, typeof (RequiredAttribute)))
                 .Select(propInfo => propInfo.Name)
                 .ToList();
 
-            var subTypes = _subTypesLookup.ContainsKey(type)
-                ? _subTypesLookup[type]
-                : new Type[]{};
-
-            var subTypeSpecs = subTypes
-                .Select(subType => CreateSpecFor(subType, true, complexTypes))
+            var polymorphicType = PolymorphicTypeFor(type);
+            var subTypeSpecs = polymorphicType.SubTypes
+                .Select(subType => CreateSpecFor(subType.Type, true, complexTypeMappings))
                 .Select(subTypeSpec => subTypeSpec.Ref)
                 .ToList();
 
@@ -129,7 +126,8 @@ namespace Swashbuckle.Core.Swagger
                 Type = "object",
                 Properties = propSpecs,
                 Required = required,
-                SubTypes = subTypeSpecs
+                SubTypes = subTypeSpecs,
+                Discriminator = polymorphicType.Discriminator
             };
         }
 
@@ -150,6 +148,21 @@ namespace Swashbuckle.Core.Swagger
             }
 
             return type.Name;
+        }
+
+        private PolymorphicType PolymorphicTypeFor(Type type)
+        {
+            var polymorphicType = _polymorphicTypes.SingleOrDefault(t => t.Type == type);
+            if (polymorphicType != null) return polymorphicType;
+            
+            // Is it nested?
+            foreach (var baseType in _polymorphicTypes)
+            {
+                polymorphicType = baseType.SearchHierarchyFor(type);
+                if (polymorphicType != null) return polymorphicType;
+            }
+
+            return new PolymorphicType(type);
         }
     }
 }
