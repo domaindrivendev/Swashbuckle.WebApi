@@ -162,7 +162,7 @@ namespace Swashbuckle.Core.Swagger
                 if (polymorphicType != null) return polymorphicType;
             }
 
-            return new PolymorphicType(type);
+            return new PolymorphicType(type, true);
         }
     }
 }

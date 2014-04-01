@@ -6,10 +6,13 @@ namespace Swashbuckle.Core
 {
     public class PolymorphicType
     {
+        private readonly bool _isBase;
         private readonly List<PolymorphicType> _subTypes;
-        public PolymorphicType(Type type)
+
+        public PolymorphicType(Type type, bool isBase)
         {
             Type = type;
+            _isBase = isBase;
             _subTypes = new List<PolymorphicType>();
         }
 
@@ -24,11 +27,17 @@ namespace Swashbuckle.Core
 
         internal void DiscriminatorBy(string discriminator)
         {
+            if (!_isBase)
+                throw new InvalidOperationException("Invalid Swashbuckle configuration. Discriminator can only be applied to the base class");
+
             Discriminator = discriminator;
         }
 
         internal void RegisterSubType(PolymorphicType subTypeInfo)
         {
+            if (_isBase && Discriminator == null)
+                throw new InvalidOperationException("Invalid Swashbuckle configuration. Discriminator must be set on the base class ");
+
             _subTypes.Add(subTypeInfo);
         }
 
@@ -48,24 +57,32 @@ namespace Swashbuckle.Core
 
     public class PolymorphicType<T> : PolymorphicType
     {
-        public PolymorphicType()
-            : base(typeof(T))
+        public PolymorphicType(bool isBase)
+            : base(typeof(T), isBase)
+        {}
+
+        public PolymorphicType<T> SubType<TSub>(Action<PolymorphicType<TSub>> configure = null)
+        {
+            var subTypeInfo = new PolymorphicType<TSub>(false);
+            RegisterSubType(subTypeInfo);
+
+            if (configure != null) configure(subTypeInfo);
+            
+            return this;
+        }
+
+    }
+
+    public class BasePolymorphicType<T> : PolymorphicType<T>
+    {
+        public BasePolymorphicType()
+            : base(true)
         {
         }
 
         public PolymorphicType<T> DiscriminateBy(Expression<Func<T, object>> expression)
         {
             DiscriminatorBy(InferDiscriminatorFrom(expression));
-            return this;
-        }
-
-        public PolymorphicType<T> SubType<TSub>(Action<PolymorphicType<TSub>> configure = null)
-        {
-            var subTypeInfo = new PolymorphicType<TSub>();
-            RegisterSubType(subTypeInfo);
-
-            if (configure != null) configure(subTypeInfo);
-            
             return this;
         }
 

@@ -745,7 +745,7 @@ namespace Swashbuckle.Tests
         [Test]
         public void It_should_generate_model_specs_for_explicitly_configured_sub_types()
         {
-            var productType = new PolymorphicType<Product>()
+            var productType = new BasePolymorphicType<Product>()
                 .DiscriminateBy(p => p.Type)
                 .SubType<Book>()
                 .SubType<Album>()

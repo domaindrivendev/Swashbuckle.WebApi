@@ -70,11 +70,11 @@ namespace Swashbuckle.Core.Application
             return this;
         }
 
-        public SwaggerSpecConfig PolymorphicType<TBase>(Action<PolymorphicType<TBase>> configure)
+        public SwaggerSpecConfig PolymorphicType<TBase>(Action<BasePolymorphicType<TBase>> configure)
         {
-            var subTypeInfo = new PolymorphicType<TBase>();
-            configure(subTypeInfo);
-            PolymorphicTypes.Add(subTypeInfo);
+            var polymorphicType = new BasePolymorphicType<TBase>();
+            configure(polymorphicType);
+            PolymorphicTypes.Add(polymorphicType);
             return this;
         }
 
