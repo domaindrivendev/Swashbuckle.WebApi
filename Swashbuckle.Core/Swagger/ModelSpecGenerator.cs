@@ -158,7 +158,7 @@ namespace Swashbuckle.Core.Swagger
             // Is it nested?
             foreach (var baseType in _polymorphicTypes)
             {
-                polymorphicType = baseType.SearchHierarchyFor(type);
+                polymorphicType = baseType.FindSubType(type);
                 if (polymorphicType != null) return polymorphicType;
             }
 

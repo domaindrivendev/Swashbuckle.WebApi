@@ -103,8 +103,39 @@ namespace Swashbuckle.Core.Application
             var requestUri = request.RequestUri;
             return requestUri.GetLeftPart(UriPartial.Authority) + request.GetConfiguration().VirtualPathRoot;
         }
+    }
 
-        private string InferDescriminatorFrom<T>(Expression<Func<T, object>> expression)
+    public class PolymorphicType<T> : PolymorphicType
+    {
+        public PolymorphicType(bool isBase)
+            : base(typeof(T), isBase)
+        { }
+
+        public PolymorphicType<T> SubType<TSub>(Action<PolymorphicType<TSub>> configure = null)
+        {
+            var subTypeInfo = new PolymorphicType<TSub>(false);
+            RegisterSubType(subTypeInfo);
+
+            if (configure != null) configure(subTypeInfo);
+
+            return this;
+        }
+    }
+
+    public class BasePolymorphicType<T> : PolymorphicType<T>
+    {
+        public BasePolymorphicType()
+            : base(true)
+        {
+        }
+
+        public PolymorphicType<T> DiscriminateBy(Expression<Func<T, object>> expression)
+        {
+            DiscriminateBy(InferDiscriminatorFrom(expression));
+            return this;
+        }
+
+        private static string InferDiscriminatorFrom(Expression<Func<T, object>> expression)
         {
             MemberExpression memberExpression;
 
@@ -115,34 +146,9 @@ namespace Swashbuckle.Core.Application
                 memberExpression = expression.Body as MemberExpression;
 
             if (memberExpression == null)
-                throw new ArgumentException(String.Format("Failed to infer descriminator from provided expression - {0}", expression));
+                throw new ArgumentException(String.Format("Failed to infer discriminator from provided expression - {0}", expression));
 
             return memberExpression.Member.Name;
-        }
-    }
-
-    public class SubTypeList<TBase> : IEnumerable<Type>
-    {
-        readonly List<Type> _subTypes = new List<Type>();
-
-        public SubTypeList<TBase> Include<T>()
-            where T : TBase
-        {
-            var type = typeof(T);
-            if (!_subTypes.Contains(type))
-                _subTypes.Add(type);
-
-            return this;
-        }
-
-        public IEnumerator<Type> GetEnumerator()
-        {
-            return _subTypes.GetEnumerator();
-        }
-
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return _subTypes.GetEnumerator();
         }
     }
 }

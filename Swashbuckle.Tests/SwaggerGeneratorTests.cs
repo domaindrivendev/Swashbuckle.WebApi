@@ -5,6 +5,7 @@ using System.Web.Http;
 using System.Web.Http.Description;
 using NUnit.Framework;
 using Swashbuckle.Core;
+using Swashbuckle.Core.Application;
 using Swashbuckle.Core.Swagger;
 using Swashbuckle.TestApp.Core;
 using Swashbuckle.TestApp.Core.Models;
