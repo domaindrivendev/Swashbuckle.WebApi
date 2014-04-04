@@ -7,13 +7,13 @@ using Swashbuckle.Core.Swagger;
 
 namespace Swashbuckle.TestApp.Core.SwaggerExtensions
 {
-    public class AddAuthorizationErrorCodes : IOperationSpecFilter
+    public class AddAuthorizationErrorCodes : IOperationFilter
     {
-        public void Apply(OperationSpec operationSpec, Dictionary<string, ModelSpec> complexModels, ModelSpecGenerator modelSpecGenerator, ApiDescription apiDescription)
+        public void Apply(Operation operation, Dictionary<string, DataType> complexModels, DataTypeGenerator dataTypeGenerator, ApiDescription apiDescription)
         {
             if (apiDescription.ActionDescriptor.GetFilters().OfType<AuthorizeAttribute>().Any())
             {
-                operationSpec.ResponseMessages.Add(new ResponseMessageSpec
+                operation.ResponseMessages.Add(new ResponseMessage
                 {
                     Code = (int)HttpStatusCode.Unauthorized,
                     Message = "Authentication required"

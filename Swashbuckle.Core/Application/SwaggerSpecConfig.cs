@@ -22,20 +22,20 @@ namespace Swashbuckle.Core.Application
         {
             VersionResolver = (req) => "1.0";
             BasePathResolver = DefaultBasePathResolver;
-            DeclarationKeySelector = (apiDesc) => apiDesc.ActionDescriptor.ControllerDescriptor.ControllerName;
-            CustomTypeMappings = new Dictionary<Type, ModelSpec>();
-            PolymorphicTypes = new List<PolymorphicType>();
-            OperationSpecFilters = new List<IOperationSpecFilter>();
             IgnoreObsoleteActionsFlag = false;
+            DeclarationKeySelector = (apiDesc) => apiDesc.ActionDescriptor.ControllerDescriptor.ControllerName;
+            OperationFilters = new List<IOperationFilter>();
+            CustomTypeMappings = new Dictionary<Type, DataType>();
+            PolymorphicTypes = new List<PolymorphicType>();
         }
 
         internal Func<HttpRequestMessage, string> VersionResolver { get; private set; }
         internal Func<HttpRequestMessage, string> BasePathResolver { get; private set; }
         internal Func<ApiDescription, string> DeclarationKeySelector { get; private set; }
-        internal Dictionary<Type, ModelSpec> CustomTypeMappings { get; private set; }
-        internal List<PolymorphicType> PolymorphicTypes { get; private set; }
-        internal List<IOperationSpecFilter> OperationSpecFilters = new List<IOperationSpecFilter>();
         internal bool IgnoreObsoleteActionsFlag { get; private set; }
+        internal List<IOperationFilter> OperationFilters = new List<IOperationFilter>();
+        internal Dictionary<Type, DataType> CustomTypeMappings { get; private set; }
+        internal List<PolymorphicType> PolymorphicTypes { get; private set; }
 
         public SwaggerSpecConfig ResolveApiVersion(Func<HttpRequestMessage, string> versionResolver)
         {
@@ -51,6 +51,12 @@ namespace Swashbuckle.Core.Application
             return this;
         }
 
+        public SwaggerSpecConfig IgnoreObsoleteActions()
+        {
+            IgnoreObsoleteActionsFlag = true;
+            return this;
+        }
+
         public SwaggerSpecConfig GroupDeclarationsBy(Func<ApiDescription, string> declarationKeySelector)
         {
             if (declarationKeySelector == null) throw new ArgumentNullException("declarationKeySelector");
@@ -58,15 +64,22 @@ namespace Swashbuckle.Core.Application
             return this;
         }
 
-        public SwaggerSpecConfig IgnoreObsoleteActions()
+        public SwaggerSpecConfig OperationFilter<T>()
+            where T : IOperationFilter, new()
         {
-            IgnoreObsoleteActionsFlag = true;
+            return OperationFilter(new T());
+        }
+
+        public SwaggerSpecConfig OperationFilter(IOperationFilter operationFilter)
+        {
+            if (operationFilter == null) throw new ArgumentNullException("operationFilter");
+            OperationFilters.Add(operationFilter);
             return this;
         }
 
-        public SwaggerSpecConfig MapType<T>(ModelSpec modelSpec)
+        public SwaggerSpecConfig MapType<T>(DataType dataType)
         {
-            CustomTypeMappings[typeof (T)] = modelSpec;
+            CustomTypeMappings[typeof (T)] = dataType;
             return this;
         }
 
@@ -78,23 +91,10 @@ namespace Swashbuckle.Core.Application
             return this;
         }
 
-        public SwaggerSpecConfig OperationSpecFilter<T>()
-            where T : IOperationSpecFilter, new()
-        {
-            return OperationSpecFilter(new T());
-        }
-
-        public SwaggerSpecConfig OperationSpecFilter(IOperationSpecFilter operationSpecFilter)
-        {
-            if (operationSpecFilter == null) throw new ArgumentNullException("operationSpecFilter");
-            OperationSpecFilters.Add(operationSpecFilter);
-            return this;
-        }
-
         public SwaggerSpecConfig IncludeXmlComments(string xmlCommentsPath)
         {
             var xmlCommentsDoc = new XPathDocument(xmlCommentsPath);
-            OperationSpecFilters.Add(new ApplyActionXmlComments(xmlCommentsDoc));
+            OperationFilters.Add(new ApplyActionXmlComments(xmlCommentsDoc));
             return this;
         }
 

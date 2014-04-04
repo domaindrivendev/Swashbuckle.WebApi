@@ -62,11 +62,7 @@ namespace Swashbuckle.Core.Application
                     var generator = new SwaggerGenerator(
                         apiVersion: _config.VersionResolver(request),
                         basePath: _config.BasePathResolver(request),
-                        declarationKeySelector: _config.DeclarationKeySelector,
-                        customTypeMappings: _config.CustomTypeMappings,
-                        polymorphicTypes: _config.PolymorphicTypes,
-                        operationSpecFilters: _config.OperationSpecFilters,
-                        ignoreObsoleteActions: _config.IgnoreObsoleteActionsFlag);
+                        ignoreObsoleteActions: _config.IgnoreObsoleteActionsFlag, declarationKeySelector: _config.DeclarationKeySelector, operationFilters: _config.OperationFilters, customTypeMappings: _config.CustomTypeMappings, polymorphicTypes: _config.PolymorphicTypes);
 
                     var apiExplorer = request.GetConfiguration().Services.GetApiExplorer();
 

@@ -5,17 +5,17 @@ using Swashbuckle.Core.Swagger;
 
 namespace Swashbuckle.TestApp.Core.SwaggerExtensions
 {
-    public class AddStandardErrorCodes : IOperationSpecFilter
+    public class AddStandardErrorCodes : IOperationFilter
     {
-        public void Apply(OperationSpec operationSpec, Dictionary<string, ModelSpec> complexModels, ModelSpecGenerator modelSpecGenerator, ApiDescription apiDescription)
+        public void Apply(Operation operation, Dictionary<string, DataType> complexModels, DataTypeGenerator dataTypeGenerator, ApiDescription apiDescription)
         {
-            operationSpec.ResponseMessages.Add(new ResponseMessageSpec
+            operation.ResponseMessages.Add(new ResponseMessage
             {
                 Code = (int)HttpStatusCode.OK,
                 Message = "It's all good!"
             });
 
-            operationSpec.ResponseMessages.Add(new ResponseMessageSpec
+            operation.ResponseMessages.Add(new ResponseMessage
             {
                 Code = (int)HttpStatusCode.InternalServerError,
                 Message = "Somethings up!"

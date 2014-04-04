@@ -19,13 +19,16 @@ namespace Swashbuckle.Core.Swagger
         public string ApiVersion { get; set; }
 
         [JsonProperty("apis")]
-        public IList<ApiDeclarationLink> Apis { get; set; }
+        public IList<Resource> Apis { get; set; }
     }
 
-    public class ApiDeclarationLink
+    public class Resource
     {
         [JsonProperty("path")]
         public string Path { get; set; }
+
+        [JsonProperty("description")]
+        public string Description { get; set; }
     }
 
     public class ApiDeclaration
@@ -43,13 +46,13 @@ namespace Swashbuckle.Core.Swagger
         public string ResourcePath { get; set; }
 
         [JsonProperty("apis")]
-        public IList<ApiSpec> Apis { get; set; }
+        public IList<Api> Apis { get; set; }
 
         [JsonProperty("models")]
-        public IDictionary<string, ModelSpec> Models { get; set; }
+        public IDictionary<string, DataType> Models { get; set; }
     }
 
-    public class ApiSpec
+    public class Api
     {
         [JsonProperty("path")]
         public string Path { get; set; }
@@ -58,10 +61,10 @@ namespace Swashbuckle.Core.Swagger
         public string Description { get; set; }
 
         [JsonProperty("operations")]
-        public IList<OperationSpec> Operations { get; set; }
+        public IList<Operation> Operations { get; set; }
     }
 
-    public class OperationSpec
+    public class Operation
     {
         [JsonProperty("method")]
         public string Method { get; set; }
@@ -82,19 +85,19 @@ namespace Swashbuckle.Core.Swagger
         public string Format { get; set; }
 
         [JsonProperty("items")]
-        public ModelSpec Items { get; set; }
+        public DataType Items { get; set; }
 
         [JsonProperty("enum")]
         public IList<string> Enum { get; set; }
 
         [JsonProperty("parameters")]
-        public IList<ParameterSpec> Parameters { get; set; }
+        public IList<Parameter> Parameters { get; set; }
 
         [JsonProperty("responseMessages")]
-        public IList<ResponseMessageSpec> ResponseMessages { get; set; }
+        public IList<ResponseMessage> ResponseMessages { get; set; }
     }
 
-    public class ParameterSpec
+    public class Parameter
     {
         [JsonProperty("paramType")]
         public string ParamType { get; set; }
@@ -115,13 +118,13 @@ namespace Swashbuckle.Core.Swagger
         public string Format { get; set; }
 
         [JsonProperty("items")]
-        public ModelSpec Items { get; set; }
+        public DataType Items { get; set; }
 
         [JsonProperty("enum")]
         public IList<string> Enum { get; set; }
     }
 
-    public class ResponseMessageSpec
+    public class ResponseMessage
     {
         [JsonProperty("code")]
         public int Code { get; set; }
@@ -130,7 +133,7 @@ namespace Swashbuckle.Core.Swagger
         public string Message { get; set; }
     }
 
-    public class ModelSpec
+    public class DataType
     {
         [JsonProperty("$ref")]
         public string Ref { get; set; }
@@ -145,13 +148,13 @@ namespace Swashbuckle.Core.Swagger
         public string Format { get; set; }
 
         [JsonProperty("items")]
-        public ModelSpec Items { get; set; }
+        public DataType Items { get; set; }
 
         [JsonProperty("enum")]
         public IList<string> Enum { get; set; }
 
         [JsonProperty("properties")]
-        public IDictionary<string, ModelSpec> Properties { get; set; }
+        public IDictionary<string, DataType> Properties { get; set; }
 
         [JsonProperty("required")]
         public IList<string> Required { get; set; }

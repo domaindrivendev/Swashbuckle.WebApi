@@ -8,7 +8,7 @@ using System.Xml.XPath;
 
 namespace Swashbuckle.Core.Swagger
 {
-    public class ApplyActionXmlComments : IOperationSpecFilter
+    public class ApplyActionXmlComments : IOperationFilter
     {
         private const string MethodExpression = "/doc/members/member[@name='M:{0}.{1}({2})']";
         private const string SummaryExpression = "summary";
@@ -22,19 +22,19 @@ namespace Swashbuckle.Core.Swagger
             _navigator = xmlCommentsDoc.CreateNavigator();
         }
 
-        public void Apply(OperationSpec operationSpec, Dictionary<string, ModelSpec> complexModels, ModelSpecGenerator modelSpecGenerator, ApiDescription apiDescription)
+        public void Apply(Operation operation, Dictionary<string, DataType> complexModels, DataTypeGenerator dataTypeGenerator, ApiDescription apiDescription)
         {
             var methodNode = GetNodeFor(apiDescription.ActionDescriptor);
 
-            operationSpec.Summary = GetChildValueOrDefault(methodNode, SummaryExpression);
-            operationSpec.Notes = GetChildValueOrDefault(methodNode, RemarksExpression);
+            operation.Summary = GetChildValueOrDefault(methodNode, SummaryExpression);
+            operation.Notes = GetChildValueOrDefault(methodNode, RemarksExpression);
 
             foreach (var paramDesc in apiDescription.ParameterDescriptions)
             {
-                var paramSpec = operationSpec.Parameters.SingleOrDefault(p => p.Name == paramDesc.Name);
-                if (paramSpec == null) continue;
+                var parameter = operation.Parameters.SingleOrDefault(p => p.Name == paramDesc.Name);
+                if (parameter == null) continue;
 
-                paramSpec.Description = GetChildValueOrDefault(methodNode, String.Format(ParameterExpression, paramDesc.Name));
+                parameter.Description = GetChildValueOrDefault(methodNode, String.Format(ParameterExpression, paramDesc.Name));
             }
         }
 

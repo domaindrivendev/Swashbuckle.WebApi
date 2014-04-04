@@ -14,22 +14,22 @@ namespace Swashbuckle.Core.Swagger
         private readonly bool _ignoreObsoleteActions;
         private readonly Func<ApiDescription, string> _declarationKeySelector;
 
-        private readonly OperationSpecGenerator _operationSpecGenerator;
+        private readonly OperationGenerator _operationGenerator;
 
         public SwaggerGenerator(
             string apiVersion,
             string basePath,
             bool ignoreObsoleteActions,
             Func<ApiDescription, string> declarationKeySelector,
-            Dictionary<Type, ModelSpec> customTypeMappings,
-            IEnumerable<PolymorphicType> polymorphicTypes,
-            IEnumerable<IOperationSpecFilter> operationSpecFilters)
+            IEnumerable<IOperationFilter> operationFilters,
+            IDictionary<Type, DataType> customTypeMappings,
+            IEnumerable<PolymorphicType> polymorphicTypes)
         {
             _apiVersion = apiVersion;
             _basePath = basePath.TrimEnd('/');
             _ignoreObsoleteActions = ignoreObsoleteActions;
             _declarationKeySelector = declarationKeySelector;
-            _operationSpecGenerator = new OperationSpecGenerator(customTypeMappings, polymorphicTypes, operationSpecFilters);
+            _operationGenerator = new OperationGenerator(operationFilters, customTypeMappings, polymorphicTypes);
         }
 
         public SwaggerSpec ApiExplorerToSwaggerSpec(IApiExplorer apiExplorer)
@@ -50,7 +50,7 @@ namespace Swashbuckle.Core.Swagger
         private ResourceListing CreateListing(IEnumerable<IGrouping<string, ApiDescription>> apiDescriptionGroups)
         {
             var declarationLinks = apiDescriptionGroups
-                .Select(apiDescGrp => new ApiDeclarationLink { Path = apiDescGrp.Key })
+                .Select(apiDescGrp => new Resource { Path = apiDescGrp.Key })
                 .ToArray();
 
             return new ResourceListing
@@ -69,13 +69,13 @@ namespace Swashbuckle.Core.Swagger
 
         private ApiDeclaration CreateDeclaration(IGrouping<string, ApiDescription> apiDescriptionGroup)
         {
-            var complexModels = new Dictionary<string, ModelSpec>();
+            var complexModels = new Dictionary<string, DataType>();
 
-            // Group further by relative path - each group corresponds to an ApiSpec
-            var apiSpecs = apiDescriptionGroup
+            // Group further by relative path - each group corresponds to an Api
+            var apis = apiDescriptionGroup
                 .GroupBy(apiDesc => apiDesc.RelativePathSansQueryString())
-                .Select(apiDescGrp => CreateApiSpec(apiDescGrp, complexModels))
-                .OrderBy(apiSpec => apiSpec.Path)
+                .Select(apiDescGrp => CreateApi(apiDescGrp, complexModels))
+                .OrderBy(api => api.Path)
                 .ToList();
 
             return new ApiDeclaration
@@ -84,22 +84,22 @@ namespace Swashbuckle.Core.Swagger
                 ApiVersion = _apiVersion,
                 BasePath = _basePath,
                 ResourcePath = apiDescriptionGroup.Key,
-                Apis = apiSpecs,
+                Apis = apis,
                 Models = complexModels
             };
         }
 
-        private ApiSpec CreateApiSpec(IGrouping<string, ApiDescription> apiDescriptionGroup, Dictionary<string, ModelSpec> complexModels)
+        private Api CreateApi(IGrouping<string, ApiDescription> apiDescriptionGroup, Dictionary<string, DataType> complexModels)
         {
-            var operationSpecs = apiDescriptionGroup
-                .Select(apiDesc => _operationSpecGenerator.ApiDescriptionToOperationSpec(apiDesc, complexModels))
-                .OrderBy(operationSpec => operationSpec.Method)
+            var operations = apiDescriptionGroup
+                .Select(apiDesc => _operationGenerator.ApiDescriptionToOperation(apiDesc, complexModels))
+                .OrderBy(op => op.Method)
                 .ToList();
 
-            return new ApiSpec
+            return new Api
             {
                 Path = "/" + apiDescriptionGroup.Key,
-                Operations = operationSpecs
+                Operations = operations
             };
         }
     }

@@ -29,75 +29,75 @@ namespace Swashbuckle.Tests
         [Test]
         public void It_should_apply_action_summary_if_available_otherwise_blank()
         {
-            ApplyFilterFor("Orders", "GetAll", operationSpec =>
-                Assert.IsNull(operationSpec.Summary));
+            ApplyFilterFor("Orders", "GetAll", operation =>
+                Assert.IsNull(operation.Summary));
 
-            ApplyFilterFor("OrderItems", "GetAll", operationSpec =>
-                Assert.AreEqual("Get all order items", operationSpec.Summary));
+            ApplyFilterFor("OrderItems", "GetAll", operation =>
+                Assert.AreEqual("Get all order items", operation.Summary));
 
-            ApplyFilterFor("OrderItems", "GetById", operationSpec =>
-                Assert.AreEqual("Get order item by id", operationSpec.Summary));
+            ApplyFilterFor("OrderItems", "GetById", operation =>
+                Assert.AreEqual("Get order item by id", operation.Summary));
 
-            ApplyFilterFor("OrderItems", "GetByPropertyValues", operationSpec =>
-                Assert.AreEqual("Retreive items in an order by property names and values", operationSpec.Summary));
+            ApplyFilterFor("OrderItems", "GetByPropertyValues", operation =>
+                Assert.AreEqual("Retreive items in an order by property names and values", operation.Summary));
         }
 
         [Test]
         public void It_should_apply_action_remarks_if_available_otherwise_blank()
         {
-            ApplyFilterFor("Orders", "GetAll", operationSpec =>
-                Assert.IsNull(operationSpec.Notes));
+            ApplyFilterFor("Orders", "GetAll", operation =>
+                Assert.IsNull(operation.Notes));
 
-            ApplyFilterFor("OrderItems", "GetAll", operationSpec =>
-                Assert.AreEqual("Returns all three order items we've got here", operationSpec.Notes));
+            ApplyFilterFor("OrderItems", "GetAll", operation =>
+                Assert.AreEqual("Returns all three order items we've got here", operation.Notes));
 
-            ApplyFilterFor("OrderItems", "GetById", operationSpec =>
-                Assert.IsNull(operationSpec.Notes));
+            ApplyFilterFor("OrderItems", "GetById", operation =>
+                Assert.IsNull(operation.Notes));
 
-            ApplyFilterFor("OrderItems", "GetByPropertyValues", operationSpec =>
-                Assert.IsNull(operationSpec.Notes));
+            ApplyFilterFor("OrderItems", "GetByPropertyValues", operation =>
+                Assert.IsNull(operation.Notes));
         }
 
         [Test]
         public void It_should_apply_parameter_descriptions_if_available_otherwise_blank()
         {
-            ApplyFilterFor("Orders", "GetByParams", operationSpec =>
+            ApplyFilterFor("Orders", "GetByParams", operation =>
             {
-                Assert.IsNull(operationSpec.Parameters[0].Description);
-                Assert.IsNull(operationSpec.Parameters[1].Description);
+                Assert.IsNull(operation.Parameters[0].Description);
+                Assert.IsNull(operation.Parameters[1].Description);
             });
 
-            ApplyFilterFor("OrderItems", "GetAll", operationSpec =>
+            ApplyFilterFor("OrderItems", "GetAll", operation =>
             {
-                Assert.IsNull(operationSpec.Parameters[0].Description);
-                Assert.IsNull(operationSpec.Parameters[1].Description);
+                Assert.IsNull(operation.Parameters[0].Description);
+                Assert.IsNull(operation.Parameters[1].Description);
             });
 
-            ApplyFilterFor("OrderItems", "GetById", operationSpec =>
+            ApplyFilterFor("OrderItems", "GetById", operation =>
             {
-                Assert.AreEqual("The identifier for the order", operationSpec.Parameters[0].Description);
-                Assert.AreEqual("The identifier for the requested order item", operationSpec.Parameters[1].Description);
+                Assert.AreEqual("The identifier for the order", operation.Parameters[0].Description);
+                Assert.AreEqual("The identifier for the requested order item", operation.Parameters[1].Description);
             });
 
-            ApplyFilterFor("OrderItems", "GetByPropertyValues", operationSpec =>
+            ApplyFilterFor("OrderItems", "GetByPropertyValues", operation =>
             {
-                Assert.AreEqual("The identifier for the order", operationSpec.Parameters[0].Description);
-                Assert.AreEqual("Dictionary of property names and values", operationSpec.Parameters[1].Description);
+                Assert.AreEqual("The identifier for the order", operation.Parameters[0].Description);
+                Assert.AreEqual("Dictionary of property names and values", operation.Parameters[1].Description);
             });
         }
 
-        private void ApplyFilterFor(string controllerName, string actionName, Action<OperationSpec> applyAssertions)
+        private void ApplyFilterFor(string controllerName, string actionName, Action<Operation> applyAssertions)
         {
             var apiDescription = _apiExplorer.ApiDescriptions.Single(apiDesc => apiDesc.ActionDescriptor.ControllerDescriptor.ControllerName == controllerName
                 && apiDesc.ActionDescriptor.ActionName == actionName);
 
-            var operationSpec = new OperationSpec
+            var operation = new Operation
                 {
                     Summary = "foo",
                     Notes = "foo",
                     Parameters = apiDescription.ParameterDescriptions
                         .Select(paramDesc =>
-                            new ParameterSpec
+                            new Parameter
                             {
                                 Name = paramDesc.Name,
                                 Description = "foo" 
@@ -105,9 +105,9 @@ namespace Swashbuckle.Tests
                          .ToList()
                 };
 
-            _filter.Apply(operationSpec, null, null, apiDescription);
+            _filter.Apply(operation, null, null, apiDescription);
 
-            applyAssertions(operationSpec);
+            applyAssertions(operation);
         }
     }
 }

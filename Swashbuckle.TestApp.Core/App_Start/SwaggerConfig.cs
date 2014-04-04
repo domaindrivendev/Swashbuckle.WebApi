@@ -4,6 +4,7 @@ using System.Web.Http;
 using Swashbuckle.Core;
 using Swashbuckle.Core.Application;
 using Swashbuckle.TestApp.Core.Models;
+using Swashbuckle.TestApp.Core.SwaggerExtensions;
 
 namespace Swashbuckle.TestApp.Core
 {
@@ -17,6 +18,9 @@ namespace Swashbuckle.TestApp.Core
                 {
                     c.ResolveApiVersion((req) => "1.0");
                     c.IgnoreObsoleteActions();
+
+                    c.OperationFilter<AddStandardErrorCodes>();
+                    c.OperationFilter<AddAuthorizationErrorCodes>();
 
                     c.PolymorphicType<Product>(pc => pc
                         .DiscriminateBy(p => p.Type)
