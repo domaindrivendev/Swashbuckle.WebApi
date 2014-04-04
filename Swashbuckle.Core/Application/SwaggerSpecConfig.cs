@@ -112,6 +112,7 @@ namespace Swashbuckle.Core.Application
         { }
 
         public PolymorphicType<T> SubType<TSub>(Action<PolymorphicType<TSub>> configure = null)
+            where TSub : T
         {
             var subTypeInfo = new PolymorphicType<TSub>(false);
             RegisterSubType(subTypeInfo);
