@@ -10,13 +10,10 @@ namespace Swashbuckle.Core.Swagger
         private readonly IEnumerable<IOperationFilter> _operationFilters;
         private readonly DataTypeGenerator _dataTypeGenerator;
 
-        public OperationGenerator(
-            IEnumerable<IOperationFilter> operationFilters,
-            IDictionary<Type, DataType> customTypeMappings,
-            IEnumerable<PolymorphicType> polymorphicTypes)
+        public OperationGenerator(IEnumerable<IOperationFilter> operationFilters, DataTypeGenerator dataTypeGenerator)
         {
             _operationFilters = operationFilters;
-            _dataTypeGenerator = new DataTypeGenerator(customTypeMappings, polymorphicTypes);
+            _dataTypeGenerator = dataTypeGenerator;
         }
 
         public Operation ApiDescriptionToOperation(ApiDescription apiDescription, Dictionary<string, DataType> complexModels)

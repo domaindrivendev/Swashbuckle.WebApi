@@ -905,13 +905,15 @@ namespace Swashbuckle.Tests
             bool ignoreObsoletetActions = false)
         {
             return new SwaggerGenerator(
-                apiVersion: "1.0",
-                basePath: "http://tempuri.org",
-                ignoreObsoleteActions: ignoreObsoletetActions,
-                declarationKeySelector: declarationKeySelector ?? (apiDesc => apiDesc.ActionDescriptor.ControllerDescriptor.ControllerName),
-                operationFilters: operationFilters ?? new List<IOperationFilter>(),
-                customTypeMappings: new Dictionary<Type, DataType>(),
-                polymorphicTypes: polymorphicTypes ?? new List<PolymorphicType>());
+                "1.0",
+                "http://tempuri.org",
+                ignoreObsoletetActions,
+                declarationKeySelector ?? (apiDesc => apiDesc.ActionDescriptor.ControllerDescriptor.ControllerName),
+                new OperationGenerator(
+                    operationFilters ?? new List<IOperationFilter>(),
+                    new DataTypeGenerator(
+                        new Dictionary<Type, DataType>(),
+                        polymorphicTypes ?? new List<PolymorphicType>())));
         }
 
         private static void ApiDeclaration(SwaggerSpec swaggerSpec, string resourcePath, Action<ApiDeclaration> applyAssertions)
