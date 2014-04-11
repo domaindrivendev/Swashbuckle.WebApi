@@ -144,6 +144,9 @@ namespace Swashbuckle.Core.Swagger
         [JsonProperty("type")]
         public string Type { get; set; }
 
+        [JsonProperty("description")]
+        public string Description { get; set; }
+
         [JsonProperty("format")]
         public string Format { get; set; }
 

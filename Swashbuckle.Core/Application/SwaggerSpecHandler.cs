@@ -66,7 +66,10 @@ namespace Swashbuckle.Core.Application
                         _config.DeclarationKeySelector,
                         new OperationGenerator(
                             _config.OperationFilters,
-                            new DataTypeGenerator(_config.CustomTypeMappings, _config.PolymorphicTypes)));
+                            new DataTypeGenerator(
+                                _config.CustomTypeMappings,
+                                _config.PolymorphicTypes,
+                                _config.ModelFilters)));
 
                     var apiExplorer = request.GetConfiguration().Services.GetApiExplorer();
 

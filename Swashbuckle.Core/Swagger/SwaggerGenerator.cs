@@ -67,12 +67,12 @@ namespace Swashbuckle.Core.Swagger
 
         private ApiDeclaration CreateDeclaration(IGrouping<string, ApiDescription> apiDescriptionGroup)
         {
-            var complexModels = new Dictionary<string, DataType>();
+            var models = new Dictionary<string, DataType>();
 
             // Group further by relative path - each group corresponds to an Api
             var apis = apiDescriptionGroup
                 .GroupBy(apiDesc => apiDesc.RelativePathSansQueryString())
-                .Select(apiDescGrp => CreateApi(apiDescGrp, complexModels))
+                .Select(apiDescGrp => CreateApi(apiDescGrp, models))
                 .OrderBy(api => api.Path)
                 .ToList();
 
@@ -83,14 +83,14 @@ namespace Swashbuckle.Core.Swagger
                 BasePath = _basePath,
                 ResourcePath = apiDescriptionGroup.Key,
                 Apis = apis,
-                Models = complexModels
+                Models = models
             };
         }
 
-        private Api CreateApi(IGrouping<string, ApiDescription> apiDescriptionGroup, Dictionary<string, DataType> complexModels)
+        private Api CreateApi(IGrouping<string, ApiDescription> apiDescriptionGroup, Dictionary<string, DataType> models)
         {
             var operations = apiDescriptionGroup
-                .Select(apiDesc => _operationGenerator.ApiDescriptionToOperation(apiDesc, complexModels))
+                .Select(apiDesc => _operationGenerator.ApiDescriptionToOperation(apiDesc, models))
                 .OrderBy(op => op.Method)
                 .ToList();
 

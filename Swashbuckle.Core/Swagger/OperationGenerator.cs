@@ -16,11 +16,11 @@ namespace Swashbuckle.Core.Swagger
             _dataTypeGenerator = dataTypeGenerator;
         }
 
-        public Operation ApiDescriptionToOperation(ApiDescription apiDescription, Dictionary<string, DataType> complexModels)
+        public Operation ApiDescriptionToOperation(ApiDescription apiDescription, Dictionary<string, DataType> models)
         {
             var apiPath = apiDescription.RelativePathSansQueryString();
             var parameters = apiDescription.ParameterDescriptions
-                .Select(paramDesc => CreateParameter(paramDesc, apiPath, complexModels))
+                .Select(paramDesc => CreateParameter(paramDesc, apiPath, models))
                 .ToList();
 
             var operation = new Operation
@@ -39,10 +39,10 @@ namespace Swashbuckle.Core.Swagger
             }
             else
             {
-                IDictionary<string, DataType> complexModelsForResponseType;
-                var dataType = _dataTypeGenerator.TypeToDataType(responseType, out complexModelsForResponseType);
+                IDictionary<string, DataType> modelsForResponseType;
+                var dataType = _dataTypeGenerator.TypeToDataType(responseType, out modelsForResponseType);
 
-                complexModels.Merge(complexModelsForResponseType);
+                models.Merge(modelsForResponseType);
 
                 if (dataType.Type == "object")
                 {
@@ -59,13 +59,13 @@ namespace Swashbuckle.Core.Swagger
 
             foreach (var filter in _operationFilters)
             {
-                filter.Apply(operation, complexModels, _dataTypeGenerator, apiDescription);
+                filter.Apply(operation, models, _dataTypeGenerator, apiDescription);
             }
 
             return operation;
         }
 
-        private Parameter CreateParameter(ApiParameterDescription apiParamDesc, string apiPath, Dictionary<string, DataType> complexModels)
+        private Parameter CreateParameter(ApiParameterDescription apiParamDesc, string apiPath, Dictionary<string, DataType> models)
         {
             var paramType = "";
             switch (apiParamDesc.Source)
@@ -86,10 +86,10 @@ namespace Swashbuckle.Core.Swagger
                 Required = !apiParamDesc.ParameterDescriptor.IsOptional
             };
 
-            IDictionary<string, DataType> complexModelsForParameter;
-            var dataType = _dataTypeGenerator.TypeToDataType(apiParamDesc.ParameterDescriptor.ParameterType, out complexModelsForParameter);
+            IDictionary<string, DataType> modelsForParameter;
+            var dataType = _dataTypeGenerator.TypeToDataType(apiParamDesc.ParameterDescriptor.ParameterType, out modelsForParameter);
 
-            complexModels.Merge(complexModelsForParameter);
+            models.Merge(modelsForParameter);
 
             if (dataType.Type == "object")
             {

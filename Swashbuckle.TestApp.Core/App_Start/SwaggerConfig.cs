@@ -12,7 +12,7 @@ namespace Swashbuckle.TestApp.Core
     {
         public static void Register(HttpConfiguration config)
         {
-            Bootstrapper.Init(config);
+            Swashbuckle.Core.Bootstrapper.Init(config);
 
             SwaggerSpecConfig.Customize(c =>
                 {

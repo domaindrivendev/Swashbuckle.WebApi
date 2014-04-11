@@ -25,8 +25,9 @@ namespace Swashbuckle.Core.Application
             IgnoreObsoleteActionsFlag = false;
             DeclarationKeySelector = (apiDesc) => apiDesc.ActionDescriptor.ControllerDescriptor.ControllerName;
             OperationFilters = new List<IOperationFilter>();
-            CustomTypeMappings = new Dictionary<Type, DataType>();
+            CustomTypeMappings = new Dictionary<Type, Func<DataType>>();
             PolymorphicTypes = new List<PolymorphicType>();
+            ModelFilters = new List<IModelFilter>();
         }
 
         internal Func<HttpRequestMessage, string> VersionResolver { get; private set; }
@@ -34,8 +35,9 @@ namespace Swashbuckle.Core.Application
         internal Func<ApiDescription, string> DeclarationKeySelector { get; private set; }
         internal bool IgnoreObsoleteActionsFlag { get; private set; }
         internal List<IOperationFilter> OperationFilters = new List<IOperationFilter>();
-        internal Dictionary<Type, DataType> CustomTypeMappings { get; private set; }
+        internal Dictionary<Type, Func<DataType>> CustomTypeMappings { get; private set; }
         internal List<PolymorphicType> PolymorphicTypes { get; private set; }
+        internal List<IModelFilter> ModelFilters { get; private set; }
 
         public SwaggerSpecConfig ResolveApiVersion(Func<HttpRequestMessage, string> versionResolver)
         {
@@ -77,9 +79,9 @@ namespace Swashbuckle.Core.Application
             return this;
         }
 
-        public SwaggerSpecConfig MapType<T>(DataType dataType)
+        public SwaggerSpecConfig MapType<T>(Func<DataType> factoryMethod)
         {
-            CustomTypeMappings[typeof (T)] = dataType;
+            CustomTypeMappings[typeof (T)] = factoryMethod;
             return this;
         }
 
@@ -95,6 +97,7 @@ namespace Swashbuckle.Core.Application
         {
             var xmlCommentsDoc = new XPathDocument(xmlCommentsPath);
             OperationFilters.Add(new ApplyActionXmlComments(xmlCommentsDoc));
+            ModelFilters.Add(new ApplyTypeXmlComments(xmlCommentsDoc));
             return this;
         }
 

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Web.Http;
 using System.Web.Http.Description;
@@ -912,8 +913,9 @@ namespace Swashbuckle.Tests
                 new OperationGenerator(
                     operationFilters ?? new List<IOperationFilter>(),
                     new DataTypeGenerator(
-                        new Dictionary<Type, DataType>(),
-                        polymorphicTypes ?? new List<PolymorphicType>())));
+                        new Dictionary<Type, Func<DataType>>(),
+                        polymorphicTypes ?? new List<PolymorphicType>(),
+                        new List<IModelFilter>())));
         }
 
         private static void ApiDeclaration(SwaggerSpec swaggerSpec, string resourcePath, Action<ApiDeclaration> applyAssertions)

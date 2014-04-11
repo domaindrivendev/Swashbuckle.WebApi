@@ -29,5 +29,20 @@
             <param name="propertyValues">Dictionary of property names and values</param>
             <returns></returns>
         </member>
+        <member name="T:Swashbuckle.TestApp.Core.Models.Customer">
+            <summary>
+            Represents a registered customer
+            </summary>
+        </member>
+        <member name="P:Swashbuckle.TestApp.Core.Models.Customer.Id">
+            <summary>
+            Unique identifier for the customer
+            </summary>
+        </member>
+        <member name="P:Swashbuckle.TestApp.Core.Models.Customer.Associates">
+            <summary>
+            Lists all registered associates 
+            </summary>
+        </member>
     </members>
 </doc>
