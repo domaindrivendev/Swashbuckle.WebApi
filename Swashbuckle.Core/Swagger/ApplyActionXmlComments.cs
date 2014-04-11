@@ -22,9 +22,9 @@ namespace Swashbuckle.Core.Swagger
             _navigator = xmlCommentsDoc.CreateNavigator();
         }
 
-        public void Apply(Operation operation, Dictionary<string, DataType> complexModels, DataTypeGenerator dataTypeGenerator, ApiDescription apiDescription)
+        public void Apply(Operation operation, Dictionary<string, DataType> models, DataTypeGenerator dataTypeGenerator, ApiDescription apiDescription)
         {
-            var methodNode = GetNodeFor(apiDescription.ActionDescriptor);
+            var methodNode = _navigator.SelectSingleNode(GetXPathFor(apiDescription.ActionDescriptor));
 
             operation.Summary = GetChildValueOrDefault(methodNode, SummaryExpression);
             operation.Notes = GetChildValueOrDefault(methodNode, RemarksExpression);
@@ -38,15 +38,14 @@ namespace Swashbuckle.Core.Swagger
             }
         }
 
-        private XPathNavigator GetNodeFor(HttpActionDescriptor actionDescriptor)
+        private static string GetXPathFor(HttpActionDescriptor actionDescriptor)
         {
             var controllerName = actionDescriptor.ControllerDescriptor.ControllerType.FullName;
             var actionName = actionDescriptor.ActionName;
             var parameters = String.Join(",", actionDescriptor.GetParameters()
                 .Select(paramDesc => TypeNameFor(paramDesc.ParameterType)));
 
-            var xpath = String.Format(MethodExpression, controllerName, actionName, parameters);
-            return _navigator.SelectSingleNode(xpath);
+            return String.Format(MethodExpression, controllerName, actionName, parameters);
         }
 
         private static string TypeNameFor(Type type)

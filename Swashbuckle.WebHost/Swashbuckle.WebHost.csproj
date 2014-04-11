@@ -42,8 +42,8 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <None Include="App_Start\SwaggerConfig.cs.pp" />
-    <None Include="Web.config.transform" />
+    <None Include="Nuget\Content\App_Start\SwaggerConfig.cs.pp" />
+    <None Include="Nuget\Content\Web.config.transform" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />

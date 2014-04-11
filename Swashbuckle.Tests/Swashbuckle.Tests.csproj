@@ -53,6 +53,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ApplyActionXmlCommentsTests.cs" />
+    <Compile Include="ApplyTypeXmlCommentsTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SwaggerGeneratorTests.cs" />
     <Compile Include="SwaggerUiHandlerTests.cs" />

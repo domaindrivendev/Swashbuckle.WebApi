@@ -68,6 +68,8 @@
     <Compile Include="ApiDescriptionExtensions.cs" />
     <Compile Include="DictionaryExtensions.cs" />
     <Compile Include="Swagger\ApplyActionXmlComments.cs" />
+    <Compile Include="Swagger\ApplyTypeXmlComments.cs" />
+    <Compile Include="Swagger\IModelFilter.cs" />
     <Compile Include="Swagger\IOperationFilter.cs" />
     <Compile Include="Swagger\DataTypeGenerator.cs" />
     <Compile Include="Swagger\OperationGenerator.cs" />

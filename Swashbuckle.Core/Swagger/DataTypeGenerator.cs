@@ -12,41 +12,44 @@ namespace Swashbuckle.Core.Swagger
 {
     public class DataTypeGenerator
     {
-        private static readonly Dictionary<Type, DataType> StaticMappings = new Dictionary<Type, DataType>()
+        private static readonly Dictionary<Type, Func<DataType>> StaticMappings = new Dictionary<Type, Func<DataType>>()
             {
-                {typeof (Int16), new DataType {Type = "integer", Format = "int32"}},
-                {typeof (UInt16), new DataType {Type = "integer", Format = "int32"}},
-                {typeof (Int32), new DataType {Type = "integer", Format = "int32"}},
-                {typeof (UInt32), new DataType {Type = "integer", Format = "int32"}},
-                {typeof (Int64), new DataType {Type = "integer", Format = "int64"}},
-                {typeof (UInt64), new DataType {Type = "integer", Format = "int64"}},
-                {typeof (Single), new DataType {Type = "number", Format = "float"}},
-                {typeof (Double), new DataType {Type = "number", Format = "double"}},
-                {typeof (Decimal), new DataType {Type = "number", Format = "double"}},
-                {typeof (String), new DataType {Type = "string", Format = null}},
-                {typeof (Char), new DataType {Type = "string", Format = null}},
-                {typeof (Byte), new DataType {Type = "string", Format = "byte"}},
-                {typeof (Boolean), new DataType {Type = "boolean", Format = null}},
-                {typeof (DateTime), new DataType {Type = "string", Format = "date-time"}},
-                {typeof (Object), new DataType{Type="string", Format = null}},
-                {typeof (ExpandoObject), new DataType{Type="string", Format = null}},
-                {typeof (JObject), new DataType{Type="string", Format = null}},
-                {typeof (HttpResponseMessage), new DataType{Type="string", Format = null}}
+                {typeof (Int16), () => new DataType {Type = "integer", Format = "int32"}},
+                {typeof (UInt16), () => new DataType {Type = "integer", Format = "int32"}},
+                {typeof (Int32), () => new DataType {Type = "integer", Format = "int32"}},
+                {typeof (UInt32), () => new DataType {Type = "integer", Format = "int32"}},
+                {typeof (Int64), () => new DataType {Type = "integer", Format = "int64"}},
+                {typeof (UInt64), () => new DataType {Type = "integer", Format = "int64"}},
+                {typeof (Single), () => new DataType {Type = "number", Format = "float"}},
+                {typeof (Double), () => new DataType {Type = "number", Format = "double"}},
+                {typeof (Decimal), () => new DataType {Type = "number", Format = "double"}},
+                {typeof (String), () => new DataType {Type = "string", Format = null}},
+                {typeof (Char), () => new DataType {Type = "string", Format = null}},
+                {typeof (Byte), () => new DataType {Type = "string", Format = "byte"}},
+                {typeof (Boolean), () => new DataType {Type = "boolean", Format = null}},
+                {typeof (DateTime), () => new DataType {Type = "string", Format = "date-time"}},
+                {typeof (DateTimeOffset), () => new DataType {Type = "string", Format = "date-time"}},
+                {typeof (Object), () => new DataType{Type="string", Format = null}},
+                {typeof (ExpandoObject), () => new DataType{Type="string", Format = null}},
+                {typeof (JObject), () => new DataType{Type="string", Format = null}},
+                {typeof (HttpResponseMessage), () => new DataType{Type="string", Format = null}}
             };
 
-        private readonly IDictionary<Type, DataType> _customMappings;
+        private readonly IDictionary<Type, Func<DataType>> _customMappings;
         private readonly IEnumerable<PolymorphicType> _polymorphicTypes;
-            
-        public DataTypeGenerator(IDictionary<Type, DataType> customMappings, IEnumerable<PolymorphicType> polymorphicTypes)
+        private readonly IEnumerable<IModelFilter> _modelFilters;
+
+        public DataTypeGenerator(IDictionary<Type, Func<DataType>> customMappings, IEnumerable<PolymorphicType> polymorphicTypes, IEnumerable<IModelFilter> modelFilters)
         {
             if (customMappings == null)
                 throw new ArgumentNullException("customMappings");
 
             _customMappings = customMappings;
             _polymorphicTypes = polymorphicTypes;
+            _modelFilters = modelFilters;
         }
 
-        public DataType TypeToDataType(Type type, out IDictionary<string, DataType> complexModels)
+        public DataType TypeToDataType(Type type, out IDictionary<string, DataType> models)
         {
             // Track complex mappings, deferred mappings will have a null Value
             var complexMappings = new Dictionary<Type, DataType>();
@@ -61,9 +64,9 @@ namespace Swashbuckle.Core.Swagger
                 complexMappings[complexType] = spec;
             }
 
-            complexModels = complexMappings.ToDictionary((entry) => entry.Value.Id, (entry) => entry.Value);
+            models = complexMappings.ToDictionary((entry) => entry.Value.Id, (entry) => entry.Value);
             if (rootDataType.Type == "object")
-                complexModels[rootDataType.Id] = rootDataType;
+                models[rootDataType.Id] = rootDataType;
 
             return rootDataType;
         }
@@ -71,10 +74,10 @@ namespace Swashbuckle.Core.Swagger
         private DataType CreateDataType(Type type, bool deferIfComplex, IDictionary<Type, DataType> complexMappings)
         {
             if (_customMappings.ContainsKey(type))
-                return _customMappings[type];
+                return _customMappings[type]();
 
             if (StaticMappings.ContainsKey(type))
-                return StaticMappings[type];
+                return StaticMappings[type]();
 
             if (type.IsEnum)
                 return new DataType { Type = "string", Enum = type.GetEnumNames() };
@@ -120,7 +123,7 @@ namespace Swashbuckle.Core.Swagger
                 .Select(subDataType => subDataType.Ref)
                 .ToList();
 
-            return new DataType
+            var model = new DataType
             {
                 Id = UniqueIdFor(type),
                 Type = "object",
@@ -129,6 +132,13 @@ namespace Swashbuckle.Core.Swagger
                 SubTypes = subDataTypes,
                 Discriminator = polymorphicType.Discriminator
             };
+
+            foreach (var filter in _modelFilters)
+            {
+                filter.Apply(model, type);
+            }
+
+            return model;
         }
 
         private static string UniqueIdFor(Type type)
