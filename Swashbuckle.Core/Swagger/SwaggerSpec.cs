@@ -50,6 +50,15 @@ namespace Swashbuckle.Core.Swagger
 
         [JsonProperty("models")]
         public IDictionary<string, DataType> Models { get; set; }
+
+        [JsonProperty("produces")]
+        public IList<string> Produces { get; set; }
+
+        [JsonProperty("consumes")]
+        public IList<string> Consumes { get; set; }
+
+        [JsonProperty("authorizations")]
+        public IList<string> Authorizations { get; set; }
     }
 
     public class Api
@@ -95,6 +104,15 @@ namespace Swashbuckle.Core.Swagger
 
         [JsonProperty("responseMessages")]
         public IList<ResponseMessage> ResponseMessages { get; set; }
+
+        [JsonProperty("produces")]
+        public IList<string> Produces { get; set; }
+
+        [JsonProperty("consumes")]
+        public IList<string> Consumes { get; set; }
+
+        [JsonProperty("authorizations")]
+        public IList<string> Authorizations { get; set; }
     }
 
     public class Parameter
