@@ -93,6 +93,19 @@ namespace Swashbuckle.Application
             return this;
         }
 
+        public SwaggerSpecConfig ModelFilter<T>()
+            where T : IModelFilter, new()
+        {
+            return ModelFilter(new T());
+        }
+
+        public SwaggerSpecConfig ModelFilter(IModelFilter modelFilter)
+        {
+            if (modelFilter == null) throw new ArgumentNullException("modelFilter");
+            ModelFilters.Add(modelFilter);
+            return this;
+        }
+
         public SwaggerSpecConfig IncludeXmlComments(string xmlCommentsPath)
         {
             var xmlCommentsDoc = new XPathDocument(xmlCommentsPath);
