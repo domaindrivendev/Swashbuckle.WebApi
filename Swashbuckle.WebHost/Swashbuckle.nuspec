@@ -2,7 +2,7 @@
 <package >
   <metadata>
     <id>Swashbuckle</id>
-    <version>4.0</version>
+    <version>4.0-rc1</version>
     <title>Swashbuckle</title>
     <authors>Richard Morris, GettyImages</authors>
     <licenseUrl>http://opensource.org/licenses/BSD-3-Clause</licenseUrl>
@@ -16,7 +16,7 @@
     <dependencies>
       <dependency id="Microsoft.AspNet.WebApi.WebHost" version="4.0.20710" />
       <dependency id="WebActivatorEx" />
-      <dependency id="Swashbuckle.Core" version="4.0" />
+      <dependency id="Swashbuckle.Core" version="4.0-rc1" />
     </dependencies>
   </metadata>
   <files>
