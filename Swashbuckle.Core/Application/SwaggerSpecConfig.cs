@@ -25,18 +25,16 @@ namespace Swashbuckle.Application
             ResolveVersionSupport = (apiDesc, version) => true;
             ResolveResourceName = (apiDesc) => apiDesc.ActionDescriptor.ControllerDescriptor.ControllerName;
             OperationFilters = new List<IOperationFilter>();
-            CustomTypeMappings = new Dictionary<Type, Func<DataType>>();
             PolymorphicTypes = new List<PolymorphicType>();
             ModelFilters = new List<IModelFilter>();
         }
 
         internal Func<HttpRequestMessage, string> ResolveBasePath { get; private set; }
         internal Func<HttpRequestMessage, string> ResolveTargetVersion { get; private set; }
-        internal Func<ApiDescription, string, bool> ResolveVersionSupport { get; private set; } 
-        internal Func<ApiDescription, string> ResolveResourceName { get; private set; }
         internal bool IgnoreObsoleteActionsFlag { get; private set; }
+        internal Func<ApiDescription, string, bool> ResolveVersionSupport { get; private set; }
+        internal Func<ApiDescription, string> ResolveResourceName { get; private set; }
         internal List<IOperationFilter> OperationFilters = new List<IOperationFilter>();
-        internal Dictionary<Type, Func<DataType>> CustomTypeMappings { get; private set; }
         internal List<PolymorphicType> PolymorphicTypes { get; private set; }
         internal List<IModelFilter> ModelFilters { get; private set; }
 
@@ -84,12 +82,6 @@ namespace Swashbuckle.Application
         {
             if (operationFilter == null) throw new ArgumentNullException("operationFilter");
             OperationFilters.Add(operationFilter);
-            return this;
-        }
-
-        public SwaggerSpecConfig MapType<T>(Func<DataType> factoryMethod)
-        {
-            CustomTypeMappings[typeof (T)] = factoryMethod;
             return this;
         }
 
