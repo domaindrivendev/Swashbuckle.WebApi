@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Swashbuckle.Core
+namespace Swashbuckle
 {
     public class PolymorphicType
     {

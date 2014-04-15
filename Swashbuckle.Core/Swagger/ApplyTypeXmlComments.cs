@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Xml.XPath;
 
-namespace Swashbuckle.Core.Swagger
+namespace Swashbuckle.Swagger
 {
     public class ApplyTypeXmlComments : IModelFilter
     {

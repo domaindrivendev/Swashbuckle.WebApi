@@ -4,9 +4,9 @@ using System.Linq.Expressions;
 using System.Net.Http;
 using System.Web.Http.Description;
 using System.Xml.XPath;
-using Swashbuckle.Core.Swagger;
+using Swashbuckle.Swagger;
 
-namespace Swashbuckle.Core.Application
+namespace Swashbuckle.Application
 {
     public class SwaggerSpecConfig
     {

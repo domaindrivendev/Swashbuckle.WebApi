@@ -6,9 +6,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Web.Http;
 using Newtonsoft.Json;
-using Swashbuckle.Core.Swagger;
+using Swashbuckle.Swagger;
 
-namespace Swashbuckle.Core.Application
+namespace Swashbuckle.Application
 {
     public class SwaggerSpecHandler : HttpMessageHandler
     {

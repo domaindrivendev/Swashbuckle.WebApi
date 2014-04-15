@@ -4,9 +4,8 @@ using System.Linq;
 using System.Web.Http;
 using System.Web.Http.Description;
 using NUnit.Framework;
-using Swashbuckle.Core;
-using Swashbuckle.Core.Application;
-using Swashbuckle.Core.Swagger;
+using Swashbuckle.Application;
+using Swashbuckle.Swagger;
 using Swashbuckle.TestApp.Core;
 using Swashbuckle.TestApp.Core.Models;
 using Swashbuckle.TestApp.Core.SwaggerExtensions;
@@ -856,7 +855,7 @@ namespace Swashbuckle.Tests
         [Test]
         public void It_should_apply_all_configured_operation_filters()
         {
-            var operationFilters = new IOperationFilter[] {new AddStandardErrorCodes(), new AddAuthorizationErrorCodes()};
+            var operationFilters = new IOperationFilter[] {new AddStandardResponseCodes(), new AddAuthorizationResponseCodes()};
             var swaggerProvider = GetSwaggerProvider(operationFilters: operationFilters);
 
             Operation(swaggerProvider, "Orders", "/api/orders", 0, "POST", operation =>

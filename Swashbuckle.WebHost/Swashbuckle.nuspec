@@ -9,7 +9,7 @@
     <projectUrl>https://github.com/domaindrivendev/Swashbuckle</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>Seamlessly adds a Swagger to WebApi projects!</description>
-    <releaseNotes>This version of Swashbuckle has no dependency on ASP.NET MVC. As a result, it's now available to both IIS hosted and sef-hosted Web API's. However, this introduced several (relatively) trivial breaking changes. Checkout the transition guide (https://github.com/domaindrivendev/Swashbuckle#transitioning-to-swashbuckle-40) if you're upgrading from a prior version. This version also includes out-of-the-box support for leveraging XML comments.</releaseNotes>
+    <releaseNotes>This version of Swashbuckle has no dependency on ASP.NET MVC. As a result, it's now available to both IIS hosted and self-hosted Web API's. However, this introduces several (relatively) trivial breaking changes. Checkout the transition guide (https://github.com/domaindrivendev/Swashbuckle#transitioning-to-swashbuckle-40) if you're upgrading from a prior version. This version also includes out-of-the-box support for leveraging XML comments.</releaseNotes>
     <summary>Combines ApiExplorer and swagger/swagger-ui to provide a rich discovery and documentation experience to your API consumers. If you're WebApi is hosted in IIS use this package. If it's self-hosted, just use Swashbuckle.Core and apply the documented bootstrapping steps.</summary>
     <copyright>Copyright 2013</copyright>
     <tags>Swagger Documentation Discovery Help WebApi AspNet AspNetWebApi Docs WebHost IIS</tags>

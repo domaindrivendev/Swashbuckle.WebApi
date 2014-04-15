@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Net.Http;
 using System.Web.Http;
-using Swashbuckle.Core.Application;
+using Swashbuckle.Application;
 using Swashbuckle.TestApp.Core.Models;
 using Swashbuckle.TestApp.Core.SwaggerExtensions;
 
@@ -11,16 +11,16 @@ namespace Swashbuckle.TestApp.Core
     {
         public static void Register(HttpConfiguration config)
         {
-            Swashbuckle.Core.Bootstrapper.Init(config);
+            Bootstrapper.Init(config);
 
             SwaggerSpecConfig.Customize(c =>
                 {
-                    c.ResolveBasePathUsing((req) => "1.0");
+                    c.ResolveTargetVersionUsing((req) => "2.0");
 
                     c.IgnoreObsoleteActions();
 
-                    c.OperationFilter<AddStandardErrorCodes>();
-                    c.OperationFilter<AddAuthorizationErrorCodes>();
+                    c.OperationFilter<AddStandardResponseCodes>();
+                    c.OperationFilter<AddAuthorizationResponseCodes>();
 
                     c.PolymorphicType<Product>(pc => pc
                         .DiscriminateBy(p => p.Type)

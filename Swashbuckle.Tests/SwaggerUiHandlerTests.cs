@@ -3,7 +3,7 @@ using System.Threading;
 using System.Web.Http.Hosting;
 using System.Web.Http.Routing;
 using NUnit.Framework;
-using Swashbuckle.Core.Application;
+using Swashbuckle.Application;
 
 namespace Swashbuckle.Tests
 {

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Xml.XPath;
 using NUnit.Framework;
-using Swashbuckle.Core.Swagger;
+using Swashbuckle.Swagger;
 using Swashbuckle.TestApp.Core.Models;
 
 namespace Swashbuckle.Tests

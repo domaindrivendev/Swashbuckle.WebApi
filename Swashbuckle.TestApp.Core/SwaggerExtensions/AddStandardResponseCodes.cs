@@ -1,10 +1,10 @@
 ﻿using System.Net;
 using System.Web.Http.Description;
-using Swashbuckle.Core.Swagger;
+using Swashbuckle.Swagger;
 
 namespace Swashbuckle.TestApp.Core.SwaggerExtensions
 {
-    public class AddStandardErrorCodes : IOperationFilter
+    public class AddStandardResponseCodes : IOperationFilter
     {
         public void Apply(Operation operation, DataTypeRegistry dataTypeRegistry, ApiDescription apiDescription)
         {

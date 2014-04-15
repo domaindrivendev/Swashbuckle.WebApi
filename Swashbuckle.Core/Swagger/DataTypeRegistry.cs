@@ -8,7 +8,7 @@ using System.Reflection;
 using System.Text;
 using Newtonsoft.Json.Linq;
 
-namespace Swashbuckle.Core.Swagger
+namespace Swashbuckle.Swagger
 {
     public class DataTypeRegistry
     {
@@ -66,7 +66,14 @@ namespace Swashbuckle.Core.Swagger
 
         public IDictionary<string, DataType> GetModels()
         {
-            return _complexMappings.ToDictionary(entry => entry.Value.Id, entry => entry.Value);
+            try
+            {
+                return _complexMappings.ToDictionary(entry => entry.Value.Id, entry => entry.Value);
+            }
+            catch (ArgumentException ex)
+            {
+                throw new InvalidOperationException("Failed to generate Swagger models with unique Id's. Do you have multiple API types with the same class name?");
+            }
         }
 
         private DataType GetOrRegister(Type type, bool deferIfComplex, Queue<Type> deferredTypes)

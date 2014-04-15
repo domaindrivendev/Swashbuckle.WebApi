@@ -1,6 +1,6 @@
 ﻿using System.Web.Http.Description;
 
-namespace Swashbuckle.Core.Swagger
+namespace Swashbuckle.Swagger
 {
     public interface IOperationFilter
     {

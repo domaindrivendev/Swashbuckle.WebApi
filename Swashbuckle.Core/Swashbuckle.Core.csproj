@@ -7,7 +7,7 @@
     <ProjectGuid>{D50A26FF-02C6-4C16-BA94-4CD7D43EFBB3}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Swashbuckle.Core</RootNamespace>
+    <RootNamespace>Swashbuckle</RootNamespace>
     <AssemblyName>Swashbuckle.Core</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>

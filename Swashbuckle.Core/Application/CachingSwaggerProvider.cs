@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Concurrent;
-using Swashbuckle.Core.Swagger;
+using Swashbuckle.Swagger;
 
-namespace Swashbuckle.Core.Application
+namespace Swashbuckle.Application
 {
     internal class CachingSwaggerProvider : ISwaggerProvider
     {

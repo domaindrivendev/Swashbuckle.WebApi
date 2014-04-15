@@ -4,7 +4,7 @@ using System.Web.Http;
 using System.Web.Http.Description;
 using System.Xml.XPath;
 using NUnit.Framework;
-using Swashbuckle.Core.Swagger;
+using Swashbuckle.Swagger;
 
 namespace Swashbuckle.Tests
 {

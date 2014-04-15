@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Web.Http.Description;
 
-namespace Swashbuckle.Core
+namespace Swashbuckle
 {
     internal static class ApiDescriptionExtensions
     {

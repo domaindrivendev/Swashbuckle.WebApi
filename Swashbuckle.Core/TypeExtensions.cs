@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
-namespace Swashbuckle.Core
+namespace Swashbuckle
 {
     public static class TypeExtensions
     {

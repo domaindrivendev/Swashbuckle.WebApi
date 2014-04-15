@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Swashbuckle.Core.Swagger
+namespace Swashbuckle.Swagger
 {
     public interface IModelFilter
     {

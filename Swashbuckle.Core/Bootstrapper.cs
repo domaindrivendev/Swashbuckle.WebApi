@@ -1,7 +1,7 @@
 ﻿using System.Web.Http;
-using Swashbuckle.Core.Application;
+using Swashbuckle.Application;
 
-namespace Swashbuckle.Core
+namespace Swashbuckle
 {
     public static class Bootstrapper
     {

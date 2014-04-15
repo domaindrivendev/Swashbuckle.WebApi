@@ -2,7 +2,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Web.Http;
 using System.Web.Http.Description;
-using Swashbuckle.Core.Application;
+using Swashbuckle.Application;
 using Swashbuckle.TestApp2;
 using WebActivatorEx;
 
@@ -15,7 +15,7 @@ namespace Swashbuckle.TestApp2
         public static void Register()
         {
             // NOTE: Don't remove this line, it's required to wire-up the swagger routes 
-            Swashbuckle.Core.Bootstrapper.Init(GlobalConfiguration.Configuration);
+            Bootstrapper.Init(GlobalConfiguration.Configuration);
 
             // NOTE: If you want to customize the generated swagger or UI, use SwaggerSpecConfig and/or SwaggerUiConfig here ...
             SwaggerSpecConfig.Customize(c =>

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Net.Http;
 using System.Reflection;
 
-namespace Swashbuckle.Core.Application
+namespace Swashbuckle.Application
 {
     public class SwaggerUiConfig
     {
