@@ -29,8 +29,11 @@ namespace Swashbuckle.Tests
         [Test]
         public void It_should_apply_action_summary_if_available_otherwise_blank()
         {
-            ApplyFilterFor("Orders", "GetAll", operation =>
+            ApplyFilterFor("Orders", "Post", operation =>
                 Assert.IsNull(operation.Summary));
+
+            ApplyFilterFor("Orders", "GetAll", operation =>
+                Assert.AreEqual("Get all orders in the system", operation.Summary));
 
             ApplyFilterFor("OrderItems", "GetAll", operation =>
                 Assert.AreEqual("Get all order items", operation.Summary));
@@ -45,8 +48,11 @@ namespace Swashbuckle.Tests
         [Test]
         public void It_should_apply_action_remarks_if_available_otherwise_blank()
         {
-            ApplyFilterFor("Orders", "GetAll", operation =>
+            ApplyFilterFor("Orders", "Post", operation =>
                 Assert.IsNull(operation.Notes));
+
+            ApplyFilterFor("Orders", "GetAll", operation =>
+                Assert.AreEqual("For power users only", operation.Notes));
 
             ApplyFilterFor("OrderItems", "GetAll", operation =>
                 Assert.AreEqual("Returns all three order items we've got here", operation.Notes));

@@ -29,6 +29,13 @@
             <param name="propertyValues">Dictionary of property names and values</param>
             <returns></returns>
         </member>
+        <member name="M:Swashbuckle.TestApp.Core.Controllers.OrdersController.GetAll">
+            <summary>
+            Get all orders in the system
+            </summary>
+            <remarks>For power users only</remarks>
+            <returns></returns>
+        </member>
         <member name="T:Swashbuckle.TestApp.Core.Models.Customer">
             <summary>
             Represents a registered customer

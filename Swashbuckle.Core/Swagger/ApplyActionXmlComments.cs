@@ -9,7 +9,7 @@ namespace Swashbuckle.Swagger
 {
     public class ApplyActionXmlComments : IOperationFilter
     {
-        private const string MethodExpression = "/doc/members/member[@name='M:{0}.{1}({2})']";
+        private const string MethodExpression = "/doc/members/member[@name='M:{0}.{1}{2}']";
         private const string SummaryExpression = "summary";
         private const string RemarksExpression = "remarks";
         private const string ParameterExpression = "param[@name=\"{0}\"]";
@@ -41,8 +41,14 @@ namespace Swashbuckle.Swagger
         {
             var controllerName = actionDescriptor.ControllerDescriptor.ControllerType.FullName;
             var actionName = actionDescriptor.ActionName;
-            var parameters = String.Join(",", actionDescriptor.GetParameters()
-                .Select(paramDesc => TypeNameFor(paramDesc.ParameterType)));
+
+            var paramTypeNames = actionDescriptor.GetParameters()
+                .Select(paramDesc => TypeNameFor(paramDesc.ParameterType))
+                .ToArray();
+
+            var parameters = (paramTypeNames.Any())
+                ? String.Format("({0})", String.Join(",", paramTypeNames))
+                : String.Empty;
 
             return String.Format(MethodExpression, controllerName, actionName, parameters);
         }

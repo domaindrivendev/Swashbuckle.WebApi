@@ -12,6 +12,11 @@ namespace Swashbuckle.TestApp.Core.Controllers
             return order;
         }
 
+        /// <summary>
+        /// Get all orders in the system
+        /// </summary>
+        /// <remarks>For power users only</remarks>
+        /// <returns></returns>
         public IList<Order> GetAll()
         {
             return new[]
