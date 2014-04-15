@@ -3,11 +3,11 @@ using Newtonsoft.Json;
 
 namespace Swashbuckle.Core.Swagger
 {
-    public class SwaggerSpec
+    public interface ISwaggerProvider
     {
-        public ResourceListing Listing { get; set; }
+        ResourceListing GetListing(string basePath, string version);
 
-        public Dictionary<string, ApiDeclaration> Declarations { get; set; }
+        ApiDeclaration GetDeclaration(string basePath, string version, string resourceName);
     }
 
     public class ResourceListing

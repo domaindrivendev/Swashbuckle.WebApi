@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Web.Http.Controllers;
@@ -22,7 +21,7 @@ namespace Swashbuckle.Core.Swagger
             _navigator = xmlCommentsDoc.CreateNavigator();
         }
 
-        public void Apply(Operation operation, Dictionary<string, DataType> models, DataTypeGenerator dataTypeGenerator, ApiDescription apiDescription)
+        public void Apply(Operation operation, DataTypeRegistry dataTypeRegistry, ApiDescription apiDescription)
         {
             var methodNode = _navigator.SelectSingleNode(GetXPathFor(apiDescription.ActionDescriptor));
 

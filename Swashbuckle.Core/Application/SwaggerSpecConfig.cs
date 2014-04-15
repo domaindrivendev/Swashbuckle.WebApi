@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Net.Http;
@@ -20,36 +19,38 @@ namespace Swashbuckle.Core.Application
 
         public SwaggerSpecConfig()
         {
-            VersionResolver = (req) => "1.0";
-            BasePathResolver = DefaultBasePathResolver;
+            ResolveBasePath = (req) => req.RequestUri.GetLeftPart(UriPartial.Authority) + req.GetConfiguration().VirtualPathRoot.TrimEnd('/');
+            ResolveTargetVersion = (req) => "1.0";
             IgnoreObsoleteActionsFlag = false;
-            DeclarationKeySelector = (apiDesc) => apiDesc.ActionDescriptor.ControllerDescriptor.ControllerName;
+            ResolveVersionSupport = (apiDesc, version) => true;
+            ResolveResourceName = (apiDesc) => apiDesc.ActionDescriptor.ControllerDescriptor.ControllerName;
             OperationFilters = new List<IOperationFilter>();
             CustomTypeMappings = new Dictionary<Type, Func<DataType>>();
             PolymorphicTypes = new List<PolymorphicType>();
             ModelFilters = new List<IModelFilter>();
         }
 
-        internal Func<HttpRequestMessage, string> VersionResolver { get; private set; }
-        internal Func<HttpRequestMessage, string> BasePathResolver { get; private set; }
-        internal Func<ApiDescription, string> DeclarationKeySelector { get; private set; }
+        internal Func<HttpRequestMessage, string> ResolveBasePath { get; private set; }
+        internal Func<HttpRequestMessage, string> ResolveTargetVersion { get; private set; }
+        internal Func<ApiDescription, string, bool> ResolveVersionSupport { get; private set; } 
+        internal Func<ApiDescription, string> ResolveResourceName { get; private set; }
         internal bool IgnoreObsoleteActionsFlag { get; private set; }
         internal List<IOperationFilter> OperationFilters = new List<IOperationFilter>();
         internal Dictionary<Type, Func<DataType>> CustomTypeMappings { get; private set; }
         internal List<PolymorphicType> PolymorphicTypes { get; private set; }
         internal List<IModelFilter> ModelFilters { get; private set; }
 
-        public SwaggerSpecConfig ResolveApiVersion(Func<HttpRequestMessage, string> versionResolver)
+        public SwaggerSpecConfig ResolveBasePathUsing(Func<HttpRequestMessage, string> resolveBasePath)
         {
-            if (versionResolver == null) throw new ArgumentNullException("versionResolver");
-            VersionResolver = versionResolver;
+            if (resolveBasePath == null) throw new ArgumentNullException("resolveBasePath");
+            ResolveBasePath = resolveBasePath;
             return this;
         }
 
-        public SwaggerSpecConfig ResolveBasePath(Func<HttpRequestMessage, string> basePathResolver)
+        public SwaggerSpecConfig ResolveTargetVersionUsing(Func<HttpRequestMessage, string> resolveTargetVersion)
         {
-            if (basePathResolver == null) throw new ArgumentNullException("basePathResolver");
-            BasePathResolver = basePathResolver;
+            if (resolveTargetVersion == null) throw new ArgumentNullException("resolveTargetVersion");
+            ResolveTargetVersion = resolveTargetVersion;
             return this;
         }
 
@@ -59,10 +60,17 @@ namespace Swashbuckle.Core.Application
             return this;
         }
 
-        public SwaggerSpecConfig GroupDeclarationsBy(Func<ApiDescription, string> declarationKeySelector)
+        public SwaggerSpecConfig ResolveVersionSupportUsing(Func<ApiDescription, string, bool> resolveVersionSupport)
         {
-            if (declarationKeySelector == null) throw new ArgumentNullException("declarationKeySelector");
-            DeclarationKeySelector = declarationKeySelector;
+            if (resolveVersionSupport == null) throw new ArgumentNullException("resolveVersionSupport");
+            ResolveVersionSupport = resolveVersionSupport;
+            return this;
+        }
+
+        public SwaggerSpecConfig GroupDeclarationsBy(Func<ApiDescription, string> resolveResourceName)
+        {
+            if (resolveResourceName == null) throw new ArgumentNullException("resolveResourceName");
+            ResolveResourceName = resolveResourceName;
             return this;
         }
 
@@ -99,12 +107,6 @@ namespace Swashbuckle.Core.Application
             OperationFilters.Add(new ApplyActionXmlComments(xmlCommentsDoc));
             ModelFilters.Add(new ApplyTypeXmlComments(xmlCommentsDoc));
             return this;
-        }
-
-        private static string DefaultBasePathResolver(HttpRequestMessage request)
-        {
-            var requestUri = request.RequestUri;
-            return requestUri.GetLeftPart(UriPartial.Authority) + request.GetConfiguration().VirtualPathRoot;
         }
     }
 
