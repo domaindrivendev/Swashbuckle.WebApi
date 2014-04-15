@@ -8,19 +8,19 @@ namespace Swashbuckle.Core.Swagger
     public class OperationGenerator
     {
         private readonly IEnumerable<IOperationFilter> _operationFilters;
-        private readonly DataTypeGenerator _dataTypeGenerator;
+        private readonly DataTypeRegistry _dataTypeRegistry;
 
-        public OperationGenerator(IEnumerable<IOperationFilter> operationFilters, DataTypeGenerator dataTypeGenerator)
+        public OperationGenerator(DataTypeRegistry dataTypeRegistry, IEnumerable<IOperationFilter> operationFilters)
         {
+            _dataTypeRegistry = dataTypeRegistry;
             _operationFilters = operationFilters;
-            _dataTypeGenerator = dataTypeGenerator;
         }
 
-        public Operation ApiDescriptionToOperation(ApiDescription apiDescription, Dictionary<string, DataType> models)
+        public Operation ApiDescriptionToOperation(ApiDescription apiDescription)
         {
             var apiPath = apiDescription.RelativePathSansQueryString();
             var parameters = apiDescription.ParameterDescriptions
-                .Select(paramDesc => CreateParameter(paramDesc, apiPath, models))
+                .Select(paramDesc => CreateParameter(paramDesc, apiPath))
                 .ToList();
 
             var operation = new Operation
@@ -39,11 +39,7 @@ namespace Swashbuckle.Core.Swagger
             }
             else
             {
-                IDictionary<string, DataType> modelsForResponseType;
-                var dataType = _dataTypeGenerator.TypeToDataType(responseType, out modelsForResponseType);
-
-                models.Merge(modelsForResponseType);
-
+                var dataType = _dataTypeRegistry.GetOrRegister(responseType);
                 if (dataType.Type == "object")
                 {
                     operation.Type = dataType.Id;
@@ -59,13 +55,13 @@ namespace Swashbuckle.Core.Swagger
 
             foreach (var filter in _operationFilters)
             {
-                filter.Apply(operation, models, _dataTypeGenerator, apiDescription);
+                filter.Apply(operation, _dataTypeRegistry, apiDescription);
             }
 
             return operation;
         }
 
-        private Parameter CreateParameter(ApiParameterDescription apiParamDesc, string apiPath, Dictionary<string, DataType> models)
+        private Parameter CreateParameter(ApiParameterDescription apiParamDesc, string apiPath)
         {
             var paramType = "";
             switch (apiParamDesc.Source)
@@ -86,11 +82,7 @@ namespace Swashbuckle.Core.Swagger
                 Required = !apiParamDesc.ParameterDescriptor.IsOptional
             };
 
-            IDictionary<string, DataType> modelsForParameter;
-            var dataType = _dataTypeGenerator.TypeToDataType(apiParamDesc.ParameterDescriptor.ParameterType, out modelsForParameter);
-
-            models.Merge(modelsForParameter);
-
+            var dataType = _dataTypeRegistry.GetOrRegister(apiParamDesc.ParameterDescriptor.ParameterType);
             if (dataType.Type == "object")
             {
                 parameter.Type = dataType.Id;

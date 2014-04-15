@@ -11,7 +11,6 @@ namespace Swashbuckle.Tests
     public class ApplyTypeXmlCommentsTests
     {
         private ApplyTypeXmlComments _filter;
-        private DataType _customerModel;
 
         [SetUp]
         public void Setup()
@@ -24,7 +23,7 @@ namespace Swashbuckle.Tests
         public void It_should_apply_the_type_summary_if_available_otherwise_blank()
         {
             var customerModel = GetDummyCustomerModel();
-            _filter.Apply(customerModel, typeof(Customer));
+            _filter.Apply(customerModel, null, typeof(Customer));
 
             Assert.AreEqual("Represents a registered customer", customerModel.Description);
         }
@@ -33,7 +32,7 @@ namespace Swashbuckle.Tests
         public void It_should_apply_property_summaries_if_available_otherwise_blank()
         {
             var customerModel = GetDummyCustomerModel();
-            _filter.Apply(customerModel, typeof(Customer));
+            _filter.Apply(customerModel, null, typeof(Customer));
 
             Assert.AreEqual("Unique identifier for the customer", customerModel.Properties["Id"].Description);
             Assert.AreEqual("Lists all registered associates", customerModel.Properties["Associates"].Description);

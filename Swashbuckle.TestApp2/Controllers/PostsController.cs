@@ -9,11 +9,13 @@ namespace Swashbuckle.TestApp2.Controllers
 {
     public class PostsController : ApiController
     {
+        [SupportedInVersions("1.0", "2.0")]
         public IEnumerable<Post> GetAll()
         {
             throw new NotImplementedException();
         }
 
+        [SupportedInVersions("2.0")]
         [ResponseType(typeof(Confirmation))]
         public HttpResponseMessage Delete(int id)
         {
@@ -21,4 +23,3 @@ namespace Swashbuckle.TestApp2.Controllers
         }
     }
 }
- 

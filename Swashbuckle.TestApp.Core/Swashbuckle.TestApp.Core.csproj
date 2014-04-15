@@ -68,6 +68,7 @@
     <Compile Include="Controllers\OrderItemsController.cs" />
     <Compile Include="Controllers\OrdersController.cs" />
     <Compile Include="Controllers\ProductsController.cs" />
+    <Compile Include="SupportedInVersionsAttribute.cs" />
     <Compile Include="Models\Confirmation.cs" />
     <Compile Include="Models\Customer.cs" />
     <Compile Include="Models\MyGenericType.cs" />

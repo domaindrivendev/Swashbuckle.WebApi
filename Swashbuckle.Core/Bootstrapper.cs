@@ -16,8 +16,8 @@ namespace Swashbuckle.Core
 
             config.Routes.MapHttpRoute(
                 "swagger_api_docs",
-                "swagger/api-docs/{declarationName}",
-                new { declarationName = RouteParameter.Optional },
+                "swagger/api-docs/{resourceName}",
+                new { resourceName = RouteParameter.Optional },
                 null,
                 new SwaggerSpecHandler());
 

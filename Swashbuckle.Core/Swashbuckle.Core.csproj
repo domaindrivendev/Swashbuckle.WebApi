@@ -58,6 +58,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Application\CachingSwaggerProvider.cs" />
     <Compile Include="Application\RedirectHandler.cs" />
     <Compile Include="Application\SwaggerSpecConfig.cs" />
     <Compile Include="Application\SwaggerUiConfig.cs" />
@@ -67,15 +68,15 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ApiDescriptionExtensions.cs" />
     <Compile Include="DictionaryExtensions.cs" />
+    <Compile Include="Swagger\ApiExplorerAdapter.cs" />
     <Compile Include="Swagger\ApplyActionXmlComments.cs" />
     <Compile Include="Swagger\ApplyTypeXmlComments.cs" />
+    <Compile Include="Swagger\DataTypeRegistry.cs" />
     <Compile Include="Swagger\IModelFilter.cs" />
     <Compile Include="Swagger\IOperationFilter.cs" />
-    <Compile Include="Swagger\DataTypeGenerator.cs" />
+    <Compile Include="Swagger\ISwaggerProvider.cs" />
     <Compile Include="Swagger\OperationGenerator.cs" />
     <Compile Include="PolymorphicType.cs" />
-    <Compile Include="Swagger\SwaggerGenerator.cs" />
-    <Compile Include="Swagger\SwaggerSpec.cs" />
     <Compile Include="TypeExtensions.cs" />
   </ItemGroup>
   <ItemGroup />

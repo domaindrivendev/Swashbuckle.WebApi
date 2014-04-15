@@ -1,4 +1,8 @@
+using System.Linq;
+using System.Net.Http;
 using System.Web.Http;
+using System.Web.Http.Description;
+using Swashbuckle.Core.Application;
 using Swashbuckle.TestApp2;
 using WebActivatorEx;
 
@@ -14,6 +18,30 @@ namespace Swashbuckle.TestApp2
             Swashbuckle.Core.Bootstrapper.Init(GlobalConfiguration.Configuration);
 
             // NOTE: If you want to customize the generated swagger or UI, use SwaggerSpecConfig and/or SwaggerUiConfig here ...
+            SwaggerSpecConfig.Customize(c =>
+                {
+                    c.ResolveTargetVersionUsing(VersionFromApiKey);
+                    c.ResolveVersionSupportUsing(VersionSupportByAttribute);
+                });
+        }
+
+        private static string VersionFromApiKey(HttpRequestMessage request)
+        {
+            foreach (var param in request.GetQueryNameValuePairs())
+            {
+                if (param.Key.ToLower() == "api_key")
+                    return param.Value;
+            }
+
+            return "2.0";
+        }
+
+        private static bool VersionSupportByAttribute(ApiDescription apiDesc, string version)
+        {
+            var attr = apiDesc.ActionDescriptor.GetCustomAttributes<SupportedInVersionsAttribute>().FirstOrDefault();
+            if (attr == null) return false;
+
+            return attr.Versions.Contains(version);
         }
     }
 }

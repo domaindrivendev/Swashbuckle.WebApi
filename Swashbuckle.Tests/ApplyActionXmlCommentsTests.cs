@@ -105,7 +105,7 @@ namespace Swashbuckle.Tests
                          .ToList()
                 };
 
-            _filter.Apply(operation, null, null, apiDescription);
+            _filter.Apply(operation, null, apiDescription);
 
             applyAssertions(operation);
         }

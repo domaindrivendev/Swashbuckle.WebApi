@@ -10,9 +10,9 @@ using Newtonsoft.Json.Linq;
 
 namespace Swashbuckle.Core.Swagger
 {
-    public class DataTypeGenerator
+    public class DataTypeRegistry
     {
-        private static readonly Dictionary<Type, Func<DataType>> StaticMappings = new Dictionary<Type, Func<DataType>>()
+        private static readonly Dictionary<Type, Func<DataType>> PrimitiveMappings = new Dictionary<Type, Func<DataType>>()
             {
                 {typeof (Int16), () => new DataType {Type = "integer", Format = "int32"}},
                 {typeof (UInt16), () => new DataType {Type = "integer", Format = "int32"}},
@@ -35,83 +35,77 @@ namespace Swashbuckle.Core.Swagger
                 {typeof (HttpResponseMessage), () => new DataType{Type="string", Format = null}}
             };
 
-        private readonly IDictionary<Type, Func<DataType>> _customMappings;
+        private readonly IDictionary<Type, DataType> _complexMappings;
+
         private readonly IEnumerable<PolymorphicType> _polymorphicTypes;
         private readonly IEnumerable<IModelFilter> _modelFilters;
 
-        public DataTypeGenerator(IDictionary<Type, Func<DataType>> customMappings, IEnumerable<PolymorphicType> polymorphicTypes, IEnumerable<IModelFilter> modelFilters)
+        public DataTypeRegistry(IEnumerable<PolymorphicType> polymorphicTypes, IEnumerable<IModelFilter> modelFilters)
         {
-            if (customMappings == null)
-                throw new ArgumentNullException("customMappings");
-
-            _customMappings = customMappings;
+            _complexMappings = new Dictionary<Type, DataType>();
             _polymorphicTypes = polymorphicTypes;
             _modelFilters = modelFilters;
         }
 
-        public DataType TypeToDataType(Type type, out IDictionary<string, DataType> models)
+        public DataType GetOrRegister(Type type)
         {
-            // Track complex mappings, deferred mappings will have a null Value
-            var complexMappings = new Dictionary<Type, DataType>();
+            // Defer processing of related models to avoid infinite recursion
+            var deferredTypes = new Queue<Type>();
 
-            var rootDataType = CreateDataType(type, false, complexMappings);
+            var rootDataType = GetOrRegister(type, false, deferredTypes);
 
-            // Iterate through remaining deferred mappings
-            while (complexMappings.ContainsValue(null))
+            // Process any remaining deferred type
+            while (deferredTypes.Any())
             {
-                var complexType = complexMappings.First(kvp => kvp.Value == null).Key;
-                var spec = CreateDataType(complexType, false, complexMappings);
-                complexMappings[complexType] = spec;
+                var deferredType = deferredTypes.Dequeue();
+                GetOrRegister(deferredType, false, deferredTypes);
             }
-
-            models = complexMappings.ToDictionary((entry) => entry.Value.Id, (entry) => entry.Value);
-            if (rootDataType.Type == "object")
-                models[rootDataType.Id] = rootDataType;
 
             return rootDataType;
         }
 
-        private DataType CreateDataType(Type type, bool deferIfComplex, IDictionary<Type, DataType> complexMappings)
+        public IDictionary<string, DataType> GetModels()
         {
-            if (_customMappings.ContainsKey(type))
-                return _customMappings[type]();
+            return _complexMappings.ToDictionary(entry => entry.Value.Id, entry => entry.Value);
+        }
 
-            if (StaticMappings.ContainsKey(type))
-                return StaticMappings[type]();
+        private DataType GetOrRegister(Type type, bool deferIfComplex, Queue<Type> deferredTypes)
+        {
+            if (PrimitiveMappings.ContainsKey(type))
+                return PrimitiveMappings[type]();
 
             if (type.IsEnum)
                 return new DataType { Type = "string", Enum = type.GetEnumNames() };
 
             Type innerType;
             if (type.IsNullable(out innerType))
-                return CreateDataType(innerType, deferIfComplex, complexMappings);
+                return GetOrRegister(innerType, deferIfComplex, deferredTypes);
 
             Type itemType;
             if (type.IsEnumerable(out itemType))
-                return new DataType { Type = "array", Items = CreateDataType(itemType, true, complexMappings) };
+                return new DataType { Type = "array", Items = GetOrRegister(itemType, true, deferredTypes) };
 
             // Anthing else is complex
-
             if (deferIfComplex)
             {
-                if (!complexMappings.ContainsKey(type))
-                    complexMappings.Add(type, null);
+                if (!_complexMappings.ContainsKey(type))
+                    deferredTypes.Enqueue(type);
 
                 // Just return a reference for now
                 return new DataType { Ref = UniqueIdFor(type) };
             }
 
-            return CreateComplexDataType(type, complexMappings);
+            return _complexMappings.GetOrAdd(type, () => CreateComplexDataType(type, deferredTypes));
         }
 
-        private DataType CreateComplexDataType(Type type, IDictionary<Type, DataType> complexMappings)
+        private DataType CreateComplexDataType(Type type, Queue<Type> deferredTypes)
         {
             var propInfos = type.GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.DeclaredOnly)
                 .Where(propInfo => !propInfo.GetIndexParameters().Any())    // Ignore indexer properties
                 .ToArray();
 
             var properties = propInfos
-                .ToDictionary(propInfo => propInfo.Name, propInfo => CreateDataType(propInfo.PropertyType, true, complexMappings));
+                .ToDictionary(propInfo => propInfo.Name, propInfo => GetOrRegister(propInfo.PropertyType, true, deferredTypes));
 
             var required = propInfos.Where(propInfo => Attribute.IsDefined(propInfo, typeof (RequiredAttribute)))
                 .Select(propInfo => propInfo.Name)
@@ -119,11 +113,11 @@ namespace Swashbuckle.Core.Swagger
 
             var polymorphicType = PolymorphicTypeFor(type);
             var subDataTypes = polymorphicType.SubTypes
-                .Select(subType => CreateDataType(subType.Type, true, complexMappings))
+                .Select(subType => GetOrRegister(subType.Type, true, deferredTypes))
                 .Select(subDataType => subDataType.Ref)
                 .ToList();
 
-            var model = new DataType
+            var dataType = new DataType
             {
                 Id = UniqueIdFor(type),
                 Type = "object",
@@ -135,10 +129,10 @@ namespace Swashbuckle.Core.Swagger
 
             foreach (var filter in _modelFilters)
             {
-                filter.Apply(model, type);
+                filter.Apply(dataType, this, type);
             }
 
-            return model;
+            return dataType;
         }
 
         private static string UniqueIdFor(Type type)

@@ -16,7 +16,7 @@ namespace Swashbuckle.Core.Swagger
             _navigator = xmlCommentsDoc.CreateNavigator();
         }
 
-        public void Apply(DataType model, Type type)
+        public void Apply(DataType model, DataTypeRegistry dataTypeRegistry, Type type)
         {
             var typeNode = _navigator.SelectSingleNode(String.Format(TypeExpression, type.FullName));
             model.Description = GetChildValueOrDefault(typeNode, SummaryExpression);

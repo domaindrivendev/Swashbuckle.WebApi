@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
 using System.Web.Http;
 using System.Web.Http.Description;
@@ -14,8 +13,11 @@ using Swashbuckle.TestApp.Core.SwaggerExtensions;
 
 namespace Swashbuckle.Tests
 {
-    public class SwaggerGeneratorTests
+    public class ApiExplorerAdapterTests
     {
+        private const string RequestedBasePath = "http://tempuri.org";
+        private const string RequestedVersion = "1.0";
+
         private ApiExplorer _apiExplorer;
 
         [SetUp]
@@ -30,10 +32,9 @@ namespace Swashbuckle.Tests
         [Test]
         public void It_should_generate_a_listing_according_to_provided_strategy()
         {
-            var generator = CreateGenerator(declarationKeySelector: (apiDesc) => apiDesc.ActionDescriptor.ControllerDescriptor.ControllerName);
-            var swaggerSpec = generator.ApiExplorerToSwaggerSpec(_apiExplorer);
+            var swaggerProvider = GetSwaggerProvider(resourceNameResolver: (apiDesc) => apiDesc.ActionDescriptor.ControllerDescriptor.ControllerName);
+            var resourceListing = swaggerProvider.GetListing(RequestedBasePath, RequestedVersion);
 
-            var resourceListing = swaggerSpec.Listing;
             Assert.AreEqual("1.0", resourceListing.ApiVersion);
             Assert.AreEqual("1.2", resourceListing.SwaggerVersion);
             Assert.AreEqual(4, resourceListing.Apis.Count());
@@ -51,33 +52,30 @@ namespace Swashbuckle.Tests
         [Test]
         public void It_should_generate_declarations_according_to_provided_strategy()
         {
-            var generator = CreateGenerator(declarationKeySelector: (apiDesc) => apiDesc.ActionDescriptor.ControllerDescriptor.ControllerName);
-            var swaggerSpec = generator.ApiExplorerToSwaggerSpec(_apiExplorer);
+            var swaggerProvider = GetSwaggerProvider(resourceNameResolver: (apiDesc) => apiDesc.ActionDescriptor.ControllerDescriptor.ControllerName);
 
-            Assert.AreEqual(4, swaggerSpec.Declarations.Count());
-
-            ApiDeclaration(swaggerSpec, "/Orders", dec =>
+            ApiDeclaration(swaggerProvider, "Orders", dec =>
                 {
                     Assert.AreEqual("1.2", dec.SwaggerVersion);
                     Assert.AreEqual("http://tempuri.org", dec.BasePath);
                     Assert.AreEqual("/Orders", dec.ResourcePath);
                 });
 
-            ApiDeclaration(swaggerSpec, "/OrderItems", dec =>
+            ApiDeclaration(swaggerProvider, "OrderItems", dec =>
                 {
                     Assert.AreEqual("1.2", dec.SwaggerVersion);
                     Assert.AreEqual("http://tempuri.org", dec.BasePath);
                     Assert.AreEqual("/OrderItems", dec.ResourcePath);
                 });
 
-            ApiDeclaration(swaggerSpec, "/Customers", dec =>
+            ApiDeclaration(swaggerProvider, "Customers", dec =>
                 {
                     Assert.AreEqual("1.2", dec.SwaggerVersion);
                     Assert.AreEqual("http://tempuri.org", dec.BasePath);
                     Assert.AreEqual("/Customers", dec.ResourcePath);
                 });
 
-            ApiDeclaration(swaggerSpec, "/Products", dec =>
+            ApiDeclaration(swaggerProvider, "Products", dec =>
                 {
                     Assert.AreEqual("1.2", dec.SwaggerVersion);
                     Assert.AreEqual("http://tempuri.org", dec.BasePath);
@@ -88,10 +86,9 @@ namespace Swashbuckle.Tests
         [Test]
         public void It_should_generate_an_api_for_each_url_in_a_declaration()
         {
-            var generator = CreateGenerator();
-            var swaggerSpec = generator.ApiExplorerToSwaggerSpec(_apiExplorer);
+            var swaggerProvider = GetSwaggerProvider();
 
-            ApiDeclaration(swaggerSpec, "/Orders", dec =>
+            ApiDeclaration(swaggerProvider, "Orders", dec =>
                 {
                     // 2: /api/orders, /api/orders/{id}
                     Assert.AreEqual(2, dec.Apis.Count);
@@ -100,7 +97,7 @@ namespace Swashbuckle.Tests
                     Api(dec, "/api/orders/{id}", api => Assert.IsNull(api.Description));
                 });
 
-            ApiDeclaration(swaggerSpec, "/OrderItems", dec =>
+            ApiDeclaration(swaggerProvider, "OrderItems", dec =>
                 {
                     // 2: /api/orders/{orderId}/items/{id}, /api/orders/{orderId}/items?category={category}
                     Assert.AreEqual(2, dec.Apis.Count);
@@ -109,7 +106,7 @@ namespace Swashbuckle.Tests
                     Api(dec, "/api/orders/{orderId}/items", api => Assert.IsNull(api.Description));
                 });
 
-            ApiDeclaration(swaggerSpec, "/Customers", dec =>
+            ApiDeclaration(swaggerProvider, "Customers", dec =>
                 {
                     // 2: /api/customers, /api/customers/{id}
                     Assert.AreEqual(2, dec.Apis.Count);
@@ -122,10 +119,9 @@ namespace Swashbuckle.Tests
         [Test]
         public void It_should_generate_an_operation_for_all_supported_methods_on_a_url()
         {
-            var generator = CreateGenerator();
-            var swaggerSpec = generator.ApiExplorerToSwaggerSpec(_apiExplorer);
+            var swaggerProvider = GetSwaggerProvider();
 
-            Api(swaggerSpec, "/Orders", "/api/orders", api =>
+            Api(swaggerProvider, "Orders", "/api/orders", api =>
                 {
                     // 4: POST /api/orders, GET /api/orders, GET /api/orders?foo={foo}&bar={bar}, DELETE /api/orders
                     Assert.AreEqual(4, api.Operations.Count);
@@ -175,7 +171,7 @@ namespace Swashbuckle.Tests
                         });
                 });
 
-            Api(swaggerSpec, "/Orders", "/api/orders/{id}", api =>
+            Api(swaggerProvider, "Orders", "/api/orders/{id}", api =>
                 {
                     // 1: DELETE /api/orders/{id}
                     Assert.AreEqual(1, api.Operations.Count);
@@ -192,7 +188,7 @@ namespace Swashbuckle.Tests
                         });
                 });
 
-            Api(swaggerSpec, "/OrderItems", "/api/orders/{orderId}/items/{id}", api =>
+            Api(swaggerProvider, "OrderItems", "/api/orders/{orderId}/items/{id}", api =>
                 {
                     // 1: GET /api/orders/{orderId}/items/{id}
                     Assert.AreEqual(1, api.Operations.Count);
@@ -209,7 +205,7 @@ namespace Swashbuckle.Tests
                         });
                 });
 
-            Api(swaggerSpec, "/OrderItems", "/api/orders/{orderId}/items", api =>
+            Api(swaggerProvider, "OrderItems", "/api/orders/{orderId}/items", api =>
                 {
                     // 2: GET /api/orders/{orderId}/items?category={category}, PUT /api/orders/{orderId}/items
                     Assert.AreEqual(2, api.Operations.Count);
@@ -237,7 +233,7 @@ namespace Swashbuckle.Tests
                         });
                 });
 
-            Api(swaggerSpec, "/Customers", "/api/customers", api =>
+            Api(swaggerProvider, "Customers", "/api/customers", api =>
                 {
                     // 1: POST /api/customers
                     Assert.AreEqual(1, api.Operations.Count);
@@ -254,7 +250,7 @@ namespace Swashbuckle.Tests
                         });
                 });
 
-            Api(swaggerSpec, "/Customers", "/api/customers/{id}", api =>
+            Api(swaggerProvider, "Customers", "/api/customers/{id}", api =>
                 {
                     // 1: GET /api/customers/{id}, DELETE /api/customers/{id}
                     Assert.AreEqual(2, api.Operations.Count);
@@ -282,7 +278,7 @@ namespace Swashbuckle.Tests
                         });
                 });
 
-            Api(swaggerSpec, "/Products", "/api/products", api =>
+            Api(swaggerProvider, "Products", "/api/products", api =>
                 {
                     // 1: GET /api/products
                     Assert.AreEqual(1, api.Operations.Count);
@@ -303,19 +299,17 @@ namespace Swashbuckle.Tests
         [Test]
         public void It_should_honor_the_config_setting_to_ignore_obsolete_actions()
         {
-            var generator = CreateGenerator(ignoreObsoletetActions: true);
-            var swaggerSpec = generator.ApiExplorerToSwaggerSpec(_apiExplorer);
+            var swaggerProvider = GetSwaggerProvider(ignoreObsoletetActions: true);
 
-            Api(swaggerSpec, "/Orders", "/api/orders", api => CollectionAssert.IsEmpty(api.Operations.Where(op => op.Nickname == "Orders_DeleteAll")));
+            Api(swaggerProvider, "Orders", "/api/orders", api => CollectionAssert.IsEmpty(api.Operations.Where(op => op.Nickname == "Orders_DeleteAll")));
         }
 
         [Test]
         public void It_should_generate_a_parameter_for_each_parameter_in_a_given_operation()
         {
-            var generator = CreateGenerator();
-            var swaggerSpec = generator.ApiExplorerToSwaggerSpec(_apiExplorer);
+            var swaggerProvider = GetSwaggerProvider();
 
-            Operation(swaggerSpec, "/Orders", "/api/orders", 0, "POST", operation =>
+            Operation(swaggerProvider, "Orders", "/api/orders", 0, "POST", operation =>
                 {
                     Assert.AreEqual(1, operation.Parameters.Count);
 
@@ -331,10 +325,10 @@ namespace Swashbuckle.Tests
                         });
                 });
 
-            Operation(swaggerSpec, "/Orders", "/api/orders", 0, "GET", operation =>
+            Operation(swaggerProvider, "Orders", "/api/orders", 0, "GET", operation =>
                 Assert.AreEqual(0, operation.Parameters.Count));
 
-            Operation(swaggerSpec, "/Orders", "/api/orders", 1, "GET", operation =>
+            Operation(swaggerProvider, "Orders", "/api/orders", 1, "GET", operation =>
                 {
                     Assert.AreEqual(2, operation.Parameters.Count);
 
@@ -361,7 +355,7 @@ namespace Swashbuckle.Tests
                         });
                 });
 
-            Operation(swaggerSpec, "/Orders", "/api/orders/{id}", 0, "DELETE", operation =>
+            Operation(swaggerProvider, "Orders", "/api/orders/{id}", 0, "DELETE", operation =>
                 {
                     Assert.AreEqual(1, operation.Parameters.Count);
 
@@ -377,7 +371,7 @@ namespace Swashbuckle.Tests
                         });
                 });
 
-            Operation(swaggerSpec, "/OrderItems", "/api/orders/{orderId}/items/{id}", 0, "GET", operation =>
+            Operation(swaggerProvider, "OrderItems", "/api/orders/{orderId}/items/{id}", 0, "GET", operation =>
                 {
                     Assert.AreEqual(2, operation.Parameters.Count);
 
@@ -404,7 +398,7 @@ namespace Swashbuckle.Tests
                         });
                 });
 
-            Operation(swaggerSpec, "/OrderItems", "/api/orders/{orderId}/items", 0, "GET", operation =>
+            Operation(swaggerProvider, "OrderItems", "/api/orders/{orderId}/items", 0, "GET", operation =>
                 {
                     Assert.AreEqual(2, operation.Parameters.Count);
 
@@ -432,7 +426,7 @@ namespace Swashbuckle.Tests
                         });
                 });
 
-            Operation(swaggerSpec, "/OrderItems", "/api/orders/{orderId}/items", 0, "PUT", operation =>
+            Operation(swaggerProvider, "OrderItems", "/api/orders/{orderId}/items", 0, "PUT", operation =>
                 {
                     Assert.AreEqual(2, operation.Parameters.Count);
 
@@ -459,7 +453,7 @@ namespace Swashbuckle.Tests
                         });
                 });
 
-            Operation(swaggerSpec, "/Customers", "/api/customers", 0, "POST", operation =>
+            Operation(swaggerProvider, "Customers", "/api/customers", 0, "POST", operation =>
                 {
                     Assert.AreEqual(1, operation.Parameters.Count);
 
@@ -475,7 +469,7 @@ namespace Swashbuckle.Tests
                         });
                 });
 
-            Operation(swaggerSpec, "/Customers", "/api/customers/{id}", 0, "GET", operation =>
+            Operation(swaggerProvider, "Customers", "/api/customers/{id}", 0, "GET", operation =>
                 {
                     Assert.AreEqual(1, operation.Parameters.Count);
 
@@ -491,7 +485,7 @@ namespace Swashbuckle.Tests
                         });
                 });
 
-            Operation(swaggerSpec, "/Customers", "/api/customers/{id}", 0, "DELETE", operation =>
+            Operation(swaggerProvider, "Customers", "/api/customers/{id}", 0, "DELETE", operation =>
                 {
                     Assert.AreEqual(1, operation.Parameters.Count);
 
@@ -507,7 +501,7 @@ namespace Swashbuckle.Tests
                         });
                 });
 
-            Operation(swaggerSpec, "/Products", "/api/products", 0, "GET", operation =>
+            Operation(swaggerProvider, "Products", "/api/products", 0, "GET", operation =>
                 CollectionAssert.IsEmpty(operation.Parameters)
                 );
         }
@@ -515,10 +509,9 @@ namespace Swashbuckle.Tests
         [Test]
         public void It_should_generate_models_for_complex_types_in_a_declaration()
         {
-            var generator = CreateGenerator();
-            var swaggerSpec = generator.ApiExplorerToSwaggerSpec(_apiExplorer);
+            var swaggerProvider = GetSwaggerProvider();
 
-            ApiDeclaration(swaggerSpec, "/Orders", dec =>
+            ApiDeclaration(swaggerProvider, "Orders", dec =>
                 {
                     // 1: Order
                     Assert.AreEqual(4, dec.Models.Count);
@@ -612,7 +605,7 @@ namespace Swashbuckle.Tests
                         });
                 });
 
-            ApiDeclaration(swaggerSpec, "/OrderItems", dec =>
+            ApiDeclaration(swaggerProvider, "OrderItems", dec =>
                 {
                     // 1: OrderItem
                     Assert.AreEqual(2, dec.Models.Count);
@@ -679,7 +672,7 @@ namespace Swashbuckle.Tests
                         });
                 });
 
-            ApiDeclaration(swaggerSpec, "/Customers", dec =>
+            ApiDeclaration(swaggerProvider, "Customers", dec =>
                 {
                     Assert.AreEqual(1, dec.Models.Count);
 
@@ -706,7 +699,7 @@ namespace Swashbuckle.Tests
                         });
                 });
 
-            ApiDeclaration(swaggerSpec, "/Products", dec =>
+            ApiDeclaration(swaggerProvider, "Products", dec =>
                 {
                     Assert.AreEqual(1, dec.Models.Count);
 
@@ -755,10 +748,9 @@ namespace Swashbuckle.Tests
                     .SubType<Shipping>()
                     .SubType<Packaging>());
 
-            var generator = CreateGenerator(polymorphicTypes: new PolymorphicType[] {productType});
-            var swaggerSpec = generator.ApiExplorerToSwaggerSpec(_apiExplorer);
+            var swaggerProvider = GetSwaggerProvider(polymorphicTypes: new PolymorphicType[] { productType });
 
-            ApiDeclaration(swaggerSpec, "/Products", dec =>
+            ApiDeclaration(swaggerProvider, "Products", dec =>
                 {
                     Assert.AreEqual(6, dec.Models.Count);
 
@@ -865,62 +857,58 @@ namespace Swashbuckle.Tests
         public void It_should_apply_all_configured_operation_filters()
         {
             var operationFilters = new IOperationFilter[] {new AddStandardErrorCodes(), new AddAuthorizationErrorCodes()};
-            var generator = CreateGenerator(operationFilters: operationFilters);
-            var swaggerSpec = generator.ApiExplorerToSwaggerSpec(_apiExplorer);
+            var swaggerProvider = GetSwaggerProvider(operationFilters: operationFilters);
 
-            Operation(swaggerSpec, "/Orders", "/api/orders", 0, "POST", operation =>
+            Operation(swaggerProvider, "Orders", "/api/orders", 0, "POST", operation =>
                 Assert.AreEqual(2, operation.ResponseMessages.Count));
 
-            Operation(swaggerSpec, "/Orders", "/api/orders", 0, "GET", operation =>
+            Operation(swaggerProvider, "Orders", "/api/orders", 0, "GET", operation =>
                 Assert.AreEqual(2, operation.ResponseMessages.Count));
 
-            Operation(swaggerSpec, "/Orders", "/api/orders", 1, "GET", operation =>
+            Operation(swaggerProvider, "Orders", "/api/orders", 1, "GET", operation =>
                 Assert.AreEqual(2, operation.ResponseMessages.Count));
 
-            Operation(swaggerSpec, "/Orders", "/api/orders/{id}", 0, "DELETE", operation =>
+            Operation(swaggerProvider, "Orders", "/api/orders/{id}", 0, "DELETE", operation =>
                 Assert.AreEqual(2, operation.ResponseMessages.Count));
 
-            Operation(swaggerSpec, "/OrderItems", "/api/orders/{orderId}/items/{id}", 0, "GET", operation =>
+            Operation(swaggerProvider, "OrderItems", "/api/orders/{orderId}/items/{id}", 0, "GET", operation =>
                 Assert.AreEqual(2, operation.ResponseMessages.Count));
 
-            Operation(swaggerSpec, "/OrderItems", "/api/orders/{orderId}/items", 0, "GET", operation =>
+            Operation(swaggerProvider, "OrderItems", "/api/orders/{orderId}/items", 0, "GET", operation =>
                 Assert.AreEqual(2, operation.ResponseMessages.Count));
 
-            Operation(swaggerSpec, "/OrderItems", "/api/orders/{orderId}/items", 0, "PUT", operation =>
+            Operation(swaggerProvider, "OrderItems", "/api/orders/{orderId}/items", 0, "PUT", operation =>
                 Assert.AreEqual(2, operation.ResponseMessages.Count));
 
-            Operation(swaggerSpec, "/Customers", "/api/customers/{id}", 0, "GET", operation =>
+            Operation(swaggerProvider, "Customers", "/api/customers/{id}", 0, "GET", operation =>
                 Assert.AreEqual(3, operation.ResponseMessages.Count));
 
-            Operation(swaggerSpec, "/Customers", "/api/customers/{id}", 0, "DELETE", operation =>
+            Operation(swaggerProvider, "Customers", "/api/customers/{id}", 0, "DELETE", operation =>
                 Assert.AreEqual(3, operation.ResponseMessages.Count));
 
-            Operation(swaggerSpec, "/Products", "/api/products", 0, "GET", operation =>
+            Operation(swaggerProvider, "Products", "/api/products", 0, "GET", operation =>
                 Assert.AreEqual(2, operation.ResponseMessages.Count));
         }
 
-        private static SwaggerGenerator CreateGenerator(
-            Func<ApiDescription, string> declarationKeySelector = null,
+        private ISwaggerProvider GetSwaggerProvider(
+            Func<ApiDescription, string> resourceNameResolver = null,
             IEnumerable<PolymorphicType> polymorphicTypes = null,
             IEnumerable<IOperationFilter> operationFilters = null,
             bool ignoreObsoletetActions = false)
         {
-            return new SwaggerGenerator(
-                "1.0",
-                "http://tempuri.org",
+            return new ApiExplorerAdapter(
+                _apiExplorer,
                 ignoreObsoletetActions,
-                declarationKeySelector ?? (apiDesc => apiDesc.ActionDescriptor.ControllerDescriptor.ControllerName),
-                new OperationGenerator(
-                    operationFilters ?? new List<IOperationFilter>(),
-                    new DataTypeGenerator(
-                        new Dictionary<Type, Func<DataType>>(),
-                        polymorphicTypes ?? new List<PolymorphicType>(),
-                        new List<IModelFilter>())));
+                (apiDesc, version) => true,
+                resourceNameResolver ?? (apiDesc => apiDesc.ActionDescriptor.ControllerDescriptor.ControllerName),
+                polymorphicTypes ?? new List<PolymorphicType>(),
+                new List<IModelFilter>(),
+                operationFilters ?? new List<IOperationFilter>());
         }
 
-        private static void ApiDeclaration(SwaggerSpec swaggerSpec, string resourcePath, Action<ApiDeclaration> applyAssertions)
+        private static void ApiDeclaration(ISwaggerProvider swaggerProvider, string resourceName, Action<ApiDeclaration> applyAssertions)
         {
-            var declaration = swaggerSpec.Declarations[resourcePath];
+            var declaration = swaggerProvider.GetDeclaration(RequestedBasePath, RequestedVersion, resourceName);
             applyAssertions(declaration);
         }
 
@@ -932,27 +920,27 @@ namespace Swashbuckle.Tests
             applyAssertions(api);
         }
 
-        private static void Api(SwaggerSpec swaggerSpec, string resourcePath, string apiPath, Action<Api> applyAssertions)
+        private static void Api(ISwaggerProvider swaggerProvider, string resourceName, string apiPath, Action<Api> applyAssertions)
         {
-            var api = swaggerSpec.Declarations[resourcePath].Apis
+            var api = swaggerProvider.GetDeclaration(RequestedBasePath, RequestedVersion, resourceName).Apis
                 .Single(a => a.Path == apiPath);
 
             applyAssertions(api);
+        }
+
+        private static void Operation(ISwaggerProvider swaggerProvider, string resourceName, string apiPath, int index, string httpMethod,
+            Action<Operation> applyAssertions)
+        {
+            var api = swaggerProvider.GetDeclaration(RequestedBasePath, RequestedVersion, resourceName).Apis
+                .Single(a => a.Path == apiPath);
+
+            Operation(api, httpMethod, index, applyAssertions);
         }
 
         private static void Operation(Api api, string httpMethod, int index, Action<Operation> applyAssertions)
         {
             var operation = api.Operations.Where(op => op.Method == httpMethod).ElementAt(index);
             applyAssertions(operation);
-        }
-
-        private static void Operation(SwaggerSpec swaggerSpec, string resourcePath, string apiPath, int index, string httpMethod,
-            Action<Operation> applyAssertions)
-        {
-            var api = swaggerSpec.Declarations[resourcePath].Apis
-                .Single(a => a.Path == apiPath);
-
-            Operation(api, httpMethod, index, applyAssertions);
         }
 
         private static void Parameter(Operation operation, string name, Action<Parameter> applyAssertions)

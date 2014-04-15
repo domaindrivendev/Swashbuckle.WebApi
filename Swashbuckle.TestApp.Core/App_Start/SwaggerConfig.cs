@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Net.Http;
 using System.Web.Http;
-using Swashbuckle.Core;
 using Swashbuckle.Core.Application;
 using Swashbuckle.TestApp.Core.Models;
 using Swashbuckle.TestApp.Core.SwaggerExtensions;
@@ -16,7 +15,8 @@ namespace Swashbuckle.TestApp.Core
 
             SwaggerSpecConfig.Customize(c =>
                 {
-                    c.ResolveApiVersion((req) => "1.0");
+                    c.ResolveBasePathUsing((req) => "1.0");
+
                     c.IgnoreObsoleteActions();
 
                     c.OperationFilter<AddStandardErrorCodes>();

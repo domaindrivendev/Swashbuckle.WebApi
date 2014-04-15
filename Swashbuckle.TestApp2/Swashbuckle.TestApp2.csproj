@@ -97,6 +97,7 @@
     <Compile Include="Models\Confirmation.cs" />
     <Compile Include="Models\Post.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SupportedInVersionsAttribute.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="packages.config" />

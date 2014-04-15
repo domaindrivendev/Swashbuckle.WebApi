@@ -12,9 +12,6 @@ namespace Swashbuckle.Core.Application
 {
     public class SwaggerSpecHandler : HttpMessageHandler
     {
-        private static readonly object SyncRoot = new object();
-        private static SwaggerSpec _cachedSwaggerSpec;
-
         private readonly SwaggerSpecConfig _config;
 
         public SwaggerSpecHandler()
@@ -24,60 +21,41 @@ namespace Swashbuckle.Core.Application
 
         protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
         {
-            var swaggerSpec = GetSwaggerSpec(request);
+            var swaggerProvider = GetSwaggerProvider(request.GetConfiguration());
+            
+            var basePath = _config.ResolveBasePath(request);
+            var version = _config.ResolveTargetVersion(request);
 
-            object declarationName;
-            request.GetRouteData().Values.TryGetValue("declarationName", out declarationName);
+            object resourceName;
+            request.GetRouteData().Values.TryGetValue("resourceName", out resourceName);
 
-            var responseMessage = (declarationName == null)
-                ? ListingResponse(swaggerSpec)
-                : DeclarationResponse(swaggerSpec, declarationName.ToString());
+            var content = (resourceName == null)
+                ? ContentFor(swaggerProvider.GetListing(basePath, version))
+                : ContentFor(swaggerProvider.GetDeclaration(basePath, version, resourceName.ToString()));
 
-            return Task.Factory.StartNew(() => responseMessage);
+            return Task.Factory.StartNew(() => new HttpResponseMessage(HttpStatusCode.OK)
+            {
+                Content = content
+            });
         }
 
-        private static HttpResponseMessage ListingResponse(SwaggerSpec swaggerSpec)
+        private ISwaggerProvider GetSwaggerProvider(HttpConfiguration httpConfig)
         {
-            return new HttpResponseMessage(HttpStatusCode.OK)
-            {
-                Content = new StringContent(JsonTextFor(swaggerSpec.Listing), Encoding.UTF8, "application/json")
-            };
+            var swaggerProvider = new ApiExplorerAdapter(
+                httpConfig.Services.GetApiExplorer(),
+                _config.IgnoreObsoleteActionsFlag,
+                _config.ResolveVersionSupport,
+                _config.ResolveResourceName,
+                _config.PolymorphicTypes,
+                _config.ModelFilters,
+                _config.OperationFilters);
+
+            return new CachingSwaggerProvider(swaggerProvider);
         }
 
-        private static HttpResponseMessage DeclarationResponse(SwaggerSpec swaggerSpec, string declarationName)
+        private HttpContent ContentFor(object value)
         {
-            var declaration = swaggerSpec.Declarations["/" + declarationName];
-            return new HttpResponseMessage(HttpStatusCode.OK)
-            {
-                Content = new StringContent(JsonTextFor(declaration), Encoding.UTF8, "application/json")
-            };
-        }
-
-        private SwaggerSpec GetSwaggerSpec(HttpRequestMessage request)
-        {
-            lock (SyncRoot)
-            {
-                if (_cachedSwaggerSpec == null)
-                {
-                    var generator = new SwaggerGenerator(
-                        _config.VersionResolver(request),
-                        _config.BasePathResolver(request),
-                        _config.IgnoreObsoleteActionsFlag,
-                        _config.DeclarationKeySelector,
-                        new OperationGenerator(
-                            _config.OperationFilters,
-                            new DataTypeGenerator(
-                                _config.CustomTypeMappings,
-                                _config.PolymorphicTypes,
-                                _config.ModelFilters)));
-
-                    var apiExplorer = request.GetConfiguration().Services.GetApiExplorer();
-
-                    _cachedSwaggerSpec = generator.ApiExplorerToSwaggerSpec(apiExplorer);
-                }
-            }
-
-            return _cachedSwaggerSpec;
+            return new StringContent(JsonTextFor(value), Encoding.UTF8, "application/json");
         }
 
         private static string JsonTextFor(object value)

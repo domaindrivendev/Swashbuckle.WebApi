@@ -1,15 +1,20 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace Swashbuckle.Core
 {
     public static class DictionaryExtensions
     {
-        public static void Merge<TKey, TValue>(this IDictionary<TKey, TValue> dictionary, IDictionary<TKey, TValue> other)
+        public static TValue GetOrAdd<TKey, TValue>(this IDictionary<TKey, TValue> dictionary, TKey key, Func<TValue> valueFactory)
         {
-            foreach (var entry in other)
+            TValue value;
+            if (!dictionary.TryGetValue(key, out value))
             {
-                dictionary[entry.Key] = entry.Value;
+                value = valueFactory();
+                dictionary.Add(key, value);
             }
+
+            return value;
         }
     }
 }

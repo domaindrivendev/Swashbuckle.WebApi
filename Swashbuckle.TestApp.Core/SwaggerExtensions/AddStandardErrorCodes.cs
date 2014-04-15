@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Net;
+﻿using System.Net;
 using System.Web.Http.Description;
 using Swashbuckle.Core.Swagger;
 
@@ -7,7 +6,7 @@ namespace Swashbuckle.TestApp.Core.SwaggerExtensions
 {
     public class AddStandardErrorCodes : IOperationFilter
     {
-        public void Apply(Operation operation, Dictionary<string, DataType> models, DataTypeGenerator dataTypeGenerator, ApiDescription apiDescription)
+        public void Apply(Operation operation, DataTypeRegistry dataTypeRegistry, ApiDescription apiDescription)
         {
             operation.ResponseMessages.Add(new ResponseMessage
             {
