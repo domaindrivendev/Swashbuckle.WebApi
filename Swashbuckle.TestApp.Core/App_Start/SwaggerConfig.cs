@@ -2,10 +2,10 @@
 using System.Net.Http;
 using System.Web.Http;
 using Swashbuckle.Application;
-using Swashbuckle.TestApp.Core.Models;
-using Swashbuckle.TestApp.Core.SwaggerExtensions;
+using Swashbuckle.TestApp.Models;
+using Swashbuckle.TestApp.SwaggerExtensions;
 
-namespace Swashbuckle.TestApp.Core
+namespace Swashbuckle.TestApp
 {
     public class SwaggerConfig
     {
@@ -19,9 +19,6 @@ namespace Swashbuckle.TestApp.Core
 
                     c.IgnoreObsoleteActions();
 
-                    c.OperationFilter<AddStandardResponseCodes>();
-                    c.OperationFilter<AddAuthorizationResponseCodes>();
-
                     c.PolymorphicType<Product>(pc => pc
                         .DiscriminateBy(p => p.Type)
                         .SubType<Book>()
@@ -29,6 +26,9 @@ namespace Swashbuckle.TestApp.Core
                         .SubType<Service>(sc => sc
                             .SubType<Shipping>()
                             .SubType<Packaging>()));
+
+                    c.OperationFilter<AddStandardResponseCodes>();
+                    c.OperationFilter<AddAuthorizationResponseCodes>();
 
                     c.IncludeXmlComments(GetXmlCommentsPath());
                 });

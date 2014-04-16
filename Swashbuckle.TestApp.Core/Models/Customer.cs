@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Swashbuckle.TestApp.Core.Models
+namespace Swashbuckle.TestApp.Models
 {
     /// <summary>
     /// Represents a registered customer

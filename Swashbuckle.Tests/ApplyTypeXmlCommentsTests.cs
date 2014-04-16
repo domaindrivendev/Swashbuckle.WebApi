@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Xml.XPath;
 using NUnit.Framework;
 using Swashbuckle.Swagger;
-using Swashbuckle.TestApp.Core.Models;
+using Swashbuckle.TestApp.Models;
 
 namespace Swashbuckle.Tests
 {

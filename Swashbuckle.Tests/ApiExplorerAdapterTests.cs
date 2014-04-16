@@ -6,9 +6,8 @@ using System.Web.Http.Description;
 using NUnit.Framework;
 using Swashbuckle.Application;
 using Swashbuckle.Swagger;
-using Swashbuckle.TestApp.Core;
-using Swashbuckle.TestApp.Core.Models;
-using Swashbuckle.TestApp.Core.SwaggerExtensions;
+using Swashbuckle.TestApp.Models;
+using Swashbuckle.TestApp.SwaggerExtensions;
 
 namespace Swashbuckle.Tests
 {
@@ -24,7 +23,7 @@ namespace Swashbuckle.Tests
         {
             // Get ApiExplorer for TestApp
             var httpConfiguration = new HttpConfiguration();
-            WebApiConfig.Register(httpConfiguration);
+            TestApp.WebApiConfig.Register(httpConfiguration);
             _apiExplorer = new ApiExplorer(httpConfiguration);
         }
 
@@ -737,6 +736,24 @@ namespace Swashbuckle.Tests
         }
 
         [Test]
+        public void It_should_override_generation_of_datatype_for_explictly_mapped_types()
+        {
+            var customMappings = new Dictionary<Type, Func<DataType>> {{typeof (Customer), () => new DataType {Type = "string"}}};
+            var swaggerProvider = GetSwaggerProvider(customTypeMappings: customMappings);
+
+            Operation(swaggerProvider, "Customers", "/api/customers/{id}", 0, "GET", operation =>
+                {
+                    Assert.AreEqual("string", operation.Type);
+                    Assert.IsNull(operation.Format);
+                    Assert.IsNull(operation.Items);
+                    Assert.IsNull(operation.Enum);
+                });
+
+            ApiDeclaration(swaggerProvider, "Customers", dec =>
+                CollectionAssert.IsEmpty(dec.Models));
+        }
+
+        [Test]
         public void It_should_generate_models_for_explicitly_configured_sub_types()
         {
             var productType = new BasePolymorphicType<Product>()
@@ -890,19 +907,20 @@ namespace Swashbuckle.Tests
         }
 
         private ISwaggerProvider GetSwaggerProvider(
+            bool ignoreObsoletetActions = false,
             Func<ApiDescription, string> resourceNameResolver = null,
+            Dictionary<Type, Func<DataType>> customTypeMappings = null,
             IEnumerable<PolymorphicType> polymorphicTypes = null,
-            IEnumerable<IOperationFilter> operationFilters = null,
-            bool ignoreObsoletetActions = false)
+            IEnumerable<IOperationFilter> operationFilters = null)
         {
             return new ApiExplorerAdapter(
                 _apiExplorer,
                 ignoreObsoletetActions,
                 (apiDesc, version) => true,
                 resourceNameResolver ?? (apiDesc => apiDesc.ActionDescriptor.ControllerDescriptor.ControllerName),
-                polymorphicTypes ?? new List<PolymorphicType>(),
-                new List<IModelFilter>(),
-                operationFilters ?? new List<IOperationFilter>());
+                customTypeMappings ?? new Dictionary<Type, Func<DataType>>(), 
+                polymorphicTypes ?? new PolymorphicType[]{},
+                new List<IModelFilter>(), operationFilters ?? new List<IOperationFilter>());
         }
 
         private static void ApiDeclaration(ISwaggerProvider swaggerProvider, string resourceName, Action<ApiDeclaration> applyAssertions)

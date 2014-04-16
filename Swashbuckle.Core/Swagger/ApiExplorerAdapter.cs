@@ -13,6 +13,7 @@ namespace Swashbuckle.Swagger
         private readonly bool _ignoreObsoleteActions;
         private readonly Func<ApiDescription, string, bool> _resoveVersionSupport;
         private readonly Func<ApiDescription, string> _resolveResourceName;
+        private readonly Dictionary<Type, Func<DataType>> _customTypeMappings;
         private readonly IEnumerable<PolymorphicType> _polymorphicTypes;
         private readonly IEnumerable<IModelFilter> _modelFilters;
         private readonly IEnumerable<IOperationFilter> _operationFilters;
@@ -22,6 +23,7 @@ namespace Swashbuckle.Swagger
             bool ignoreObsoleteActions,
             Func<ApiDescription, string, bool> resoveVersionSupport,
             Func<ApiDescription, string> resolveResourceName,
+            Dictionary<Type, Func<DataType>> customTypeMappings,
             IEnumerable<PolymorphicType> polymorphicTypes,
             IEnumerable<IModelFilter> modelFilters,
             IEnumerable<IOperationFilter> operationFilters)
@@ -30,6 +32,7 @@ namespace Swashbuckle.Swagger
             _ignoreObsoleteActions = ignoreObsoleteActions;
             _resoveVersionSupport = resoveVersionSupport;
             _resolveResourceName = resolveResourceName;
+            _customTypeMappings = customTypeMappings;
             _polymorphicTypes = polymorphicTypes;
             _modelFilters = modelFilters;
             _operationFilters = operationFilters;
@@ -56,7 +59,7 @@ namespace Swashbuckle.Swagger
             var apiDescriptionGroup = GetApplicableApiDescriptions(version)
                 .Single(apiDescGrp => apiDescGrp.Key == resourceName);
 
-            var dataTypeRegistry = new DataTypeRegistry(_polymorphicTypes, _modelFilters);
+            var dataTypeRegistry = new DataTypeRegistry(_customTypeMappings, _polymorphicTypes, _modelFilters);
             var operationGenerator = new OperationGenerator(dataTypeRegistry, _operationFilters);
 
             // Group further by relative path - each group corresponds to an Api

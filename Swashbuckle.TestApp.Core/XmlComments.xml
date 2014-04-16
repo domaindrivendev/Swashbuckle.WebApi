@@ -4,7 +4,7 @@
         <name>Swashbuckle.TestApp.Core</name>
     </assembly>
     <members>
-        <member name="M:Swashbuckle.TestApp.Core.Controllers.OrderItemsController.GetById(System.Int32,System.Int32)">
+        <member name="M:Swashbuckle.TestApp.Controllers.OrderItemsController.GetById(System.Int32,System.Int32)">
             <summary>
             Get order item by id
             </summary>
@@ -12,7 +12,7 @@
             <param name="id">The identifier for the requested order item</param>
             <returns></returns>
         </member>
-        <member name="M:Swashbuckle.TestApp.Core.Controllers.OrderItemsController.GetAll(System.Int32,System.Nullable{Swashbuckle.TestApp.Core.Models.ProductCategory})">
+        <member name="M:Swashbuckle.TestApp.Controllers.OrderItemsController.GetAll(System.Int32,System.Nullable{Swashbuckle.TestApp.Models.ProductCategory})">
             <summary>
             Get all order items
             </summary>
@@ -21,7 +21,7 @@
             <response code="401">Unauthorized</response>
             <returns></returns>
         </member>
-        <member name="M:Swashbuckle.TestApp.Core.Controllers.OrderItemsController.GetByPropertyValues(System.Int32,System.Collections.Generic.Dictionary{System.String,System.String})">
+        <member name="M:Swashbuckle.TestApp.Controllers.OrderItemsController.GetByPropertyValues(System.Int32,System.Collections.Generic.Dictionary{System.String,System.String})">
             <summary>
             Retreive items in an order by property names and values
             </summary>
@@ -29,24 +29,24 @@
             <param name="propertyValues">Dictionary of property names and values</param>
             <returns></returns>
         </member>
-        <member name="M:Swashbuckle.TestApp.Core.Controllers.OrdersController.GetAll">
+        <member name="M:Swashbuckle.TestApp.Controllers.OrdersController.GetAll">
             <summary>
             Get all orders in the system
             </summary>
             <remarks>For power users only</remarks>
             <returns></returns>
         </member>
-        <member name="T:Swashbuckle.TestApp.Core.Models.Customer">
+        <member name="T:Swashbuckle.TestApp.Models.Customer">
             <summary>
             Represents a registered customer
             </summary>
         </member>
-        <member name="P:Swashbuckle.TestApp.Core.Models.Customer.Id">
+        <member name="P:Swashbuckle.TestApp.Models.Customer.Id">
             <summary>
             Unique identifier for the customer
             </summary>
         </member>
-        <member name="P:Swashbuckle.TestApp.Core.Models.Customer.Associates">
+        <member name="P:Swashbuckle.TestApp.Models.Customer.Associates">
             <summary>
             Lists all registered associates 
             </summary>

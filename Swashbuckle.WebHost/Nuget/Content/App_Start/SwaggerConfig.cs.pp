@@ -2,7 +2,7 @@
 using $rootnamespace$;
 using WebActivatorEx;
 
-[assembly: PostApplicationStartMethod(typeof(SwaggerConfig), "Register")]
+[assembly: PreApplicationStartMethod(typeof(SwaggerConfig), "Register")]
 
 namespace $rootnamespace$
 {

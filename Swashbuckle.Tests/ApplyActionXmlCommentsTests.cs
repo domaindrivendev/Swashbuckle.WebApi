@@ -19,7 +19,7 @@ namespace Swashbuckle.Tests
         {
             // Get ApiExplorer for TestApp
             var httpConfiguration = new HttpConfiguration();
-            TestApp.Core.WebApiConfig.Register(httpConfiguration);
+            TestApp.WebApiConfig.Register(httpConfiguration);
             _apiExplorer = new ApiExplorer(httpConfiguration);
 
             var xmlCommentsDoc = new XPathDocument(String.Format(@"{0}\XmlComments.xml", AppDomain.CurrentDomain.BaseDirectory));

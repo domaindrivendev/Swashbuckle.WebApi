@@ -46,9 +46,9 @@ namespace Swashbuckle.Application
                 _config.IgnoreObsoleteActionsFlag,
                 _config.ResolveVersionSupport,
                 _config.ResolveResourceName,
+                _config.CustomTypeMappings,
                 _config.PolymorphicTypes,
-                _config.ModelFilters,
-                _config.OperationFilters);
+                _config.ModelFilters, _config.OperationFilters);
 
             return new CachingSwaggerProvider(swaggerProvider);
         }
