@@ -1,6 +1,6 @@
 ﻿using System.Web.Http;
 
-namespace Swashbuckle.TestApp.Core
+namespace Swashbuckle.TestApp
 {
     public static class WebApiConfig
     {

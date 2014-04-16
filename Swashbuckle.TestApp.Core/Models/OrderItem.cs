@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Swashbuckle.TestApp.Core.Models
+namespace Swashbuckle.TestApp.Models
 {
     public class OrderItem
     {

@@ -3,9 +3,9 @@ using System.Net;
 using System.Net.Http;
 using System.Web.Http;
 using Newtonsoft.Json.Linq;
-using Swashbuckle.TestApp.Core.Models;
+using Swashbuckle.TestApp.Models;
 
-namespace Swashbuckle.TestApp.Core.Controllers
+namespace Swashbuckle.TestApp.Controllers
 {
     public class CustomersController : ApiController
     {

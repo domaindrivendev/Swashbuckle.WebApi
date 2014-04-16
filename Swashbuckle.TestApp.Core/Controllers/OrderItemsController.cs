@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Web.Http;
-using Swashbuckle.TestApp.Core.Models;
+using Swashbuckle.TestApp.Models;
 
-namespace Swashbuckle.TestApp.Core.Controllers
+namespace Swashbuckle.TestApp.Controllers
 {
     public class OrderItemsController : ApiController
     {

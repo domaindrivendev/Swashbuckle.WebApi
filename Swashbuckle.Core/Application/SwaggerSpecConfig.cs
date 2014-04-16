@@ -26,6 +26,7 @@ namespace Swashbuckle.Application
             ResolveResourceName = (apiDesc) => apiDesc.ActionDescriptor.ControllerDescriptor.ControllerName;
             OperationFilters = new List<IOperationFilter>();
             PolymorphicTypes = new List<PolymorphicType>();
+            CustomTypeMappings = new Dictionary<Type, Func<DataType>>();
             ModelFilters = new List<IModelFilter>();
         }
 
@@ -36,6 +37,7 @@ namespace Swashbuckle.Application
         internal Func<ApiDescription, string> ResolveResourceName { get; private set; }
         internal List<IOperationFilter> OperationFilters = new List<IOperationFilter>();
         internal List<PolymorphicType> PolymorphicTypes { get; private set; }
+        internal Dictionary<Type, Func<DataType>> CustomTypeMappings { get; private set; }
         internal List<IModelFilter> ModelFilters { get; private set; }
 
         public SwaggerSpecConfig ResolveBasePathUsing(Func<HttpRequestMessage, string> resolveBasePath)
@@ -72,16 +74,9 @@ namespace Swashbuckle.Application
             return this;
         }
 
-        public SwaggerSpecConfig OperationFilter<T>()
-            where T : IOperationFilter, new()
+        public SwaggerSpecConfig MapType<T>(Func<DataType> factory)
         {
-            return OperationFilter(new T());
-        }
-
-        public SwaggerSpecConfig OperationFilter(IOperationFilter operationFilter)
-        {
-            if (operationFilter == null) throw new ArgumentNullException("operationFilter");
-            OperationFilters.Add(operationFilter);
+            CustomTypeMappings[typeof (T)] = factory;
             return this;
         }
 
@@ -103,6 +98,19 @@ namespace Swashbuckle.Application
         {
             if (modelFilter == null) throw new ArgumentNullException("modelFilter");
             ModelFilters.Add(modelFilter);
+            return this;
+        }
+
+        public SwaggerSpecConfig OperationFilter<T>()
+            where T : IOperationFilter, new()
+        {
+            return OperationFilter(new T());
+        }
+
+        public SwaggerSpecConfig OperationFilter(IOperationFilter operationFilter)
+        {
+            if (operationFilter == null) throw new ArgumentNullException("operationFilter");
+            OperationFilters.Add(operationFilter);
             return this;
         }
 

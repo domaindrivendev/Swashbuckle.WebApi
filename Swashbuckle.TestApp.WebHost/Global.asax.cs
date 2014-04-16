@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Web;
 using System.Web.Http;
-using Swashbuckle.TestApp.Core;
 
 namespace Swashbuckle.TestApp.WebHost
 {

@@ -36,13 +36,14 @@ namespace Swashbuckle.Swagger
             };
 
         private readonly IDictionary<Type, DataType> _complexMappings;
-
+        private readonly Dictionary<Type, Func<DataType>> _customMappings;
         private readonly IEnumerable<PolymorphicType> _polymorphicTypes;
         private readonly IEnumerable<IModelFilter> _modelFilters;
 
-        public DataTypeRegistry(IEnumerable<PolymorphicType> polymorphicTypes, IEnumerable<IModelFilter> modelFilters)
+        public DataTypeRegistry(Dictionary<Type, Func<DataType>> customMappings, IEnumerable<PolymorphicType> polymorphicTypes, IEnumerable<IModelFilter> modelFilters)
         {
             _complexMappings = new Dictionary<Type, DataType>();
+            _customMappings = customMappings;
             _polymorphicTypes = polymorphicTypes;
             _modelFilters = modelFilters;
         }
@@ -78,6 +79,9 @@ namespace Swashbuckle.Swagger
 
         private DataType GetOrRegister(Type type, bool deferIfComplex, Queue<Type> deferredTypes)
         {
+            if (_customMappings.ContainsKey(type))
+                return _customMappings[type]();
+
             if (PrimitiveMappings.ContainsKey(type))
                 return PrimitiveMappings[type]();
 

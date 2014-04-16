@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Web.Http.SelfHost;
-using Swashbuckle.TestApp.Core;
 
 namespace Swashbuckle.TestApp.SelfHost
 {

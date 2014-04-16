@@ -2,7 +2,7 @@
 using System.Web.Http.Description;
 using Swashbuckle.Swagger;
 
-namespace Swashbuckle.TestApp.Core.SwaggerExtensions
+namespace Swashbuckle.TestApp.SwaggerExtensions
 {
     public class AddStandardResponseCodes : IOperationFilter
     {

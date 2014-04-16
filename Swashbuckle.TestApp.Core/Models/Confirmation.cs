@@ -1,4 +1,4 @@
-﻿namespace Swashbuckle.TestApp.Core.Models
+﻿namespace Swashbuckle.TestApp.Models
 {
     public class Confirmation
     {
