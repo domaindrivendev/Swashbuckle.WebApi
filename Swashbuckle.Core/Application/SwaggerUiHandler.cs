@@ -28,9 +28,12 @@ namespace Swashbuckle.Application
 
         private HttpResponseMessage UiResourceResponse(string uiPath)
         {
-            var resourceStream = uiPath.StartsWith("ext/")
-                ? GetCustomResourceStream(uiPath.Substring(4))
-                : GetType().Assembly.GetManifestResourceStream(uiPath);
+            CustomResourceDescriptor customResourceDescriptor;
+            _config.CustomRoutes.TryGetValue(uiPath, out customResourceDescriptor);
+
+            var resourceStream = (customResourceDescriptor == null)
+                ? GetType().Assembly.GetManifestResourceStream(uiPath)
+                : GetCustomResourceStream(customResourceDescriptor);
 
             HttpContent content = new StreamContent(resourceStream);
             if (uiPath == "index.html")
@@ -40,12 +43,9 @@ namespace Swashbuckle.Application
             return new HttpResponseMessage { Content = content };
         }
 
-        private Stream GetCustomResourceStream(string resourceName)
+        private Stream GetCustomResourceStream(CustomResourceDescriptor resourceDescriptor)
         {
-            var resourceDescriptor = _config.CustomScripts
-                .Union(_config.CustomStylesheets)
-                .Single(cs => cs.ResourceName == resourceName);
-
+            var resourceName = resourceDescriptor.ResourceName;
             var stream = resourceDescriptor.ResourceAssembly.GetManifestResourceStream(resourceName);
             if (stream == null)
                 throw new FileNotFoundException("Ensure the Build Action is set to \"Embedded Resource\"", resourceName);
@@ -60,11 +60,11 @@ namespace Swashbuckle.Application
             var listOfSubmitMethods = String.Join(",", _config.SupportedSubmitMethods
                 .Select(sm => String.Format("'{0}'", sm)));
 
-            var scriptIncludes = String.Join("\r\n", _config.CustomScripts
-                .Select(cs => String.Format("$.getScript('ext/{0}');", cs.ResourceName)));
+            var scriptIncludes = String.Join("\r\n", _config.CustomScriptPaths
+                .Select(path => String.Format("$.getScript('{0}');", path)));
 
-            var stylesheetIncludes = String.Join("\r\n", _config.CustomStylesheets
-                .Select(cs => String.Format("<link href='ext/{0}' rel='stylesheet' type='text/css'/>", cs.ResourceName)));
+            var stylesheetIncludes = String.Join("\r\n", _config.CustomStylesheetPaths
+                .Select(path => String.Format("<link href='{0}' rel='stylesheet' type='text/css'/>", path)));
 
             var customizedText = originalText
                 .Replace("%(DiscoveryUrl)", "window.location.href.replace(/ui\\/index\\.html.*/, 'api-docs')")

@@ -38,8 +38,11 @@ namespace Swashbuckle.TestApp
                     c.SupportHeaderParams = true;
                     c.DocExpansion = DocExpansion.List;
                     c.SupportedSubmitMethods = new[] {HttpMethod.Get, HttpMethod.Post, HttpMethod.Put, HttpMethod.Head};
-                    c.InjectJavaScript(typeof (SwaggerConfig).Assembly, "Swashbuckle.TestApp.Core.SwaggerExtensions.customScript.js");
-                    c.InjectStylesheet(typeof (SwaggerConfig).Assembly, "Swashbuckle.TestApp.Core.SwaggerExtensions.customStyles.css");
+                    c.InjectJavaScript(typeof (SwaggerConfig).Assembly, "Swashbuckle.TestApp.SwaggerExtensions.customScript.js");
+                    c.InjectStylesheet(typeof (SwaggerConfig).Assembly, "Swashbuckle.TestApp.SwaggerExtensions.customStyles.css");
+
+                    // Experimenting with a custom routing feature - to override index.html and/or serve up additional content
+                    c.CustomRoute("index.html", typeof(SwaggerConfig).Assembly, "Swashbuckle.TestApp.SwaggerExtensions.index.html");
                 });
         }
 

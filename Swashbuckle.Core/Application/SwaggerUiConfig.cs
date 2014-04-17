@@ -14,15 +14,17 @@ namespace Swashbuckle.Application
             SupportHeaderParams = false;
             SupportedSubmitMethods = new[] { HttpMethod.Get, HttpMethod.Post, HttpMethod.Put };
             DocExpansion = DocExpansion.None;
-            CustomScripts = new List<InjectedResourceDescriptor>();
-            CustomStylesheets = new List<InjectedResourceDescriptor>();
+            CustomScriptPaths = new List<string>();
+            CustomStylesheetPaths = new List<string>();
+            CustomRoutes = new Dictionary<string, CustomResourceDescriptor>();
         }
 
         public bool SupportHeaderParams { get; set; }
         public IEnumerable<HttpMethod> SupportedSubmitMethods { get; set; }
         public DocExpansion DocExpansion { get; set; }
-        internal IList<InjectedResourceDescriptor> CustomScripts { get; private set; }
-        internal IList<InjectedResourceDescriptor> CustomStylesheets { get; private set; }
+        internal IList<string> CustomScriptPaths { get; private set; }
+        internal IList<string> CustomStylesheetPaths { get; private set; }
+        internal IDictionary<string, CustomResourceDescriptor> CustomRoutes { get; private set; }
 
         public static void Customize(Action<SwaggerUiConfig> customize)
         {
@@ -31,22 +33,26 @@ namespace Swashbuckle.Application
 
         public void InjectJavaScript(Assembly resourceAssembly, string resourceName)
         {
-            CustomScripts.Add(new InjectedResourceDescriptor
-            {
-                RelativePath = String.Format("ext/{0}", resourceName),
-                ResourceAssembly = resourceAssembly,
-                ResourceName = resourceName,
-            });
+            var uiPath = String.Format("ext/{0}", resourceName);
+            CustomScriptPaths.Add(uiPath);
+            CustomRoute(uiPath, resourceAssembly, resourceName);
         }
 
         public void InjectStylesheet(Assembly resourceAssembly, string resourceName)
         {
-            CustomStylesheets.Add(new InjectedResourceDescriptor
+            var uiPath = String.Format("ext/{0}", resourceName);
+            CustomStylesheetPaths.Add(uiPath);
+            CustomRoute(uiPath, resourceAssembly, resourceName);
+        }
+
+        public void CustomRoute(string uiPath, Assembly resourceAssembly, string resourceName)
+        {
+            CustomRoutes[uiPath] = new CustomResourceDescriptor
             {
-                RelativePath = String.Format("ext/{0}", resourceName),
+                UiPath = uiPath,
                 ResourceAssembly = resourceAssembly,
                 ResourceName = resourceName,
-            });
+            };
         }
     }
 
@@ -57,9 +63,9 @@ namespace Swashbuckle.Application
         Full
     }
 
-    internal class InjectedResourceDescriptor
+    internal class CustomResourceDescriptor
     {
-        public string RelativePath { get; set; }
+        public string UiPath { get; set; }
 
         public Assembly ResourceAssembly { get; set; }
 
