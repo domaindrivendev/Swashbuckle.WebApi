@@ -4,7 +4,7 @@
     <id>Swashbuckle.Core</id>
     <version>$version$</version>
     <title>Swashbuckle - Swagger for WebApi (Self-hosted)</title>
-    <authors>Richard Morris, GettyImages</authors>
+    <authors>Richard Morris</authors>
     <licenseUrl>http://opensource.org/licenses/BSD-3-Clause</licenseUrl>
     <projectUrl>https://github.com/domaindrivendev/Swashbuckle</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
