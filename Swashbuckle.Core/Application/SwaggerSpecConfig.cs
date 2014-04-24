@@ -1,10 +1,10 @@
-﻿using System;
+﻿using Swashbuckle.Swagger;
+using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Net.Http;
 using System.Web.Http.Description;
 using System.Xml.XPath;
-using Swashbuckle.Swagger;
 
 namespace Swashbuckle.Application
 {
@@ -28,6 +28,7 @@ namespace Swashbuckle.Application
             PolymorphicTypes = new List<PolymorphicType>();
             CustomTypeMappings = new Dictionary<Type, Func<DataType>>();
             ModelFilters = new List<IModelFilter>();
+            CamelCaseModelTypeFlag = false;
         }
 
         internal Func<HttpRequestMessage, string> ResolveBasePath { get; private set; }
@@ -39,6 +40,7 @@ namespace Swashbuckle.Application
         internal List<PolymorphicType> PolymorphicTypes { get; private set; }
         internal Dictionary<Type, Func<DataType>> CustomTypeMappings { get; private set; }
         internal List<IModelFilter> ModelFilters { get; private set; }
+        internal bool CamelCaseModelTypeFlag { get; private set; }
 
         public SwaggerSpecConfig ResolveBasePathUsing(Func<HttpRequestMessage, string> resolveBasePath)
         {
@@ -116,9 +118,23 @@ namespace Swashbuckle.Application
 
         public SwaggerSpecConfig IncludeXmlComments(string xmlCommentsPath)
         {
+            return IncludeXmlComments(xmlCommentsPath, String.Empty);
+        }
+
+        public SwaggerSpecConfig IncludeXmlComments(string xmlCommentsPath, string xmlModelCommentsPath)
+        {
             var xmlCommentsDoc = new XPathDocument(xmlCommentsPath);
+
             OperationFilters.Add(new ApplyActionXmlComments(xmlCommentsDoc));
-            ModelFilters.Add(new ApplyTypeXmlComments(xmlCommentsDoc));
+
+            ModelFilters.Add(!String.IsNullOrEmpty(xmlModelCommentsPath) ? new ApplyTypeXmlComments(new XPathDocument(xmlModelCommentsPath)) : new ApplyTypeXmlComments(xmlCommentsDoc));
+
+            return this;
+        }
+
+        public SwaggerSpecConfig CamelCaseModelType()
+        {
+            CamelCaseModelTypeFlag = true;
             return this;
         }
     }

@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Newtonsoft.Json.Linq;
+using Swashbuckle.Application;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Dynamic;
@@ -6,7 +8,6 @@ using System.Linq;
 using System.Net.Http;
 using System.Reflection;
 using System.Text;
-using Newtonsoft.Json.Linq;
 
 namespace Swashbuckle.Swagger
 {
@@ -109,6 +110,14 @@ namespace Swashbuckle.Swagger
             return _complexMappings.GetOrAdd(type, () => CreateComplexDataType(type, deferredTypes));
         }
 
+        private static string GetPropInfoName(string name)
+        {
+            if (SwaggerSpecConfig.StaticInstance.CamelCaseModelTypeFlag)
+                return Char.ToLower(name[0]) + name.Substring(1);
+            else
+                return name;
+        }
+
         private DataType CreateComplexDataType(Type type, Queue<Type> deferredTypes)
         {
             var propInfos = type.GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.DeclaredOnly)
@@ -116,7 +125,7 @@ namespace Swashbuckle.Swagger
                 .ToArray();
 
             var properties = propInfos
-                .ToDictionary(propInfo => propInfo.Name, propInfo => GetOrRegister(propInfo.PropertyType, true, deferredTypes));
+                .ToDictionary(propInfo => GetPropInfoName(propInfo.Name), propInfo => GetOrRegister(propInfo.PropertyType, true, deferredTypes));
 
             var required = propInfos.Where(propInfo => Attribute.IsDefined(propInfo, typeof (RequiredAttribute)))
                 .Select(propInfo => propInfo.Name)
