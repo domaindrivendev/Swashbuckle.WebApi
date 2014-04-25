@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Web.Http.Controllers;
@@ -13,6 +14,7 @@ namespace Swashbuckle.Swagger
         private const string SummaryExpression = "summary";
         private const string RemarksExpression = "remarks";
         private const string ParameterExpression = "param[@name=\"{0}\"]";
+        private const string ResponseExpression = "response";
 
         private readonly XPathNavigator _navigator;
 
@@ -35,6 +37,8 @@ namespace Swashbuckle.Swagger
 
                 parameter.Description = GetChildValueOrDefault(methodNode, String.Format(ParameterExpression, paramDesc.Name));
             }
+
+            operation.ResponseMessages = GetResponseMessages(methodNode);
         }
 
         private static string GetXPathFor(HttpActionDescriptor actionDescriptor)
@@ -78,6 +82,19 @@ namespace Swashbuckle.Swagger
 
             var childNode = node.SelectSingleNode(childExpression);
             return (childNode == null) ? null : childNode.Value.Trim();
+        }
+
+        private static IList<ResponseMessage> GetResponseMessages(XPathNavigator node)
+        {
+            var responseMessages = new List<ResponseMessage>();
+
+            var iterator = node.Select(ResponseExpression);
+            while (iterator.MoveNext())
+            {
+                responseMessages.Add(new ResponseMessage { Code = Convert.ToInt32(iterator.Current.GetAttribute("code", String.Empty)), Message = iterator.Current.Value });
+            }
+
+            return responseMessages;
         }
     }
 }
