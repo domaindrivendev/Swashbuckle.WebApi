@@ -32,7 +32,7 @@ namespace Swashbuckle.Swagger
                 {typeof (Object), () => new DataType{Type="string", Format = null}},
                 {typeof (ExpandoObject), () => new DataType{Type="string", Format = null}},
                 {typeof (JObject), () => new DataType{Type="string", Format = null}},
-                {typeof (HttpResponseMessage), () => new DataType{Type="string", Format = null}}
+                {typeof (HttpResponseMessage), () => new DataType{Type="string", Format = null}},
             };
 
         private readonly IDictionary<Type, DataType> _complexMappings;
@@ -50,7 +50,7 @@ namespace Swashbuckle.Swagger
 
         public DataType GetOrRegister(Type type)
         {
-            // Defer processing of related models to avoid infinite recursion
+            // Defer processing of related models to avoid infinite recursion on self-referential types
             var deferredTypes = new Queue<Type>();
 
             var rootDataType = GetOrRegister(type, false, deferredTypes);
