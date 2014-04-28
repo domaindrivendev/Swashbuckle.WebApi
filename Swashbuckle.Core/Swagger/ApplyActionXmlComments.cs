@@ -40,10 +40,9 @@ namespace Swashbuckle.Swagger
 
             if (methodNode == null) return;
 
-            var documentedResponses = GetResponseMessages(methodNode);
-            foreach (var documentedResponse in documentedResponses)
+            foreach (var responseMessage in GetResponseMessages(methodNode))
             {
-                operation.ResponseMessages.Add(documentedResponse);
+                operation.ResponseMessages.Add(responseMessage);
             }
         }
 
