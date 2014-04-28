@@ -38,7 +38,13 @@ namespace Swashbuckle.Swagger
                 parameter.Description = GetChildValueOrDefault(methodNode, String.Format(ParameterExpression, paramDesc.Name));
             }
 
-            operation.ResponseMessages = GetResponseMessages(methodNode);
+            if (methodNode == null) return;
+
+            var documentedResponses = GetResponseMessages(methodNode);
+            foreach (var documentedResponse in documentedResponses)
+            {
+                operation.ResponseMessages.Add(documentedResponse);
+            }
         }
 
         private static string GetXPathFor(HttpActionDescriptor actionDescriptor)
@@ -84,17 +90,17 @@ namespace Swashbuckle.Swagger
             return (childNode == null) ? null : childNode.Value.Trim();
         }
 
-        private static IList<ResponseMessage> GetResponseMessages(XPathNavigator node)
+        private static IEnumerable<ResponseMessage> GetResponseMessages(XPathNavigator node)
         {
-            var responseMessages = new List<ResponseMessage>();
-
             var iterator = node.Select(ResponseExpression);
             while (iterator.MoveNext())
             {
-                responseMessages.Add(new ResponseMessage { Code = Convert.ToInt32(iterator.Current.GetAttribute("code", String.Empty)), Message = iterator.Current.Value });
+                yield return new ResponseMessage
+                    {
+                        Code = Int32.Parse(iterator.Current.GetAttribute("code", String.Empty)),
+                        Message = iterator.Current.Value
+                    };
             }
-
-            return responseMessages;
         }
     }
 }

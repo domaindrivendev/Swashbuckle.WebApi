@@ -27,6 +27,8 @@ namespace Swashbuckle.Dummy.Controllers
         /// Returns a list of unicorns filtered by property names
         /// </summary>
         /// <param name="propertyValues">A list of name/value pairs for filtering results</param>
+        /// <response code="200">It's all good!</response>
+        /// <response code="500">Somethings up!</response>
         /// <returns></returns>
         [Route("unicorns")]
         public IEnumerable<Unicorn> GetUnicorns(Dictionary<string, string> propertyValues)

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Web.Http;
 using System.Web.Http.Description;
@@ -66,6 +67,26 @@ namespace Swashbuckle.Tests.Swagger
                 Assert.AreEqual("A list of name/value pairs for filtering results", operation.Parameters[0].Description));
         }
 
+        [Test]
+        public void It_should_apply_response_descriptions_if_available()
+        {
+            ApplyFilterFor("Products", "GetByType", operation =>
+                CollectionAssert.IsEmpty(operation.ResponseMessages));
+
+            ApplyFilterFor("RandomStuff", "GetUnicorns", operation =>
+                {
+                    Assert.AreEqual(2, operation.ResponseMessages.Count);
+
+                    var first = operation.ResponseMessages[0];
+                    Assert.AreEqual(200, first.Code);
+                    Assert.AreEqual("It's all good!", first.Message);
+
+                    var second = operation.ResponseMessages[1];
+                    Assert.AreEqual(500, second.Code);
+                    Assert.AreEqual("Somethings up!", second.Message);
+                });
+        }
+
         private void ApplyFilterFor(string controllerName, string actionName, Action<Operation> applyAssertions)
         {
             var apiDescription = _apiExplorer.ApiDescriptions.Single(apiDesc => apiDesc.ActionDescriptor.ControllerDescriptor.ControllerName == controllerName
@@ -82,7 +103,8 @@ namespace Swashbuckle.Tests.Swagger
                                 Name = paramDesc.Name,
                                 Description = "foo" 
                             })
-                         .ToList()
+                         .ToList(),
+                    ResponseMessages = new List<ResponseMessage>()
                 };
 
             _filter.Apply(operation, null, apiDescription);
