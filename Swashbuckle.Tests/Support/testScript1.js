@@ -1,1 +1,0 @@
-﻿var testVal = '1';

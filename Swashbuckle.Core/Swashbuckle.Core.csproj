@@ -38,8 +38,10 @@
   <PropertyGroup>
     <AssemblyOriginatorKeyFile>Swashbuckle.Core.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
+  <PropertyGroup />
   <ItemGroup>
-    <Reference Include="Newtonsoft.Json">
+    <Reference Include="Newtonsoft.Json, Version=4.5.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\Newtonsoft.Json.4.5.11\lib\net40\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="System" />
@@ -87,10 +89,10 @@
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
-    <None Include="packages.config" />
     <Content Include="Swashbuckle.Core.nuspec">
       <SubType>Designer</SubType>
     </Content>
+    <None Include="packages.config" />
     <None Include="Swashbuckle.Core.snk" />
   </ItemGroup>
   <!-- Automatically embed swagger-ui files. Construct name so resource can be retrieved by swagger-ui relative path -->
