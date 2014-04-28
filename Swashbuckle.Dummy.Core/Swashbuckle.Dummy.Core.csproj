@@ -68,6 +68,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SwaggerExtensions\AddAuthResponseCodes.cs" />
     <Compile Include="SwaggerExtensions\AddStandardResponseCodes.cs" />
+    <Compile Include="SwaggerExtensions\ApplyCamelCasing.cs" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
