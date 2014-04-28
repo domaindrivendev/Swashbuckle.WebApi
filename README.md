@@ -1,74 +1,57 @@
 Swashbuckle
 =========
-Seamlessly adds a [swagger](https://developers.helloreverb.com/swagger) to WebApi projects! Uses a combination of ApiExplorer and swagger/swagger-UI to provide a rich discovery and documentation experience for consumers.
 
-The library comes packaged with the neccessary UI components including HTML files, JavaScript and CSS. This reduces unnecessary noise and maintenance in your WebApi project, leaving you free to focus on building an awesome API!   
+Seamlessly adds a [swagger](https://developers.helloreverb.com/swagger) to WebApi projects! Combines ApiExplorer and swagger/swagger-ui to provide a rich discovery and documentation experience to your API consumers.
+
+In addition to it's Swagger generator, Swashbuckle also contains an embedded version of [swagger-ui](https://github.com/wordnik/swagger-ui.git) which it will automatically serve up once Swashbuckle is installed. This means little or no maintenance for discovery and documentation of your service, allowing you to focus on building an awesome API!
 
 And that's not all ...
 
 Once you have a Web API that can describe itself in Swagger, you've opened the treasure chest of Swagger-based tools including a client generator that can be targetted to a wide range of popular platforms. See [swagger-codegen](https://github.com/wordnik/swagger-codegen) for more details.
 
-**Core Features:**
+**Swashbuckle Core Features:**
 
-* Auto-generated swagger according to the swagger 1.2 spec
-* Seamlessly embeds swagger-ui into your service
-* In addition to the basic spec, also generates swagger data-type/model descriptions
-* Optional support for describing polymorphic models using the "subTypes" property
-    * Currently no UI support see https://groups.google.com/forum/#!topic/swagger-swaggersocket/kE4bL1xkSoQ
-* Extensibility hooks for customizing the generated spec AND the swagger-ui
+* Auto-generated [Swagger 1.2](https://github.com/wordnik/swagger-spec/blob/master/versions/1.2.md)
+* Seamless integration of swagger-ui
+* Reflection-based type/model descriptions ... including support for polymorphic types
+* Extensibility hooks for customizing the generated spec
+* Extensibility hooks for customizing the swagger-ui
+* Out-of-the-box support for leveraging Xml comments
 
-Getting Started
---------------------
+**\*Swashbuckle 4.0**
 
-To start exposing auto-generated Swagger docs and a Swagger UI, simply install the Nuget package from your WebApi project:
+As of version 4.0, Swashbuckle has no dependency on ASP.Net MVC. As a result, it's now available to both IIS hosted and self-hosted Web API's. However, this introduces several (relatively) trivial breaking changes. Checkout the [transition guide](#transitioning-to-swashbuckle-40) if you're upgrading from a prior version.
+
+## Getting Started ##
+
+### IIS Hosted ###
+
+If youre service is hosted in IIS, you can start exposing Swagger docs and a corresponding Swagger UI by simply installing the following Nuget package:
 
     Install-Package Swashbuckle
 
-This will add a reference to Swashbuckle.dll which contains an embedded "Area" for Swagger. The Area includes the following routes for the raw Swagger docs and UI respectively:
+This will add a reference to Swashbuckle.Core, which contains the generator and embedded swagger-ui. It will also install a bootstrapper (App_Start/SwaggerConfig.cs) that initiates Swashbuckle on app start-up using [WeActivatorEx](https://github.com/davidebbo/WebActivator). Once installed, you should be able to browse the following raw docs and UI endpoints: 
 
-*swagger/api-docs*
+***swagger/api-docs***
 
-*swagger*
+***swagger***
 
-Troubleshooting
---------------------
+### Self-hosted ###
 
-If you've installed the Nuget package but still can't access the above routes, then try the following steps ...
+If youre service is self-hosted, you need to install Swashbuckle.Core directly ...
 
-### Issues with VS 2013 ###
+    Install-Package Swashbuckle.Core
 
-VS 2103 ships with a new feature - Browser Link that improves the web development workflow by setting up a channel between the IDE and pages being previewed in a local browser. It does this by dynamically injecting JavaScript into your files.
+And then manually apply the one-liner to initiate Swashbuckle before starting the server:
 
-Although this JavaScript SHOULD have no affect on your production code, it appears to be breaking the swagger-ui.
+    var config = new HttpSelfHostConfiguration("http://localhost:8080");
+    Swashbuckle.Bootstrapper.Init(config);
 
-I hope to find a permanent fix but in the meantime, you'll need to workaround this isuse by disabling the feature in your web.config:
+## Troubleshooting ##
 
-    <appSettings>
-        <add key="vs:EnableBrowserLink" value="false"/>
-    </appSettings>< appSettings>
+Troubleshooting??? I thought this was all supposed to be "seamless"? OK you've called me out! Things shouldn't go wrong, but if they do, take a look at the [troubleshooting steps](#troubleshooting-steps) for inspiration.
 
-### Ensure MVC Areas are registered at application startup ###
-
-The Swagger routes are wired-up as an MVC Area. For MVC projects, Areas are usually registered at application startup. If the code to do this is not present in your Global.asax.cs, you'll need to add it manually:
-
-    protected void Application_Start()
-    {
-        // Other boot-strapping ...
-        
-        AreaRegistration.RegisterAllAreas();
-    }
-    
-### Ensure All Managed Modules are run for all requests ###
-
-The [swagger-ui](https://github.com/wordnik/swagger-ui) is a single page application (SPA) consisting of html, JavaScript and CSS. To serve up these files (.html, .js and .css extensions), you're web server must execute the ASP.NET Routing Module on all requests (as opposed to extensionless only). If the setting for this is not present in your Web.config, you'll need to add it manually:
-
-    <system.webServer>
-        <modules runAllManagedModulesForAllRequests="true" />
-        <!-- Other web server settings -->
-    </system.webServer>
-
-Extensibility
---------------------
+## Extensibility ##
 
 Swashbuckle automatically generates a Swagger spec and UI based off the WebApi ApiExplorer. The out-of-the-box generator caters for the majority of WebApi implementations but also includes some extensibility points for application-specific needs ..
 
@@ -78,21 +61,34 @@ You can customize the auto-generated spec by applying the following config optio
 
     SwaggerSpecConfig.Customize(c =>
         {
-            c.IgnoreObsoleteActions = true;
-            c.GroupDeclarationsBy(GetRootResource);
-            c.PostFilter<AddStandardResponseMessages>();
-            c.PostFilter<AddAuthorizationResponseMessages>();
-            c.MapType<MySerializableType>(new ModelSpec { Type = "string" });
+            c.ResolveTargetVersionUsing((req) => "2.0");
             
-            c.SubTypesOf<Product>()
-               .Include<Book>()
-               .Include<Album>()
-               .Include<Service>();
+            c.IgnoreObsoleteActions();
+            c.ResolveVersionSupportUsing((apiDesc, version) => GetVersionByAttribute(apiDesc) == version)
 
-            c.SubTypesOf<Service>()
-               .Include<Shipping>()
-               .Include<Packaging>();
+            c.GroupDeclarationsBy(RootResourceName)
+
+			c.MapType<MySerializeableType>(() => new DataType { Type = "string" });
+
+            c.PolymorphicType<Product>(pc => pc
+                .DiscriminateBy(p => p.Type)
+                .SubType<Book>()
+                .SubType<Album>()
+                .SubType<Service>(sc => sc
+                    .SubType<Shipping>()
+                    .SubType<Packaging>()));
+
+            c.OperationFilter<AddStandardResponseCodes>();
+            c.OperationFilter<AddAuthorizationResponseCodes>();
+
+            c.IncludeXmlComments(GetXmlCommentsPath());
         });
+
+#### ResolveTargetVersionUsing ####
+
+You can use this option to indicate the current version of your API.
+
+It may also be used in conjuction with the **ResolveVersionSupportUsing** to implement a UI that can switch between service versions. For example, something in the Swagger request (maybe a query param) could indicate the target version. Then you can provide a lambda for **ResolveVersionSupportUsing** that takes an ApiDescription and target version and determines if the action should be included in the Swagger spec for that version.
 
 #### IgnoreObsoleteActions ####
 
@@ -102,56 +98,15 @@ Set this option if you'd like to exclude any WebApi actions decorated with the S
 
 This option accepts a lambda as a strategy for grouping actions into ApiDeclarations. The default implementation groups by controller name. 
 
-#### PostFilter ####
-
-You can use this option to apply any number of filters that modify each "OperationSpec" after initial generation. For example ...
-
-A filter that enhances the spec with standard response code descriptions:
-
-    public class AddStandardResponseMessages : IOperationSpecFilter
-    {
-        public void Apply(ApiDescription apiDescription, OperationSpec operationSpec, ModelSpecMap modelSpecMap)
-        {
-            operationSpec.ResponseMessages.Add(new ResponseMessageSpec
-                {
-                    Code = (int) HttpStatusCode.OK,
-                    Message = "It's all good!"
-                });
-
-            operationSpec.ResponseMessages.Add(new ResponseMessageSpec
-            {
-                Code = (int)HttpStatusCode.InternalServerError,
-                Message = "Somethings up!"
-            });
-        }
-    }
-    
-Or, a filter that adds an authorization response code description to actions that are decorated with the AuthorizeAttribute:
-
-    public class AddAuthorizationResponseMessages : IOperationSpecFilter
-    {
-        public void Apply(ApiDescription apiDescription, OperationSpec operationSpec, ModelSpecMap modelSpecMap)
-        {
-            if (apiDescription.ActionDescriptor.GetFilters().OfType<AuthorizeAttribute>().Any())
-            {
-                operationSpec.ResponseMessages.Add(new ResponseMessageSpec
-                    {
-                        Code = (int) HttpStatusCode.Unauthorized,
-                        Message = "Authentication required"
-                    });
-            }
-        }
-    }
-
 #### MapType ####
 
-This option accepts a Type and a ModelSpec. It allows you to customize the ModelSpec for a given Type.
+This allows you to override the default DataType generation for a given Type. It's intended for the use-case when you have a class that is serialized to a primitive JSON type.
 
-#### SubTypesOf ####
+#### PolymorphicType ####
 
-The latest Swagger spec supports description of polymorphic models using a subTypes property. This can be applied to any complex model to indicate sub-types that are part of the API. However, coresponding support in the Swagger tools, including swagger-ui, is currently very limited.
+The Swagger spec provides a way to describe polymorphic models with **subTypes** and **discriminator** properties. Swashbuckle currently requires these to be explicitly configured. Later versions may include a feature to scan assemblies but in the meantime you can use the fluent "PolymorphicType" method to guide you.  
 
-That said, if you'd still like to describe polymorphic models in your raw spec, you can explicitly call out the sub-types for a given type using the "SubTypesOf" API as shown above. This will generate an additional complex model for each sub-type and bind them to the base model via the subTypes property:
+This will generate an additional complex model for each sub-type and bind them to the base model via the subTypes property:
 
      "Product": {
        "id": "Product",
@@ -165,10 +120,78 @@ That said, if you'd still like to describe polymorphic models in your raw spec, 
            "type": "number",
            "format": "double"
          }
+         "Type": {
+           "type": "string",
+         }
        },
        "required": [],
-       "subTypes": [ "Book", "Album", "Service" ]
+       "subTypes": [ "Book", "Album", "Service" ],
+       "discriminator": "Type"
      }
+
+**\*Note:** The [Swagger Spec](https://github.com/wordnik/swagger-spec/blob/master/versions/1.2.md) is typically ahead of swagger-ui and so the latter doesn't currently have support for displaying polymorphic types.
+
+#### ModelFilter ####
+
+This is similar to the **OperationFilter** option. It provides a way to customize the generated DataType/Model for complex Types in your API. Model filters implement the following interface:
+
+    public interface IModelFilter
+    {
+        void Apply(DataType model, DataTypeRegistry dataTypeRegistry, Type type);
+    }
+
+#### OperationFilter ####
+
+This provides a way to customize Operation descriptions by applying one or more filters after initial generation. For example:
+
+A filter that enhances the spec with standard response code descriptions ...
+
+    public class AddStandardResponseCodes : IOperationFilter
+    {
+        public void Apply(Operation operation, DataTypeRegistry dataTypeRegistry, ApiDescription apiDescription)
+        {
+            operation.ResponseMessages.Add(new ResponseMessage
+            {
+                Code = (int)HttpStatusCode.OK,
+                Message = "It's all good!"
+            });
+
+            operation.ResponseMessages.Add(new ResponseMessage
+            {
+                Code = (int)HttpStatusCode.InternalServerError,
+                Message = "Somethings up!"
+            });
+        }
+    }
+    
+Or, a filter that adds an authorization response description to actions that are decorated with the AuthorizeAttribute ...
+
+    public class AddAuthorizationResponseCodes : IOperationFilter
+    {
+        public void Apply(Operation operation, DataTypeRegistry dataTypeRegistry, ApiDescription apiDescription)
+        {
+            if (apiDescription.ActionDescriptor.GetFilters().OfType<AuthorizeAttribute>().Any())
+            {
+                operation.ResponseMessages.Add(new ResponseMessage
+                {
+                    Code = (int)HttpStatusCode.Unauthorized,
+                    Message = "Authentication required"
+                });
+            }
+        }
+    }
+
+The filter interface is relatively simple. In most cases, you just inspect the **apiDescription** and then modify the corresponding **operation** accordingly. If you're customizing DataType descriptions for the operation and need to register new Models for the underlying ApiDeclaration, you can use the provided **dataTypeRegistry**.
+
+#### Include Xml Comments ####
+
+If you annonate Controllers and API Types with Xml Comments, you can use this option to incorporate those comments into the generated spec and UI. The Xml tags are mapped to Swagger properties as follows:
+
+* **Action summary** -> Operation.Summary
+* **Action remarks** -> Operation.Notes
+* **Parameter summary** -> Operation.Parameters[name].Description
+* **Type summary** -> DataType.Descripton
+* **Property summary** -> DataType.Properties[name].Description
 
 ### Customize the swagger-ui ###
 
@@ -181,43 +204,98 @@ All of these options are exposed through Swashbuckle configuration ...
             c.SupportHeaderParams = true;
             c.DocExpansion = DocExpansion.List;
             c.SupportedSubmitMethods = new[] {HttpMethod.Get, HttpMethod.Post, HttpMethod.Put, HttpMethod.Head};
-            c.AddOnCompleteScript(typeof (SwaggerConfig).Assembly, "Swashbuckle.TestApp.SwaggerExtensions.onComplete.js");
-            c.AddStylesheet(typeof(SwaggerConfig).Assembly, "Swashbuckle.TestApp.SwaggerExtensions.customStyles.css");
+            c.InjectJavaScript(typeof (SwaggerConfig).Assembly, "Swashbuckle.TestApp.SwaggerExtensions.onComplete.js");
+            c.InjectStylesheet(typeof(SwaggerConfig).Assembly, "Swashbuckle.TestApp.SwaggerExtensions.customStyles.css");
         });
 
-The __AddOnCompleteScript__ and __AddStylesheet__ options allow custom JavaScript or CSS to be injected into the UI once it's loaded.
+The **InjectJavaScript** and **InjectStylesheet** options allow custom JavaScript or CSS to be injected into the UI once it's loaded.
 
-To do this, the file(s) must be added to your project as an "Embedded Resource". Then, you can inject them by specifying the containing Assembly and resource name as shown above.
+To do this, the file(s) **MUST** be added to your project as an "Embedded Resource". After that, you can inject them by specifying the containing Assembly and resource name as shown above.
 
-__TIP__: When you add an embedded resource (Right-click in Solution Explorer -> Properties -> Build Action), it is assigned the following name by default:
+**What's the resource name?**: When you add an embedded resource (Right-click in Solution Explorer -> Properties -> Build Action), it is assigned the following resource name by default:
 
 \<Project Default Namespace>.\<Escaped Folder Path>.\<File Name>
 
-For example, if your app's default namespace is "Swashbuckle.TestApp", and you have a custom script - "SwaggerExtensions/onComplete.js", then it will be assigned the following Logical Name at build time:
+So, if your app's default namespace is "Swashbuckle.TestApp", and you have a custom script - "SwaggerExtensions/onComplete.js", then it will be assigned the following resource name at build time:
 
 "Swashbuckle.TestApp.SwaggerExtensions.onComplete.js"
 
-Then, to inject the script, this name, along with the containing Assembly, would be passed to the AddOnCompleteScript call.
+## Transitioning to Swashbuckle 4.0 ##
 
-### Extract documentation from XML Comments ###
+If you're upgrading from a version prior to 4.0, the following information will help make the upgrade as seamless as possible
 
-WebApi ships with an [ApiExplorer](http://msdn.microsoft.com/en-us/library/system.web.http.description.apiexplorer.aspx) component that provides a service description based off routes, controllers and actions. Swashbuckle uses this to generate a corresponding Swagger spec.
+### Changes to Bootstrapping ###
 
-So, to have Swashbuckle pull descriptive fields from XML Comments in code, you'll need to start by wiring up this functionailty in ApiExplorer. This is done by implementing a custom IDocumentationProvider. Step 3) in this [blog](http://blogs.msdn.com/b/yaohuang1/archive/2012/05/21/asp-net-web-api-generating-a-web-api-help-page-using-apiexplorer.aspx) provides more details. The implementation described here extracts the "summary" node from XML Comments and ApiExplorer in turn set's this value on the ApiDescription.Documentation field. Finally, Swashbuckle maps this value to the "summary" field of the corresponding OperationSpec.
+Because Swashbuckle 4.0 has no dependency on ASP.Net MVC, the approach to bootstrapping is a little different. The upgrade should install a bootstrapper (App_Start/SwaggerConfig.cs) that is invoked on app start-up using [WeActivatorEx](https://github.com/davidebbo/WebActivator). If you're unable to access the Swagger content after upgrading, check out the [bootstrap troubleshooting steps](#missing-bootststrap-one-liner-only-applicable-to-40-and-above).
 
-However, Swagger also provides a second "notes" field for providing additional information on an operation. If you'd like to source both fields from the XML Comments, you can modify the implementation of XmlCommentsDocumentationProvider to return the whole XML block instead of just the summary node. Then, you can implement an operation spec filter to parse the XML and assign both the "summary" and "notes" fields accordingly:
+### Changes to the Config API ###
 
-    public class ExtractXmlComments : IOperationSpecFilter
+* SwaggerSpecConfig and SwaggerUiConfig classes have moved namespace from Swashbuckle.Models to Swashbuckle.Application.
+* ApiVersion has been replaced with a method - ResolveTargetVersionUsing that accepts a lambda.
+* IgnoreObsoleteActions has been converted to a method.
+* IOperationFilter interface has moved namespace from Swashbuckle.Models to Swashbuckle.Swagger
+* It's signature has also been simplified - see the [Extensibility](#operationfilter) section for more details
+* Some of the Swagger types have been renamed to better reflect terminology used in the [Swagger Spec](https://github.com/wordnik/swagger-spec/blob/master/versions/1.2.md)
+    * the "Spec" suffix has been removed from several of the class names, e.g. OperationSpec is now called Operation
+    * The ModelSpec class has been renamed to DataType as it describes both primitive and complex data types (Models).
+
+### Leveraging Xml Comments ###
+
+In previous versions this was left up to the app - typically with a custom implementation of the WebApi's IDocumentationProvider and an IOperationFilter that parses the XML into the relevant Swagger properties
+. Version 4.0 supports this out-of-the-box and so both of these artifacts can be removed from your app. See the [Extensibilty](#extensibility) section for details on including Xml Comments.
+
+## Troubleshooting Steps ##
+
+### Missing Bootststrap One-liner (*only applicable to 4.0 and above)###
+
+As of version 4.0, Swashbuckle has no dependency on ASP.Net MVC and so, routes are no longer wired up through an MVC Area. Instead, the Swashbuckle package will install a bootstrapper (App_Start/SwaggerConfig.cs) that is invoked on app start-up using [WeActivatorEx](https://github.com/davidebbo/WebActivator). You should ensure that this file exists and is annotated with the following assembly attribute:
+
+    [assembly: PreApplicationStartMethod(.....)]
+
+In addition, the referenced static method should contain the following line to initiate Swashbuckle:
+
+    Swashbuckle.Bootstrapper.Init(GlobalConfiguration.Configuration);
+
+### Ensure All Managed Modules are run for all requests ###
+
+The [swagger-ui](https://github.com/wordnik/swagger-ui) is a single page application (SPA) consisting of html, JavaScript and CSS. To serve up these files (.html, .js and .css), you're web server must execute the ASP.NET Routing Module on all requests (as opposed to just extensionless URL's). If the setting for this is not present in your Web.config, you'll need to add it manually:
+
+    <system.webServer>
+        <modules runAllManagedModulesForAllRequests="true" />
+        <!-- Other web server settings -->
+    </system.webServer>
+
+### Conflicting Model Id's ###
+
+If you see the following error message in the Swagger UI ...
+
+***Unable to read api '.....' from path ..... (server returned undefined)***
+
+It's likely because something went wrong during the spec generation. You can dig a little deeper by browsing to the path in question. When you do this, you may see the following error message:
+
+***Failed to generate Swagger models with unique Id's. Do you have multiple API types with the same class name?***
+
+This is by design and will occur if one or more of your API types have conflicting class names - e.g. Namespace1.Customer, Namespace2.Customer etc. Actually, the class names need only be unique within a given ApiDeclaration, the scope if which is customizeable via the [GroupDeclarationsBy](#groupdeclarationsby) option described below. 
+
+### Issues with VS 2013 ###
+
+VS 2103 ships with a new feature - Browser Link that improves the web development workflow by setting up a channel between the IDE and pages being previewed in a local browser. It does this by dynamically injecting JavaScript into your files.
+
+Although this JavaScript SHOULD have no affect on your production code, it appears to be breaking the swagger-ui.
+
+I hope to find a permanent fix but in the meantime, you'll need to workaround this isuse by disabling the feature in your web.config:
+
+    <appSettings>
+        <add key="vs:EnableBrowserLink" value="false"/>
+    </appSettings>< appSettings> 
+
+### Missing Area Registration (*only applicable to 3.x and below)###
+
+Prior to version 4.0, Swashbuckle wires up it's routes as an MVC Area. In MVC projects, all Areas are usually registered at application startup. If the code to do this is not present in your Global.asax.cs, you'll need to add it manually:
+
+    protected void Application_Start()
     {
-        public void Apply(ApiDescription apiDescription, OperationSpec operationSpec, ModelSpecMap modelSpecMap)
-        {
-            var descriptionXml = XElement.Parse(apiDescription.Documentation);
-
-            var summary = descriptionXml.Element("summary");
-            operationSpec.Summary = summary != null ? summary.Value : descriptionXml.Value;
-
-            var notes = descriptionXml.Element("remarks");
-            if (notes != null)
-                operationSpec.Notes = notes.Value;
-        }
+        // Other boot-strapping ...
+        
+        AreaRegistration.RegisterAllAreas();
     }
