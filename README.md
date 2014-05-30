@@ -32,9 +32,9 @@ If youre service is hosted in IIS, you can start exposing Swagger docs and a cor
 
 This will add a reference to Swashbuckle.Core, which contains the generator and embedded swagger-ui. It will also install a bootstrapper (App_Start/SwaggerConfig.cs) that initiates Swashbuckle on app start-up using [WeActivatorEx](https://github.com/davidebbo/WebActivator). Once installed, you should be able to browse the following raw docs and UI endpoints: 
 
-***swagger/api-docs***
+***\<your-api-endpoint\>/swagger/api-docs***
 
-***swagger***
+***\<your-api-endpoint\>/swagger***
 
 ### Self-hosted ###
 
