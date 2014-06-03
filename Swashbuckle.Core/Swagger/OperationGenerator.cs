@@ -7,8 +7,8 @@ namespace Swashbuckle.Swagger
 {
     public class OperationGenerator
     {
-        private readonly IEnumerable<IOperationFilter> _operationFilters;
         private readonly DataTypeRegistry _dataTypeRegistry;
+        private readonly IEnumerable<IOperationFilter> _operationFilters;
 
         public OperationGenerator(DataTypeRegistry dataTypeRegistry, IEnumerable<IOperationFilter> operationFilters)
         {
@@ -69,6 +69,7 @@ namespace Swashbuckle.Swagger
                 case ApiParameterSource.FromBody:
                     paramType = "body";
                     break;
+
                 case ApiParameterSource.FromUri:
                     paramType = apiPath.Contains(String.Format("{{{0}}}", apiParamDesc.Name)) ? "path" : "query";
                     break;
@@ -79,22 +80,30 @@ namespace Swashbuckle.Swagger
                 ParamType = paramType,
                 Name = apiParamDesc.Name,
                 Description = apiParamDesc.Documentation,
-                Required = !apiParamDesc.ParameterDescriptor.IsOptional
+                Required = apiParamDesc.ParameterDescriptor != null ? !apiParamDesc.ParameterDescriptor.IsOptional : true //Note: Unknown parameters should be required ?
             };
 
-            var dataType = _dataTypeRegistry.GetOrRegister(apiParamDesc.ParameterDescriptor.ParameterType);
-            if (dataType.Type == "object")
+            DataType dataType = null;
+            if (apiParamDesc.ParameterDescriptor != null)
+                dataType = _dataTypeRegistry.GetOrRegister(apiParamDesc.ParameterDescriptor.ParameterType);
+            if (dataType != null)
             {
-                parameter.Type = dataType.Id;
+                if (dataType.Type == "object")
+                {
+                    parameter.Type = dataType.Id;
+                }
+                else
+                {
+                    parameter.Type = dataType.Type;
+                    parameter.Format = dataType.Format;
+                    parameter.Items = dataType.Items;
+                    parameter.Enum = dataType.Enum;
+                }
             }
             else
             {
-                parameter.Type = dataType.Type;
-                parameter.Format = dataType.Format;
-                parameter.Items = dataType.Items;
-                parameter.Enum = dataType.Enum;
+                parameter.Type = "string";
             }
-
             return parameter;
         }
     }
