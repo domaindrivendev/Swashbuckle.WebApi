@@ -23,6 +23,30 @@ namespace Swashbuckle.Dummy.Controllers
             throw new NotImplementedException();
         }
 
+        [Route("unicorns/{id}")]
+        [Authorize]
+        public HttpResponseMessage DeleteUnicorn(int id)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// Returns a kitten
+        /// </summary>
+        /// <param name="id">Kitten id</param>
+        /// <returns></returns>
+        [Route("{garden}/kittens/{id}")]
+        public JObject GetKitten(int id)
+        {
+            throw new NotImplementedException();
+        }
+
+        [Route("{universe}/unicorns/{id}")]
+        public Unicorn GetUnicorn(int id)
+        {
+            throw new NotImplementedException();
+        }
+
         /// <summary>
         /// Returns a list of unicorns filtered by property names
         /// </summary>
@@ -32,13 +56,6 @@ namespace Swashbuckle.Dummy.Controllers
         /// <returns></returns>
         [Route("unicorns")]
         public IEnumerable<Unicorn> GetUnicorns(Dictionary<string, string> propertyValues)
-        {
-            throw new NotImplementedException();
-        }
-
-        [Route("unicorns/{id}")]
-        [Authorize]
-        public HttpResponseMessage DeleteUnicorn(int id)
         {
             throw new NotImplementedException();
         }

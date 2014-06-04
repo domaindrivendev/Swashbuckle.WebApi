@@ -18,14 +18,36 @@ namespace Swashbuckle.Tests.Swagger
 
         private ApiExplorer _apiExplorer;
 
-        [TestFixtureSetUp]
-        public void Setup()
+        [Test]
+        public void It_should_apply_all_configured_operation_filters()
         {
-            // Get dummy ApiExplorer
-            var config = new HttpConfiguration();
-            Dummy.WebApiConfig.Register(config);
-            _apiExplorer = new ApiExplorer(config);
-            config.EnsureInitialized();
+            var operationFilters = new IOperationFilter[] { new AddStandardResponseCodes(), new AddAuthResponseCodes() };
+            var swaggerProvider = GetSwaggerProvider(operationFilters: operationFilters);
+
+            Api(swaggerProvider, "Products", "/products", api =>
+                {
+                    Operation(api, "GET", 0, operation => Assert.AreEqual(2, operation.ResponseMessages.Count));
+
+                    Operation(api, "GET", 1, operation => Assert.AreEqual(2, operation.ResponseMessages.Count));
+                });
+
+            Api(swaggerProvider, "Products", "/products/{id}/suspend", api =>
+                Operation(api, "PUT", 0, operation => Assert.AreEqual(2, operation.ResponseMessages.Count)));
+
+            Api(swaggerProvider, "Customers", "/customers", api =>
+                Operation(api, "POST", 0, operation => Assert.AreEqual(2, operation.ResponseMessages.Count)));
+
+            Api(swaggerProvider, "Customers", "/customers/{id}", api =>
+                Operation(api, "PUT", 0, operation => Assert.AreEqual(2, operation.ResponseMessages.Count)));
+
+            Api(swaggerProvider, "RandomStuff", "/kittens", api =>
+                Operation(api, "POST", 0, operation => Assert.AreEqual(2, operation.ResponseMessages.Count)));
+
+            Api(swaggerProvider, "RandomStuff", "/unicorns", api =>
+                Operation(api, "POST", 0, operation => Assert.AreEqual(2, operation.ResponseMessages.Count)));
+
+            Api(swaggerProvider, "RandomStuff", "/unicorns/{id}", api =>
+                Operation(api, "DELETE", 0, operation => Assert.AreEqual(3, operation.ResponseMessages.Count)));
         }
 
         [Test]
@@ -44,33 +66,6 @@ namespace Swashbuckle.Tests.Swagger
                 "Customers declaration not listed");
             Assert.IsTrue(resourceListing.Apis.Any(a => a.Path == "/RandomStuff"),
                 "RandomStuff declaration not listed");
-        }
-
-        [Test]
-        public void It_should_generate_declarations_grouped_by_the_configured_strategy()
-        {
-            var swaggerProvider = GetSwaggerProvider(resourceNameResolver: (apiDesc) => apiDesc.ActionDescriptor.ControllerDescriptor.ControllerName);
-
-            ApiDeclaration(swaggerProvider, "Products", dec =>
-                {
-                    Assert.AreEqual("1.2", dec.SwaggerVersion);
-                    Assert.AreEqual("http://tempuri.org", dec.BasePath);
-                    Assert.AreEqual("/Products", dec.ResourcePath);
-                });
-
-            ApiDeclaration(swaggerProvider, "Customers", dec =>
-                {
-                    Assert.AreEqual("1.2", dec.SwaggerVersion);
-                    Assert.AreEqual("http://tempuri.org", dec.BasePath);
-                    Assert.AreEqual("/Customers", dec.ResourcePath);
-                });
-
-            ApiDeclaration(swaggerProvider, "RandomStuff", dec =>
-            {
-                Assert.AreEqual("1.2", dec.SwaggerVersion);
-                Assert.AreEqual("http://tempuri.org", dec.BasePath);
-                Assert.AreEqual("/RandomStuff", dec.ResourcePath);
-            });
         }
 
         [Test]
@@ -102,12 +97,16 @@ namespace Swashbuckle.Tests.Swagger
 
                 Api(dec, "/kittens", api => Assert.IsNull(api.Description));
 
+                Api(dec, "{garden}/kittens/{id}", api => Assert.IsNull(api.Description));
+
                 Api(dec, "/unicorns", api => Assert.IsNull(api.Description));
 
                 Api(dec, "/unicorns/{id}", api => Assert.IsNull(api.Description));
+
+                Api(dec, "{universe}/unicorns/{id}", api => Assert.IsNull(api.Description));
             });
         }
-       
+
         [Test]
         public void It_should_generate_an_operation_for_each_verb_on_a_given_uri()
         {
@@ -343,7 +342,7 @@ namespace Swashbuckle.Tests.Swagger
 
             Api(swaggerProvider, "RandomStuff", "/unicorns/{id}", api =>
                 {
-                    // 1: DELETE /kittens
+                    // 1: DELETE /unicorns
                     Assert.AreEqual(1, api.Operations.Count);
                     Operation(api, "DELETE", 0, operation =>
                     {
@@ -369,14 +368,111 @@ namespace Swashbuckle.Tests.Swagger
                         });
                     });
                 });
+
+            Api(swaggerProvider, "RandomStuff", "{universe}/unicorns/{id}", api =>
+            {
+                // 1: GET /unicorns
+                Assert.AreEqual(1, api.Operations.Count);
+                Operation(api, "GET", 0, operation =>
+                {
+                    Assert.AreEqual("RandomStuff_GETUnicorn", operation.Nickname);
+                    Assert.IsNull(operation.Summary);
+                    Assert.IsNull(operation.Notes);
+                    Assert.AreEqual("string", operation.Type);
+                    Assert.IsNull(operation.Format);
+                    Assert.IsNull(operation.Items);
+                    Assert.IsNull(operation.Enum);
+
+                    Assert.AreEqual(2, operation.Parameters.Count);
+
+                    Parameter(operation, "id", parameter =>
+                    {
+                        Assert.AreEqual("path", parameter.ParamType);
+                        Assert.IsNull(parameter.Description);
+                        Assert.AreEqual(true, parameter.Required);
+                        Assert.AreEqual("integer", parameter.Type);
+                        Assert.AreEqual("int32", parameter.Format);
+                        Assert.IsNull(parameter.Items);
+                        Assert.IsNull(parameter.Enum);
+                    });
+
+                    Parameter(operation, "universe", parameter =>
+                    {
+                        Assert.AreEqual("path", parameter.ParamType);
+                        Assert.IsNull(parameter.Description);
+                        Assert.AreEqual(true, parameter.Required);
+                        Assert.AreEqual("string", parameter.Type);
+                        Assert.IsNull(parameter.Items);
+                        Assert.IsNull(parameter.Enum);
+                    });
+                });
+            });
+
+            Api(swaggerProvider, "RandomStuff", "{garden}/kittens/{id}", api =>
+            {
+                // 1: GET {garden}/kittens/{Id}
+                Assert.AreEqual(1, api.Operations.Count);
+                Operation(api, "GET", 0, operation =>
+                {
+                    Assert.AreEqual("RandomStuff_GETkittens", operation.Nickname);
+                    Assert.IsNull(operation.Summary);
+                    Assert.IsNull(operation.Notes);
+                    Assert.AreEqual("string", operation.Type);
+                    Assert.IsNull(operation.Format);
+                    Assert.IsNull(operation.Items);
+                    Assert.IsNull(operation.Enum);
+
+                    Assert.AreEqual(2, operation.Parameters.Count);
+
+                    Parameter(operation, "id", parameter =>
+                    {
+                        Assert.AreEqual("path", parameter.ParamType);
+                        Assert.IsNull(parameter.Description);
+                        Assert.AreEqual(true, parameter.Required);
+                        Assert.AreEqual("integer", parameter.Type);
+                        Assert.AreEqual("int32", parameter.Format);
+                        Assert.IsNull(parameter.Items);
+                        Assert.IsNull(parameter.Enum);
+                    });
+
+                    Parameter(operation, "garden", parameter =>
+                    {
+                        Assert.AreEqual("path", parameter.ParamType);
+                        Assert.IsNull(parameter.Description);
+                        Assert.AreEqual(true, parameter.Required);
+                        Assert.AreEqual("string", parameter.Type);
+                        Assert.IsNull(parameter.Items);
+                        Assert.IsNull(parameter.Enum);
+                    });
+                });
+            });
         }
 
         [Test]
-        public void It_should_honor_the_config_setting_to_ignore_obsolete_actions()
+        public void It_should_generate_declarations_grouped_by_the_configured_strategy()
         {
-            var swaggerProvider = GetSwaggerProvider(ignoreObsoletetActions: true);
+            var swaggerProvider = GetSwaggerProvider(resourceNameResolver: (apiDesc) => apiDesc.ActionDescriptor.ControllerDescriptor.ControllerName);
 
-            ApiDeclaration(swaggerProvider, "Products", dec => Assert.AreEqual(1, dec.Apis.Count));
+            ApiDeclaration(swaggerProvider, "Products", dec =>
+                {
+                    Assert.AreEqual("1.2", dec.SwaggerVersion);
+                    Assert.AreEqual("http://tempuri.org", dec.BasePath);
+                    Assert.AreEqual("/Products", dec.ResourcePath);
+                });
+
+            ApiDeclaration(swaggerProvider, "Customers", dec =>
+                {
+                    Assert.AreEqual("1.2", dec.SwaggerVersion);
+                    Assert.AreEqual("http://tempuri.org", dec.BasePath);
+                    Assert.AreEqual("/Customers", dec.ResourcePath);
+                });
+
+            ApiDeclaration(swaggerProvider, "RandomStuff", dec =>
+            {
+                Assert.AreEqual("1.2", dec.SwaggerVersion);
+                Assert.AreEqual("http://tempuri.org", dec.BasePath);
+                Assert.AreEqual("/RandomStuff", dec.ResourcePath);
+            });
         }
 
         [Test]
@@ -391,7 +487,7 @@ namespace Swashbuckle.Tests.Swagger
 
                 Model(dec, "Product", model =>
                     {
-                        CollectionAssert.AreEqual(new[] {"Name", "Price", "Type"}, model.Required);
+                        CollectionAssert.AreEqual(new[] { "Name", "Price", "Type" }, model.Required);
                         Assert.AreEqual(4, model.Properties.Count);
 
                         ModelProperty(model, "Id", property =>
@@ -423,7 +519,7 @@ namespace Swashbuckle.Tests.Swagger
                                 Assert.AreEqual("string", property.Type);
                                 Assert.IsNull(property.Format);
                                 Assert.IsNull(property.Items);
-                                CollectionAssert.AreEqual(new[] {"Book", "Album", "Shipping", "Packaging"}, property.Enum);
+                                CollectionAssert.AreEqual(new[] { "Book", "Album", "Shipping", "Packaging" }, property.Enum);
                             });
                     });
             });
@@ -566,37 +662,6 @@ namespace Swashbuckle.Tests.Swagger
         }
 
         [Test]
-        public void It_should_override_generation_of_datatype_for_explictly_mapped_types()
-        {
-            var customMappings = new Dictionary<Type, Func<DataType>> {{typeof (Product), () => new DataType {Type = "string"}}};
-            var swaggerProvider = GetSwaggerProvider(customTypeMappings: customMappings);
-
-            ApiDeclaration(swaggerProvider, "Products", dec =>
-                {
-                    Api(dec, "/products", api =>
-                        {
-                            Operation(api, "GET", 0, operation =>
-                                {
-                                    Assert.AreEqual("array", operation.Type);
-                                    Assert.IsNull(operation.Format);
-                                    Assert.AreEqual("string", operation.Items.Type);
-                                    Assert.IsNull(operation.Enum);
-                                });
-
-                            Operation(api, "GET", 1, operation =>
-                                {
-                                    Assert.AreEqual("array", operation.Type);
-                                    Assert.IsNull(operation.Format);
-                                    Assert.AreEqual("string", operation.Items.Type);
-                                    Assert.IsNull(operation.Enum);
-                                });
-                        });
-
-                    CollectionAssert.IsEmpty(dec.Models);
-                });
-        }
-
-        [Test]
         public void It_should_generate_models_for_explicitly_configured_sub_types()
         {
             var productType = new BasePolymorphicType<Product>()
@@ -647,7 +712,7 @@ namespace Swashbuckle.Tests.Swagger
                                     CollectionAssert.AreEqual(new[] { "Book", "Album", "Shipping", "Packaging" }, property.Enum);
                                 });
 
-                            CollectionAssert.AreEqual(new[] {"Book", "Album", "Service"}, model.SubTypes);
+                            CollectionAssert.AreEqual(new[] { "Book", "Album", "Service" }, model.SubTypes);
                             Assert.AreEqual("Type", model.Discriminator);
                         });
 
@@ -686,7 +751,7 @@ namespace Swashbuckle.Tests.Swagger
                     Model(dec, "Service", model =>
                         {
                             CollectionAssert.IsEmpty(model.Properties);
-                            CollectionAssert.AreEqual(new[] {"Shipping", "Packaging"}, model.SubTypes);
+                            CollectionAssert.AreEqual(new[] { "Shipping", "Packaging" }, model.SubTypes);
                             Assert.IsNull(model.Discriminator);
                         });
 
@@ -707,58 +772,52 @@ namespace Swashbuckle.Tests.Swagger
         }
 
         [Test]
-        public void It_should_apply_all_configured_operation_filters()
+        public void It_should_honor_the_config_setting_to_ignore_obsolete_actions()
         {
-            var operationFilters = new IOperationFilter[] {new AddStandardResponseCodes(), new AddAuthResponseCodes()};
-            var swaggerProvider = GetSwaggerProvider(operationFilters: operationFilters);
+            var swaggerProvider = GetSwaggerProvider(ignoreObsoletetActions: true);
 
-            Api(swaggerProvider, "Products", "/products", api =>
+            ApiDeclaration(swaggerProvider, "Products", dec => Assert.AreEqual(1, dec.Apis.Count));
+        }
+
+        [Test]
+        public void It_should_override_generation_of_datatype_for_explictly_mapped_types()
+        {
+            var customMappings = new Dictionary<Type, Func<DataType>> { { typeof(Product), () => new DataType { Type = "string" } } };
+            var swaggerProvider = GetSwaggerProvider(customTypeMappings: customMappings);
+
+            ApiDeclaration(swaggerProvider, "Products", dec =>
                 {
-                    Operation(api, "GET", 0, operation => Assert.AreEqual(2, operation.ResponseMessages.Count));
+                    Api(dec, "/products", api =>
+                        {
+                            Operation(api, "GET", 0, operation =>
+                                {
+                                    Assert.AreEqual("array", operation.Type);
+                                    Assert.IsNull(operation.Format);
+                                    Assert.AreEqual("string", operation.Items.Type);
+                                    Assert.IsNull(operation.Enum);
+                                });
 
-                    Operation(api, "GET", 1, operation => Assert.AreEqual(2, operation.ResponseMessages.Count));
+                            Operation(api, "GET", 1, operation =>
+                                {
+                                    Assert.AreEqual("array", operation.Type);
+                                    Assert.IsNull(operation.Format);
+                                    Assert.AreEqual("string", operation.Items.Type);
+                                    Assert.IsNull(operation.Enum);
+                                });
+                        });
+
+                    CollectionAssert.IsEmpty(dec.Models);
                 });
-
-            Api(swaggerProvider, "Products", "/products/{id}/suspend", api =>
-                Operation(api, "PUT", 0, operation => Assert.AreEqual(2, operation.ResponseMessages.Count)));
-
-            Api(swaggerProvider, "Customers", "/customers", api =>
-                Operation(api, "POST", 0, operation => Assert.AreEqual(2, operation.ResponseMessages.Count)));
-
-            Api(swaggerProvider, "Customers", "/customers/{id}", api =>
-                Operation(api, "PUT", 0, operation => Assert.AreEqual(2, operation.ResponseMessages.Count)));
-
-            Api(swaggerProvider, "RandomStuff", "/kittens", api =>
-                Operation(api, "POST", 0, operation => Assert.AreEqual(2, operation.ResponseMessages.Count)));
-
-            Api(swaggerProvider, "RandomStuff", "/unicorns", api =>
-                Operation(api, "POST", 0, operation => Assert.AreEqual(2, operation.ResponseMessages.Count)));
-
-            Api(swaggerProvider, "RandomStuff", "/unicorns/{id}", api =>
-                Operation(api, "DELETE", 0, operation => Assert.AreEqual(3, operation.ResponseMessages.Count)));
         }
 
-        private ISwaggerProvider GetSwaggerProvider(
-            bool ignoreObsoletetActions = false,
-            Func<ApiDescription, string> resourceNameResolver = null,
-            Dictionary<Type, Func<DataType>> customTypeMappings = null,
-            IEnumerable<PolymorphicType> polymorphicTypes = null,
-            IEnumerable<IOperationFilter> operationFilters = null)
+        [TestFixtureSetUp]
+        public void Setup()
         {
-            return new ApiExplorerAdapter(
-                _apiExplorer,
-                ignoreObsoletetActions,
-                (apiDesc, version) => true,
-                resourceNameResolver ?? (apiDesc => apiDesc.ActionDescriptor.ControllerDescriptor.ControllerName),
-                customTypeMappings ?? new Dictionary<Type, Func<DataType>>(), 
-                polymorphicTypes ?? new PolymorphicType[]{},
-                new List<IModelFilter>(), operationFilters ?? new List<IOperationFilter>());
-        }
-
-        private static void ApiDeclaration(ISwaggerProvider swaggerProvider, string resourceName, Action<ApiDeclaration> applyAssertions)
-        {
-            var declaration = swaggerProvider.GetDeclaration(RequestedBasePath, RequestedVersion, resourceName);
-            applyAssertions(declaration);
+            // Get dummy ApiExplorer
+            var config = new HttpConfiguration();
+            Dummy.WebApiConfig.Register(config);
+            _apiExplorer = new ApiExplorer(config);
+            config.EnsureInitialized();
         }
 
         private static void Api(ApiDeclaration declaration, string apiPath, Action<Api> applyAssertions)
@@ -777,16 +836,10 @@ namespace Swashbuckle.Tests.Swagger
             applyAssertions(api);
         }
 
-        private static void Operation(Api api, string httpMethod, int index, Action<Operation> applyAssertions)
+        private static void ApiDeclaration(ISwaggerProvider swaggerProvider, string resourceName, Action<ApiDeclaration> applyAssertions)
         {
-            var operation = api.Operations.Where(op => op.Method == httpMethod).ElementAt(index);
-            applyAssertions(operation);
-        }
-
-        private static void Parameter(Operation operation, string name, Action<Parameter> applyAssertions)
-        {
-            var parameter = operation.Parameters.Single(param => param.Name == name);
-            applyAssertions(parameter);
+            var declaration = swaggerProvider.GetDeclaration(RequestedBasePath, RequestedVersion, resourceName);
+            applyAssertions(declaration);
         }
 
         private static void Model(ApiDeclaration declaration, string id, Action<DataType> applyAssertions)
@@ -799,6 +852,35 @@ namespace Swashbuckle.Tests.Swagger
         {
             var modelProperty = model.Properties[name];
             applyAssertions(modelProperty);
+        }
+
+        private static void Operation(Api api, string httpMethod, int index, Action<Operation> applyAssertions)
+        {
+            var operation = api.Operations.Where(op => op.Method == httpMethod).ElementAt(index);
+            applyAssertions(operation);
+        }
+
+        private static void Parameter(Operation operation, string name, Action<Parameter> applyAssertions)
+        {
+            var parameter = operation.Parameters.Single(param => param.Name == name);
+            applyAssertions(parameter);
+        }
+
+        private ISwaggerProvider GetSwaggerProvider(
+            bool ignoreObsoletetActions = false,
+            Func<ApiDescription, string> resourceNameResolver = null,
+            Dictionary<Type, Func<DataType>> customTypeMappings = null,
+            IEnumerable<PolymorphicType> polymorphicTypes = null,
+            IEnumerable<IOperationFilter> operationFilters = null)
+        {
+            return new ApiExplorerAdapter(
+                _apiExplorer,
+                ignoreObsoletetActions,
+                (apiDesc, version) => true,
+                resourceNameResolver ?? (apiDesc => apiDesc.ActionDescriptor.ControllerDescriptor.ControllerName),
+                customTypeMappings ?? new Dictionary<Type, Func<DataType>>(),
+                polymorphicTypes ?? new PolymorphicType[] { },
+                new List<IModelFilter>(), operationFilters ?? new List<IOperationFilter>());
         }
     }
 }
