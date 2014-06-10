@@ -75,17 +75,20 @@ namespace Swashbuckle.Swagger
                     break;
             }
 
+            if (apiParamDesc.ParameterDescriptor == null)
+            {
+                return new Parameter { ParamType = paramType, Name = apiParamDesc.Name, Required = true, Type = "string" };
+            }
+
             var parameter = new Parameter
             {
                 ParamType = paramType,
                 Name = apiParamDesc.Name,
                 Description = apiParamDesc.Documentation,
-                Required = apiParamDesc.ParameterDescriptor != null ? !apiParamDesc.ParameterDescriptor.IsOptional : true //Note: Unknown parameters should be required ?
+                Required = !apiParamDesc.ParameterDescriptor.IsOptional
             };
 
-            DataType dataType = null;
-            if (apiParamDesc.ParameterDescriptor != null)
-                dataType = _dataTypeRegistry.GetOrRegister(apiParamDesc.ParameterDescriptor.ParameterType);
+            DataType dataType = _dataTypeRegistry.GetOrRegister(apiParamDesc.ParameterDescriptor.ParameterType);
             if (dataType != null)
             {
                 if (dataType.Type == "object")
@@ -100,10 +103,7 @@ namespace Swashbuckle.Swagger
                     parameter.Enum = dataType.Enum;
                 }
             }
-            else
-            {
-                parameter.Type = "string";
-            }
+
             return parameter;
         }
     }
