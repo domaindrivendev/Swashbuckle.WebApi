@@ -27,7 +27,9 @@ namespace Swashbuckle.Swagger
         {
             var methodNode = _navigator.SelectSingleNode(GetXPathFor(apiDescription.ActionDescriptor));
 
-            operation.Summary = GetChildValueOrDefault(methodNode, SummaryExpression);
+            string summary = GetChildValueOrDefault(methodNode, SummaryExpression);
+            if(!string.IsNullOrEmpty(summary))
+                operation.Summary = summary;
             operation.Notes = GetChildValueOrDefault(methodNode, RemarksExpression);
 
             foreach (var paramDesc in apiDescription.ParameterDescriptions)
