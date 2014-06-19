@@ -29,7 +29,9 @@ namespace Swashbuckle.Swagger
                 Nickname = apiDescription.Nickname(),
                 Summary = apiDescription.Documentation,
                 Parameters = parameters,
-                ResponseMessages = new List<ResponseMessage>()
+                ResponseMessages = new List<ResponseMessage>(),
+                Produces = apiDescription.SupportedResponseFormatters.SelectMany(d => d.SupportedMediaTypes.Select(t => t.MediaType)).ToList(),
+                Consumes = apiDescription.SupportedRequestBodyFormatters.SelectMany(d => d.SupportedMediaTypes.Select(t => t.MediaType)).ToList()
             };
 
             var responseType = apiDescription.ActualResponseType();
