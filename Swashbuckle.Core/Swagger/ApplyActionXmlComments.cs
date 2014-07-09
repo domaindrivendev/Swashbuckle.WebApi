@@ -27,15 +27,15 @@ namespace Swashbuckle.Swagger
         {
             var methodNode = _navigator.SelectSingleNode(GetXPathFor(apiDescription.ActionDescriptor));
 
-            operation.Summary = GetChildValueOrDefault(methodNode, SummaryExpression);
-            operation.Notes = GetChildValueOrDefault(methodNode, RemarksExpression);
+            operation.Summary = GetFirstDescendantTextValueOrDefault(methodNode, SummaryExpression);
+            operation.Notes = GetFirstDescendantTextValueOrDefault(methodNode, RemarksExpression);
 
             foreach (var paramDesc in apiDescription.ParameterDescriptions)
             {
                 var parameter = operation.Parameters.SingleOrDefault(p => p.Name == paramDesc.Name);
                 if (parameter == null) continue;
 
-                parameter.Description = GetChildValueOrDefault(methodNode, String.Format(ParameterExpression, paramDesc.Name));
+                parameter.Description = GetFirstDescendantTextValueOrDefault(methodNode, String.Format(ParameterExpression, paramDesc.ParameterDescriptor.ParameterName));
             }
 
             if (methodNode == null) return;
@@ -81,12 +81,14 @@ namespace Swashbuckle.Swagger
             return type.Namespace + "." + type.Name;
         }
 
-        private static string GetChildValueOrDefault(XPathNavigator node, string childExpression)
+        private static string GetFirstDescendantTextValueOrDefault(XPathNavigator node, string childExpression)
         {
             if (node == null) return null;
-
             var childNode = node.SelectSingleNode(childExpression);
-            return (childNode == null) ? null : childNode.Value.Trim();
+            if (childNode == null) return null;
+
+            var subnodes = childNode.SelectDescendants(XPathNodeType.Text, true);
+            return subnodes.Count > 0 ? subnodes.Current.ToString() : null;
         }
 
         private static IEnumerable<ResponseMessage> GetResponseMessages(XPathNavigator node)
@@ -95,10 +97,10 @@ namespace Swashbuckle.Swagger
             while (iterator.MoveNext())
             {
                 yield return new ResponseMessage
-                    {
-                        Code = Int32.Parse(iterator.Current.GetAttribute("code", String.Empty)),
-                        Message = iterator.Current.Value
-                    };
+                {
+                    Code = Int32.Parse(iterator.Current.GetAttribute("code", String.Empty)),
+                    Message = iterator.Current.Value
+                };
             }
         }
     }
