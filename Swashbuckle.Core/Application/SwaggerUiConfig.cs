@@ -9,7 +9,7 @@ namespace Swashbuckle.Application
     {
         internal static readonly SwaggerUiConfig StaticInstance = new SwaggerUiConfig();
 
-        private SwaggerUiConfig()
+        public SwaggerUiConfig()
         {
             SupportHeaderParams = false;
             SupportedSubmitMethods = new[] { HttpMethod.Get, HttpMethod.Post, HttpMethod.Put };

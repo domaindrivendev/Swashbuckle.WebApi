@@ -2,7 +2,7 @@
 using System.Net.Http;
 using System.Web.Http;
 using Swashbuckle.Application;
-using Swashbuckle.Dummy.Models;
+using Swashbuckle.Dummy.Controllers;
 using Swashbuckle.Dummy.SwaggerExtensions;
 
 namespace Swashbuckle.Dummy
@@ -19,13 +19,9 @@ namespace Swashbuckle.Dummy
             
                     c.IgnoreObsoleteActions();
 
-                    c.PolymorphicType<Product>(pc => pc
-                        .DiscriminateBy(p => p.Type)
-                        .SubType<Book>()
-                        .SubType<Album>()
-                        .SubType<Service>(sc => sc
-                            .SubType<Shipping>()
-                            .SubType<Packaging>()));
+                    //c.PolymorphicType<Animal>(ac => ac
+                    //    .DiscriminateBy(a => a.Type)
+                    //    .SubType<Kitten>());
 
                     c.OperationFilter<AddStandardResponseCodes>();
                     c.OperationFilter<AddAuthResponseCodes>();
