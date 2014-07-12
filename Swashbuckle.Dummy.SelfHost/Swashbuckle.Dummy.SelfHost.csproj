@@ -67,6 +67,10 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Swashbuckle.Core\Swashbuckle.Core.csproj">
+      <Project>{d50a26ff-02c6-4c16-ba94-4cd7d43efbb3}</Project>
+      <Name>Swashbuckle.Core</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Swashbuckle.Dummy.Core\Swashbuckle.Dummy.Core.csproj">
       <Project>{2dfe3931-747f-48c6-8530-b74710988095}</Project>
       <Name>Swashbuckle.Dummy.Core</Name>

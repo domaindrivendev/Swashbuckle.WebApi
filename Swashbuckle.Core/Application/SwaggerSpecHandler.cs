@@ -15,8 +15,12 @@ namespace Swashbuckle.Application
         private readonly SwaggerSpecConfig _config;
 
         public SwaggerSpecHandler()
+			: this(SwaggerSpecConfig.StaticInstance)
+        {}
+
+		public SwaggerSpecHandler(SwaggerSpecConfig config)
         {
-            _config = SwaggerSpecConfig.StaticInstance;
+            _config = config;
         }
 
         protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
@@ -41,6 +45,8 @@ namespace Swashbuckle.Application
 
         private ISwaggerProvider GetSwaggerProvider(HttpConfiguration httpConfig)
         {
+			var test = httpConfig.Services.GetApiExplorer();
+
             var swaggerProvider = new ApiExplorerAdapter(
                 httpConfig.Services.GetApiExplorer(),
                 _config.IgnoreObsoleteActionsFlag,
@@ -50,7 +56,7 @@ namespace Swashbuckle.Application
                 _config.PolymorphicTypes,
                 _config.ModelFilters, _config.OperationFilters);
 
-            return new CachingSwaggerProvider(swaggerProvider);
+            return swaggerProvider;
         }
 
         private HttpContent ContentFor(object value)

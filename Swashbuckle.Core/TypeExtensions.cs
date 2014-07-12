@@ -32,5 +32,11 @@ namespace Swashbuckle
 
             return enumerableType != null;
         }
+
+        public static bool IsEnumerable(this Type type)
+        {
+            Type enumerableTypeArgument;
+            return IsEnumerable(type, out enumerableTypeArgument);
+        }
     }
 }

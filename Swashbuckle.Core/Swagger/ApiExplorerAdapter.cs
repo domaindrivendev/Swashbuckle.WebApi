@@ -11,7 +11,7 @@ namespace Swashbuckle.Swagger
 
         private readonly IApiExplorer _apiExplorer;
         private readonly bool _ignoreObsoleteActions;
-        private readonly Func<ApiDescription, string, bool> _resoveVersionSupport;
+        private readonly Func<ApiDescription, string, bool> _resolveVersionSupport;
         private readonly Func<ApiDescription, string> _resolveResourceName;
         private readonly Dictionary<Type, Func<DataType>> _customTypeMappings;
         private readonly IEnumerable<PolymorphicType> _polymorphicTypes;
@@ -30,7 +30,7 @@ namespace Swashbuckle.Swagger
         {
             _apiExplorer = apiExplorer;
             _ignoreObsoleteActions = ignoreObsoleteActions;
-            _resoveVersionSupport = resoveVersionSupport;
+            _resolveVersionSupport = resoveVersionSupport;
             _resolveResourceName = resolveResourceName;
             _customTypeMappings = customTypeMappings;
             _polymorphicTypes = polymorphicTypes;
@@ -84,7 +84,7 @@ namespace Swashbuckle.Swagger
         {
             return _apiExplorer.ApiDescriptions
                 .Where(apiDesc => !_ignoreObsoleteActions || !apiDesc.IsMarkedObsolete())
-                .Where(apiDesc => _resoveVersionSupport(apiDesc, version))
+                .Where(apiDesc => _resolveVersionSupport(apiDesc, version))
                 .GroupBy(apiDesc => _resolveResourceName(apiDesc))
                 .OrderBy(group => group.Key)
                 .ToArray();

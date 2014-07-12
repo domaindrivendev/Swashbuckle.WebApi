@@ -13,8 +13,14 @@ namespace Swashbuckle.Application
         private readonly SwaggerUiConfig _config;
 
         public SwaggerUiHandler()
+			: this(SwaggerUiConfig.StaticInstance)
         {
             _config = SwaggerUiConfig.StaticInstance;
+        }
+
+		public SwaggerUiHandler(SwaggerUiConfig config)
+        {
+            _config = config;
         }
 
         protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)

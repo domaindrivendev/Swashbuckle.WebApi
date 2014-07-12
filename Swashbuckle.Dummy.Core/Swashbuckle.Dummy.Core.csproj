@@ -58,13 +58,16 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="App_Start\WebApiConfig.cs" />
-    <Compile Include="Models\Customer.cs" />
+    <Compile Include="Controllers\AnimalsController.cs" />
+    <Compile Include="Controllers\ComponentsController.cs" />
     <Compile Include="Controllers\CustomersController.cs" />
-    <Compile Include="Models\Product.cs" />
+    <Compile Include="Controllers\DynamicsController.cs" />
+    <Compile Include="Controllers\KittensController.cs" />
+    <Compile Include="Controllers\MatrixesController.cs" />
+    <Compile Include="Controllers\OrdersController.cs" />
+    <Compile Include="Controllers\PaymentsController.cs" />
     <Compile Include="Controllers\ProductsController.cs" />
-    <Compile Include="Controllers\RandomStuffController.cs" />
-    <Compile Include="Models\Unicorn.cs" />
+    <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SwaggerExtensions\AddAuthResponseCodes.cs" />
     <Compile Include="SwaggerExtensions\AddStandardResponseCodes.cs" />

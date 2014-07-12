@@ -12,6 +12,15 @@ namespace Swashbuckle.Swagger
 {
     public class DataTypeRegistry
     {
+        private static readonly Dictionary<Type, Func<DataType>> IndeterminateMappings = new Dictionary<Type, Func<DataType>>()
+            {
+                {typeof (object), () => new DataType{Type="string", Format = null}},
+                {typeof (ExpandoObject), () => new DataType{Type="string", Format = null}},
+                {typeof (JObject), () => new DataType{Type="string", Format = null}},
+                {typeof (JToken), () => new DataType{Type="string", Format = null}},
+                {typeof (HttpResponseMessage), () => new DataType{Type="string", Format = null}},
+            };
+
         private static readonly Dictionary<Type, Func<DataType>> PrimitiveMappings = new Dictionary<Type, Func<DataType>>()
             {
                 {typeof (Int16), () => new DataType {Type = "integer", Format = "int32"}},
@@ -28,24 +37,20 @@ namespace Swashbuckle.Swagger
                 {typeof (Byte), () => new DataType {Type = "string", Format = "byte"}},
                 {typeof (Boolean), () => new DataType {Type = "boolean", Format = null}},
                 {typeof (DateTime), () => new DataType {Type = "string", Format = "date-time"}},
-                {typeof (DateTimeOffset), () => new DataType {Type = "string", Format = "date-time"}},
-                {typeof (Object), () => new DataType{Type="string", Format = null}},
-                {typeof (ExpandoObject), () => new DataType{Type="string", Format = null}},
-                {typeof (JObject), () => new DataType{Type="string", Format = null}},
-                {typeof (HttpResponseMessage), () => new DataType{Type="string", Format = null}},
+                {typeof (DateTimeOffset), () => new DataType {Type = "string", Format = "date-time"}}
             };
 
-        private readonly IDictionary<Type, DataType> _complexMappings;
         private readonly Dictionary<Type, Func<DataType>> _customMappings;
         private readonly IEnumerable<PolymorphicType> _polymorphicTypes;
         private readonly IEnumerable<IModelFilter> _modelFilters;
+        private readonly IDictionary<Type, DataType> _complexMappings;
 
         public DataTypeRegistry(Dictionary<Type, Func<DataType>> customMappings, IEnumerable<PolymorphicType> polymorphicTypes, IEnumerable<IModelFilter> modelFilters)
         {
-            _complexMappings = new Dictionary<Type, DataType>();
             _customMappings = customMappings;
             _polymorphicTypes = polymorphicTypes;
             _modelFilters = modelFilters;
+            _complexMappings = new Dictionary<Type, DataType>();
         }
 
         public DataType GetOrRegister(Type type)
@@ -55,7 +60,7 @@ namespace Swashbuckle.Swagger
 
             var rootDataType = GetOrRegister(type, false, deferredTypes);
 
-            // Process any remaining deferred type
+            // Process any remaining deferred types
             while (deferredTypes.Any())
             {
                 var deferredType = deferredTypes.Dequeue();
@@ -71,7 +76,7 @@ namespace Swashbuckle.Swagger
             {
                 return _complexMappings.ToDictionary(entry => entry.Value.Id, entry => entry.Value);
             }
-            catch (ArgumentException ex)
+            catch (ArgumentException)
             {
                 throw new InvalidOperationException("Failed to generate Swagger models with unique Id's. Do you have multiple API types with the same class name?");
             }
@@ -81,6 +86,9 @@ namespace Swashbuckle.Swagger
         {
             if (_customMappings.ContainsKey(type))
                 return _customMappings[type]();
+
+            if (IndeterminateMappings.ContainsKey(type))
+                return IndeterminateMappings[type]();
 
             if (PrimitiveMappings.ContainsKey(type))
                 return PrimitiveMappings[type]();
@@ -94,7 +102,13 @@ namespace Swashbuckle.Swagger
 
             Type itemType;
             if (type.IsEnumerable(out itemType))
+            {
+                if (itemType.IsEnumerable() && !IndeterminateMappings.ContainsKey(itemType))
+                    throw new InvalidOperationException(
+                        String.Format("Type {0} is not supported. Swagger does not support containers of containers", type));
+
                 return new DataType { Type = "array", Items = GetOrRegister(itemType, true, deferredTypes) };
+            }
 
             // Anthing else is complex
             if (deferIfComplex)
@@ -111,7 +125,13 @@ namespace Swashbuckle.Swagger
 
         private DataType CreateComplexDataType(Type type, Queue<Type> deferredTypes)
         {
-            var propInfos = type.GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.DeclaredOnly)
+			// Ignore inherited properties if its an explicitly configured polymorphic sub type
+            var polymorphicType = PolymorphicTypeFor(type);
+            var bindingFlags = polymorphicType.IsBase
+                ? BindingFlags.Instance | BindingFlags.Public
+                : BindingFlags.Instance | BindingFlags.Public | BindingFlags.DeclaredOnly;
+
+            var propInfos = type.GetProperties(bindingFlags)
                 .Where(propInfo => !propInfo.GetIndexParameters().Any())    // Ignore indexer properties
                 .ToArray();
 
@@ -122,7 +142,6 @@ namespace Swashbuckle.Swagger
                 .Select(propInfo => propInfo.Name)
                 .ToList();
 
-            var polymorphicType = PolymorphicTypeFor(type);
             var subDataTypes = polymorphicType.SubTypes
                 .Select(subType => GetOrRegister(subType.Type, true, deferredTypes))
                 .Select(subDataType => subDataType.Ref)

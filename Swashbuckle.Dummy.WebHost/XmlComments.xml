@@ -4,36 +4,35 @@
         <name>Swashbuckle.Dummy.Core</name>
     </assembly>
     <members>
-        <member name="T:Swashbuckle.Dummy.Models.Customer">
+        <member name="M:Swashbuckle.Dummy.Controllers.ProductsController.Create(Swashbuckle.Dummy.Controllers.Product)">
             <summary>
-            Represents a registered customer
+            Create a new product 
             </summary>
-        </member>
-        <member name="P:Swashbuckle.Dummy.Models.Customer.Id">
-            <summary>
-            Unique identifier for the customer
-            </summary>
-        </member>
-        <member name="P:Swashbuckle.Dummy.Models.Customer.Associates">
-            <summary>
-            Lists all registered associates
-            </summary>
-        </member>
-        <member name="M:Swashbuckle.Dummy.Controllers.ProductsController.GetByType(Swashbuckle.Dummy.Models.ProductType,System.Nullable{System.Decimal})">
-            <summary>
-            Returns a list of products filtered by type
-            </summary>
-            <remarks>There are several different Product types</remarks>
+            <remarks>Requires admin priveleges</remarks>
+            <param name="product">New product details</param>
             <returns></returns>
         </member>
-        <member name="M:Swashbuckle.Dummy.Controllers.RandomStuffController.GetUnicorns(System.Collections.Generic.Dictionary{System.String,System.String})">
+        <member name="M:Swashbuckle.Dummy.Controllers.ProductsController.GetById(System.Int32)">
             <summary>
-            Returns a list of unicorns filtered by property names
+            Retrieve product by unique Id
             </summary>
-            <param name="propertyValues">A list of name/value pairs for filtering results</param>
-            <response code="200">It's all good!</response>
-            <response code="500">Somethings up!</response>
             <returns></returns>
+        </member>
+        <member name="M:Swashbuckle.Dummy.Controllers.ProductsController.FindAll">
+            <summary>
+            List all products
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="T:Swashbuckle.Dummy.Controllers.Product">
+            <summary>
+            Describes a product
+            </summary>
+        </member>
+        <member name="P:Swashbuckle.Dummy.Controllers.Product.Id">
+            <summary>
+            Uniquely identifies the product
+            </summary>
         </member>
     </members>
 </doc>
