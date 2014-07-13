@@ -7,8 +7,8 @@ namespace Swashbuckle.Swagger
 {
     public class OperationGenerator
     {
-        private readonly IEnumerable<IOperationFilter> _operationFilters;
         private readonly DataTypeRegistry _dataTypeRegistry;
+        private readonly IEnumerable<IOperationFilter> _operationFilters;
 
         public OperationGenerator(DataTypeRegistry dataTypeRegistry, IEnumerable<IOperationFilter> operationFilters)
         {
@@ -69,9 +69,15 @@ namespace Swashbuckle.Swagger
                 case ApiParameterSource.FromBody:
                     paramType = "body";
                     break;
+
                 case ApiParameterSource.FromUri:
                     paramType = apiPath.Contains(String.Format("{{{0}}}", apiParamDesc.Name)) ? "path" : "query";
                     break;
+            }
+
+            if (apiParamDesc.ParameterDescriptor == null)
+            {
+                return new Parameter { ParamType = paramType, Name = apiParamDesc.Name, Required = true, Type = "string" };
             }
 
             var parameter = new Parameter
@@ -82,17 +88,20 @@ namespace Swashbuckle.Swagger
                 Required = !apiParamDesc.ParameterDescriptor.IsOptional
             };
 
-            var dataType = _dataTypeRegistry.GetOrRegister(apiParamDesc.ParameterDescriptor.ParameterType);
-            if (dataType.Type == "object")
+            DataType dataType = _dataTypeRegistry.GetOrRegister(apiParamDesc.ParameterDescriptor.ParameterType);
+            if (dataType != null)
             {
-                parameter.Type = dataType.Id;
-            }
-            else
-            {
-                parameter.Type = dataType.Type;
-                parameter.Format = dataType.Format;
-                parameter.Items = dataType.Items;
-                parameter.Enum = dataType.Enum;
+                if (dataType.Type == "object")
+                {
+                    parameter.Type = dataType.Id;
+                }
+                else
+                {
+                    parameter.Type = dataType.Type;
+                    parameter.Format = dataType.Format;
+                    parameter.Items = dataType.Items;
+                    parameter.Enum = dataType.Enum;
+                }
             }
 
             return parameter;
