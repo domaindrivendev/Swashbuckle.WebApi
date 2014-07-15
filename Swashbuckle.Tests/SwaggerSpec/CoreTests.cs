@@ -94,7 +94,8 @@ namespace Swashbuckle.Tests.SwaggerSpec
 											type = "Customer",
                                         }
                                     },
-									responseMessages = new object[]{}
+									responseMessages = new object[]{},
+									produces = new []{ "application/json", "text/json", "application/xml", "text/xml" }
                                 }
                             }
                         },
@@ -119,7 +120,8 @@ namespace Swashbuckle.Tests.SwaggerSpec
 											format = "int32"
                                         }
                                     },
-									responseMessages = new object[]{}
+									responseMessages = new object[]{},
+									produces = new string[]{}
                                 },
 								new
 								{
@@ -144,7 +146,8 @@ namespace Swashbuckle.Tests.SwaggerSpec
 											type = "Customer",
                                         }
                                     },
-									responseMessages = new object[]{}
+									responseMessages = new object[]{},
+									produces = new string[]{}
                                 }
                             }
                         }
@@ -180,7 +183,8 @@ namespace Swashbuckle.Tests.SwaggerSpec
 									type = "array",
 									items = JObject.Parse("{ $ref: \"Product\" }"),
 									parameters = new object[]{},
-									responseMessages = new object[]{}
+									responseMessages = new object[]{},
+									produces = new []{ "application/json", "text/json", "application/xml", "text/xml" }
 								},
                                 new
 								{
@@ -199,7 +203,8 @@ namespace Swashbuckle.Tests.SwaggerSpec
 											@enum = new[] { "Book", "Album" }
                                         }
                                     },
-									responseMessages = new object[]{}
+									responseMessages = new object[]{},
+									produces = new []{ "application/json", "text/json", "application/xml", "text/xml" }
 								},
 								new
 								{
@@ -217,7 +222,9 @@ namespace Swashbuckle.Tests.SwaggerSpec
 											type = "Product",
                                         }
                                     },
-									responseMessages = new object[]{}
+									responseMessages = new object[]{},
+									produces = new []{ "application/json", "text/json", "application/xml", "text/xml" }
+
 								}
                             }
                         },
@@ -242,7 +249,8 @@ namespace Swashbuckle.Tests.SwaggerSpec
 											format = "int32"
                                         }
                                     },
-									responseMessages = new object[]{}
+									responseMessages = new object[]{},
+									produces = new []{ "application/json", "text/json", "application/xml", "text/xml" }
 								}
                            }
                         },
