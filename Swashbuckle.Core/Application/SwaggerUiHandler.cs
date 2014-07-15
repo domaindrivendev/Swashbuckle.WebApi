@@ -93,6 +93,10 @@ namespace Swashbuckle.Application
                     return "text/css";
                 case "js":
                     return "text/javascript";
+                case "gif":
+                    return "image/gif";
+                case "png":
+                    return "image/png";
                 default:
                     return "text/html";
             }
