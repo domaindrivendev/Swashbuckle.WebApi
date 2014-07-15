@@ -315,6 +315,31 @@ namespace Swashbuckle.Tests.SwaggerSpec
                 declaration.SelectToken("apis[1].operations[1].responseMessages[0]").ToString());
         }
 
+		[Test]
+		public void It_should_handle_additional_route_parameters_treating_them_as_required_strings()
+        {
+			// i.e. route params that are not included in the action signature
+            HttpConfiguration.Routes.Clear();
+            HttpConfiguration.Routes.MapHttpRoute(
+                "test_route",
+                "{apiVersion}/customers/{id}",
+                new { controller = "Customers" }
+                );
+
+            var updateParams = Get<JObject>("http://tempuri.org/swagger/api-docs/Customers")
+                .SelectToken("apis[0].operations[1].parameters[1]");
+
+            var expected = JObject.FromObject(new
+                {
+                    paramType = "path",
+                    name = "apiVersion",
+                    required = true,
+                    type = "string"
+                });
+
+            Assert.AreEqual(expected, updateParams);
+        }
+
 		class AddResponseCodes : IOperationFilter
         {
             public void Apply(Operation operation, DataTypeRegistry dataTypeRegistry, System.Web.Http.Description.ApiDescription apiDescription)
