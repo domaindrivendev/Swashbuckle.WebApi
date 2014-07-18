@@ -27,7 +27,7 @@ namespace Swashbuckle.Swagger
             {
                 Method = apiDescription.HttpMethod.Method,
                 Nickname = apiDescription.Nickname(),
-                Summary = apiDescription.Documentation,
+                Summary = apiDescription.Documentation ?? "",
                 Parameters = parameters,
                 ResponseMessages = new List<ResponseMessage>(),
                 Produces = apiDescription.SupportedResponseFormatters.SelectMany(d => d.SupportedMediaTypes.Select(t => t.MediaType)).ToList()
