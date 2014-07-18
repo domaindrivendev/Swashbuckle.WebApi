@@ -61,14 +61,18 @@ You can customize the auto-generated spec by applying the following config optio
 
     SwaggerSpecConfig.Customize(c =>
         {
+            c.ResolveBasePathUsing((req) => GetBasePathFromAppConfig());
             c.ResolveTargetVersionUsing((req) => "2.0");
             
             c.IgnoreObsoleteActions();
             c.ResolveVersionSupportUsing((apiDesc, version) => GetVersionByAttribute(apiDesc) == version)
-
+            
             c.GroupDeclarationsBy(RootResourceName)
 
-			c.MapType<MySerializeableType>(() => new DataType { Type = "string" });
+            c.OperationFilter<AddStandardResponseCodes>();
+            c.OperationFilter<AddAuthorizationResponseCodes>();
+            
+            c.MapType<MySerializeableType>(() => new DataType { Type = "string" });
 
             c.PolymorphicType<Product>(pc => pc
                 .DiscriminateBy(p => p.Type)
@@ -78,11 +82,12 @@ You can customize the auto-generated spec by applying the following config optio
                     .SubType<Shipping>()
                     .SubType<Packaging>()));
 
-            c.OperationFilter<AddStandardResponseCodes>();
-            c.OperationFilter<AddAuthorizationResponseCodes>();
-
             c.IncludeXmlComments(GetXmlCommentsPath());
         });
+
+#### ResolveBasePathUsing ####
+
+Swashbuckle will try to infer your API's base path (authority plus virtual path) from the incoming request (i.e. the request for api-docs). However, there may be situations (e.g. certain load-balanced environments) where this does not resolve correctly. In this case, you can implement your own strategy for resolving your API's base path and wire it up with the **ResolveBasePathUsing** option.
 
 #### ResolveTargetVersionUsing ####
 
@@ -97,48 +102,6 @@ Set this option if you'd like to exclude any WebApi actions decorated with the S
 #### GroupDeclarationsBy ####
 
 This option accepts a lambda as a strategy for grouping actions into ApiDeclarations. The default implementation groups by controller name. 
-
-#### MapType ####
-
-This allows you to override the default DataType generation for a given Type. It's intended for the use-case when you have a class that is serialized to a primitive JSON type.
-
-#### PolymorphicType ####
-
-The Swagger spec provides a way to describe polymorphic models with **subTypes** and **discriminator** properties. Swashbuckle currently requires these to be explicitly configured. Later versions may include a feature to scan assemblies but in the meantime you can use the fluent "PolymorphicType" method to guide you.  
-
-This will generate an additional complex model for each sub-type and bind them to the base model via the subTypes property:
-
-     "Product": {
-       "id": "Product",
-       "type": "object",
-       "properties": {
-         "Id": {
-           "type": "integer",
-           "format": "int32"
-         },
-         "Price": {
-           "type": "number",
-           "format": "double"
-         }
-         "Type": {
-           "type": "string",
-         }
-       },
-       "required": [],
-       "subTypes": [ "Book", "Album", "Service" ],
-       "discriminator": "Type"
-     }
-
-**\*Note:** The [Swagger Spec](https://github.com/wordnik/swagger-spec/blob/master/versions/1.2.md) is typically ahead of swagger-ui and so the latter doesn't currently have support for displaying polymorphic types.
-
-#### ModelFilter ####
-
-This is similar to the **OperationFilter** option. It provides a way to customize the generated DataType/Model for complex Types in your API. Model filters implement the following interface:
-
-    public interface IModelFilter
-    {
-        void Apply(DataType model, DataTypeRegistry dataTypeRegistry, Type type);
-    }
 
 #### OperationFilter ####
 
@@ -183,6 +146,48 @@ Or, a filter that adds an authorization response description to actions that are
 
 The filter interface is relatively simple. In most cases, you just inspect the **apiDescription** and then modify the corresponding **operation** accordingly. If you're customizing DataType descriptions for the operation and need to register new Models for the underlying ApiDeclaration, you can use the provided **dataTypeRegistry**.
 
+#### MapType ####
+
+This allows you to override the default DataType generation for a given Type. It's intended for the use-case when you have a class that is serialized to a primitive JSON type.
+
+#### PolymorphicType ####
+
+The Swagger spec provides a way to describe polymorphic models with **subTypes** and **discriminator** properties. Swashbuckle currently requires these to be explicitly configured. Later versions may include a feature to scan assemblies but in the meantime you can use the fluent "PolymorphicType" method to guide you.  
+
+This will generate an additional complex model for each sub-type and bind them to the base model via the subTypes property:
+
+     "Product": {
+       "id": "Product",
+       "type": "object",
+       "properties": {
+         "Id": {
+           "type": "integer",
+           "format": "int32"
+         },
+         "Price": {
+           "type": "number",
+           "format": "double"
+         }
+         "Type": {
+           "type": "string",
+         }
+       },
+       "required": [],
+       "subTypes": [ "Book", "Album", "Service" ],
+       "discriminator": "Type"
+     }
+
+**\*Note:** The [swagger-ui](https://github.com/wordnik/swagger-ui.git) is typically behind the [Swagger Spec](https://github.com/wordnik/swagger-spec/blob/master/versions/1.2.md) and, as of this writing, does not currently have support for displaying polymorphic types.
+
+#### ModelFilter ####
+
+This is similar to the **OperationFilter** option. It provides a way to customize the generated DataType/Model for complex Types in your API. Model filters implement the following interface:
+
+    public interface IModelFilter
+    {
+        void Apply(DataType model, DataTypeRegistry dataTypeRegistry, Type type);
+    }
+
 #### Include Xml Comments ####
 
 If you annonate Controllers and API Types with Xml Comments, you can use this option to incorporate those comments into the generated spec and UI. The Xml tags are mapped to Swagger properties as follows:
@@ -206,6 +211,8 @@ All of these options are exposed through Swashbuckle configuration ...
             c.SupportedSubmitMethods = new[] {HttpMethod.Get, HttpMethod.Post, HttpMethod.Put, HttpMethod.Head};
             c.InjectJavaScript(typeof (SwaggerConfig).Assembly, "Swashbuckle.TestApp.SwaggerExtensions.onComplete.js");
             c.InjectStylesheet(typeof(SwaggerConfig).Assembly, "Swashbuckle.TestApp.SwaggerExtensions.customStyles.css");
+            
+            c.CustomRoute("index.html", resourceAssembly, "Swashbuckle.TestApp.SwaggerExtensions.myIndex.html");
         });
 
 The **InjectJavaScript** and **InjectStylesheet** options allow custom JavaScript or CSS to be injected into the UI once it's loaded.
@@ -219,6 +226,11 @@ To do this, the file(s) **MUST** be added to your project as an "Embedded Resour
 So, if your app's default namespace is "Swashbuckle.TestApp", and you have a custom script - "SwaggerExtensions/onComplete.js", then it will be assigned the following resource name at build time:
 
 "Swashbuckle.TestApp.SwaggerExtensions.onComplete.js"
+
+#### Custom ui routes and embedded resources ####
+
+You can use the **CustomRoute** option to map a swagger ui path (<your-api-endpoint\>/swagger/ui/{*uiPath}) to 
+a custom embedded resource. For example, the code sample above overrides index.html from the embedded swagger-ui with a custom version. You could use this approach to build your own tailored version of the swagger-ui and then serve it up instead of the default embedded version.
 
 ## Transitioning to Swashbuckle 4.0 ##
 
