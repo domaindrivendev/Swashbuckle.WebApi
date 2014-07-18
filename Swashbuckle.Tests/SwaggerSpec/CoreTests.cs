@@ -93,7 +93,8 @@ namespace Swashbuckle.Tests.SwaggerSpec
                                         }
                                     },
 									responseMessages = new object[]{},
-									produces = new []{ "application/json", "text/json", "application/xml", "text/xml" }
+									produces = new []{ "application/json", "text/json", "application/xml", "text/xml" },
+									consumes = new []{ "application/json", "text/json", "application/xml", "text/xml", "application/x-www-form-urlencoded" }
                                 }
                             }
                         },
@@ -120,7 +121,8 @@ namespace Swashbuckle.Tests.SwaggerSpec
                                         }
                                     },
 									responseMessages = new object[]{},
-									produces = new string[]{}
+									produces = new string[]{},
+									consumes = new string[]{}
                                 },
 								new
 								{
@@ -147,7 +149,8 @@ namespace Swashbuckle.Tests.SwaggerSpec
                                         }
                                     },
 									responseMessages = new object[]{},
-									produces = new string[]{}
+									produces = new string[]{},
+									consumes = new []{ "application/json", "text/json", "application/xml", "text/xml", "application/x-www-form-urlencoded" }
                                 }
                             }
                         }
@@ -185,7 +188,8 @@ namespace Swashbuckle.Tests.SwaggerSpec
 									items = JObject.Parse("{ $ref: \"Product\" }"),
 									parameters = new object[]{},
 									responseMessages = new object[]{},
-									produces = new []{ "application/json", "text/json", "application/xml", "text/xml" }
+									produces = new []{ "application/json", "text/json", "application/xml", "text/xml" },
+									consumes = new object[]{}
 								},
                                 new
 								{
@@ -206,7 +210,8 @@ namespace Swashbuckle.Tests.SwaggerSpec
                                         }
                                     },
 									responseMessages = new object[]{},
-									produces = new []{ "application/json", "text/json", "application/xml", "text/xml" }
+									produces = new []{ "application/json", "text/json", "application/xml", "text/xml" },
+									consumes = new object[]{}
 								},
 								new
 								{
@@ -226,8 +231,8 @@ namespace Swashbuckle.Tests.SwaggerSpec
                                         }
                                     },
 									responseMessages = new object[]{},
-									produces = new []{ "application/json", "text/json", "application/xml", "text/xml" }
-
+									produces = new []{ "application/json", "text/json", "application/xml", "text/xml" },
+									consumes = new []{ "application/json", "text/json", "application/xml", "text/xml", "application/x-www-form-urlencoded" }
 								}
                             }
                         },
@@ -254,7 +259,8 @@ namespace Swashbuckle.Tests.SwaggerSpec
                                         }
                                     },
 									responseMessages = new object[]{},
-									produces = new []{ "application/json", "text/json", "application/xml", "text/xml" }
+									produces = new []{ "application/json", "text/json", "application/xml", "text/xml" },
+									consumes = new object[]{}
 								}
                            }
                         },

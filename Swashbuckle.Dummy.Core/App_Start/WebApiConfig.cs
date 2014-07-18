@@ -15,7 +15,7 @@ namespace Swashbuckle.Dummy
                 name: "DefaultApi",
                 routeTemplate: "api/{controller}/{id}",
                 defaults: new { id = RouteParameter.Optional },
-                constraints: new { controller = @"(?!Matrixes).*" }
+                constraints: new { controller = @"(?!UnsupportedTypes).*" }
             );
         }
     }
