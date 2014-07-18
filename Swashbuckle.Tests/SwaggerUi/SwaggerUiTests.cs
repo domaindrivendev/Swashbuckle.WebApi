@@ -5,6 +5,8 @@ using System.Web.Http.Routing;
 using NUnit.Framework;
 using Swashbuckle.Application;
 using System.Web.Http;
+using Swashbuckle.Dummy.Controllers;
+using Swashbuckle.Dummy;
 
 namespace Swashbuckle.Tests.SwaggerUi
 {
@@ -21,7 +23,6 @@ namespace Swashbuckle.Tests.SwaggerUi
         public void Setup()
         {
             _swaggerUiConfig = new SwaggerUiConfig();
-            HttpConfiguration = new HttpConfiguration();
 			Handler = new SwaggerUiHandler(_swaggerUiConfig);
         }
 
@@ -50,31 +51,54 @@ namespace Swashbuckle.Tests.SwaggerUi
 		[Test]
 		public void It_should_support_custom_stylesheet_injection()
         {
-            var resourceAssembly = GetType().Assembly;
-            _swaggerUiConfig.InjectStylesheet(resourceAssembly, "Swashbuckle.Test.ApiFixtures.testStyles1.css");
-            _swaggerUiConfig.InjectStylesheet(resourceAssembly, "Swashbuckle.Test.ApiFixtures.testStyles2.css");
+            var resourceAssembly = typeof(SwaggerConfig).Assembly;
+            _swaggerUiConfig.InjectStylesheet(resourceAssembly, "Swashbuckle.Dummy.SwaggerExtensions.testStyles1.css");
+            _swaggerUiConfig.InjectStylesheet(resourceAssembly, "Swashbuckle.Dummy.SwaggerExtensions.testStyles2.css");
 
-            var content = GetAsString("http://tempuri.org/swagger/ui/index.html");
+            var index = GetAsString("http://tempuri.org/swagger/ui/index.html");
 
-            Assert.IsTrue(content.Contains(
-                "<link href='ext/Swashbuckle.Test.ApiFixtures.testStyles1.css' rel='stylesheet' type='text/css'/>\r\n" +
-                "<link href='ext/Swashbuckle.Test.ApiFixtures.testStyles2.css' rel='stylesheet' type='text/css'/>"),
+            Assert.IsTrue(index.Contains(
+                "<link href='ext/Swashbuckle.Dummy.SwaggerExtensions.testStyles1.css' rel='stylesheet' type='text/css'/>\r\n" +
+                "<link href='ext/Swashbuckle.Dummy.SwaggerExtensions.testStyles2.css' rel='stylesheet' type='text/css'/>"),
                 "Custom stylesheets not included");
+
+            var content = GetAsString("http://tempuri.org/swagger/ui/ext/Swashbuckle.Dummy.SwaggerExtensions.testStyles1.css");
+            Assert.IsTrue(content.StartsWith("h1"), "custom stylesheet not served");
+
+            content = GetAsString("http://tempuri.org/swagger/ui/ext/Swashbuckle.Dummy.SwaggerExtensions.testStyles2.css");
+            Assert.IsTrue(content.StartsWith("h2"), "custom stylesheet not served");
 		}
 
 		[Test]
 		public void It_should_support_custom_javascript_injection()
         {
-            var resourceAssembly = GetType().Assembly;
-            _swaggerUiConfig.InjectJavaScript(resourceAssembly, "Swashbuckle.Test.ApiFixtures.testScript1.js");
-            _swaggerUiConfig.InjectJavaScript(resourceAssembly, "Swashbuckle.Test.ApiFixtures.testScript2.js");
+            var resourceAssembly = typeof(SwaggerConfig).Assembly;
+            _swaggerUiConfig.InjectJavaScript(resourceAssembly, "Swashbuckle.Dummy.SwaggerExtensions.testScript1.js");
+            _swaggerUiConfig.InjectJavaScript(resourceAssembly, "Swashbuckle.Dummy.SwaggerExtensions.testScript2.js");
+
+            var index = GetAsString("http://tempuri.org/swagger/ui/index.html");
+
+            Assert.IsTrue(index.Contains(
+                "$.getScript('ext/Swashbuckle.Dummy.SwaggerExtensions.testScript1.js');\r\n" +
+                "$.getScript('ext/Swashbuckle.Dummy.SwaggerExtensions.testScript2.js');"),
+                "Custom javascripts not included");
+
+            var content = GetAsString("http://tempuri.org/swagger/ui/ext/Swashbuckle.Dummy.SwaggerExtensions.testScript1.js");
+            Assert.IsTrue(content.StartsWith("var str1"), "custom javascript not served");
+
+            content = GetAsString("http://tempuri.org/swagger/ui/ext/Swashbuckle.Dummy.SwaggerExtensions.testScript2.js");
+            Assert.IsTrue(content.StartsWith("var str2"), "custom javascript not served");
+		}
+		
+		[Test]
+		public void It_should_support_customized_route_to_resource_mapping()
+        {
+            var resourceAssembly = typeof(SwaggerConfig).Assembly;
+            _swaggerUiConfig.CustomRoute("index.html", resourceAssembly, "Swashbuckle.Dummy.SwaggerExtensions.myIndex.html");
 
             var content = GetAsString("http://tempuri.org/swagger/ui/index.html");
 
-            Assert.IsTrue(content.Contains(
-                "$.getScript('ext/Swashbuckle.Test.ApiFixtures.testScript1.js');\r\n" +
-                "$.getScript('ext/Swashbuckle.Test.ApiFixtures.testScript2.js');"),
-                "Custom javascripts not included");
-		}
+            Assert.IsTrue(content.Contains("My Index"), "Custom javascripts not included");
+        }
     }
 }

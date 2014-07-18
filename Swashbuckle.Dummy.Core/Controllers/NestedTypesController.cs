@@ -4,7 +4,7 @@ using System.Web.Http;
 
 namespace Swashbuckle.Dummy.Controllers
 {
-    public class OrdersController : ApiController
+    public class NestedTypesController : ApiController
     {
 		public int Create(Order order)
         {
@@ -14,7 +14,6 @@ namespace Swashbuckle.Dummy.Controllers
 	
 	public class Order
     {
-        public int Id { get; set; }
         public IEnumerable<LineItem> LineItems { get; set; }
     }
 

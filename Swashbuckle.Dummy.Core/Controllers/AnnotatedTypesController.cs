@@ -5,7 +5,7 @@ using System.Web.Http;
 
 namespace Swashbuckle.Dummy.Controllers
 {
-    public class PaymentsController : ApiController
+    public class AnnotatedTypesController : ApiController
     {
 		public int Create(Payment payment)
         {

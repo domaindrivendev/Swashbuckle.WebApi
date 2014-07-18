@@ -4,7 +4,7 @@ using System.Web.Http;
 
 namespace Swashbuckle.Dummy.Controllers
 {
-    public class ComponentsController : ApiController
+    public class SelfReferencingTypesController : ApiController
     {
 		public int Create(Component component)
         {

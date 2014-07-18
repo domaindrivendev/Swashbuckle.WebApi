@@ -26,10 +26,7 @@ namespace Swashbuckle.Tests.SwaggerSpec
             _swaggerSpecConfig = new SwaggerSpecConfig();
             Handler = new SwaggerSpecHandler(_swaggerSpecConfig);
 
-            HttpConfiguration = new HttpConfiguration();
-            HttpConfiguration.Routes
-                .Include<CustomersController>()
-                .Include<ProductsController>();
+            SetUpDefaultRoutesFor(new[] { typeof(ProductsController), typeof(CustomersController) });
         }
 
         [Test]
@@ -260,15 +257,49 @@ namespace Swashbuckle.Tests.SwaggerSpec
             Assert.AreEqual(expected.ToString(), declaration.ToString());
         }
 
+		[Test]
+		public void It_should_handle_additional_route_parameters_treating_them_as_required_strings()
+        {
+			// i.e. route params that are not included in the action signature
+            SetUpCustomRouteFor<ProductsController>("{apiVersion}/products");
+
+            var versionParam = Get<JObject>("http://tempuri.org/swagger/api-docs/Products")
+                .SelectToken("apis[0].operations[0].parameters[0]");
+
+            var expected = JObject.FromObject(new
+                {
+                    paramType = "path",
+                    name = "apiVersion",
+                    required = true,
+                    type = "string"
+                });
+
+            Assert.AreEqual(expected, versionParam);
+        }
+
         [Test]
         public void It_should_support_customized_base_path_resolution()
         {
             _swaggerSpecConfig.ResolveBasePathUsing((req) => "http://custombasepath.com");
 
-			var declaration = Get<JObject>("http://tempuri.org/swagger/api-docs/Customers");
+			var declaration = Get<JObject>("http://tempuri.org/swagger/api-docs/Products");
 			Assert.AreEqual("http://custombasepath.com", (string)declaration["basePath"]);
         }
         
+		[Test]
+		public void It_should_support_an_optional_setting_to_ignore_any_actions_marked_obsolete()
+        {
+            SetUpDefaultRouteFor<ObsoleteActionsController>();
+
+			var declaration = Get<JObject>("http://tempuri.org/swagger/api-docs/ObsoleteActions");
+			Assert.IsNotNull(declaration.SelectToken("apis[0].operations[1]"));
+
+            _swaggerSpecConfig.IgnoreObsoleteActions();
+
+			declaration = Get<JObject>("http://tempuri.org/swagger/api-docs/ObsoleteActions");
+			Assert.IsNull(declaration.SelectToken("apis[0].operations[1]"));
+        }
+
         [Test]
         public void It_should_support_customized_api_declaration_grouping()
         {
@@ -297,18 +328,6 @@ namespace Swashbuckle.Tests.SwaggerSpec
             Assert.NotNull(Get<JObject>("http://tempuri.org/swagger/api-docs/puts"));
         }
 
-		[Test]
-		public void It_should_support_an_optional_setting_to_ignore_any_actions_marked_obsolete()
-        {
-			var declaration = Get<JObject>("http://tempuri.org/swagger/api-docs/Customers");
-			Assert.IsNotNull(declaration.SelectToken("apis[1].operations[1]"));
-
-            _swaggerSpecConfig.IgnoreObsoleteActions();
-
-			declaration = Get<JObject>("http://tempuri.org/swagger/api-docs/Customers");
-			Assert.IsNull(declaration.SelectToken("apis[1].operations[1]"));
-        }
-
   		[Test]
 		public void It_should_support_configurable_filters_for_modifying_generated_operations()
         {
@@ -321,31 +340,6 @@ namespace Swashbuckle.Tests.SwaggerSpec
                 declaration.SelectToken("apis[1].operations[0].responseMessages[0]").ToString());
             Assert.AreEqual(expected.ToString(),
                 declaration.SelectToken("apis[1].operations[1].responseMessages[0]").ToString());
-        }
-
-		[Test]
-		public void It_should_handle_additional_route_parameters_treating_them_as_required_strings()
-        {
-			// i.e. route params that are not included in the action signature
-            HttpConfiguration.Routes.Clear();
-            HttpConfiguration.Routes.MapHttpRoute(
-                "test_route",
-                "{apiVersion}/customers/{id}",
-                new { controller = "Customers" }
-                );
-
-            var updateParams = Get<JObject>("http://tempuri.org/swagger/api-docs/Customers")
-                .SelectToken("apis[0].operations[1].parameters[1]");
-
-            var expected = JObject.FromObject(new
-                {
-                    paramType = "path",
-                    name = "apiVersion",
-                    required = true,
-                    type = "string"
-                });
-
-            Assert.AreEqual(expected, updateParams);
         }
 
 		class AddResponseCodes : IOperationFilter

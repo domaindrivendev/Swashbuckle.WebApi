@@ -58,14 +58,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Controllers\AnimalsController.cs" />
-    <Compile Include="Controllers\ComponentsController.cs" />
+    <Compile Include="Controllers\SelfReferencingTypesController.cs" />
     <Compile Include="Controllers\CustomersController.cs" />
-    <Compile Include="Controllers\DynamicsController.cs" />
-    <Compile Include="Controllers\KittensController.cs" />
-    <Compile Include="Controllers\MatrixesController.cs" />
-    <Compile Include="Controllers\OrdersController.cs" />
-    <Compile Include="Controllers\PaymentsController.cs" />
+    <Compile Include="Controllers\DynamicTypesController.cs" />
+    <Compile Include="Controllers\PolymorphicTypesController.cs" />
+    <Compile Include="Controllers\UnsupportedTypesController.cs" />
+    <Compile Include="Controllers\NestedTypesController.cs" />
+    <Compile Include="Controllers\ObsoleteActionsController.cs" />
+    <Compile Include="Controllers\AnnotatedTypesController.cs" />
     <Compile Include="Controllers\ProductsController.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -73,7 +73,9 @@
     <Compile Include="SwaggerExtensions\AddStandardResponseCodes.cs" />
     <Compile Include="SwaggerExtensions\ApplyCamelCasing.cs" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <EmbeddedResource Include="SwaggerExtensions\myIndex.html" />
+  </ItemGroup>
   <ItemGroup>
     <Compile Include="App_Start\SwaggerConfig.cs" />
     <None Include="packages.config" />

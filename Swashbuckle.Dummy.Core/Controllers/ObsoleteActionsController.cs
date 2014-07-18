@@ -5,16 +5,17 @@ using System.Web.Http;
 
 namespace Swashbuckle.Dummy.Controllers
 {
-    public class KittensController : ApiController
+    public class ObsoleteActionsController : ApiController
     {
-		public int Create(Kitten kitten)
+		public int Update(int id, string value)
         {
             throw new NotImplementedException();
         }
-    }
-	
-	public class Kitten : Animal
-    {
-        public bool HasWhiskers { get; set; }
+
+		[Obsolete]
+		public void Delete(int id)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

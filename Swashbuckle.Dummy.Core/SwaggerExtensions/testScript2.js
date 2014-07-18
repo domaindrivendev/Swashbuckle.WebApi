@@ -1,1 +1,1 @@
-﻿var testVal = '2';
+﻿var str2 = 'foobar';

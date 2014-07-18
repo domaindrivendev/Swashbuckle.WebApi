@@ -25,8 +25,8 @@ namespace Swashbuckle.Application
             ResolveVersionSupport = (apiDesc, version) => true;
             ResolveResourceName = (apiDesc) => apiDesc.ActionDescriptor.ControllerDescriptor.ControllerName;
             OperationFilters = new List<IOperationFilter>();
-            PolymorphicTypes = new List<PolymorphicType>();
             CustomTypeMappings = new Dictionary<Type, Func<DataType>>();
+            PolymorphicTypes = new List<PolymorphicType>();
             ModelFilters = new List<IModelFilter>();
         }
 
@@ -36,8 +36,8 @@ namespace Swashbuckle.Application
         internal Func<ApiDescription, string, bool> ResolveVersionSupport { get; private set; }
         internal Func<ApiDescription, string> ResolveResourceName { get; private set; }
         internal List<IOperationFilter> OperationFilters = new List<IOperationFilter>();
-        internal List<PolymorphicType> PolymorphicTypes { get; private set; }
         internal Dictionary<Type, Func<DataType>> CustomTypeMappings { get; private set; }
+        internal List<PolymorphicType> PolymorphicTypes { get; private set; }
         internal List<IModelFilter> ModelFilters { get; private set; }
 
         public SwaggerSpecConfig ResolveBasePathUsing(Func<HttpRequestMessage, string> resolveBasePath)

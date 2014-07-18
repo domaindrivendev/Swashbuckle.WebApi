@@ -70,7 +70,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="HttpRouteCollectionExtensions.cs" />
     <Compile Include="HttpMessageHandlerTestsBase.cs" />
     <Compile Include="SwaggerSpec\XmlCommentsTests.cs" />
     <Compile Include="SwaggerSpec\ModelTests.cs" />

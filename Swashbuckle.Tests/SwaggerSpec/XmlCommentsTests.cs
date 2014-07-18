@@ -25,8 +25,7 @@ namespace Swashbuckle.Tests.SwaggerSpec
 
             Handler = new SwaggerSpecHandler(swaggerSpecConfig);
 
-            HttpConfiguration = new HttpConfiguration();
-            HttpConfiguration.Routes.Include<ProductsController>();
+            SetUpDefaultRouteFor<ProductsController>();
         }
 
         [Test]

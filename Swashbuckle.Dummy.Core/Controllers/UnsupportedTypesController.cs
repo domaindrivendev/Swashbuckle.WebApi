@@ -4,7 +4,7 @@ using System.Web.Http;
 
 namespace Swashbuckle.Dummy.Controllers
 {
-    public class MatrixesController : ApiController
+    public class UnsupportedTypesController : ApiController
     {
 		public int Create(Matrix matrix)
         {

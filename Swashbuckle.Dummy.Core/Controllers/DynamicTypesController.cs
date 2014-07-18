@@ -8,14 +8,14 @@ using System.Web.Http;
 
 namespace Swashbuckle.Dummy.Controllers
 {
-    public class DynamicsController : ApiController
+    public class DynamicTypesController : ApiController
     {
-		public int Create(dynamic anything)
+		public int Create(dynamic thing)
         {
             throw new NotImplementedException();
         }
 
-		public JObject GeByProperties(ExpandoObject anything)
+		public ExpandoObject GeByProperties(JObject thing)
         {
             throw new NotImplementedException();
         }
