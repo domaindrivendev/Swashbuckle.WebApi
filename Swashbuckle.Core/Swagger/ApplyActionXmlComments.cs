@@ -27,9 +27,7 @@ namespace Swashbuckle.Swagger
         {
             var methodNode = _navigator.SelectSingleNode(GetXPathFor(apiDescription.ActionDescriptor));
 
-            string summary = GetChildValueOrDefault(methodNode, SummaryExpression);
-            if(!string.IsNullOrEmpty(summary))
-                operation.Summary = summary;
+            operation.Summary = GetChildValueOrDefault(methodNode, SummaryExpression);
             operation.Notes = GetChildValueOrDefault(methodNode, RemarksExpression);
 
             foreach (var paramDesc in apiDescription.ParameterDescriptions)
@@ -85,10 +83,10 @@ namespace Swashbuckle.Swagger
 
         private static string GetChildValueOrDefault(XPathNavigator node, string childExpression)
         {
-            if (node == null) return null;
+            if (node == null) return String.Empty;
 
             var childNode = node.SelectSingleNode(childExpression);
-            return (childNode == null) ? null : childNode.Value.Trim();
+            return (childNode == null) ? String.Empty : childNode.Value.Trim();
         }
 
         private static IEnumerable<ResponseMessage> GetResponseMessages(XPathNavigator node)

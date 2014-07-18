@@ -79,6 +79,7 @@ namespace Swashbuckle.Tests.SwaggerSpec
 								{
 									method = "POST",
 									nickname = "Customers_Create",
+									summary = "",
 									type = "integer",
 									format = "int32",
 									parameters = new object[]
@@ -105,6 +106,7 @@ namespace Swashbuckle.Tests.SwaggerSpec
 								{
 									method = "DELETE",
 									nickname = "Customers_Delete",
+									summary = "",
 									type = "void",
 									parameters = new object[]
                                     {
@@ -124,6 +126,7 @@ namespace Swashbuckle.Tests.SwaggerSpec
 								{
 									method = "PUT",
 									nickname = "Customers_Update",
+									summary = "",
 									type = "void",
 									parameters = new object[]
                                     {
@@ -177,6 +180,7 @@ namespace Swashbuckle.Tests.SwaggerSpec
 								{
 									method = "GET",
 									nickname = "Products_FindAll",
+									summary = "",
 									type = "array",
 									items = JObject.Parse("{ $ref: \"Product\" }"),
 									parameters = new object[]{},
@@ -187,6 +191,7 @@ namespace Swashbuckle.Tests.SwaggerSpec
 								{
 									method = "GET",
 									nickname = "Products_FindByType",
+									summary = "",
 									type = "array",
 									items = JObject.Parse("{ $ref: \"Product\" }"),
 									parameters = new object[]
@@ -207,6 +212,7 @@ namespace Swashbuckle.Tests.SwaggerSpec
 								{
 									method = "POST",
 									nickname = "Products_Create",
+									summary = "",
 									type = "integer",
 									format = "int32",
 									parameters = new object[]
@@ -234,6 +240,7 @@ namespace Swashbuckle.Tests.SwaggerSpec
 								{
 									method = "GET",
 									nickname = "Products_GetById",
+									summary = "",
 									type = "Product",
 									parameters = new object[]
                                     {

@@ -37,6 +37,10 @@ namespace Swashbuckle.Tests.SwaggerSpec
             Assert.IsNotNull(token);
             Assert.AreEqual("List all products", token.ToString());
 
+            token = declaration.SelectToken("apis[0].operations[1].summary");
+            Assert.IsNotNull(token);
+            Assert.AreEqual(String.Empty, token.ToString());
+
             token = declaration.SelectToken("apis[0].operations[2].summary");
             Assert.IsNotNull(token);
             Assert.AreEqual("Create a new product", token.ToString());
