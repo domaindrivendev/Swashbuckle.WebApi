@@ -190,13 +190,21 @@ This is similar to the **OperationFilter** option. It provides a way to customiz
 
 #### Include Xml Comments ####
 
-If you annonate Controllers and API Types with Xml Comments, you can use this option to incorporate those comments into the generated spec and UI. The Xml tags are mapped to Swagger properties as follows:
+If you annonate Controllers and API Types with [Xml Comments](http://msdn.microsoft.com/en-us/library/b2s063f7(v=vs.110).aspx), you can use this option to incorporate those comments into the generated spec and UI. The Xml tags are mapped to Swagger properties as follows:
 
 * **Action summary** -> Operation.Summary
 * **Action remarks** -> Operation.Notes
 * **Parameter summary** -> Operation.Parameters[name].Description
 * **Type summary** -> DataType.Descripton
 * **Property summary** -> DataType.Properties[name].Description
+
+Although it's not one of the official XML comment tags, Swashbuckle also supports the use of one or more **response** tags on an action. These can be used to describe the error codes for a given operation. For example,
+
+    /// <response code="200">It's all good!</response>
+    /// <response code="500">Somethings up!</response>
+    public int Create(Product product)
+    
+These values will get mapped to the Operation.ResponseMessages.
 
 ### Customize the swagger-ui ###
 
