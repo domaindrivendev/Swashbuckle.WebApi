@@ -188,7 +188,7 @@ This is similar to the **OperationFilter** option. It provides a way to customiz
         void Apply(DataType model, DataTypeRegistry dataTypeRegistry, Type type);
     }
 
-#### Include Xml Comments ####
+#### IncludeXmlComments ####
 
 If you annonate Controllers and API Types with [Xml Comments](http://msdn.microsoft.com/en-us/library/b2s063f7(v=vs.110).aspx), you can use this option to incorporate those comments into the generated spec and UI. The Xml tags are mapped to Swagger properties as follows:
 
