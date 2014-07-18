@@ -11,6 +11,7 @@
             <remarks>Requires admin priveleges</remarks>
             <param name="product">New product details</param>
             <returns></returns>
+            <response code="200">It's all good!</response>
         </member>
         <member name="M:Swashbuckle.Dummy.Controllers.ProductsController.GetById(System.Int32)">
             <summary>

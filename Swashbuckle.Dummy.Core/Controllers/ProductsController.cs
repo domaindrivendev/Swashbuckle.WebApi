@@ -12,6 +12,7 @@ namespace Swashbuckle.Dummy.Controllers
 		/// <remarks>Requires admin priveleges</remarks>
 		/// <param name="product">New product details</param>
 		/// <returns></returns>
+		/// <response code="200">It's all good!</response>
 		public int Create(Product product)
         {
             throw new NotImplementedException();

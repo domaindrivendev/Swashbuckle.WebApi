@@ -71,6 +71,17 @@ namespace Swashbuckle.Tests.SwaggerSpec
         }
 		
         [Test]
+        public void It_should_apply_responses_to_operation_response_messages()
+        {
+            var responseMessage = Get<JObject>("http://tempuri.org/swagger/api-docs/Products")
+                .SelectToken("apis[0].operations[2].responseMessages[0]");
+
+            Assert.IsNotNull(responseMessage);
+            Assert.AreEqual("200", responseMessage["code"].ToString());
+            Assert.AreEqual("It's all good!", responseMessage["message"].ToString());
+        }
+		
+        [Test]
         public void It_should_apply_type_summaries_to_model_descriptions()
         {
             var declaration = Get<JObject>("http://tempuri.org/swagger/api-docs/Products");
