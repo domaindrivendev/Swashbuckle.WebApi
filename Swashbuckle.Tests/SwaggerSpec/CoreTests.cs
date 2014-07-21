@@ -16,8 +16,8 @@ namespace Swashbuckle.Tests.SwaggerSpec
     {
         private SwaggerSpecConfig _swaggerSpecConfig;
 
-		public CoreTests()
-			: base("swagger/api-docs/{resourceName}")
+        public CoreTests()
+            : base("swagger/api-docs/{resourceName}")
         {}
 
         [SetUp]
@@ -32,7 +32,7 @@ namespace Swashbuckle.Tests.SwaggerSpec
         [Test]
         public void It_should_provide_a_listing_with_an_api_per_controller_name()
         {
-			var listing = Get<JObject>("http://tempuri.org/swagger/api-docs");
+            var listing = Get<JObject>("http://tempuri.org/swagger/api-docs");
 
             var expected = JObject.FromObject(
                 new
@@ -52,8 +52,8 @@ namespace Swashbuckle.Tests.SwaggerSpec
         [Test]
         public void It_should_provide_a_declaration_for_each_listed_api()
         {
-			AssertCustomersDeclaration();
-			AssertProductsDeclaration();
+            AssertCustomersDeclaration();
+            AssertProductsDeclaration();
         }
 
         private void AssertCustomersDeclaration()
@@ -64,97 +64,97 @@ namespace Swashbuckle.Tests.SwaggerSpec
             var expected = JObject.FromObject(
                 new
                 {
-					swaggerVersion = "1.2",
-					apiVersion = "1.0",
-					basePath = "http://tempuri.org",
-					resourcePath = "/Customers",
+                    swaggerVersion = "1.2",
+                    apiVersion = "1.0",
+                    basePath = "http://tempuri.org",
+                    resourcePath = "/Customers",
                     apis = new object[]
-					{
-						new
+                    {
+                        new
                         {
-							path = "/customers",
-							operations = new object[]
+                            path = "/customers",
+                            operations = new object[]
                             {
-								new
-								{
-									method = "POST",
-									nickname = "Customers_Create",
-									summary = "",
-									type = "integer",
-									format = "int32",
-									parameters = new object[]
+                                new
+                                {
+                                    method = "POST",
+                                    nickname = "Customers_Create",
+                                    summary = "",
+                                    type = "integer",
+                                    format = "int32",
+                                    parameters = new object[]
                                     {
-										new
-										{
-											paramType = "body",
-											name = "customer",
-											required = true,
-											type = "Customer",
+                                        new
+                                        {
+                                            paramType = "body",
+                                            name = "customer",
+                                            required = true,
+                                            type = "Customer",
                                         }
                                     },
-									responseMessages = new object[]{},
-									produces = new []{ "application/json", "text/json", "application/xml", "text/xml" },
-									consumes = new []{ "application/json", "text/json", "application/xml", "text/xml", "application/x-www-form-urlencoded" }
+                                    responseMessages = new object[]{},
+                                    produces = new []{ "application/json", "text/json", "application/xml", "text/xml" },
+                                    consumes = new []{ "application/json", "text/json", "application/xml", "text/xml", "application/x-www-form-urlencoded" }
                                 }
                             }
                         },
-						new
+                        new
                         {
-							path = "/customers/{id}",
-							operations = new object[]
+                            path = "/customers/{id}",
+                            operations = new object[]
                             {
-								new
-								{
-									method = "DELETE",
-									nickname = "Customers_Delete",
-									summary = "",
-									type = "void",
-									parameters = new object[]
+                                new
+                                {
+                                    method = "DELETE",
+                                    nickname = "Customers_Delete",
+                                    summary = "",
+                                    type = "void",
+                                    parameters = new object[]
                                     {
-										new
-										{
-											paramType = "path",
-											name = "id",
-											required = true,
-											type = "integer",
-											format = "int32"
+                                        new
+                                        {
+                                            paramType = "path",
+                                            name = "id",
+                                            required = true,
+                                            type = "integer",
+                                            format = "int32"
                                         }
                                     },
-									responseMessages = new object[]{},
-									produces = new string[]{},
-									consumes = new string[]{}
+                                    responseMessages = new object[]{},
+                                    produces = new string[]{},
+                                    consumes = new string[]{}
                                 },
-								new
-								{
-									method = "PUT",
-									nickname = "Customers_Update",
-									summary = "",
-									type = "void",
-									parameters = new object[]
+                                new
+                                {
+                                    method = "PUT",
+                                    nickname = "Customers_Update",
+                                    summary = "",
+                                    type = "void",
+                                    parameters = new object[]
                                     {
-										new
-										{
-											paramType = "path",
-											name = "id",
-											required = true,
-											type = "integer",
-											format = "int32"
+                                        new
+                                        {
+                                            paramType = "path",
+                                            name = "id",
+                                            required = true,
+                                            type = "integer",
+                                            format = "int32"
                                         },
-										new
-										{
-											paramType = "body",
-											name = "customer",
-											required = true,
-											type = "Customer",
+                                        new
+                                        {
+                                            paramType = "body",
+                                            name = "customer",
+                                            required = true,
+                                            type = "Customer",
                                         }
                                     },
-									responseMessages = new object[]{},
-									produces = new string[]{},
-									consumes = new []{ "application/json", "text/json", "application/xml", "text/xml", "application/x-www-form-urlencoded" }
+                                    responseMessages = new object[]{},
+                                    produces = new string[]{},
+                                    consumes = new []{ "application/json", "text/json", "application/xml", "text/xml", "application/x-www-form-urlencoded" }
                                 }
                             }
                         }
-					}
+                    }
                 });
 
             Assert.AreEqual(expected.ToString(), declaration.ToString());
@@ -168,112 +168,112 @@ namespace Swashbuckle.Tests.SwaggerSpec
             var expected = JObject.FromObject(
                 new
                 {
-					swaggerVersion = "1.2",
-					apiVersion = "1.0",
-					basePath = "http://tempuri.org",
-					resourcePath = "/Products",
+                    swaggerVersion = "1.2",
+                    apiVersion = "1.0",
+                    basePath = "http://tempuri.org",
+                    resourcePath = "/Products",
                     apis = new object[]
-					{
-						new
+                    {
+                        new
                         {
-							path = "/products",
-							operations = new object[]
+                            path = "/products",
+                            operations = new object[]
                             {
-								new
-								{
-									method = "GET",
-									nickname = "Products_FindAll",
-									summary = "",
-									type = "array",
-									items = JObject.Parse("{ $ref: \"Product\" }"),
-									parameters = new object[]{},
-									responseMessages = new object[]{},
-									produces = new []{ "application/json", "text/json", "application/xml", "text/xml" },
-									consumes = new object[]{}
-								},
                                 new
-								{
-									method = "GET",
-									nickname = "Products_FindByType",
-									summary = "",
-									type = "array",
-									items = JObject.Parse("{ $ref: \"Product\" }"),
-									parameters = new object[]
+                                {
+                                    method = "GET",
+                                    nickname = "Products_FindAll",
+                                    summary = "",
+                                    type = "array",
+                                    items = JObject.Parse("{ $ref: \"Product\" }"),
+                                    parameters = new object[]{},
+                                    responseMessages = new object[]{},
+                                    produces = new []{ "application/json", "text/json", "application/xml", "text/xml" },
+                                    consumes = new object[]{}
+                                },
+                                new
+                                {
+                                    method = "GET",
+                                    nickname = "Products_FindByType",
+                                    summary = "",
+                                    type = "array",
+                                    items = JObject.Parse("{ $ref: \"Product\" }"),
+                                    parameters = new object[]
                                     {
-										new
-										{
-											paramType = "query",
-											name = "type",
-											required = true,
-											type = "string",
-											@enum = new[] { "Book", "Album" }
+                                        new
+                                        {
+                                            paramType = "query",
+                                            name = "type",
+                                            required = true,
+                                            type = "string",
+                                            @enum = new[] { "Book", "Album" }
                                         }
                                     },
-									responseMessages = new object[]{},
-									produces = new []{ "application/json", "text/json", "application/xml", "text/xml" },
-									consumes = new object[]{}
-								},
-								new
-								{
-									method = "POST",
-									nickname = "Products_Create",
-									summary = "",
-									type = "integer",
-									format = "int32",
-									parameters = new object[]
+                                    responseMessages = new object[]{},
+                                    produces = new []{ "application/json", "text/json", "application/xml", "text/xml" },
+                                    consumes = new object[]{}
+                                },
+                                new
+                                {
+                                    method = "POST",
+                                    nickname = "Products_Create",
+                                    summary = "",
+                                    type = "integer",
+                                    format = "int32",
+                                    parameters = new object[]
                                     {
-										new
-										{
-											paramType = "body",
-											name = "product",
-											required = true,
-											type = "Product",
+                                        new
+                                        {
+                                            paramType = "body",
+                                            name = "product",
+                                            required = true,
+                                            type = "Product",
                                         }
                                     },
-									responseMessages = new object[]{},
-									produces = new []{ "application/json", "text/json", "application/xml", "text/xml" },
-									consumes = new []{ "application/json", "text/json", "application/xml", "text/xml", "application/x-www-form-urlencoded" }
-								}
+                                    responseMessages = new object[]{},
+                                    produces = new []{ "application/json", "text/json", "application/xml", "text/xml" },
+                                    consumes = new []{ "application/json", "text/json", "application/xml", "text/xml", "application/x-www-form-urlencoded" }
+                                }
                             }
                         },
-						new
+                        new
                         {
-							path = "/products/{id}",
-							operations = new object[]
+                            path = "/products/{id}",
+                            operations = new object[]
                             {
-								new
-								{
-									method = "GET",
-									nickname = "Products_GetById",
-									summary = "",
-									type = "Product",
-									parameters = new object[]
+                                new
+                                {
+                                    method = "GET",
+                                    nickname = "Products_GetById",
+                                    summary = "",
+                                    type = "Product",
+                                    parameters = new object[]
                                     {
-										new
-										{
-											paramType = "path",
-											name = "id",
-											required = true,
-											type = "integer",
-											format = "int32"
+                                        new
+                                        {
+                                            paramType = "path",
+                                            name = "id",
+                                            required = true,
+                                            type = "integer",
+                                            format = "int32"
                                         }
                                     },
-									responseMessages = new object[]{},
-									produces = new []{ "application/json", "text/json", "application/xml", "text/xml" },
-									consumes = new object[]{}
-								}
+                                    responseMessages = new object[]{},
+                                    produces = new []{ "application/json", "text/json", "application/xml", "text/xml" },
+                                    consumes = new object[]{}
+                                }
                            }
                         },
-					}
+                    }
                 });
 
             Assert.AreEqual(expected.ToString(), declaration.ToString());
         }
 
-		[Test]
-		public void It_should_handle_additional_route_parameters_treating_them_as_required_strings()
+        [Test]
+        public void It_should_handle_additional_route_parameters_treating_them_as_required_strings()
         {
-			// i.e. route params that are not included in the action signature
+            // i.e. route params that are not included in the action signature
             SetUpCustomRouteFor<ProductsController>("{apiVersion}/products");
 
             var versionParam = Get<JObject>("http://tempuri.org/swagger/api-docs/Products")
@@ -295,22 +295,22 @@ namespace Swashbuckle.Tests.SwaggerSpec
         {
             _swaggerSpecConfig.ResolveBasePathUsing((req) => "http://custombasepath.com");
 
-			var declaration = Get<JObject>("http://tempuri.org/swagger/api-docs/Products");
-			Assert.AreEqual("http://custombasepath.com", (string)declaration["basePath"]);
+            var declaration = Get<JObject>("http://tempuri.org/swagger/api-docs/Products");
+            Assert.AreEqual("http://custombasepath.com", (string)declaration["basePath"]);
         }
         
-		[Test]
-		public void It_should_support_an_optional_setting_to_ignore_any_actions_marked_obsolete()
+        [Test]
+        public void It_should_support_an_optional_setting_to_ignore_any_actions_marked_obsolete()
         {
             SetUpDefaultRouteFor<ObsoleteActionsController>();
 
-			var declaration = Get<JObject>("http://tempuri.org/swagger/api-docs/ObsoleteActions");
-			Assert.IsNotNull(declaration.SelectToken("apis[0].operations[1]"));
+            var declaration = Get<JObject>("http://tempuri.org/swagger/api-docs/ObsoleteActions");
+            Assert.IsNotNull(declaration.SelectToken("apis[0].operations[1]"));
 
             _swaggerSpecConfig.IgnoreObsoleteActions();
 
-			declaration = Get<JObject>("http://tempuri.org/swagger/api-docs/ObsoleteActions");
-			Assert.IsNull(declaration.SelectToken("apis[0].operations[1]"));
+            declaration = Get<JObject>("http://tempuri.org/swagger/api-docs/ObsoleteActions");
+            Assert.IsNull(declaration.SelectToken("apis[0].operations[1]"));
         }
 
         [Test]
@@ -318,7 +318,7 @@ namespace Swashbuckle.Tests.SwaggerSpec
         {
             _swaggerSpecConfig.GroupDeclarationsBy((apiDesc) => String.Format("{0}s", apiDesc.HttpMethod.ToString().ToLower()));
 
-			var listing = Get<JObject>("http://tempuri.org/swagger/api-docs/");
+            var listing = Get<JObject>("http://tempuri.org/swagger/api-docs/");
 
             var expected = JObject.FromObject(
                 new
@@ -341,12 +341,12 @@ namespace Swashbuckle.Tests.SwaggerSpec
             Assert.NotNull(Get<JObject>("http://tempuri.org/swagger/api-docs/puts"));
         }
 
-  		[Test]
-		public void It_should_support_configurable_filters_for_modifying_generated_operations()
+        [Test]
+        public void It_should_support_configurable_filters_for_modifying_generated_operations()
         {
             _swaggerSpecConfig.OperationFilter<AddResponseCodes>();
 
-			var declaration = Get<JObject>("http://tempuri.org/swagger/api-docs/Customers");
+            var declaration = Get<JObject>("http://tempuri.org/swagger/api-docs/Customers");
 
             var expected = JObject.FromObject(new { code = 200, message = "It's all good!" });
             Assert.AreEqual(expected.ToString(),
@@ -355,7 +355,7 @@ namespace Swashbuckle.Tests.SwaggerSpec
                 declaration.SelectToken("apis[1].operations[1].responseMessages[0]").ToString());
         }
 
-		class AddResponseCodes : IOperationFilter
+        class AddResponseCodes : IOperationFilter
         {
             public void Apply(Operation operation, DataTypeRegistry dataTypeRegistry, System.Web.Http.Description.ApiDescription apiDescription)
             {

@@ -10,22 +10,22 @@ namespace Swashbuckle.Dummy.Controllers
 {
     public class DynamicTypesController : ApiController
     {
-		public int Create(dynamic thing)
+        public int Create(dynamic thing)
         {
             throw new NotImplementedException();
         }
 
-		public ExpandoObject GeByProperties(JObject thing)
+        public ExpandoObject GeByProperties(JObject thing)
         {
             throw new NotImplementedException();
         }
 
-		public IEnumerable<JToken> GetAll()
+        public IEnumerable<JToken> GetAll()
         {
             throw new NotImplementedException();
         }
 
-		public HttpResponseMessage Delete(int id)
+        public HttpResponseMessage Delete(int id)
         {
             throw new NotImplementedException();
         }

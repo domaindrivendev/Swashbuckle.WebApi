@@ -13,8 +13,8 @@ namespace Swashbuckle.Tests.SwaggerSpec
     [TestFixture]
     public class XmlCommentsTests : HttpMessageHandlerTestsBase<SwaggerSpecHandler>
     {
-		public XmlCommentsTests()
-			: base("swagger/api-docs/{resourceName}")
+        public XmlCommentsTests()
+            : base("swagger/api-docs/{resourceName}")
         {}
 
         [SetUp]
@@ -69,7 +69,7 @@ namespace Swashbuckle.Tests.SwaggerSpec
             Assert.IsNotNull(token);
             Assert.AreEqual("New product details", token.ToString());
         }
-		
+        
         [Test]
         public void It_should_apply_responses_to_operation_response_messages()
         {
@@ -80,7 +80,7 @@ namespace Swashbuckle.Tests.SwaggerSpec
             Assert.AreEqual("200", responseMessage["code"].ToString());
             Assert.AreEqual("It's all good!", responseMessage["message"].ToString());
         }
-		
+        
         [Test]
         public void It_should_apply_type_summaries_to_model_descriptions()
         {

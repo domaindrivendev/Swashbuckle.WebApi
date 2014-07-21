@@ -91,17 +91,17 @@ namespace Swashbuckle.Swagger
             };
 
             var dataType = _dataTypeRegistry.GetOrRegister(apiParamDesc.ParameterDescriptor.ParameterType);
-			if (dataType.Type == "object")
-			{
-				parameter.Type = dataType.Id;
-			}
-			else
-			{
-				parameter.Type = dataType.Type;
-				parameter.Format = dataType.Format;
-				parameter.Items = dataType.Items;
-				parameter.Enum = dataType.Enum;
-			}
+            if (dataType.Type == "object")
+            {
+                parameter.Type = dataType.Id;
+            }
+            else
+            {
+                parameter.Type = dataType.Type;
+                parameter.Format = dataType.Format;
+                parameter.Items = dataType.Items;
+                parameter.Enum = dataType.Enum;
+            }
 
             return parameter;
         }

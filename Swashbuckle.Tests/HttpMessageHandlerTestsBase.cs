@@ -11,12 +11,12 @@ using System.Web.Http.Routing;
 namespace Swashbuckle.Tests
 {
     public class HttpMessageHandlerTestsBase<THandler>
-		where THandler : HttpMessageHandler
+        where THandler : HttpMessageHandler
     {
         private string _routeTemplate;
         private HttpConfiguration _httpConfiguration;
 
-		protected HttpMessageHandlerTestsBase(string routeTemplate)
+        protected HttpMessageHandlerTestsBase(string routeTemplate)
         {
             _routeTemplate = routeTemplate;
             _httpConfiguration = new HttpConfiguration();
@@ -38,37 +38,37 @@ namespace Swashbuckle.Tests
             }
         }
 
-		protected void SetUpDefaultRouteFor<TController>()
-			where TController : ApiController
+        protected void SetUpDefaultRouteFor<TController>()
+            where TController : ApiController
         {
             SetUpDefaultRoutesFor(new[] { typeof(TController) });
         }
-		
-		protected void SetUpCustomRouteFor<TController>(string routeTemplate)
-			where TController : ApiController
+        
+        protected void SetUpCustomRouteFor<TController>(string routeTemplate)
+            where TController : ApiController
         {
             _httpConfiguration = new HttpConfiguration();
 
-			var controllerName = typeof(TController).Name.ToLower().Replace("controller", String.Empty);
-			var route = new HttpRoute(
-				routeTemplate,
-				new HttpRouteValueDictionary(new { controller = controllerName, id = RouteParameter.Optional }));
-			_httpConfiguration.Routes.Add(controllerName, route);
+            var controllerName = typeof(TController).Name.ToLower().Replace("controller", String.Empty);
+            var route = new HttpRoute(
+                routeTemplate,
+                new HttpRouteValueDictionary(new { controller = controllerName, id = RouteParameter.Optional }));
+            _httpConfiguration.Routes.Add(controllerName, route);
         }
 
-		protected TContent Get<TContent>(string uri)
+        protected TContent Get<TContent>(string uri)
         {
-			var responseMessage = ExecuteGet(uri);
+            var responseMessage = ExecuteGet(uri);
             return responseMessage.Content.ReadAsAsync<TContent>().Result;
         }
 
-		protected string GetAsString(string uri)
+        protected string GetAsString(string uri)
         {
-			var responseMessage = ExecuteGet(uri);
+            var responseMessage = ExecuteGet(uri);
             return responseMessage.Content.ReadAsStringAsync().Result;
         }
 
-		private HttpResponseMessage ExecuteGet(string uri)
+        private HttpResponseMessage ExecuteGet(string uri)
         {
             if (Handler == null)
                 throw new InvalidOperationException("Handler not set");
@@ -76,9 +76,9 @@ namespace Swashbuckle.Tests
             var request = new HttpRequestMessage(HttpMethod.Get, uri);
             request.Properties[HttpPropertyKeys.HttpConfigurationKey] = _httpConfiguration; 
 
-			var route = new HttpRoute(_routeTemplate);
+            var route = new HttpRoute(_routeTemplate);
             var routeData = route.GetRouteData("/", request) ?? new HttpRouteData(route);
-			request.Properties[HttpPropertyKeys.HttpRouteDataKey] = routeData;
+            request.Properties[HttpPropertyKeys.HttpRouteDataKey] = routeData;
 
             return new HttpMessageInvoker(Handler)
                 .SendAsync(request, new CancellationToken(false))

@@ -15,10 +15,10 @@ namespace Swashbuckle.Application
         private readonly SwaggerSpecConfig _config;
 
         public SwaggerSpecHandler()
-			: this(SwaggerSpecConfig.StaticInstance)
+            : this(SwaggerSpecConfig.StaticInstance)
         {}
 
-		public SwaggerSpecHandler(SwaggerSpecConfig config)
+        public SwaggerSpecHandler(SwaggerSpecConfig config)
         {
             _config = config;
         }
@@ -45,7 +45,7 @@ namespace Swashbuckle.Application
 
         private ISwaggerProvider GetSwaggerProvider(HttpConfiguration httpConfig)
         {
-			var test = httpConfig.Services.GetApiExplorer();
+            var test = httpConfig.Services.GetApiExplorer();
 
             var swaggerProvider = new ApiExplorerAdapter(
                 httpConfig.Services.GetApiExplorer(),

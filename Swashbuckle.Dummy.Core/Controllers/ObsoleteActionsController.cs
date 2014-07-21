@@ -7,13 +7,13 @@ namespace Swashbuckle.Dummy.Controllers
 {
     public class ObsoleteActionsController : ApiController
     {
-		public int Update(int id, string value)
+        public int Update(int id, string value)
         {
             throw new NotImplementedException();
         }
 
-		[Obsolete]
-		public void Delete(int id)
+        [Obsolete]
+        public void Delete(int id)
         {
             throw new NotImplementedException();
         }

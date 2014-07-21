@@ -7,18 +7,18 @@ namespace Swashbuckle.Dummy.Controllers
 {
     public class AnnotatedTypesController : ApiController
     {
-		public int Create(Payment payment)
+        public int Create(Payment payment)
         {
             throw new NotImplementedException();
         }
     }
-	
-	public class Payment
+    
+    public class Payment
     {
-		[Required]
+        [Required]
         public decimal Amount { get; set; }
 
-		[Required]
+        [Required]
         public string CardNumber { get; set; }
 
         public string Cvv { get; set; }

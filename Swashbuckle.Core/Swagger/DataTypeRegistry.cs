@@ -125,7 +125,7 @@ namespace Swashbuckle.Swagger
 
         private DataType CreateComplexDataType(Type type, Queue<Type> deferredTypes)
         {
-			// Ignore inherited properties if its an explicitly configured polymorphic sub type
+            // Ignore inherited properties if its an explicitly configured polymorphic sub type
             var polymorphicType = PolymorphicTypeFor(type);
             var bindingFlags = polymorphicType.IsBase
                 ? BindingFlags.Instance | BindingFlags.Public

@@ -16,8 +16,8 @@ namespace Swashbuckle.Tests.SwaggerSpec
     {
         private SwaggerSpecConfig _swaggerSpecConfig;
 
-		public ModelTests()
-			: base("swagger/api-docs/{resourceName}")
+        public ModelTests()
+            : base("swagger/api-docs/{resourceName}")
         {}
 
         [SetUp]
@@ -32,42 +32,42 @@ namespace Swashbuckle.Tests.SwaggerSpec
         {
             SetUpDefaultRouteFor<ProductsController>();
 
-			var models = Get<JObject>("http://tempuri.org/swagger/api-docs/Products")
-				.SelectToken("models");
+            var models = Get<JObject>("http://tempuri.org/swagger/api-docs/Products")
+                .SelectToken("models");
 
-			var expected = JObject.FromObject(
+            var expected = JObject.FromObject(
                 new
-				{
-					Product = new
-					{
-						id = "Product",
-						type = "object",
-						properties = new
-						{
-							Id = new
-							{
-								type = "integer",
-								format = "int32",
-							},
-							Type = new
-							{
-								type = "string",
-								@enum = new[] { "Book", "Album" }
-							},
-							Description = new
-							{
-								type = "string",
-							},
-							UnitPrice = new
-							{
-								type = "number",
-								format = "double"
-							}
-						},
+                {
+                    Product = new
+                    {
+                        id = "Product",
+                        type = "object",
+                        properties = new
+                        {
+                            Id = new
+                            {
+                                type = "integer",
+                                format = "int32",
+                            },
+                            Type = new
+                            {
+                                type = "string",
+                                @enum = new[] { "Book", "Album" }
+                            },
+                            Description = new
+                            {
+                                type = "string",
+                            },
+                            UnitPrice = new
+                            {
+                                type = "number",
+                                format = "double"
+                            }
+                        },
                         required = new object[] {},
                         subTypes = new object[] {}
-					}
-				}
+                    }
+                }
             );
 
             Assert.AreEqual(expected.ToString(), models.ToString());
@@ -78,8 +78,8 @@ namespace Swashbuckle.Tests.SwaggerSpec
         {
             SetUpDefaultRouteFor<PolymorphicTypesController>();
 
-			var models = Get<JObject>("http://tempuri.org/swagger/api-docs/PolymorphicTypes")
-				.SelectToken("models");
+            var models = Get<JObject>("http://tempuri.org/swagger/api-docs/PolymorphicTypes")
+                .SelectToken("models");
 
             var expected = JObject.FromObject(
                 new
@@ -109,13 +109,13 @@ namespace Swashbuckle.Tests.SwaggerSpec
                     },
                     Animal = new
                     {
-						id = "Animal",
-						type = "object",
+                        id = "Animal",
+                        type = "object",
                         properties = new
                         {
                             Type = new
                             {
-								type = "string"
+                                type = "string"
                             }
                         },
                         required = new object[] { },
@@ -126,7 +126,7 @@ namespace Swashbuckle.Tests.SwaggerSpec
 
             Assert.AreEqual(expected.ToString(), models.ToString());
         }
-		
+        
         [Test]
         public void It_should_handle_nested_types()
         {
@@ -184,44 +184,44 @@ namespace Swashbuckle.Tests.SwaggerSpec
         {
             SetUpDefaultRouteFor<SelfReferencingTypesController>();
 
-			var models = Get<JObject>("http://tempuri.org/swagger/api-docs/SelfReferencingTypes")
-				.SelectToken("models");
+            var models = Get<JObject>("http://tempuri.org/swagger/api-docs/SelfReferencingTypes")
+                .SelectToken("models");
 
             var expected = JObject.FromObject(
                 new
                 {
-					Component = new
-					{
-						id = "Component",
-						type = "object",
-						properties = new
-						{
-							Name = new
-							{
-								type = "string"
-							},
-							SubComponents = new
-							{
-								type = "array",
-								items = JObject.Parse("{ $ref: \"Component\" }")
-							}
-						},
+                    Component = new
+                    {
+                        id = "Component",
+                        type = "object",
+                        properties = new
+                        {
+                            Name = new
+                            {
+                                type = "string"
+                            },
+                            SubComponents = new
+                            {
+                                type = "array",
+                                items = JObject.Parse("{ $ref: \"Component\" }")
+                            }
+                        },
                         required = new object[] {},
                         subTypes = new object[] {}
-					}
+                    }
                 }
             );
 
             Assert.AreEqual(expected.ToString(), models.ToString());
         }
 
-		[Test]
-		public void It_should_not_create_models_for_dynamic_types_treating_them_instead_as_strings()
+        [Test]
+        public void It_should_not_create_models_for_dynamic_types_treating_them_instead_as_strings()
         {
             SetUpDefaultRouteFor<DynamicTypesController>();
 
-			var models = Get<JObject>("http://tempuri.org/swagger/api-docs/DynamicTypes")
-				.SelectToken("models");
+            var models = Get<JObject>("http://tempuri.org/swagger/api-docs/DynamicTypes")
+                .SelectToken("models");
 
             var expected = JObject.FromObject(
                 new {}
@@ -230,13 +230,13 @@ namespace Swashbuckle.Tests.SwaggerSpec
             Assert.AreEqual(expected.ToString(), models.ToString());
         }
 
-		[Test]
-		public void It_should_honor_required_property_data_annotations()
+        [Test]
+        public void It_should_honor_required_property_data_annotations()
         {
             SetUpDefaultRouteFor<AnnotatedTypesController>();
 
-			var required = Get<JObject>("http://tempuri.org/swagger/api-docs/AnnotatedTypes")
-				.SelectToken("models.Payment.required");
+            var required = Get<JObject>("http://tempuri.org/swagger/api-docs/AnnotatedTypes")
+                .SelectToken("models.Payment.required");
 
             var expected = JArray.FromObject(new[] { "Amount", "CardNumber" });
 
@@ -245,24 +245,24 @@ namespace Swashbuckle.Tests.SwaggerSpec
 
 
 
-		[Test]
-		[ExpectedException(typeof(InvalidOperationException))]
-		public void It_should_honor_the_swagger_spec_and_not_support_containers_of_containers()
+        [Test]
+        [ExpectedException(typeof(InvalidOperationException))]
+        public void It_should_honor_the_swagger_spec_and_not_support_containers_of_containers()
         {
             SetUpDefaultRouteFor<UnsupportedTypesController>();
 
             Get<JObject>("http://tempuri.org/swagger/api-docs/Matrixes");
-		}
+        }
 
-		[Test]
-		public void It_should_support_explicit_mapping_of_types_to_data_types()
+        [Test]
+        public void It_should_support_explicit_mapping_of_types_to_data_types()
         {
             SetUpDefaultRouteFor<UnsupportedTypesController>();
 
             _swaggerSpecConfig.MapType<Matrix>(() => new DataType { Type = "string" });
 
-			var models = Get<JObject>("http://tempuri.org/swagger/api-docs/UnsupportedTypes")
-				.SelectToken("models");
+            var models = Get<JObject>("http://tempuri.org/swagger/api-docs/UnsupportedTypes")
+                .SelectToken("models");
 
             var expected = JObject.FromObject(
                 new {}
@@ -293,14 +293,14 @@ namespace Swashbuckle.Tests.SwaggerSpec
                 {
                     Elephant = new
                     {
-						id = "Elephant",
-						type = "object",
+                        id = "Elephant",
+                        type = "object",
                         properties = new
                         {
                             TrunkLength = new
                             {
-								type = "integer",
-								format = "int32"
+                                type = "integer",
+                                format = "int32"
                             }
                         },
                         required = new object[] {},
@@ -308,28 +308,28 @@ namespace Swashbuckle.Tests.SwaggerSpec
                     },
                     Animal = new
                     {
-						id = "Animal",
-						type = "object",
+                        id = "Animal",
+                        type = "object",
                         properties = new
                         {
                             Type = new
                             {
-								type = "string"
+                                type = "string"
                             }
                         },
                         required = new object[] {},
                         subTypes = new object[] { "Mamal" },
-						discriminator = "Type"
+                        discriminator = "Type"
                     },
                     Mamal = new
                     {
-						id = "Mamal",
-						type = "object",
+                        id = "Mamal",
+                        type = "object",
                         properties = new
                         {
                             HairColor = new
                             {
-								type = "string"
+                                type = "string"
                             }
                         },
                         required = new object[] {},
@@ -341,11 +341,11 @@ namespace Swashbuckle.Tests.SwaggerSpec
             Assert.AreEqual(expected.ToString(), models.ToString());
         }
 
-		[Test]
-		public void It_should_support_configurable_filters_for_modifying_generated_models()
+        [Test]
+        public void It_should_support_configurable_filters_for_modifying_generated_models()
         {
             SetUpDefaultRouteFor<ProductsController>();
-			
+            
             _swaggerSpecConfig.ModelFilter<OverrideDescription>();
 
             var models = Get<JObject>("http://tempuri.org/swagger/api-docs/Products")
@@ -354,7 +354,7 @@ namespace Swashbuckle.Tests.SwaggerSpec
             Assert.AreEqual("foobar", models.SelectToken("Product.description").ToString());
         }
 
-		class OverrideDescription : IModelFilter
+        class OverrideDescription : IModelFilter
         {
             public void Apply(DataType model, DataTypeRegistry dataTypeRegistry, Type type)
             {
