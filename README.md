@@ -20,7 +20,7 @@ Once you have a Web API that can describe itself in Swagger, you've opened the t
 
 **\*Swashbuckle 4.0**
 
-As of version 4.0, Swashbuckle has no dependency on ASP.Net MVC. As a result, it's now available to both IIS hosted and self-hosted Web API's. However, this introduces several (relatively) trivial breaking changes. Checkout the [transition guide](#transitioning-to-swashbuckle-40) if you're upgrading from a prior version.
+As of version 4.0, Swashbuckle has no dependency on ASP.Net MVC. As a result, it's now available to IIS hosted, self-hosted and OWIN-hosted Web API's. However, this introduces several (relatively) trivial breaking changes. Checkout the [transition guide](#transitioning-to-swashbuckle-40) if you're upgrading from a prior version.
 
 ## Getting Started ##
 
@@ -38,7 +38,7 @@ This will add a reference to Swashbuckle.Core, which contains the generator and 
 
 ### Self-hosted ###
 
-If youre service is self-hosted, you need to install Swashbuckle.Core directly ...
+If youre service is self-hosted, you will need to install Swashbuckle.Core directly ...
 
     Install-Package Swashbuckle.Core
 
@@ -46,6 +46,47 @@ And then manually apply the one-liner to initiate Swashbuckle before starting th
 
     var config = new HttpSelfHostConfiguration("http://localhost:8080");
     Swashbuckle.Bootstrapper.Init(config);
+    
+### OWIN Self-hosted ###
+
+Similarly, if you're using OWIN to self-host your service, you should install Swashbuckle.Core directly and then manually invoke the Swashbuckle bootstrapper inside the Startup class:
+
+    public class Startup
+    {
+        public void Configuration(IAppBuilder app)
+        {
+            var config = new HttpConfiguration();
+
+            Swashbuckle.Bootstrapper.Init(config);
+
+            config.Routes.MapHttpRoute(
+                name: "Default",
+                routeTemplate: "{controller}/{id}",
+                defaults: new { id = RouteParameter.Optional });
+
+            app.UseWebApi(config);
+        }
+    }
+
+### OWIN Hosted in IIS ###
+
+If your using OWIN to host your service via the IIS Integrated pipeline (i.e. Microsoft.Owin.Host.SystemWeb), the steps are the same as above but with some additional workarounds.
+
+1) The following line must be included in your Web.config:
+
+    <configuration>
+       <system.webServer>
+          <modules runAllManagedModulesForAllRequests=“true” />
+       </system.webServer>
+    </configuration>
+    
+This is because IIS has a native module for handling static files and when it sees an extension in the URL, it assumes a static file and tries to handle the request itself skipping remaining parts of the pipeline. However, Swashbuckle serves it's UI routes (which do have extensions) through WebApi which is being invoked through the OWIN module. This setting ensures the OWIN module is run for all requests - extension and extensionless.
+
+2) Add the following stage marker AFTER configuring the WebApi middleware (in namespace Microsoft.Owin.Extensions):
+
+    app.UseStageMarker(PipelineStage.MapHandler);
+    
+This setting causes the WebApi middleware to execute earlier in the pipeline, allowing it to also handle URL's with extensions. See the following article for more information on stage markers (http://www.asp.net/aspnet/overview/owin-and-katana/owin-middleware-in-the-iis-integrated-pipeline) 
 
 ## Troubleshooting ##
 
@@ -276,7 +317,7 @@ In addition, the referenced static method should contain the following line to i
 
     Swashbuckle.Bootstrapper.Init(GlobalConfiguration.Configuration);
 
-### Ensure All Managed Modules are run for all requests ###
+### IIS Hosted - UI returning 404 File not Found ###
 
 The [swagger-ui](https://github.com/wordnik/swagger-ui) is a single page application (SPA) consisting of html, JavaScript and CSS. To serve up these files (.html, .js and .css), you're web server must execute the ASP.NET Routing Module on all requests (as opposed to just extensionless URL's). If the setting for this is not present in your Web.config, you'll need to add it manually:
 
@@ -284,6 +325,15 @@ The [swagger-ui](https://github.com/wordnik/swagger-ui) is a single page applica
         <modules runAllManagedModulesForAllRequests="true" />
         <!-- Other web server settings -->
     </system.webServer>
+    
+### OWIN Hosted in IIS - UI returning 404 File not Found
+
+This is similar to the issue above with an additonal workaround required. To ensure that the OWIN module is run for all requests (extension and extensionless), **runAllManagedModulesForAllRequests** must be set in the Web.config.
+
+In addition, a stage marker must be used in Startup.cs, AFTER configuring the WebApi middleware, to ensure that routes with extensions are also processed via WebApi:
+
+    app.UseWebApi(config);
+    app.UseStageMarker(PipelineStage.MapHandler);
 
 ### Conflicting Model Id's ###
 
