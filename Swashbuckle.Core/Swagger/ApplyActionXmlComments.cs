@@ -18,9 +18,9 @@ namespace Swashbuckle.Swagger
 
         private readonly XPathNavigator _navigator;
 
-        public ApplyActionXmlComments(XPathDocument xmlCommentsDoc)
+        public ApplyActionXmlComments(string xmlCommentsPath)
         {
-            _navigator = xmlCommentsDoc.CreateNavigator();
+            _navigator = new XPathDocument(xmlCommentsPath).CreateNavigator();
         }
 
         public void Apply(Operation operation, DataTypeRegistry dataTypeRegistry, ApiDescription apiDescription)

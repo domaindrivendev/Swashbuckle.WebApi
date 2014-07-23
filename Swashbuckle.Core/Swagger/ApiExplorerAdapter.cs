@@ -11,8 +11,8 @@ namespace Swashbuckle.Swagger
 
         private readonly IApiExplorer _apiExplorer;
         private readonly bool _ignoreObsoleteActions;
-        private readonly Func<ApiDescription, string, bool> _resolveVersionSupport;
-        private readonly Func<ApiDescription, string> _resolveResourceName;
+        private readonly Func<ApiDescription, string, bool> _versionSupportResolver;
+        private readonly Func<ApiDescription, string> _resourceNameResolver;
         private readonly Dictionary<Type, Func<DataType>> _customTypeMappings;
         private readonly IEnumerable<PolymorphicType> _polymorphicTypes;
         private readonly IEnumerable<IModelFilter> _modelFilters;
@@ -30,8 +30,8 @@ namespace Swashbuckle.Swagger
         {
             _apiExplorer = apiExplorer;
             _ignoreObsoleteActions = ignoreObsoleteActions;
-            _resolveVersionSupport = resoveVersionSupport;
-            _resolveResourceName = resolveResourceName;
+            _versionSupportResolver = resoveVersionSupport;
+            _resourceNameResolver = resolveResourceName;
             _customTypeMappings = customTypeMappings;
             _polymorphicTypes = polymorphicTypes;
             _modelFilters = modelFilters;
@@ -84,8 +84,8 @@ namespace Swashbuckle.Swagger
         {
             return _apiExplorer.ApiDescriptions
                 .Where(apiDesc => !_ignoreObsoleteActions || !apiDesc.IsMarkedObsolete())
-                .Where(apiDesc => _resolveVersionSupport(apiDesc, version))
-                .GroupBy(apiDesc => _resolveResourceName(apiDesc))
+                .Where(apiDesc => _versionSupportResolver(apiDesc, version))
+                .GroupBy(apiDesc => _resourceNameResolver(apiDesc))
                 .OrderBy(group => group.Key)
                 .ToArray();
         }

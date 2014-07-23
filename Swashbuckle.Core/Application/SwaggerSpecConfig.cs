@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Net.Http;
 using System.Web.Http.Description;
-using System.Xml.XPath;
+using System.Linq;
 using Swashbuckle.Swagger;
 
 namespace Swashbuckle.Application
@@ -17,74 +17,78 @@ namespace Swashbuckle.Application
             customize(StaticInstance);
         }
 
+        internal Func<HttpRequestMessage, string> BasePathResolver { get; set; }
+        internal Func<HttpRequestMessage, string> TargetVersionResolver { get; set; }
+
+        private bool _ignoreObsoleteActions;
+        private Func<ApiDescription, string, bool> _versionSupportResolver;
+        private Func<ApiDescription, string> _resourceNameResolver;
+        private readonly Dictionary<Type, Func<DataType>> _customTypeMappings;
+        private readonly List<PolymorphicType> _polymorphicTypes;
+
+        private readonly List<Func<IModelFilter>> _modelFilterFactories;
+        private readonly List<Func<IOperationFilter>> _operationFilterFactories;
+        
         public SwaggerSpecConfig()
         {
-            ResolveBasePath = (req) => req.RequestUri.GetLeftPart(UriPartial.Authority) + req.GetConfiguration().VirtualPathRoot.TrimEnd('/');
-            ResolveTargetVersion = (req) => "1.0";
-            IgnoreObsoleteActionsFlag = false;
-            ResolveVersionSupport = (apiDesc, version) => true;
-            ResolveResourceName = (apiDesc) => apiDesc.ActionDescriptor.ControllerDescriptor.ControllerName;
-            OperationFilters = new List<IOperationFilter>();
-            CustomTypeMappings = new Dictionary<Type, Func<DataType>>();
-            PolymorphicTypes = new List<PolymorphicType>();
-            ModelFilters = new List<IModelFilter>();
+            BasePathResolver = (req) => req.RequestUri.GetLeftPart(UriPartial.Authority) + req.GetConfiguration().VirtualPathRoot.TrimEnd('/');
+            TargetVersionResolver = (req) => "1.0";
+
+            _ignoreObsoleteActions = false;
+            _versionSupportResolver = (apiDesc, version) => true;
+            _resourceNameResolver = (apiDesc) => apiDesc.ActionDescriptor.ControllerDescriptor.ControllerName;
+            _customTypeMappings = new Dictionary<Type, Func<DataType>>();
+            _polymorphicTypes = new List<PolymorphicType>();
+
+            _modelFilterFactories = new List<Func<IModelFilter>>();
+            _operationFilterFactories = new List<Func<IOperationFilter>>();
         }
 
-        internal Func<HttpRequestMessage, string> ResolveBasePath { get; private set; }
-        internal Func<HttpRequestMessage, string> ResolveTargetVersion { get; private set; }
-        internal bool IgnoreObsoleteActionsFlag { get; private set; }
-        internal Func<ApiDescription, string, bool> ResolveVersionSupport { get; private set; }
-        internal Func<ApiDescription, string> ResolveResourceName { get; private set; }
-        internal List<IOperationFilter> OperationFilters = new List<IOperationFilter>();
-        internal Dictionary<Type, Func<DataType>> CustomTypeMappings { get; private set; }
-        internal List<PolymorphicType> PolymorphicTypes { get; private set; }
-        internal List<IModelFilter> ModelFilters { get; private set; }
-
-        public SwaggerSpecConfig ResolveBasePathUsing(Func<HttpRequestMessage, string> resolveBasePath)
+        public SwaggerSpecConfig ResolveBasePathUsing(Func<HttpRequestMessage, string> basePathResolver)
         {
-            if (resolveBasePath == null) throw new ArgumentNullException("resolveBasePath");
-            ResolveBasePath = resolveBasePath;
+            if (basePathResolver == null) throw new ArgumentNullException("basePathResolver");
+            BasePathResolver = basePathResolver;
             return this;
         }
 
-        public SwaggerSpecConfig ResolveTargetVersionUsing(Func<HttpRequestMessage, string> resolveTargetVersion)
+        public SwaggerSpecConfig ResolveTargetVersionUsing(Func<HttpRequestMessage, string> targetVersionResolver)
         {
-            if (resolveTargetVersion == null) throw new ArgumentNullException("resolveTargetVersion");
-            ResolveTargetVersion = resolveTargetVersion;
+            if (targetVersionResolver == null) throw new ArgumentNullException("targetVersionResolver");
+            TargetVersionResolver = targetVersionResolver;
             return this;
         }
 
         public SwaggerSpecConfig IgnoreObsoleteActions()
         {
-            IgnoreObsoleteActionsFlag = true;
+            _ignoreObsoleteActions = true;
             return this;
         }
 
-        public SwaggerSpecConfig ResolveVersionSupportUsing(Func<ApiDescription, string, bool> resolveVersionSupport)
+        public SwaggerSpecConfig ResolveVersionSupportUsing(Func<ApiDescription, string, bool> versionSupportResolver)
         {
-            if (resolveVersionSupport == null) throw new ArgumentNullException("resolveVersionSupport");
-            ResolveVersionSupport = resolveVersionSupport;
+            if (versionSupportResolver == null) throw new ArgumentNullException("versionSupportResolver");
+            _versionSupportResolver = versionSupportResolver;
             return this;
         }
 
-        public SwaggerSpecConfig GroupDeclarationsBy(Func<ApiDescription, string> resolveResourceName)
+        public SwaggerSpecConfig GroupDeclarationsBy(Func<ApiDescription, string> resourceNameResolver)
         {
-            if (resolveResourceName == null) throw new ArgumentNullException("resolveResourceName");
-            ResolveResourceName = resolveResourceName;
+            if (resourceNameResolver == null) throw new ArgumentNullException("resourceNameResolver");
+            _resourceNameResolver = resourceNameResolver;
             return this;
         }
 
         public SwaggerSpecConfig MapType<T>(Func<DataType> factory)
         {
-            CustomTypeMappings[typeof (T)] = factory;
+            _customTypeMappings[typeof (T)] = factory;
             return this;
         }
 
-        public SwaggerSpecConfig PolymorphicType<TBase>(Action<BasePolymorphicType<TBase>> configure)
+        public SwaggerSpecConfig PolymorphicType<TBase>(Action<PolymorphicBaseType<TBase>> configure)
         {
-            var polymorphicType = new BasePolymorphicType<TBase>();
+            var polymorphicType = new PolymorphicBaseType<TBase>();
             configure(polymorphicType);
-            PolymorphicTypes.Add(polymorphicType);
+            _polymorphicTypes.Add(polymorphicType);
             return this;
         }
 
@@ -97,7 +101,7 @@ namespace Swashbuckle.Application
         public SwaggerSpecConfig ModelFilter(IModelFilter modelFilter)
         {
             if (modelFilter == null) throw new ArgumentNullException("modelFilter");
-            ModelFilters.Add(modelFilter);
+            _modelFilterFactories.Add(() => modelFilter);
             return this;
         }
 
@@ -110,64 +114,31 @@ namespace Swashbuckle.Application
         public SwaggerSpecConfig OperationFilter(IOperationFilter operationFilter)
         {
             if (operationFilter == null) throw new ArgumentNullException("operationFilter");
-            OperationFilters.Add(operationFilter);
+            _operationFilterFactories.Add(() => operationFilter);
             return this;
         }
 
         public SwaggerSpecConfig IncludeXmlComments(string xmlCommentsPath)
         {
-            var xmlCommentsDoc = new XPathDocument(xmlCommentsPath);
-            OperationFilters.Add(new ApplyActionXmlComments(xmlCommentsDoc));
-            ModelFilters.Add(new ApplyTypeXmlComments(xmlCommentsDoc));
-            return this;
-        }
-    }
-
-    public class PolymorphicType<T> : PolymorphicType
-    {
-        public PolymorphicType(bool isBase)
-            : base(typeof(T), isBase)
-        { }
-
-        public PolymorphicType<T> SubType<TSub>(Action<PolymorphicType<TSub>> configure = null)
-            where TSub : T
-        {
-            var subTypeInfo = new PolymorphicType<TSub>(false);
-            RegisterSubType(subTypeInfo);
-
-            if (configure != null) configure(subTypeInfo);
-
-            return this;
-        }
-    }
-
-    public class BasePolymorphicType<T> : PolymorphicType<T>
-    {
-        public BasePolymorphicType()
-            : base(true)
-        {
-        }
-
-        public PolymorphicType<T> DiscriminateBy(Expression<Func<T, object>> expression)
-        {
-            DiscriminateBy(InferDiscriminatorFrom(expression));
+            _operationFilterFactories.Add(() => new ApplyActionXmlComments(xmlCommentsPath));
+            _modelFilterFactories.Add(() => new ApplyTypeXmlComments(xmlCommentsPath));
             return this;
         }
 
-        private static string InferDiscriminatorFrom(Expression<Func<T, object>> expression)
+        internal ISwaggerProvider GetSwaggerProvider(IApiExplorer apiExplorer)
         {
-            MemberExpression memberExpression;
+            var modelFilters = _modelFilterFactories.Select((f) => f());
+            var operationFilters = _operationFilterFactories.Select((f) => f());
 
-            var unaryExpression = expression.Body as UnaryExpression;
-            if (unaryExpression != null)
-                memberExpression = unaryExpression.Operand as MemberExpression;
-            else
-                memberExpression = expression.Body as MemberExpression;
-
-            if (memberExpression == null)
-                throw new ArgumentException(String.Format("Failed to infer discriminator from provided expression - {0}", expression));
-
-            return memberExpression.Member.Name;
+            return new ApiExplorerAdapter(
+                apiExplorer,
+                _ignoreObsoleteActions,
+                _versionSupportResolver,
+                _resourceNameResolver,
+                _customTypeMappings,
+                _polymorphicTypes,
+                modelFilters,
+                operationFilters);
         }
     }
 }

@@ -14,7 +14,7 @@ namespace Swashbuckle.Application
         public RedirectHandler(string redirectPath)
         {
             _redirectPath = redirectPath;
-            _basePathResolver = SwaggerSpecConfig.StaticInstance.ResolveBasePath;
+            _basePathResolver = SwaggerSpecConfig.StaticInstance.BasePathResolver;
         }
 
         protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)

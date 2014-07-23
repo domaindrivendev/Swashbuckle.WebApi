@@ -67,6 +67,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Application\CachingSwaggerProvider.cs" />
+    <Compile Include="Application\PolymorphicType.cs" />
     <Compile Include="Application\RedirectHandler.cs" />
     <Compile Include="Application\SwaggerSpecConfig.cs" />
     <Compile Include="Application\SwaggerUiConfig.cs" />

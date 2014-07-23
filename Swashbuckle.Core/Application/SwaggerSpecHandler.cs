@@ -25,10 +25,10 @@ namespace Swashbuckle.Application
 
         protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
         {
-            var swaggerProvider = GetSwaggerProvider(request.GetConfiguration());
+            var swaggerProvider = _config.GetSwaggerProvider(request.GetConfiguration().Services.GetApiExplorer());
             
-            var basePath = _config.ResolveBasePath(request);
-            var version = _config.ResolveTargetVersion(request);
+            var basePath = _config.BasePathResolver(request);
+            var version = _config.TargetVersionResolver(request);
 
             object resourceName;
             request.GetRouteData().Values.TryGetValue("resourceName", out resourceName);
@@ -41,22 +41,6 @@ namespace Swashbuckle.Application
             {
                 Content = content
             });
-        }
-
-        private ISwaggerProvider GetSwaggerProvider(HttpConfiguration httpConfig)
-        {
-            var test = httpConfig.Services.GetApiExplorer();
-
-            var swaggerProvider = new ApiExplorerAdapter(
-                httpConfig.Services.GetApiExplorer(),
-                _config.IgnoreObsoleteActionsFlag,
-                _config.ResolveVersionSupport,
-                _config.ResolveResourceName,
-                _config.CustomTypeMappings,
-                _config.PolymorphicTypes,
-                _config.ModelFilters, _config.OperationFilters);
-
-            return swaggerProvider;
         }
 
         private HttpContent ContentFor(object value)
