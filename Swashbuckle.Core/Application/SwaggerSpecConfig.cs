@@ -19,6 +19,8 @@ namespace Swashbuckle.Application
 
         internal Func<HttpRequestMessage, string> BasePathResolver { get; set; }
         internal Func<HttpRequestMessage, string> TargetVersionResolver { get; set; }
+        internal Info Info { get; set; }
+        internal Dictionary<string, Authorization> Authorizations { get; set; }
 
         private bool _ignoreObsoleteActions;
         private Func<ApiDescription, string, bool> _versionSupportResolver;
@@ -61,6 +63,21 @@ namespace Swashbuckle.Application
         public SwaggerSpecConfig IgnoreObsoleteActions()
         {
             _ignoreObsoleteActions = true;
+            return this;
+        }
+
+        public SwaggerSpecConfig ApiInfo(Info info)
+        {
+            this.Info = info;
+            return this;
+        }
+
+        public SwaggerSpecConfig SetOAuth2Authorization(Authorization auth)
+        {
+            if (this.Authorizations == null)
+                this.Authorizations = new Dictionary<string,Authorization>();
+
+            this.Authorizations["oauth2"] = auth;
             return this;
         }
 
@@ -138,7 +155,9 @@ namespace Swashbuckle.Application
                 _customTypeMappings,
                 _polymorphicTypes,
                 modelFilters,
-                operationFilters);
+                operationFilters,
+                this.Info,
+                this.Authorizations);
         }
     }
 }

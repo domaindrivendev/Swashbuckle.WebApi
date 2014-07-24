@@ -15,6 +15,7 @@ namespace Swashbuckle.Swagger
         private const string RemarksExpression = "remarks";
         private const string ParameterExpression = "param[@name=\"{0}\"]";
         private const string ResponseExpression = "response";
+        private const string ScopeExpression = "scope";
 
         private readonly XPathNavigator _navigator;
 
@@ -44,6 +45,14 @@ namespace Swashbuckle.Swagger
             {
                 operation.ResponseMessages.Add(responseMessage);
             }
+
+            var scopes = GetAuthorizationScopes(methodNode);
+            if (scopes.Any())
+            {
+                operation.Authorizations = new Dictionary<string,IList<Scope>>();
+                operation.Authorizations["oauth2"] = scopes.ToList();
+            }
+
         }
 
         private static string GetXPathFor(HttpActionDescriptor actionDescriptor)
@@ -99,6 +108,19 @@ namespace Swashbuckle.Swagger
                         Code = Int32.Parse(iterator.Current.GetAttribute("code", String.Empty)),
                         Message = iterator.Current.Value
                     };
+            }
+        }
+
+        private static IEnumerable<Scope> GetAuthorizationScopes(XPathNavigator node)
+        {
+            var iterator = node.Select(ScopeExpression);
+            while (iterator.MoveNext())
+            {
+                yield return new Scope
+                {
+                    ScopeId = iterator.Current.GetAttribute("code", String.Empty),
+                    Description = iterator.Current.Value
+                };
             }
         }
     }

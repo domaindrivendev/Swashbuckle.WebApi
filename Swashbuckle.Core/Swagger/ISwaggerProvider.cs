@@ -20,6 +20,12 @@ namespace Swashbuckle.Swagger
 
         [JsonProperty("apis")]
         public IList<Resource> Apis { get; set; }
+
+        [JsonProperty("info")]
+        public Info Info { get; set; }
+
+        [JsonProperty("authorizations")]
+        public IDictionary<string, Authorization> Authorizations { get; set; }
     }
 
     public class Resource
@@ -29,6 +35,7 @@ namespace Swashbuckle.Swagger
 
         [JsonProperty("description")]
         public string Description { get; set; }
+
     }
 
     public class ApiDeclaration
@@ -56,6 +63,9 @@ namespace Swashbuckle.Swagger
 
         [JsonProperty("consumes")]
         public IList<string> Consumes { get; set; }
+
+        [JsonProperty("authorizations")]
+        public Dictionary<string, IList<Scope>> Authorizations { get; set; }
     }
 
     public class Api
@@ -101,6 +111,9 @@ namespace Swashbuckle.Swagger
 
         [JsonProperty("responseMessages")]
         public IList<ResponseMessage> ResponseMessages { get; set; }
+
+        [JsonProperty("authorizations")]
+        public Dictionary<string, IList<Scope>> Authorizations { get; set; }
 
         [JsonProperty("produces")]
         public IList<string> Produces { get; set; }
@@ -180,4 +193,108 @@ namespace Swashbuckle.Swagger
         [JsonProperty("discriminator")]
         public string Discriminator { get; set; }
     }
+
+    public class Info
+    {
+        [JsonProperty("title")]
+        public string Title { get; set; }
+
+        [JsonProperty("description")]
+        public string Description { get; set; }
+
+        [JsonProperty("termsOfServiceUrl")]
+        public string TermsOfServiceUrl { get; set; }
+
+        [JsonProperty("contact")]
+        public string Contact { get; set; }
+
+        [JsonProperty("license")]
+        public string License { get; set; }
+
+        [JsonProperty("licenseUrl")]
+        public string LicenseUrl { get; set; }
+    }
+
+    public class Authorization
+    {
+        [JsonProperty("type")]
+        public string Type { get; set; }
+
+        [JsonProperty("passAs")]
+        public string PassAs { get; set; }
+
+        [JsonProperty("keyname")]
+        public string KeyName { get; set; }
+
+        [JsonProperty("scopes")]
+        public IList<Scope> Scopes { get; set; }
+
+        [JsonProperty("grantTypes")]
+        public GrantTypes GrantTypes { get; set; }
+    }
+
+    public class Scope
+    {
+        [JsonProperty("scope")]
+        public string ScopeId { get; set; }
+
+        [JsonProperty("description")]
+        public string Description { get; set; }
+    }
+
+    public class GrantTypes
+    {
+        [JsonProperty("implicit")]
+        public ImplicitGrant ImplicitGrant { get; set; }
+
+        [JsonProperty("authorization_code")]
+        public AuthorizationCodeGrant AuthorizationCode { get; set; }
+    }
+
+    public class ImplicitGrant
+    {
+        [JsonProperty("loginEndpoint")]
+        public LoginEndpoint LoginEndpoint { get; set; }
+
+        [JsonProperty("tokenName")]
+        public string TokenName { get; set; }
+    }
+
+    public class AuthorizationCodeGrant
+    {
+        [JsonProperty("tokenRequestEndpoint")]
+        public TokenRequestEndpoint TokenRequestEndpoint { get; set; }
+
+        [JsonProperty("tokenEndpoint")]
+        public TokenEndpoint TokenEndpoint { get; set; }
+    }
+
+    public class LoginEndpoint
+    {
+        [JsonProperty("url")]
+        public string Url { get; set; }
+    }
+
+    public class TokenRequestEndpoint
+    {
+        [JsonProperty("url")]
+        public string Url { get; set; }
+
+        [JsonProperty("clientIdName")]
+        public string ClientIdName { get; set; }
+
+        [JsonProperty("clientSecretName")]
+        public string ClientSecretName { get; set; }
+    }
+
+    public class TokenEndpoint
+    {
+        [JsonProperty("url")]
+        public string Url { get; set; }
+
+        [JsonProperty("tokenName")]
+        public string TokenName { get; set; }
+    }
+
+
 }
