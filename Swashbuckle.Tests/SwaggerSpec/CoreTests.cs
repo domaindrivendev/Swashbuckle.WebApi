@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using System.Collections.Generic;
+using Newtonsoft.Json.Linq;
 using NUnit.Framework;
 using Swashbuckle.Application;
 using Swashbuckle.Dummy.Controllers;
@@ -342,6 +343,30 @@ namespace Swashbuckle.Tests.SwaggerSpec
         }
 
         [Test]
+        public void It_should_support_customized_api_group_ordering()
+        {
+            _swaggerSpecConfig.SortDeclarationsBy(new DescendingAlphabeticComparer());
+
+            var listing = Get<JObject>("http://tempuri.org/swagger/api-docs/");
+
+            var expected = JObject.FromObject(
+                new
+                {
+                    swaggerVersion = "1.2",
+                    apiVersion = "1.0",
+                    apis = new object[]
+                    {
+                        new { path = "/Products" },
+                        new { path = "/Customers" }
+                    }
+                });
+            Assert.AreEqual(expected.ToString(), listing.ToString());
+
+            Assert.NotNull(Get<JObject>("http://tempuri.org/swagger/api-docs/Products"));
+            Assert.NotNull(Get<JObject>("http://tempuri.org/swagger/api-docs/Customers"));
+        }
+
+        [Test]
         public void It_should_support_configurable_filters_for_modifying_generated_operations()
         {
             _swaggerSpecConfig.OperationFilter<AddResponseCodes>();
@@ -360,6 +385,14 @@ namespace Swashbuckle.Tests.SwaggerSpec
             public void Apply(Operation operation, DataTypeRegistry dataTypeRegistry, System.Web.Http.Description.ApiDescription apiDescription)
             {
                 operation.ResponseMessages.Add(new ResponseMessage { Code = 200, Message = "It's all good!" });
+            }
+        }
+
+        class DescendingAlphabeticComparer : IComparer<string>
+        {
+            public int Compare(string x, string y)
+            {
+                return y.CompareTo(x);
             }
         }
     }

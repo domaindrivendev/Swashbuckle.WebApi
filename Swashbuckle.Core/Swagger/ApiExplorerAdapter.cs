@@ -13,6 +13,7 @@ namespace Swashbuckle.Swagger
         private readonly bool _ignoreObsoleteActions;
         private readonly Func<ApiDescription, string, bool> _versionSupportResolver;
         private readonly Func<ApiDescription, string> _resourceNameResolver;
+        private readonly IComparer<string> _groupComparer;
         private readonly Dictionary<Type, Func<DataType>> _customTypeMappings;
         private readonly IEnumerable<PolymorphicType> _polymorphicTypes;
         private readonly IEnumerable<IModelFilter> _modelFilters;
@@ -23,6 +24,7 @@ namespace Swashbuckle.Swagger
             bool ignoreObsoleteActions,
             Func<ApiDescription, string, bool> resoveVersionSupport,
             Func<ApiDescription, string> resolveResourceName,
+            IComparer<string> groupComparer,
             Dictionary<Type, Func<DataType>> customTypeMappings,
             IEnumerable<PolymorphicType> polymorphicTypes,
             IEnumerable<IModelFilter> modelFilters,
@@ -32,6 +34,7 @@ namespace Swashbuckle.Swagger
             _ignoreObsoleteActions = ignoreObsoleteActions;
             _versionSupportResolver = resoveVersionSupport;
             _resourceNameResolver = resolveResourceName;
+            _groupComparer = groupComparer;
             _customTypeMappings = customTypeMappings;
             _polymorphicTypes = polymorphicTypes;
             _modelFilters = modelFilters;
@@ -86,7 +89,7 @@ namespace Swashbuckle.Swagger
                 .Where(apiDesc => !_ignoreObsoleteActions || !apiDesc.IsMarkedObsolete())
                 .Where(apiDesc => _versionSupportResolver(apiDesc, version))
                 .GroupBy(apiDesc => _resourceNameResolver(apiDesc))
-                .OrderBy(group => group.Key)
+                .OrderBy(group => group.Key, _groupComparer)
                 .ToArray();
         }
 

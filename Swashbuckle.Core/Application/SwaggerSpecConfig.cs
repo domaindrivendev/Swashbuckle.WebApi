@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq.Expressions;
 using System.Net.Http;
 using System.Web.Http.Description;
 using System.Linq;
@@ -23,6 +22,7 @@ namespace Swashbuckle.Application
         private bool _ignoreObsoleteActions;
         private Func<ApiDescription, string, bool> _versionSupportResolver;
         private Func<ApiDescription, string> _resourceNameResolver;
+        private IComparer<string> _groupComparer;
         private readonly Dictionary<Type, Func<DataType>> _customTypeMappings;
         private readonly List<PolymorphicType> _polymorphicTypes;
 
@@ -37,6 +37,7 @@ namespace Swashbuckle.Application
             _ignoreObsoleteActions = false;
             _versionSupportResolver = (apiDesc, version) => true;
             _resourceNameResolver = (apiDesc) => apiDesc.ActionDescriptor.ControllerDescriptor.ControllerName;
+            _groupComparer = Comparer<string>.Default;
             _customTypeMappings = new Dictionary<Type, Func<DataType>>();
             _polymorphicTypes = new List<PolymorphicType>();
 
@@ -75,6 +76,13 @@ namespace Swashbuckle.Application
         {
             if (resourceNameResolver == null) throw new ArgumentNullException("resourceNameResolver");
             _resourceNameResolver = resourceNameResolver;
+            return this;
+        }
+
+        public SwaggerSpecConfig SortDeclarationsBy(IComparer<string> groupComparer)
+        {
+            if (groupComparer == null) throw new ArgumentNullException("groupComparer");
+            _groupComparer = groupComparer;
             return this;
         }
 
@@ -135,6 +143,7 @@ namespace Swashbuckle.Application
                 _ignoreObsoleteActions,
                 _versionSupportResolver,
                 _resourceNameResolver,
+                _groupComparer,
                 _customTypeMappings,
                 _polymorphicTypes,
                 modelFilters,
