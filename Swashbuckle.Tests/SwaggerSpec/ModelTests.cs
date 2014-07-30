@@ -243,8 +243,6 @@ namespace Swashbuckle.Tests.SwaggerSpec
             Assert.AreEqual(expected.ToString(), required.ToString());
         }
 
-
-
         [Test]
         [ExpectedException(typeof(InvalidOperationException))]
         public void It_should_honor_the_swagger_spec_and_not_support_containers_of_containers()
@@ -252,6 +250,14 @@ namespace Swashbuckle.Tests.SwaggerSpec
             SetUpDefaultRouteFor<UnsupportedTypesController>();
 
             Get<JObject>("http://tempuri.org/swagger/api-docs/Matrixes");
+        }
+
+        [Test]
+        public void It_should_support_collections_of_primitives()
+        {
+            SetUpDefaultRouteFor<CollectionOfPrimitivesController>();
+
+            Get<JObject>("http://tempuri.org/swagger/api-docs/CollectionOfPrimitives");
         }
 
         [Test]

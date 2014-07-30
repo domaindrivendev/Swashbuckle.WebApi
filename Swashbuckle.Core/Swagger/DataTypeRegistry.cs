@@ -103,7 +103,7 @@ namespace Swashbuckle.Swagger
             Type itemType;
             if (type.IsEnumerable(out itemType))
             {
-                if (itemType.IsEnumerable() && !IndeterminateMappings.ContainsKey(itemType))
+                if (itemType.IsEnumerable() && !IsSupportedEnumerableItem(itemType))
                     throw new InvalidOperationException(
                         String.Format("Type {0} is not supported. Swagger does not support containers of containers", type));
 
@@ -197,6 +197,11 @@ namespace Swashbuckle.Swagger
             }
 
             return new PolymorphicType(type, true);
+        }
+
+        private static bool IsSupportedEnumerableItem(Type itemType)
+        {
+            return IndeterminateMappings.ContainsKey(itemType) || PrimitiveMappings.ContainsKey(itemType);
         }
     }
 }
