@@ -1,5 +1,7 @@
 ﻿<configuration>
   <system.webServer>
-    <modules runAllManagedModulesForAllRequests="true" />
+    <handlers>
+      <add name="SwashbuckleUiHandler" verb="*" path="swagger/ui/*" type="Swashbuckle.Application.SwaggerUiHandler, Swashbuckle.Core" preCondition="managedHandler"/>
+    </handlers>
   </system.webServer>
 </configuration>
