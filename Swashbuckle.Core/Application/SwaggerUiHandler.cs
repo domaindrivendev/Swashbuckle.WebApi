@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading;
@@ -40,6 +41,9 @@ namespace Swashbuckle.Application
             var resourceStream = (customResourceDescriptor == null)
                 ? GetType().Assembly.GetManifestResourceStream(uiPath)
                 : GetCustomResourceStream(customResourceDescriptor);
+
+            if (resourceStream == null)
+                return new HttpResponseMessage(HttpStatusCode.NotFound);
 
             HttpContent content = new StreamContent(resourceStream);
             if (uiPath == "index.html")

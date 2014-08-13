@@ -78,7 +78,7 @@ namespace Swashbuckle.Tests
             return responseMessage.Content.ReadAsStringAsync().Result;
         }
 
-        private HttpResponseMessage ExecuteGet(string uri)
+        protected HttpResponseMessage ExecuteGet(string uri)
         {
             if (Handler == null)
                 throw new InvalidOperationException("Handler not set");

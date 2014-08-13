@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Net;
 using Newtonsoft.Json.Linq;
 using NUnit.Framework;
 using Swashbuckle.Application;
@@ -298,6 +299,14 @@ namespace Swashbuckle.Tests.SwaggerSpec
 
             var declaration = Get<JObject>("http://tempuri.org/swagger/api-docs/Products");
             Assert.AreEqual("http://custombasepath.com", (string)declaration["basePath"]);
+        }
+
+        [Test]
+        public void It_should_handle_missing_as_404()
+        {
+            var result = ExecuteGet("http://tempuri.org/swagger/api-docs/NoSuchController");
+            
+            Assert.That(result.StatusCode, Is.EqualTo(HttpStatusCode.NotFound));
         }
         
         [Test]

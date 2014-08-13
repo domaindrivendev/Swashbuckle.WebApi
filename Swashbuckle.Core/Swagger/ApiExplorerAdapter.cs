@@ -60,7 +60,10 @@ namespace Swashbuckle.Swagger
         public ApiDeclaration GetDeclaration(string basePath, string version, string resourceName)
         {
             var apiDescriptionGroup = GetApplicableApiDescriptions(version)
-                .Single(apiDescGrp => apiDescGrp.Key == resourceName);
+                .SingleOrDefault(apiDescGrp => apiDescGrp.Key == resourceName);
+
+            if (apiDescriptionGroup == null)
+                return null;
 
             var dataTypeRegistry = new DataTypeRegistry(_customTypeMappings, _polymorphicTypes, _modelFilters);
             var operationGenerator = new OperationGenerator(dataTypeRegistry, _operationFilters);

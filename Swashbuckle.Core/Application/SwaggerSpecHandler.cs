@@ -37,18 +37,25 @@ namespace Swashbuckle.Application
                 ? ContentFor(request, swaggerProvider.GetListing(basePath, version))
                 : ContentFor(request, swaggerProvider.GetDeclaration(basePath, version, resourceName.ToString()));
 
+            var code = content != null ? HttpStatusCode.OK : HttpStatusCode.NotFound;
+
             var tcs = new TaskCompletionSource<HttpResponseMessage>();
-            tcs.SetResult(new HttpResponseMessage(HttpStatusCode.OK)
+            
+            tcs.SetResult(new HttpResponseMessage(code)
             {
                 Content = content
             });
             return tcs.Task;
         }
 
-        private HttpContent ContentFor<T>(HttpRequestMessage request, T value)
+        private HttpContent ContentFor<T>(HttpRequestMessage request, T value) where T : class
         {
             var negotiator = request.GetConfiguration().Services.GetContentNegotiator();
             var result = negotiator.Negotiate(typeof (T), request, request.GetConfiguration().Formatters);
+
+            if (value == null)
+                return null;
+
             return new ObjectContent(typeof(T), value, result.Formatter, result.MediaType);
         }
     }

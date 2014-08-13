@@ -249,7 +249,7 @@ namespace Swashbuckle.Tests.SwaggerSpec
         {
             SetUpDefaultRouteFor<UnsupportedTypesController>();
 
-            Get<JObject>("http://tempuri.org/swagger/api-docs/Matrixes");
+            Get<JObject>("http://tempuri.org/swagger/api-docs/UnsupportedTypes");
         }
 
         [Test]

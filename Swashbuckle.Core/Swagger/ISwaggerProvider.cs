@@ -7,6 +7,7 @@ namespace Swashbuckle.Swagger
     {
         ResourceListing GetListing(string basePath, string version);
 
+        /// <returns>An <see cref="ApiDeclaration"/> or <c>null</c> if <see cref="resourceName"/> is not found.</returns>
         ApiDeclaration GetDeclaration(string basePath, string version, string resourceName);
     }
 

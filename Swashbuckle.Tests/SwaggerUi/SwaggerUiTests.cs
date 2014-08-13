@@ -1,4 +1,5 @@
-﻿using System.Net.Http;
+﻿using System.Net;
+using System.Net.Http;
 using System.Threading;
 using System.Web.Http.Hosting;
 using System.Web.Http.Routing;
@@ -32,6 +33,14 @@ namespace Swashbuckle.Tests.SwaggerUi
             var content = GetAsString("http://tempuri.org/swagger/ui/index.html");
 
             Assert.IsTrue(content.Contains("swagger-ui-container"), "Expected index.html content not found");
+        }
+
+        [Test]
+        public void It_should_handle_not_found()
+        {
+            var content = ExecuteGet("http://tempuri.org/swagger/ui/no/such/resource.html");
+
+            Assert.That(content.StatusCode, Is.EqualTo(HttpStatusCode.NotFound));
         }
 
         [Test]
