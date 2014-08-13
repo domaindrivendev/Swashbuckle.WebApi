@@ -34,30 +34,22 @@ namespace Swashbuckle.Application
             request.GetRouteData().Values.TryGetValue("resourceName", out resourceName);
 
             var content = (resourceName == null)
-                ? ContentFor(swaggerProvider.GetListing(basePath, version))
-                : ContentFor(swaggerProvider.GetDeclaration(basePath, version, resourceName.ToString()));
+                ? ContentFor(request, swaggerProvider.GetListing(basePath, version))
+                : ContentFor(request, swaggerProvider.GetDeclaration(basePath, version, resourceName.ToString()));
 
-            return Task.Factory.StartNew(() => new HttpResponseMessage(HttpStatusCode.OK)
+            var tcs = new TaskCompletionSource<HttpResponseMessage>();
+            tcs.SetResult(new HttpResponseMessage(HttpStatusCode.OK)
             {
                 Content = content
             });
+            return tcs.Task;
         }
 
-        private HttpContent ContentFor(object value)
+        private HttpContent ContentFor<T>(HttpRequestMessage request, T value)
         {
-            return new StringContent(JsonTextFor(value), Encoding.UTF8, "application/json");
-        }
-
-        private static string JsonTextFor(object value)
-        {
-            var serializer = new JsonSerializer { NullValueHandling = NullValueHandling.Ignore };
-            var jsonBuilder = new StringBuilder();
-            using (var writer = new StringWriter(jsonBuilder))
-            {
-                serializer.Serialize(writer, value);
-            }
-
-            return jsonBuilder.ToString();
+            var negotiator = request.GetConfiguration().Services.GetContentNegotiator();
+            var result = negotiator.Negotiate(typeof (T), request, request.GetConfiguration().Formatters);
+            return new ObjectContent(typeof(T), value, result.Formatter, result.MediaType);
         }
     }
 }

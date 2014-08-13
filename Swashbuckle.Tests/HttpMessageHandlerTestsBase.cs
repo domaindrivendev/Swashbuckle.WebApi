@@ -1,4 +1,7 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using System.Net;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using NUnit.Framework;
 using Swashbuckle.Application;
 using System;
 using System.Collections.Generic;
@@ -19,15 +22,13 @@ namespace Swashbuckle.Tests
         protected HttpMessageHandlerTestsBase(string routeTemplate)
         {
             _routeTemplate = routeTemplate;
-            _httpConfiguration = new HttpConfiguration();
         }
 
         protected THandler Handler { get; set; }
 
         protected void SetUpDefaultRoutesFor(IEnumerable<Type> controllerTypes)
         {
-            _httpConfiguration = new HttpConfiguration();
-
+            _httpConfiguration = CreateHttpConfiguration();
             foreach (var type in controllerTypes)
             {
                 var controllerName = type.Name.ToLower().Replace("controller", String.Empty);
@@ -47,7 +48,7 @@ namespace Swashbuckle.Tests
         protected void SetUpCustomRouteFor<TController>(string routeTemplate)
             where TController : ApiController
         {
-            _httpConfiguration = new HttpConfiguration();
+            _httpConfiguration = CreateHttpConfiguration();
 
             var controllerName = typeof(TController).Name.ToLower().Replace("controller", String.Empty);
             var route = new HttpRoute(
@@ -56,6 +57,12 @@ namespace Swashbuckle.Tests
             _httpConfiguration.Routes.Add(controllerName, route);
         }
 
+        protected virtual HttpConfiguration CreateHttpConfiguration()
+        {
+            var configuration = new HttpConfiguration();
+            configuration.Formatters.JsonFormatter.SerializerSettings.NullValueHandling = NullValueHandling.Ignore;
+            return configuration;
+        }
         protected TContent Get<TContent>(string uri)
         {
             var responseMessage = ExecuteGet(uri);
@@ -65,6 +72,9 @@ namespace Swashbuckle.Tests
         protected string GetAsString(string uri)
         {
             var responseMessage = ExecuteGet(uri);
+            Assert.That(responseMessage, Is.Not.Null, "responseMessage");
+            Assert.That(responseMessage.StatusCode, Is.EqualTo(HttpStatusCode.OK));
+            Assert.That(responseMessage.Content, Is.Not.Null, "responseMessage.Content");
             return responseMessage.Content.ReadAsStringAsync().Result;
         }
 
