@@ -12,7 +12,7 @@ namespace Swashbuckle.Application
 {
     public class SwaggerSpecHandler : HttpMessageHandler
     {
-        private readonly SwaggerSpecConfig _config;
+        private readonly SwaggerSpecConfig _swaggerSpecConfig;
 
         public SwaggerSpecHandler()
             : this(SwaggerSpecConfig.StaticInstance)
@@ -20,32 +20,25 @@ namespace Swashbuckle.Application
 
         public SwaggerSpecHandler(SwaggerSpecConfig config)
         {
-            _config = config;
+            _swaggerSpecConfig = config;
         }
 
         protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
         {
-            var swaggerProvider = _config.GetSwaggerProvider(request.GetConfiguration().Services.GetApiExplorer());
+            var swaggerGenerator = _swaggerSpecConfig.GetGenerator(request);
             
-            var basePath = _config.BasePathResolver(request);
-            var version = _config.TargetVersionResolver(request);
-
             object resourceName;
             request.GetRouteData().Values.TryGetValue("resourceName", out resourceName);
 
-            var content = (resourceName == null)
-                ? ContentFor(swaggerProvider.GetListing(basePath, version))
-                : ContentFor(swaggerProvider.GetDeclaration(basePath, version, resourceName.ToString()));
+            string json = (resourceName == null)
+                ? JsonTextFor(swaggerGenerator.GetListing())
+                : JsonTextFor(swaggerGenerator.GetDeclaration(resourceName.ToString()));
 
-            return Task.Factory.StartNew(() => new HttpResponseMessage(HttpStatusCode.OK)
-            {
-                Content = content
-            });
-        }
+            var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-        private HttpContent ContentFor(object value)
-        {
-            return new StringContent(JsonTextFor(value), Encoding.UTF8, "application/json");
+            var tsc = new TaskCompletionSource<HttpResponseMessage>();
+            tsc.SetResult(new HttpResponseMessage() { Content = content });
+            return tsc.Task;
         }
 
         private static string JsonTextFor(object value)

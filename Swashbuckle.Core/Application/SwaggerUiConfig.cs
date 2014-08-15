@@ -17,6 +17,8 @@ namespace Swashbuckle.Application
             CustomScriptPaths = new List<string>();
             CustomStylesheetPaths = new List<string>();
             CustomRoutes = new Dictionary<string, CustomResourceDescriptor>();
+
+            InjectJavaScript(GetType().Assembly, "Swashbuckle.SwaggerExtensions.versionSelector.js");
         }
 
         public bool SupportHeaderParams { get; set; }

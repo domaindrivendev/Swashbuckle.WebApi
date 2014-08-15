@@ -271,6 +271,16 @@ namespace Swashbuckle.Tests.SwaggerSpec
         }
 
         [Test]
+        public void It_should_handle_attribute_routes()
+        {
+            SetUpAttributeRoutes();
+
+            var declaration = Get<JObject>("http://tempuri.org/swagger/api-docs/AttributeRoutes");
+            var api = declaration.SelectToken("apis[0]");
+            Assert.AreEqual("/subscriptions/{id}/cancel", (string)api["path"]);
+        }
+
+        [Test]
         public void It_should_handle_additional_route_parameters_treating_them_as_required_strings()
         {
             // i.e. route params that are not included in the action signature
@@ -298,7 +308,7 @@ namespace Swashbuckle.Tests.SwaggerSpec
             var declaration = Get<JObject>("http://tempuri.org/swagger/api-docs/Products");
             Assert.AreEqual("http://custombasepath.com", (string)declaration["basePath"]);
         }
-        
+       
         [Test]
         public void It_should_support_an_optional_setting_to_ignore_any_actions_marked_obsolete()
         {

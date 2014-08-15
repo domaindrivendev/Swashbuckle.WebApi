@@ -40,12 +40,12 @@ namespace Swashbuckle.Swagger
                 {typeof (DateTimeOffset), () => new DataType {Type = "string", Format = "date-time"}}
             };
 
-        private readonly Dictionary<Type, Func<DataType>> _customMappings;
+        private readonly IDictionary<Type, Func<DataType>> _customMappings;
         private readonly IEnumerable<PolymorphicType> _polymorphicTypes;
         private readonly IEnumerable<IModelFilter> _modelFilters;
         private readonly IDictionary<Type, DataType> _complexMappings;
 
-        public DataTypeRegistry(Dictionary<Type, Func<DataType>> customMappings, IEnumerable<PolymorphicType> polymorphicTypes, IEnumerable<IModelFilter> modelFilters)
+        public DataTypeRegistry(IDictionary<Type, Func<DataType>> customMappings, IEnumerable<PolymorphicType> polymorphicTypes, IEnumerable<IModelFilter> modelFilters)
         {
             _customMappings = customMappings;
             _polymorphicTypes = polymorphicTypes;

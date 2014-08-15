@@ -2,9 +2,11 @@
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Net.Http;
+using System.Web.Http;
 using System.Web.Http.Description;
 using System.Linq;
 using Swashbuckle.Swagger;
+using Swashbuckle.SwaggerExtensions;
 
 namespace Swashbuckle.Application
 {
@@ -17,44 +19,72 @@ namespace Swashbuckle.Application
             customize(StaticInstance);
         }
 
-        internal Func<HttpRequestMessage, string> BasePathResolver { get; set; }
-        internal Func<HttpRequestMessage, string> TargetVersionResolver { get; set; }
-
+        private Func<HttpRequestMessage, string> _targetVersionResolver; // obsolete
+        private Func<ApiDescription, string, bool> _versionSupportResolver; // obsolete
+        private Func<ApiDescription, IEnumerable<string>> _applicableVersionsResolver;
         private bool _ignoreObsoleteActions;
-        private Func<ApiDescription, string, bool> _versionSupportResolver;
         private Func<ApiDescription, string> _resourceNameResolver;
         private readonly Dictionary<Type, Func<DataType>> _customTypeMappings;
         private readonly List<PolymorphicType> _polymorphicTypes;
-
         private readonly List<Func<IModelFilter>> _modelFilterFactories;
         private readonly List<Func<IOperationFilter>> _operationFilterFactories;
-        
+
         public SwaggerSpecConfig()
         {
             BasePathResolver = (req) => req.RequestUri.GetLeftPart(UriPartial.Authority) + req.GetConfiguration().VirtualPathRoot.TrimEnd('/');
-            TargetVersionResolver = (req) => "1.0";
-
+            _targetVersionResolver = (req) => "1.0"; // obsolete
+            _versionSupportResolver = (apiDesc, version) => true; // obsolete
+            _applicableVersionsResolver = (apiDesc) => new[] { "*" };
             _ignoreObsoleteActions = false;
-            _versionSupportResolver = (apiDesc, version) => true;
             _resourceNameResolver = (apiDesc) => apiDesc.ActionDescriptor.ControllerDescriptor.ControllerName;
             _customTypeMappings = new Dictionary<Type, Func<DataType>>();
             _polymorphicTypes = new List<PolymorphicType>();
-
             _modelFilterFactories = new List<Func<IModelFilter>>();
             _operationFilterFactories = new List<Func<IOperationFilter>>();
         }
 
+        internal Func<HttpRequestMessage, string> BasePathResolver { get; private set; }
+
         public SwaggerSpecConfig ResolveBasePathUsing(Func<HttpRequestMessage, string> basePathResolver)
         {
-            if (basePathResolver == null) throw new ArgumentNullException("basePathResolver");
+            if (basePathResolver == null)
+                throw new ArgumentNullException("basePathResolver");
             BasePathResolver = basePathResolver;
             return this;
         }
 
+        [Obsolete("Use ApiVersion OR, if you want to document multiple API versions, SupportMultipleApiVersions")]
         public SwaggerSpecConfig ResolveTargetVersionUsing(Func<HttpRequestMessage, string> targetVersionResolver)
         {
-            if (targetVersionResolver == null) throw new ArgumentNullException("targetVersionResolver");
-            TargetVersionResolver = targetVersionResolver;
+            if (targetVersionResolver == null)
+                throw new ArgumentNullException("targetVersionResolver");
+            _targetVersionResolver = targetVersionResolver;
+            return this;
+        }
+
+        [Obsolete("Use SupportMultipleApiVersions if you want to document multiple API versions")]
+        public SwaggerSpecConfig ResolveVersionSupportUsing(Func<ApiDescription, string, bool> versionSupportResolver)
+        {
+            if (versionSupportResolver == null)
+                throw new ArgumentNullException("versionSupportResolver");
+            _versionSupportResolver = versionSupportResolver;
+            return this;
+        }
+
+        public SwaggerSpecConfig ApiVersion(string apiVersion)
+        {
+            _targetVersionResolver = (req) => apiVersion;
+            _applicableVersionsResolver = (apiDesc) => new[] { apiVersion };
+            return this;
+        }
+
+        public SwaggerSpecConfig SupportMultipleApiVersions(Func<ApiDescription, IEnumerable<string>> applicableVersionsResolver)
+        {
+            _targetVersionResolver = (req) => req.GetRouteData().Values["apiVersion"].ToString();
+
+            if (applicableVersionsResolver == null)
+                throw new ArgumentNullException("applicableVersionsResolver");
+            _applicableVersionsResolver = applicableVersionsResolver;
             return this;
         }
 
@@ -64,23 +94,17 @@ namespace Swashbuckle.Application
             return this;
         }
 
-        public SwaggerSpecConfig ResolveVersionSupportUsing(Func<ApiDescription, string, bool> versionSupportResolver)
-        {
-            if (versionSupportResolver == null) throw new ArgumentNullException("versionSupportResolver");
-            _versionSupportResolver = versionSupportResolver;
-            return this;
-        }
-
         public SwaggerSpecConfig GroupDeclarationsBy(Func<ApiDescription, string> resourceNameResolver)
         {
-            if (resourceNameResolver == null) throw new ArgumentNullException("resourceNameResolver");
+            if (resourceNameResolver == null)
+                throw new ArgumentNullException("resourceNameResolver");
             _resourceNameResolver = resourceNameResolver;
             return this;
         }
 
         public SwaggerSpecConfig MapType<T>(Func<DataType> factory)
         {
-            _customTypeMappings[typeof (T)] = factory;
+            _customTypeMappings[typeof(T)] = factory;
             return this;
         }
 
@@ -125,20 +149,59 @@ namespace Swashbuckle.Application
             return this;
         }
 
-        internal ISwaggerProvider GetSwaggerProvider(IApiExplorer apiExplorer)
+        public IEnumerable<string> GetDiscoveryUrls(HttpRequestMessage swaggerRequest)
         {
-            var modelFilters = _modelFilterFactories.Select((f) => f());
-            var operationFilters = _operationFilterFactories.Select((f) => f());
+            var basePath = BasePathResolver(swaggerRequest);
 
-            return new ApiExplorerAdapter(
-                apiExplorer,
-                _ignoreObsoleteActions,
-                _versionSupportResolver,
+            var apiVersions = swaggerRequest.GetConfiguration().Services.GetApiExplorer()
+                .ApiDescriptions
+                .SelectMany(apiDesc => _applicableVersionsResolver(apiDesc))
+                .Distinct()
+                .OrderBy(v => v);
+
+            if (apiVersions.Contains("*"))
+                return new[] { String.Format("{0}/swagger/api-docs", basePath) };
+
+            return apiVersions
+                .Select(apiVersion => String.Format("{0}/swagger/{1}/api-docs", basePath, apiVersion));
+        }
+
+        public SwaggerGenerator GetGenerator(HttpRequestMessage swaggerRequest)
+        {
+            var basePath = BasePathResolver(swaggerRequest);
+            var targetVersion = _targetVersionResolver(swaggerRequest);
+
+            var apiDescriptions = GetApplicableApiDescriptions(
+                swaggerRequest.GetConfiguration().Services.GetApiExplorer().ApiDescriptions,
+                targetVersion);
+
+            var options = new SwaggerGeneratorOptions(
                 _resourceNameResolver,
                 _customTypeMappings,
                 _polymorphicTypes,
-                modelFilters,
-                operationFilters);
+                _modelFilterFactories.Select(factory => factory()),
+                _operationFilterFactories.Select(factory => factory())
+                );
+
+            return new SwaggerGenerator(
+                basePath,
+                targetVersion,
+                apiDescriptions,
+                options);
+        }
+
+        private IEnumerable<ApiDescription> GetApplicableApiDescriptions(
+            IEnumerable<ApiDescription> apiDescriptions,
+            string targetVersion)
+        {
+            return apiDescriptions
+                .Where(apiDesc => _versionSupportResolver(apiDesc, targetVersion)) // obsolete
+                .Where(apiDesc =>
+                {
+                    var applicableVersions = _applicableVersionsResolver(apiDesc);
+                    return applicableVersions.Contains("*") || applicableVersions.Contains(targetVersion);
+                })
+                .Where(apiDesc => !_ignoreObsoleteActions || !apiDesc.IsMarkedObsolete());
         }
     }
 }
