@@ -56,6 +56,13 @@ namespace Swashbuckle.Tests
             _httpConfiguration.Routes.Add(controllerName, route);
         }
 
+        protected void SetUpAttributeRoutes()
+        {
+            _httpConfiguration = new HttpConfiguration();
+            _httpConfiguration.MapHttpAttributeRoutes();
+            _httpConfiguration.EnsureInitialized();
+        }
+
         protected TContent Get<TContent>(string uri)
         {
             var responseMessage = ExecuteGet(uri);
@@ -74,10 +81,11 @@ namespace Swashbuckle.Tests
                 throw new InvalidOperationException("Handler not set");
 
             var request = new HttpRequestMessage(HttpMethod.Get, uri);
-            request.Properties[HttpPropertyKeys.HttpConfigurationKey] = _httpConfiguration; 
+            request.Properties[HttpPropertyKeys.HttpConfigurationKey] = _httpConfiguration;
 
             var route = new HttpRoute(_routeTemplate);
             var routeData = route.GetRouteData("/", request) ?? new HttpRouteData(route);
+
             request.Properties[HttpPropertyKeys.HttpRouteDataKey] = routeData;
 
             return new HttpMessageInvoker(Handler)
