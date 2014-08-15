@@ -15,9 +15,14 @@ namespace Swashbuckle.Dummy
 
             SwaggerSpecConfig.Customize(c =>
                 {
-                    c.ResolveTargetVersionUsing((req) => "2.0");
-            
                     c.IgnoreObsoleteActions();
+
+                    c.SupportMultipleApiVersions((apiDesc) =>
+                        {
+                            if (apiDesc.ActionDescriptor.ControllerDescriptor.ControllerName == "Products")
+                                return new[] { "1.0", "2.0" };
+                            return new[] { "2.0" };
+                        });
 
                     //c.PolymorphicType<Animal>(ac => ac
                     //    .DiscriminateBy(a => a.Type)
@@ -34,7 +39,7 @@ namespace Swashbuckle.Dummy
                 c.SupportHeaderParams = true;
                 c.DocExpansion = DocExpansion.List;
                 c.SupportedSubmitMethods = new[] { HttpMethod.Get, HttpMethod.Post, HttpMethod.Put, HttpMethod.Head };
-                c.InjectJavaScript(typeof(SwaggerConfig).Assembly, "Swashbuckle.Dummy.SwaggerExtensions.testScript1.js");
+                //c.InjectJavaScript(typeof(SwaggerConfig).Assembly, "Swashbuckle.Dummy.SwaggerExtensions.testScript1.js");
                 c.InjectStylesheet(typeof(SwaggerConfig).Assembly, "Swashbuckle.Dummy.SwaggerExtensions.testStyles1.css");
             });
 

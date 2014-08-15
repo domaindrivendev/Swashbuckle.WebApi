@@ -3,50 +3,58 @@ using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Web.Http;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Collections.Generic;
+using System.Text;
 
 namespace Swashbuckle.Application
 {
     public class SwaggerUiHandler : HttpMessageHandler
     {
-        private readonly SwaggerUiConfig _config;
+        private readonly SwaggerSpecConfig _swaggerSpecConfig;
+        private readonly SwaggerUiConfig _swaggerUiConfig;
 
         public SwaggerUiHandler()
-			: this(SwaggerUiConfig.StaticInstance)
+			: this(SwaggerSpecConfig.StaticInstance, SwaggerUiConfig.StaticInstance)
         {
-            _config = SwaggerUiConfig.StaticInstance;
         }
 
-		public SwaggerUiHandler(SwaggerUiConfig config)
+		public SwaggerUiHandler(SwaggerSpecConfig swaggerSpecConfig, SwaggerUiConfig config)
         {
-            _config = config;
+            _swaggerSpecConfig = swaggerSpecConfig;
+            _swaggerUiConfig = config;
         }
 
         protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
         {
-            var uiPath = request.GetRouteData().Values["uiPath"];
+            var uiPath = request.GetRouteData().Values["uiPath"].ToString();
 
-            var responseMessage = UiResourceResponse(uiPath.ToString());
+            var contentStream = ContentStreamFor(uiPath);
 
-            return Task.Factory.StartNew(() => responseMessage);
+            if (uiPath == "index.html")
+            {
+                var discoveryUrls = _swaggerSpecConfig.GetDiscoveryUrls(request);
+                contentStream = ApplyPlaceholderValuesTo(contentStream, discoveryUrls);
+            }
+
+            var content = new StreamContent(contentStream);
+            content.Headers.ContentType = new MediaTypeHeaderValue(MediaTypeFor(uiPath));
+
+            var tsc = new TaskCompletionSource<HttpResponseMessage>();
+            tsc.SetResult(new HttpResponseMessage() { Content = content });
+            return tsc.Task;
         }
 
-        private HttpResponseMessage UiResourceResponse(string uiPath)
+        private Stream ContentStreamFor(string uiPath)
         {
             CustomResourceDescriptor customResourceDescriptor;
-            _config.CustomRoutes.TryGetValue(uiPath, out customResourceDescriptor);
+            _swaggerUiConfig.CustomRoutes.TryGetValue(uiPath, out customResourceDescriptor);
 
-            var resourceStream = (customResourceDescriptor == null)
+            return (customResourceDescriptor == null)
                 ? GetType().Assembly.GetManifestResourceStream(uiPath)
                 : GetCustomResourceStream(customResourceDescriptor);
-
-            HttpContent content = new StreamContent(resourceStream);
-            if (uiPath == "index.html")
-                content = CustomizeIndexContent(content);
-
-            content.Headers.ContentType = new MediaTypeHeaderValue(MediaTypeFor(uiPath));
-            return new HttpResponseMessage { Content = content };
         }
 
         private Stream GetCustomResourceStream(CustomResourceDescriptor resourceDescriptor)
@@ -59,28 +67,30 @@ namespace Swashbuckle.Application
             return stream;
         }
 
-        private HttpContent CustomizeIndexContent(HttpContent content)
+        private Stream ApplyPlaceholderValuesTo(Stream contentStream, IEnumerable<string> discoveryUrls)
         {
-            var originalText = content.ReadAsStringAsync().Result;
+            var originalText = new StreamReader(contentStream).ReadToEnd();
 
-            var listOfSubmitMethods = String.Join(",", _config.SupportedSubmitMethods
+            var discoveryUrl = discoveryUrls.Last();
+
+            var listOfSubmitMethods = String.Join(",", _swaggerUiConfig.SupportedSubmitMethods
                 .Select(sm => String.Format("'{0}'", sm)));
 
-            var scriptIncludes = String.Join("\r\n", _config.CustomScriptPaths
+            var scriptIncludes = String.Join("\r\n", _swaggerUiConfig.CustomScriptPaths
                 .Select(path => String.Format("$.getScript('{0}');", path)));
 
-            var stylesheetIncludes = String.Join("\r\n", _config.CustomStylesheetPaths
+            var stylesheetIncludes = String.Join("\r\n", _swaggerUiConfig.CustomStylesheetPaths
                 .Select(path => String.Format("<link href='{0}' rel='stylesheet' type='text/css'/>", path)));
 
             var customizedText = originalText
-                .Replace("%(DiscoveryUrl)", "window.location.href.replace(/ui\\/index\\.html.*/, 'api-docs')")
-                .Replace("%(SupportHeaderParams)", _config.SupportHeaderParams.ToString().ToLower())
+                .Replace("%(DiscoveryUrl)", String.Format("\"{0}\"", discoveryUrl))
+                .Replace("%(SupportHeaderParams)", _swaggerUiConfig.SupportHeaderParams.ToString().ToLower())
                 .Replace("%(SupportedSubmitMethods)", String.Format("[{0}]", listOfSubmitMethods))
-                .Replace("%(DocExpansion)", String.Format("\"{0}\"", _config.DocExpansion.ToString().ToLower()))
+                .Replace("%(DocExpansion)", String.Format("\"{0}\"", _swaggerUiConfig.DocExpansion.ToString().ToLower()))
                 .Replace("%(CustomScripts)", scriptIncludes)
                 .Replace("%(CustomStylesheets)", stylesheetIncludes);
 
-            return new StringContent(customizedText);
+            return new MemoryStream(Encoding.UTF8.GetBytes(customizedText));
         }
 
         private static string MediaTypeFor(string path)

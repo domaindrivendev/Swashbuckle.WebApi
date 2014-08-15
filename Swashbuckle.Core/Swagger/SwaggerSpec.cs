@@ -3,13 +3,6 @@ using Newtonsoft.Json;
 
 namespace Swashbuckle.Swagger
 {
-    public interface ISwaggerProvider
-    {
-        ResourceListing GetListing(string basePath, string version);
-
-        ApiDeclaration GetDeclaration(string basePath, string version, string resourceName);
-    }
-
     public class ResourceListing
     {
         [JsonProperty("swaggerVersion")]

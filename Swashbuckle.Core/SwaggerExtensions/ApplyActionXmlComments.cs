@@ -5,8 +5,9 @@ using System.Text;
 using System.Web.Http.Controllers;
 using System.Web.Http.Description;
 using System.Xml.XPath;
+using Swashbuckle.Swagger;
 
-namespace Swashbuckle.Swagger
+namespace Swashbuckle.SwaggerExtensions
 {
     public class ApplyActionXmlComments : IOperationFilter
     {

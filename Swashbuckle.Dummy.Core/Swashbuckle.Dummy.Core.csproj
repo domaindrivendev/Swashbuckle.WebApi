@@ -63,6 +63,7 @@
     <Compile Include="Controllers\CustomersController.cs" />
     <Compile Include="Controllers\DynamicTypesController.cs" />
     <Compile Include="Controllers\PolymorphicTypesController.cs" />
+    <Compile Include="Controllers\AttributeRoutesController.cs" />
     <Compile Include="Controllers\UnsupportedTypesController.cs" />
     <Compile Include="Controllers\NestedTypesController.cs" />
     <Compile Include="Controllers\ObsoleteActionsController.cs" />
