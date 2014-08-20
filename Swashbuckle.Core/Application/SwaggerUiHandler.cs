@@ -67,7 +67,7 @@ namespace Swashbuckle.Application
                 .Replace("%(DefaultDiscoveryUrl)", "\"" + discoveryUrls.Last() + "\"")
                 .Replace("%(SupportHeaderParams)", _swaggerUiConfig.SupportHeaderParams.ToString().ToLower())
                 .Replace("%(SupportedSubmitMethods)", "[" + listOfSubmitMethods + "]")
-                .Replace("%(DocExpansion)", _swaggerUiConfig.DocExpansion.ToString().ToLower());
+                .Replace("%(DocExpansion)", "\"" + _swaggerUiConfig.DocExpansion.ToString().ToLower() + "\"");
 
             // Special cases - only applicable to index.html
             var stylesheetIncludes = String.Join("\r\n", _swaggerUiConfig.CustomEmbeddedResources.Values
