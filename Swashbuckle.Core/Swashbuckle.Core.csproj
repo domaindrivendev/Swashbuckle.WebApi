@@ -66,6 +66,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Application\EmbeddedResource.cs" />
     <Compile Include="Application\PolymorphicType.cs" />
     <Compile Include="Application\RedirectHandler.cs" />
     <Compile Include="Application\SwaggerSpecConfig.cs" />
@@ -90,7 +91,7 @@
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
-    <EmbeddedResource Include="SwaggerExtensions\versionSelector.js" />
+    <EmbeddedResource Include="SwaggerExtensions\discoveryUrlSelector.js" />
     <Content Include="Swashbuckle.Core.nuspec">
       <SubType>Designer</SubType>
     </Content>
