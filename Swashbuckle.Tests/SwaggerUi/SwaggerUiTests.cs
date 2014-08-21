@@ -48,7 +48,7 @@ namespace Swashbuckle.Tests.SwaggerUi
             var content = GetAsString("http://tempuri.org/swagger/ui/index.html");
 
             StringAssert.Contains("supportHeaderParams: true", content);
-            StringAssert.Contains("supportedSubmitMethods: ['GET','POST','PUT','HEAD']", content);
+            StringAssert.Contains("supportedSubmitMethods: ['get','post','put','head']", content);
             StringAssert.Contains("docExpansion: \"full\"", content);
         }
 

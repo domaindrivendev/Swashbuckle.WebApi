@@ -58,9 +58,11 @@ namespace Swashbuckle.Application
             var outputBuilder = new StringBuilder(text);
 
             var discoveryUrls = _swaggerSpecConfig.GetDiscoveryUrls(request);
-            var listOfDiscoveryUrls = String.Join(",", discoveryUrls.Select(str => "'" + str + "'"));
+            var listOfDiscoveryUrls = String.Join(",",
+                discoveryUrls.Select(url => "'" + url + "'"));
 
-            var listOfSubmitMethods = String.Join(",", _swaggerUiConfig.SupportedSubmitMethods.Select(str => "'" + str + "'"));
+            var listOfSubmitMethods = String.Join(",",
+                _swaggerUiConfig.SupportedSubmitMethods.Select(method => "'" + method.ToString().ToLower() + "'"));
 
             outputBuilder
                 .Replace("%(DiscoveryUrls)", "[" + listOfDiscoveryUrls + "]")

@@ -1,9 +1,13 @@
 ﻿using System;
+using System.Linq;
 using System.Net.Http;
 using System.Web.Http;
 using Swashbuckle.Application;
 using Swashbuckle.Dummy.Controllers;
 using Swashbuckle.Dummy.SwaggerExtensions;
+using System.Collections.Generic;
+using System.Web.Http.Description;
+using System.Web.Http.Routing.Constraints;
 
 namespace Swashbuckle.Dummy
 {
@@ -17,12 +21,7 @@ namespace Swashbuckle.Dummy
                 {
                     c.IgnoreObsoleteActions();
 
-                    c.SupportMultipleApiVersions((apiDesc) =>
-                        {
-                            if (apiDesc.ActionDescriptor.ControllerDescriptor.ControllerName == "Products")
-                                return new[] { "1.0", "2.0" };
-                            return new[] { "2.0" };
-                        });
+                    //c.SupportMultipleApiVersions(GetApplicableVersionsByRouteConstraint);
 
                     //c.PolymorphicType<Animal>(ac => ac
                     //    .DiscriminateBy(a => a.Type)
@@ -39,7 +38,7 @@ namespace Swashbuckle.Dummy
                 c.SupportHeaderParams = true;
                 c.DocExpansion = DocExpansion.List;
                 c.SupportedSubmitMethods = new[] { HttpMethod.Get, HttpMethod.Post, HttpMethod.Put, HttpMethod.Head };
-                c.EnableDiscoveryUrlSelector();
+                //c.EnableDiscoveryUrlSelector();
                 //c.InjectJavaScript(typeof(SwaggerConfig).Assembly, "Swashbuckle.Dummy.SwaggerExtensions.testScript1.js");
                 //c.InjectStylesheet(typeof(SwaggerConfig).Assembly, "Swashbuckle.Dummy.SwaggerExtensions.testStyles1.css");
             });
@@ -49,6 +48,17 @@ namespace Swashbuckle.Dummy
         private static string GetXmlCommentsPath()
         {
             return String.Format(@"{0}\XmlComments.xml", AppDomain.CurrentDomain.BaseDirectory);
+        }
+
+        private static IEnumerable<string> GetApplicableVersionsByRouteConstraint(ApiDescription apiDesc)
+        {
+            var versionConstraint = (apiDesc.Route.Constraints.ContainsKey("apiVersion"))
+                ? apiDesc.Route.Constraints["apiVersion"] as RegexRouteConstraint
+                : null;
+
+            return (versionConstraint == null)
+                ? new string[] {}
+                : versionConstraint.Pattern.Split('|');
         }
     }
 }
