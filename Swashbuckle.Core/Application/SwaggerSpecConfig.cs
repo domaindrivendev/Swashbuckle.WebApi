@@ -23,7 +23,7 @@ namespace Swashbuckle.Application
         private Func<ApiDescription, IEnumerable<string>> _applicableVersionsResolver;
         private bool _ignoreObsoleteActions;
         private Func<ApiDescription, string> _resourceNameResolver;
-        private IComparer<string> _groupComparer;
+        private IComparer<string> _resourceNameComparer;
         private readonly Dictionary<Type, Func<DataType>> _customTypeMappings;
         private readonly List<PolymorphicType> _polymorphicTypes;
         private readonly List<Func<IModelFilter>> _modelFilterFactories;
@@ -37,7 +37,7 @@ namespace Swashbuckle.Application
             _applicableVersionsResolver = (apiDesc) => new[] { "*" };
             _ignoreObsoleteActions = false;
             _resourceNameResolver = (apiDesc) => apiDesc.ActionDescriptor.ControllerDescriptor.ControllerName;
-            _groupComparer = Comparer<string>.Default;
+            _resourceNameComparer = Comparer<string>.Default;
             _customTypeMappings = new Dictionary<Type, Func<DataType>>();
             _polymorphicTypes = new List<PolymorphicType>();
             _modelFilterFactories = new List<Func<IModelFilter>>();
@@ -103,10 +103,10 @@ namespace Swashbuckle.Application
             return this;
         }
 
-        public SwaggerSpecConfig SortDeclarationsBy(IComparer<string> groupComparer)
+        public SwaggerSpecConfig SortDeclarationsBy(IComparer<string> resourceNameComparer)
         {
-            if (groupComparer == null) throw new ArgumentNullException("groupComparer");
-            _groupComparer = groupComparer;
+            if (resourceNameComparer == null) throw new ArgumentNullException("resourceNameComparer");
+            _resourceNameComparer = resourceNameComparer;
             return this;
         }
 
@@ -185,7 +185,7 @@ namespace Swashbuckle.Application
 
             var options = new SwaggerGeneratorOptions(
                 _resourceNameResolver,
-                _groupComparer,
+                _resourceNameComparer,
                 _customTypeMappings,
                 _polymorphicTypes,
                 _modelFilterFactories.Select(factory => factory()),

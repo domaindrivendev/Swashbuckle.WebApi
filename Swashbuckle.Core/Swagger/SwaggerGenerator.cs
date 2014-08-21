@@ -30,7 +30,7 @@ namespace Swashbuckle.Swagger
         {
             var resources = _apiDescriptions
                 .GroupBy(apiDesc => _options.ResourceNameResolver(apiDesc))
-                .OrderBy(group => group.Key)
+                .OrderBy(group => group.Key, _options.ResourceNameComparer)
                 .Select(apiDescGrp => new Resource { Path = "/" + apiDescGrp.Key })
                 .ToArray();
 
@@ -46,7 +46,6 @@ namespace Swashbuckle.Swagger
         {
             var apiDescriptionGroup = _apiDescriptions
                 .GroupBy(apiDesc => _options.ResourceNameResolver(apiDesc))
-                .OrderBy(group => group.Key)
                 .Single(apiDescGrp => apiDescGrp.Key == resourceName);
 
             var dataTypeRegistry = new DataTypeRegistry(

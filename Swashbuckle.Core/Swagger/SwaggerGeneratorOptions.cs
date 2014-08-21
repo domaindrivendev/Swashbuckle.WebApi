@@ -8,12 +8,14 @@ namespace Swashbuckle.Swagger
     {
         public SwaggerGeneratorOptions(
             Func<ApiDescription, string> resourceNameResolver,
+            IComparer<string> resourceNameComparer,
             IDictionary<Type, Func<DataType>> customTypeMappings,
             IEnumerable<PolymorphicType> polymorphicTypes,
             IEnumerable<IModelFilter> modelFilters,
             IEnumerable<IOperationFilter> operationFilters)
         {
             ResourceNameResolver = resourceNameResolver;
+            ResourceNameComparer = resourceNameComparer;
             CustomTypeMappings = customTypeMappings;
             PolymorphicTypes = polymorphicTypes;
             ModelFilters = modelFilters;
@@ -21,6 +23,8 @@ namespace Swashbuckle.Swagger
         }
 
         public Func<ApiDescription, string> ResourceNameResolver { get; private set; }
+
+        public IComparer<string> ResourceNameComparer { get; private set; }
 
         public IDictionary<Type, Func<DataType>> CustomTypeMappings { get; private set; }
 

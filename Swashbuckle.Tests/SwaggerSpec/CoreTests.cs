@@ -353,7 +353,7 @@ namespace Swashbuckle.Tests.SwaggerSpec
         }
 
         [Test]
-        public void It_should_support_customized_api_group_ordering()
+        public void It_should_support_customized_api_declaration_ordering()
         {
             _swaggerSpecConfig.SortDeclarationsBy(new DescendingAlphabeticComparer());
 
