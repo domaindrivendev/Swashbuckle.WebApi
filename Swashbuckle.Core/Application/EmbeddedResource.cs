@@ -8,15 +8,15 @@ namespace Swashbuckle.Application
     {
         public EmbeddedResource(Assembly assembly, string name, bool supportsConfigExpressions, string mediaType = null)
         {
-            ResourceAssembly = assembly;
-            ResourceName = name;
+            Assembly = assembly;
+            Name = name;
             SupportsConfigExpressions = supportsConfigExpressions;
             MediaType = mediaType ?? InferMediaTypeFrom(name);
         }
 
-        public Assembly ResourceAssembly { get; private set; }
+        public Assembly Assembly { get; private set; }
 
-        public string ResourceName { get; private set; }
+        public string Name { get; private set; }
 
         public bool SupportsConfigExpressions { get; private set; }
 
@@ -24,9 +24,9 @@ namespace Swashbuckle.Application
 
         public Stream ToStream()
         {
-            var stream = ResourceAssembly.GetManifestResourceStream(ResourceName);
+            var stream = Assembly.GetManifestResourceStream(Name);
             if (stream == null)
-                throw new FileNotFoundException("Ensure the Build Action is set to \"Embedded Resource\"", ResourceName);
+                throw new FileNotFoundException("Ensure the Build Action is set to \"Embedded Resource\"", Name);
 
             return stream;
         }

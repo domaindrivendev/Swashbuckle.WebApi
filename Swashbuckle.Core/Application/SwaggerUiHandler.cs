@@ -72,11 +72,11 @@ namespace Swashbuckle.Application
             // Special cases - only applicable to index.html
             var stylesheetIncludes = String.Join("\r\n", _swaggerUiConfig.CustomEmbeddedResources.Values
                 .Where(res => res.MediaType == "text/css")
-                .Select(res => String.Format("<link href='ext/{0}' rel='stylesheet' type='text/css'/>", res.ResourceName)));
+                .Select(res => String.Format("<link href='ext/{0}' rel='stylesheet' type='text/css'/>", res.Name)));
 
             var scriptIncludes = String.Join("\r\n", _swaggerUiConfig.CustomEmbeddedResources.Values
                 .Where(res => res.MediaType == "text/javascript")
-                .Select(res => String.Format("$.getScript('ext/{0}');", res.ResourceName)));
+                .Select(res => String.Format("$.getScript('ext/{0}');", res.Name)));
 
             outputBuilder
                 .Replace("%(StylesheetIncludes)", stylesheetIncludes)
