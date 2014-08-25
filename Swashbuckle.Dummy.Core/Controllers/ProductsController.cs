@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Swashbuckle.Dummy.SwaggerExtensions;
+using System;
 using System.Collections.Generic;
 using System.Web.Http;
 
@@ -13,6 +14,7 @@ namespace Swashbuckle.Dummy.Controllers
         /// <param name="product">New product details</param>
         /// <returns></returns>
         /// <response code="200">It's all good!</response>
+        [ScopeAuthorize("products.manage")]
         public int Create(Product product)
         {
             throw new NotImplementedException();
@@ -22,6 +24,7 @@ namespace Swashbuckle.Dummy.Controllers
         /// Retrieve product by unique Id
         /// </summary>
         /// <returns></returns>
+        [ScopeAuthorize("products.read")]
         public Product GetById(int id)
         {
             throw new NotImplementedException();
@@ -32,12 +35,14 @@ namespace Swashbuckle.Dummy.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet]
+        [ScopeAuthorize("products.read")]
         public IEnumerable<Product> FindAll()
         {
             throw new NotImplementedException();
         }
         
         [HttpGet]
+        [ScopeAuthorize("products.read")]
         public IEnumerable<Product> FindByType(ProductType type)
         {
             throw new NotImplementedException();

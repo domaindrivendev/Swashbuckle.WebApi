@@ -8,6 +8,7 @@ using Swashbuckle.Dummy.SwaggerExtensions;
 using System.Collections.Generic;
 using System.Web.Http.Description;
 using System.Web.Http.Routing.Constraints;
+using Swashbuckle.Swagger;
 
 namespace Swashbuckle.Dummy
 {
@@ -29,8 +30,37 @@ namespace Swashbuckle.Dummy
 
                     c.OperationFilter<AddStandardResponseCodes>();
                     c.OperationFilter<AddAuthResponseCodes>();
+                    c.OperationFilter<AddOAuth2Scopes>();
 
                     c.IncludeXmlComments(GetXmlCommentsPath());
+
+                    c.ApiInfo(new Info
+                    {
+                        Title = "Swashbuckle Dummy API",
+                        Description = "For testing and experimenting with Swashbuckle features",
+                        Contact = "domaindrivendev@gmail.com"
+                    });
+
+                    c.Authorization("oauth2", new Authorization
+                    {
+                        Type = "oauth2",
+                        Scopes = new List<Scope>
+                        {
+                            new Scope { ScopeId = "products.read", Description = "View products" },
+                            new Scope { ScopeId = "products.manage", Description = "Manage products" }
+                        },
+                        GrantTypes = new GrantTypes
+                        {
+                            ImplicitGrant = new ImplicitGrant
+                            {
+                                LoginEndpoint = new LoginEndpoint
+                                {
+                                    Url = "https://yourapi/oauth/authorize"
+                                },
+                                TokenName = "access_token"
+                            }
+                        }
+                    });
                 });
 
             SwaggerUiConfig.Customize(c =>

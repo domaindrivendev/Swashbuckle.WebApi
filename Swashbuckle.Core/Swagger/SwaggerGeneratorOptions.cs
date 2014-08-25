@@ -12,7 +12,9 @@ namespace Swashbuckle.Swagger
             IDictionary<Type, Func<DataType>> customTypeMappings,
             IEnumerable<PolymorphicType> polymorphicTypes,
             IEnumerable<IModelFilter> modelFilters,
-            IEnumerable<IOperationFilter> operationFilters)
+            IEnumerable<IOperationFilter> operationFilters,
+            Info apiInfo,
+            IDictionary<string, Authorization> authorizations)
         {
             ResourceNameResolver = resourceNameResolver;
             ResourceNameComparer = resourceNameComparer;
@@ -20,6 +22,8 @@ namespace Swashbuckle.Swagger
             PolymorphicTypes = polymorphicTypes;
             ModelFilters = modelFilters;
             OperationFilters = operationFilters;
+            ApiInfo = apiInfo;
+            Authorizations = authorizations;
         }
 
         public Func<ApiDescription, string> ResourceNameResolver { get; private set; }
@@ -33,5 +37,9 @@ namespace Swashbuckle.Swagger
         public IEnumerable<IModelFilter> ModelFilters { get; private set; }
 
         public IEnumerable<IOperationFilter> OperationFilters { get; private set; }
+
+        public Info ApiInfo { get; private set; }
+
+        public IDictionary<string, Authorization> Authorizations { get; private set; }
     }
 }

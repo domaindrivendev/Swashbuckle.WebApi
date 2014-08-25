@@ -73,6 +73,7 @@
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SwaggerExtensions\AddAuthResponseCodes.cs" />
+    <Compile Include="SwaggerExtensions\AddOAuth2Scopes.cs" />
     <Compile Include="SwaggerExtensions\AddStandardResponseCodes.cs" />
   </ItemGroup>
   <ItemGroup>
