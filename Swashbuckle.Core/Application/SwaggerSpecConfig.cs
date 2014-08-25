@@ -21,6 +21,7 @@ namespace Swashbuckle.Application
         private Func<HttpRequestMessage, string> _targetVersionResolver; // obsolete
         private Func<ApiDescription, string, bool> _versionSupportResolver; // obsolete
         private Func<ApiDescription, IEnumerable<string>> _applicableVersionsResolver;
+
         private bool _ignoreObsoleteActions;
         private Func<ApiDescription, string> _resourceNameResolver;
         private IComparer<string> _resourceNameComparer;
@@ -29,11 +30,16 @@ namespace Swashbuckle.Application
         private readonly List<Func<IModelFilter>> _modelFilterFactories;
         private readonly List<Func<IOperationFilter>> _operationFilterFactories;
 
+        private Info _apiInfo;
+        private IDictionary<string, Authorization> _authorizations { get; set; }
+
+
         public SwaggerSpecConfig()
         {
             BasePathResolver = (req) => req.RequestUri.GetLeftPart(UriPartial.Authority) + req.GetConfiguration().VirtualPathRoot.TrimEnd('/');
             _targetVersionResolver = (req) => "1.0"; // obsolete
             _versionSupportResolver = (apiDesc, version) => true; // obsolete
+
             _applicableVersionsResolver = (apiDesc) => new[] { "*" };
             _ignoreObsoleteActions = false;
             _resourceNameResolver = (apiDesc) => apiDesc.ActionDescriptor.ControllerDescriptor.ControllerName;
@@ -157,6 +163,19 @@ namespace Swashbuckle.Application
             return this;
         }
 
+        public SwaggerSpecConfig ApiInfo(Info apiInfo)
+        {
+            _apiInfo = apiInfo;
+            return this;
+        }
+
+        public SwaggerSpecConfig Authorization(string name, Authorization authorization)
+        {
+            _authorizations = _authorizations ?? new Dictionary<string, Authorization>();
+            _authorizations[name] = authorization;
+            return this;
+        }
+
         public IEnumerable<string> GetDiscoveryUrls(HttpRequestMessage swaggerRequest)
         {
             var basePath = BasePathResolver(swaggerRequest);
@@ -189,7 +208,9 @@ namespace Swashbuckle.Application
                 _customTypeMappings,
                 _polymorphicTypes,
                 _modelFilterFactories.Select(factory => factory()),
-                _operationFilterFactories.Select(factory => factory())
+                _operationFilterFactories.Select(factory => factory()),
+                _apiInfo,
+                _authorizations
                 );
 
             return new SwaggerGenerator(

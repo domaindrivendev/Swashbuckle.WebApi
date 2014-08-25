@@ -38,7 +38,9 @@ namespace Swashbuckle.Swagger
             {
                 SwaggerVersion = SwaggerVersion,
                 ApiVersion = _apiVersion,
-                Apis = resources
+                Apis = resources,
+                Info = _options.ApiInfo,
+                Authorizations = _options.Authorizations
             };
         }
 
