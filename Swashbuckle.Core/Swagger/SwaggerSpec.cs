@@ -8,11 +8,11 @@ namespace Swashbuckle.Swagger
         [JsonProperty("swaggerVersion")]
         public string SwaggerVersion { get; set; }
 
-        [JsonProperty("apiVersion")]
-        public string ApiVersion { get; set; }
-
         [JsonProperty("apis")]
         public IList<Resource> Apis { get; set; }
+
+        [JsonProperty("apiVersion")]
+        public string ApiVersion { get; set; }
 
         [JsonProperty("info")]
         public Info Info { get; set; }
@@ -29,162 +29,6 @@ namespace Swashbuckle.Swagger
         [JsonProperty("description")]
         public string Description { get; set; }
 
-    }
-
-    public class ApiDeclaration
-    {
-        [JsonProperty("swaggerVersion")]
-        public string SwaggerVersion { get; set; }
-
-        [JsonProperty("apiVersion")]
-        public string ApiVersion { get; set; }
-
-        [JsonProperty("basePath")]
-        public string BasePath { get; set; }
-
-        [JsonProperty("resourcePath")]
-        public string ResourcePath { get; set; }
-
-        [JsonProperty("apis")]
-        public IList<Api> Apis { get; set; }
-
-        [JsonProperty("models")]
-        public IDictionary<string, DataType> Models { get; set; }
-
-        [JsonProperty("produces")]
-        public IList<string> Produces { get; set; }
-
-        [JsonProperty("consumes")]
-        public IList<string> Consumes { get; set; }
-
-        [JsonProperty("authorizations")]
-        public Dictionary<string, IList<Scope>> Authorizations { get; set; }
-    }
-
-    public class Api
-    {
-        [JsonProperty("path")]
-        public string Path { get; set; }
-
-        [JsonProperty("description")]
-        public string Description { get; set; }
-
-        [JsonProperty("operations")]
-        public IList<Operation> Operations { get; set; }
-    }
-
-    public class Operation
-    {
-        [JsonProperty("method")]
-        public string Method { get; set; }
-
-        [JsonProperty("nickname")]
-        public string Nickname { get; set; }
-
-        [JsonProperty("summary")]
-        public string Summary { get; set; }
-
-        [JsonProperty("notes")]
-        public string Notes { get; set; }
-
-        [JsonProperty("type")]
-        public string Type { get; set; }
-
-        [JsonProperty("format")]
-        public string Format { get; set; }
-
-        [JsonProperty("items")]
-        public DataType Items { get; set; }
-
-        [JsonProperty("enum")]
-        public IList<string> Enum { get; set; }
-
-        [JsonProperty("parameters")]
-        public IList<Parameter> Parameters { get; set; }
-
-        [JsonProperty("responseMessages")]
-        public IList<ResponseMessage> ResponseMessages { get; set; }
-
-        [JsonProperty("authorizations")]
-        public Dictionary<string, IList<Scope>> Authorizations { get; set; }
-
-        [JsonProperty("produces")]
-        public IList<string> Produces { get; set; }
-
-        [JsonProperty("consumes")]
-        public IList<string> Consumes { get; set; }
-    }
-
-    public class Parameter
-    {
-        [JsonProperty("paramType")]
-        public string ParamType { get; set; }
-
-        [JsonProperty("name")]
-        public string Name { get; set; }
-
-        [JsonProperty("description")]
-        public string Description { get; set; }
-
-        [JsonProperty("required")]
-        public bool Required { get; set; }
-
-        [JsonProperty("type")]
-        public string Type { get; set; }
-
-        [JsonProperty("format")]
-        public string Format { get; set; }
-
-        [JsonProperty("items")]
-        public DataType Items { get; set; }
-
-        [JsonProperty("enum")]
-        public IList<string> Enum { get; set; }
-    }
-
-    public class ResponseMessage
-    {
-        [JsonProperty("code")]
-        public int Code { get; set; }
-
-        [JsonProperty("message")]
-        public string Message { get; set; }
-    }
-
-    public class DataType
-    {
-        [JsonProperty("$ref")]
-        public string Ref { get; set; }
-
-        [JsonProperty("id")]
-        public string Id { get; set; }
-
-        [JsonProperty("type")]
-        public string Type { get; set; }
-
-        [JsonProperty("description")]
-        public string Description { get; set; }
-
-        [JsonProperty("format")]
-        public string Format { get; set; }
-
-        [JsonProperty("items")]
-        public DataType Items { get; set; }
-
-        [JsonProperty("enum")]
-        public IList<string> Enum { get; set; }
-
-        [JsonProperty("properties")]
-        public IDictionary<string, DataType> Properties { get; set; }
-
-        [JsonProperty("required")]
-        public IList<string> Required { get; set; }
-
-        [JsonProperty("subTypes")]
-        public IList<string> SubTypes { get; set; }
-
-        [JsonProperty("discriminator")]
-        public string Discriminator { get; set; }
     }
 
     public class Info
@@ -253,6 +97,12 @@ namespace Swashbuckle.Swagger
         public string TokenName { get; set; }
     }
 
+    public class LoginEndpoint
+    {
+        [JsonProperty("url")]
+        public string Url { get; set; }
+    }
+
     public class AuthorizationCodeGrant
     {
         [JsonProperty("tokenRequestEndpoint")]
@@ -260,12 +110,6 @@ namespace Swashbuckle.Swagger
 
         [JsonProperty("tokenEndpoint")]
         public TokenEndpoint TokenEndpoint { get; set; }
-    }
-
-    public class LoginEndpoint
-    {
-        [JsonProperty("url")]
-        public string Url { get; set; }
     }
 
     public class TokenRequestEndpoint
@@ -288,6 +132,206 @@ namespace Swashbuckle.Swagger
         [JsonProperty("tokenName")]
         public string TokenName { get; set; }
     }
+    public class ApiDeclaration
+    {
+        [JsonProperty("swaggerVersion")]
+        public string SwaggerVersion { get; set; }
 
+        [JsonProperty("apiVersion")]
+        public string ApiVersion { get; set; }
 
+        [JsonProperty("basePath")]
+        public string BasePath { get; set; }
+
+        [JsonProperty("resourcePath")]
+        public string ResourcePath { get; set; }
+
+        [JsonProperty("apis")]
+        public IList<Api> Apis { get; set; }
+
+        [JsonProperty("models")]
+        public IDictionary<string, DataType> Models { get; set; }
+
+        [JsonProperty("produces")]
+        public IList<string> Produces { get; set; }
+
+        [JsonProperty("consumes")]
+        public IList<string> Consumes { get; set; }
+
+        [JsonProperty("authorizations")]
+        public Dictionary<string, IList<Scope>> Authorizations { get; set; }
+    }
+
+    public class Api
+    {
+        [JsonProperty("path")]
+        public string Path { get; set; }
+
+        [JsonProperty("description")]
+        public string Description { get; set; }
+
+        [JsonProperty("operations")]
+        public IList<Operation> Operations { get; set; }
+    }
+
+    public class Operation
+    {
+        [JsonProperty("method")]
+        public string Method { get; set; }
+
+        [JsonProperty("summary")]
+        public string Summary { get; set; }
+
+        [JsonProperty("notes")]
+        public string Notes { get; set; }
+
+        [JsonProperty("nickname")]
+        public string Nickname { get; set; }
+
+        [JsonProperty("authorizations")]
+        public Dictionary<string, IList<Scope>> Authorizations { get; set; }
+
+        [JsonProperty("parameters")]
+        public IList<Parameter> Parameters { get; set; }
+
+        [JsonProperty("responseMessages")]
+        public IList<ResponseMessage> ResponseMessages { get; set; }
+
+        [JsonProperty("produces")]
+        public IList<string> Produces { get; set; }
+
+        [JsonProperty("consumes")]
+        public IList<string> Consumes { get; set; }
+
+        [JsonProperty("type")]
+        public string Type { get; set; }
+
+        [JsonProperty("$ref")]
+        public string Ref { get; set; }
+
+        [JsonProperty("format")]
+        public string Format { get; set; }
+
+        [JsonProperty("defaultValue")]
+        public string DefaultValue { get; set; }
+
+        [JsonProperty("enum")]
+        public IList<string> Enum { get; set; }
+
+        [JsonProperty("minimum")]
+        public string Minimum { get; set; }
+
+        [JsonProperty("maximum")]
+        public string Maximum { get; set; }
+     
+        [JsonProperty("items")]
+        public DataType Items { get; set; }
+
+        [JsonProperty("uniqueItems")]
+        public bool? UniqueItems { get; set; }
+    }
+
+    public class Parameter
+    {
+        [JsonProperty("paramType")]
+        public string ParamType { get; set; }
+
+        [JsonProperty("name")]
+        public string Name { get; set; }
+
+        [JsonProperty("description")]
+        public string Description { get; set; }
+
+        [JsonProperty("required")]
+        public bool Required { get; set; }
+
+        [JsonProperty("allowMultiple")]
+        public bool? AllowMultiple { get; set; }
+
+        [JsonProperty("type")]
+        public string Type { get; set; }
+
+        [JsonProperty("$ref")]
+        public string Ref { get; set; }
+
+        [JsonProperty("format")]
+        public string Format { get; set; }
+
+        [JsonProperty("defaultValue")]
+        public string DefaultValue { get; set; }
+
+        [JsonProperty("enum")]
+        public IList<string> Enum { get; set; }
+
+        [JsonProperty("minimum")]
+        public string Minimum { get; set; }
+
+        [JsonProperty("maximum")]
+        public string Maximum { get; set; }
+     
+        [JsonProperty("items")]
+        public DataType Items { get; set; }
+
+        [JsonProperty("uniqueItems")]
+        public bool? UniqueItems { get; set; }
+    }
+
+    public class ResponseMessage
+    {
+        [JsonProperty("code")]
+        public int Code { get; set; }
+
+        [JsonProperty("message")]
+        public string Message { get; set; }
+    }
+
+    public class DataType
+    {
+        [JsonProperty("type")]
+        public string Type { get; set; }
+
+        [JsonProperty("$ref")]
+        public string Ref { get; set; }
+
+        [JsonProperty("format")]
+        public string Format { get; set; }
+
+        [JsonProperty("enum")]
+        public IList<string> Enum { get; set; }
+
+        [JsonProperty("minimum")]
+        public string Minimum { get; set; }
+
+        [JsonProperty("maximum")]
+        public string Maximum { get; set; }
+     
+        [JsonProperty("items")]
+        public DataType Items { get; set; }
+
+        [JsonProperty("uniqueItems")]
+        public bool? UniqueItems { get; set; }
+
+        /*
+        NOTE: The properties below should be in a separate "Model" class. Unfortunately,
+        it was initially modelled incorrectly and can't be fixed until the next major
+        version of Swashbuckle due to backward-comptability
+         */
+        [JsonProperty("id")]
+        public string Id { get; set; }
+
+        [JsonProperty("description")]
+        public string Description { get; set; }
+
+        [JsonProperty("required")]
+        public IList<string> Required { get; set; }
+
+        [JsonProperty("properties")]
+        public IDictionary<string, DataType> Properties { get; set; }
+
+        [JsonProperty("subTypes")]
+        public IList<string> SubTypes { get; set; }
+
+        [JsonProperty("discriminator")]
+        public string Discriminator { get; set; }
+    }
 }

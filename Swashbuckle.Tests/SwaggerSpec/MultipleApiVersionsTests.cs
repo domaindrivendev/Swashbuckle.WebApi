@@ -39,11 +39,11 @@ namespace Swashbuckle.Tests.SwaggerSpec
                 new
                 {
                     swaggerVersion = "1.2",
-                    apiVersion = "1.0",
                     apis = new object[]
                     {
                         new { path = "/Products" }
-                    }
+                    },
+                    apiVersion = "1.0"
                 });
             Assert.AreEqual(expected.ToString(), v1Listing.ToString());
 
@@ -52,12 +52,12 @@ namespace Swashbuckle.Tests.SwaggerSpec
                 new
                 {
                     swaggerVersion = "1.2",
-                    apiVersion = "2.0",
                     apis = new object[]
                     {
                         new { path = "/Customers" },
                         new { path = "/Products" }
-                    }
+                    },
+                    apiVersion = "2.0"
                 });
             Assert.AreEqual(expected.ToString(), v2Listing.ToString());
         }
