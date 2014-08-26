@@ -38,8 +38,7 @@ namespace Swashbuckle.Application
 
         public void InjectJavaScript(Assembly resourceAssembly, string resourceName)
         {
-            var uiPath = String.Format("ext/{0}", resourceName);
-            CustomEmbeddedResources[uiPath] = new EmbeddedResource(
+            CustomEmbeddedResources[resourceName] = new EmbeddedResource(
                 resourceAssembly,
                 resourceName,
                 "text/javascript");
@@ -47,8 +46,7 @@ namespace Swashbuckle.Application
 
         public void InjectStylesheet(Assembly resourceAssembly, string resourceName)
         {
-            var uiPath = String.Format("ext/{0}", resourceName);
-            CustomEmbeddedResources[uiPath] = new EmbeddedResource(
+            CustomEmbeddedResources[resourceName] = new EmbeddedResource(
                 resourceAssembly,
                 resourceName,
                 "text/css");

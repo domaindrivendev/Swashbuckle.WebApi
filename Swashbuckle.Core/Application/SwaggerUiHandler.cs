@@ -79,7 +79,7 @@ namespace Swashbuckle.Application
             // Special case - only applicable to index.html
             var stylesheetIncludes = String.Join("\r\n", _swaggerUiConfig.CustomEmbeddedResources.Values
                 .Where(res => res.MediaType == "text/css")
-                .Select(res => String.Format("<link href='ext/{0}' rel='stylesheet' type='text/css'/>", res.Name)));
+                .Select(res => String.Format("<link href='{0}' rel='stylesheet' type='text/css'/>", res.Name)));
 
             outputBuilder
                 .Replace("%(StylesheetIncludes)", stylesheetIncludes);
