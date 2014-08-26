@@ -6,11 +6,10 @@ namespace Swashbuckle.Application
 {
     internal class EmbeddedResource
     {
-        public EmbeddedResource(Assembly assembly, string name, bool supportsConfigExpressions, string mediaType = null)
+        public EmbeddedResource(Assembly assembly, string name, string mediaType = null)
         {
             Assembly = assembly;
             Name = name;
-            SupportsConfigExpressions = supportsConfigExpressions;
             MediaType = mediaType ?? InferMediaTypeFrom(name);
         }
 
@@ -18,11 +17,9 @@ namespace Swashbuckle.Application
 
         public string Name { get; private set; }
 
-        public bool SupportsConfigExpressions { get; private set; }
-
         public string MediaType { get; private set; }
 
-        public Stream ToStream()
+        public Stream GetStream()
         {
             var stream = Assembly.GetManifestResourceStream(Name);
             if (stream == null)

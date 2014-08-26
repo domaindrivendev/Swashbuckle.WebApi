@@ -32,9 +32,9 @@ namespace Swashbuckle.Application
             var uiPath = request.GetRouteData().Values["uiPath"].ToString();
             var embeddedResource = EmbeddedResourceFor(uiPath);
             
-            var stream = embeddedResource.SupportsConfigExpressions
-                ? ApplyConfigExpressions(embeddedResource.ToStream(), request)
-                : embeddedResource.ToStream();
+            var stream = embeddedResource.MediaType.StartsWith("text/")
+                ? ApplyConfigExpressions(embeddedResource.GetStream(), request)
+                : embeddedResource.GetStream();
 
             var content = new StreamContent(stream);
             content.Headers.ContentType = new MediaTypeHeaderValue(embeddedResource.MediaType);
@@ -49,7 +49,7 @@ namespace Swashbuckle.Application
             EmbeddedResource embeddedResource;
             _swaggerUiConfig.CustomEmbeddedResources.TryGetValue(uiPath, out embeddedResource);
 
-            return embeddedResource ?? new EmbeddedResource(GetType().Assembly, uiPath, uiPath == "index.html");
+            return embeddedResource ?? new EmbeddedResource(GetType().Assembly, uiPath);
         }
 
         private Stream ApplyConfigExpressions(Stream stream, HttpRequestMessage request)
@@ -58,31 +58,31 @@ namespace Swashbuckle.Application
             var outputBuilder = new StringBuilder(text);
 
             var discoveryUrls = _swaggerSpecConfig.GetDiscoveryUrls(request);
-            var listOfDiscoveryUrls = String.Join(",",
-                discoveryUrls.Select(url => "'" + url + "'"));
+            var discoveryUrlsString = String.Join(",", discoveryUrls
+                .Select(url => "'" + url + "'"));
 
-            var listOfSubmitMethods = String.Join(",",
-                _swaggerUiConfig.SupportedSubmitMethods.Select(method => "'" + method.ToString().ToLower() + "'"));
+            var submitMethodsString = String.Join(",", _swaggerUiConfig.SupportedSubmitMethods
+                .Select(method => "'" + method.ToString().ToLower() + "'"));
+
+            var customScriptsString = String.Join(",", _swaggerUiConfig.CustomEmbeddedResources.Values
+                .Where(res => res.MediaType == "text/javascript")
+                .Select(res => "'" + res.Name + "'"));
 
             outputBuilder
-                .Replace("%(DiscoveryUrls)", "[" + listOfDiscoveryUrls + "]")
+                .Replace("%(DiscoveryUrls)", "[" + discoveryUrlsString + "]")
                 .Replace("%(DefaultDiscoveryUrl)", "\"" + discoveryUrls.Last() + "\"")
                 .Replace("%(SupportHeaderParams)", _swaggerUiConfig.SupportHeaderParams.ToString().ToLower())
-                .Replace("%(SupportedSubmitMethods)", "[" + listOfSubmitMethods + "]")
+                .Replace("%(SupportedSubmitMethods)", "[" + submitMethodsString + "]")
+                .Replace("%(CustomScripts)", "[" + customScriptsString + "]")
                 .Replace("%(DocExpansion)", "\"" + _swaggerUiConfig.DocExpansion.ToString().ToLower() + "\"");
 
-            // Special cases - only applicable to index.html
+            // Special case - only applicable to index.html
             var stylesheetIncludes = String.Join("\r\n", _swaggerUiConfig.CustomEmbeddedResources.Values
                 .Where(res => res.MediaType == "text/css")
                 .Select(res => String.Format("<link href='ext/{0}' rel='stylesheet' type='text/css'/>", res.Name)));
 
-            var scriptIncludes = String.Join("\r\n", _swaggerUiConfig.CustomEmbeddedResources.Values
-                .Where(res => res.MediaType == "text/javascript")
-                .Select(res => String.Format("$.getScript('ext/{0}');", res.Name)));
-
             outputBuilder
-                .Replace("%(StylesheetIncludes)", stylesheetIncludes)
-                .Replace("%(ScriptIncludes)", scriptIncludes);
+                .Replace("%(StylesheetIncludes)", stylesheetIncludes);
 
             return new MemoryStream(Encoding.UTF8.GetBytes(outputBuilder.ToString()));
         }

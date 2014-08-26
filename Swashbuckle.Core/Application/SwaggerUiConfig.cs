@@ -16,6 +16,9 @@ namespace Swashbuckle.Application
             SupportedSubmitMethods = new[] { HttpMethod.Get, HttpMethod.Post, HttpMethod.Put };
             DocExpansion = DocExpansion.None;
             CustomEmbeddedResources = new Dictionary<string, EmbeddedResource>();
+
+            // Use Swashbuckle specific index.html
+            CustomRoute("index.html", GetType().Assembly, "Swashbuckle.SwaggerExtensions.index.html");
         }
 
         public bool SupportHeaderParams { get; set; }
@@ -39,7 +42,6 @@ namespace Swashbuckle.Application
             CustomEmbeddedResources[uiPath] = new EmbeddedResource(
                 resourceAssembly,
                 resourceName,
-                true,
                 "text/javascript");
         }
 
@@ -49,13 +51,12 @@ namespace Swashbuckle.Application
             CustomEmbeddedResources[uiPath] = new EmbeddedResource(
                 resourceAssembly,
                 resourceName,
-                true,
                 "text/css");
         }
 
         public void CustomRoute(string uiPath, Assembly resourceAssembly, string resourceName)
         {
-            CustomEmbeddedResources[uiPath] = new EmbeddedResource(resourceAssembly, resourceName, false);
+            CustomEmbeddedResources[uiPath] = new EmbeddedResource(resourceAssembly, resourceName);
         }
     }
 

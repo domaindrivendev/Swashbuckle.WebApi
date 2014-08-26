@@ -28,7 +28,6 @@ namespace Swashbuckle.Swagger
 
         [JsonProperty("description")]
         public string Description { get; set; }
-
     }
 
     public class Info
@@ -313,9 +312,10 @@ namespace Swashbuckle.Swagger
 
         /*
         NOTE: The properties below should be in a separate "Model" class. Unfortunately,
-        it was initially modelled incorrectly and can't be fixed until the next major
-        version of Swashbuckle due to backward-comptability
+        it was modelled incorrectly and can't be fixed until the next major version of
+        Swashbuckle due to backward-comptability
          */
+
         [JsonProperty("id")]
         public string Id { get; set; }
 

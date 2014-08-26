@@ -68,7 +68,7 @@ namespace Swashbuckle.Dummy
                 c.SupportHeaderParams = true;
                 c.DocExpansion = DocExpansion.List;
                 c.SupportedSubmitMethods = new[] { HttpMethod.Get, HttpMethod.Post, HttpMethod.Put, HttpMethod.Head };
-                //c.EnableDiscoveryUrlSelector();
+                c.EnableDiscoveryUrlSelector();
                 //c.InjectJavaScript(typeof(SwaggerConfig).Assembly, "Swashbuckle.Dummy.SwaggerExtensions.testScript1.js");
                 //c.InjectStylesheet(typeof(SwaggerConfig).Assembly, "Swashbuckle.Dummy.SwaggerExtensions.testStyles1.css");
             });
