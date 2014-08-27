@@ -390,6 +390,36 @@ namespace Swashbuckle.Tests.SwaggerSpec
                 declaration.SelectToken("apis[1].operations[1].responseMessages[0]").ToString());
         }
 
+        [Test]
+        public void It_should_support_description_of_additional_api_info()
+        {
+            _swaggerSpecConfig.ApiInfo(new Info
+                {
+                    Title = "Title",
+                    Description = "Description",
+                    TermsOfServiceUrl = "http://tempuri.org/terms",
+                    Contact = "contact@tempuri.org",
+                    License = "Apache 2.0",
+                    LicenseUrl = "http://www.apache.org/licenses/LICENSE-2.0.html"
+                });
+
+            var listing = Get<JObject>("http://tempuri.org/swagger/api-docs");
+            var info = listing["info"];
+
+            var expected = JObject.FromObject(
+                new
+                {
+                    title = "Title",
+                    description = "Description",
+                    termsOfServiceUrl = "http://tempuri.org/terms",
+                    contact = "contact@tempuri.org",
+                    license = "Apache 2.0",
+                    licenseUrl = "http://www.apache.org/licenses/LICENSE-2.0.html"
+                });
+
+            Assert.AreEqual(expected.ToString(), info.ToString());
+        }
+
         class AddResponseCodes : IOperationFilter
         {
             public void Apply(Operation operation, DataTypeRegistry dataTypeRegistry, System.Web.Http.Description.ApiDescription apiDescription)

@@ -71,6 +71,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="HttpMessageHandlerTestsBase.cs" />
+    <Compile Include="SwaggerSpec\OAuth2Tests.cs" />
     <Compile Include="SwaggerSpec\MultipleApiVersionsTests.cs" />
     <Compile Include="SwaggerSpec\XmlCommentsTests.cs" />
     <Compile Include="SwaggerSpec\ModelTests.cs" />

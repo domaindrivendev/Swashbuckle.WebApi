@@ -33,6 +33,10 @@
                 supportedSubmitMethods: %(SupportedSubmitMethods),
                 customScripts: %(CustomScripts),
                 docExpansion: %(DocExpansion),
+                oAuth2Enabled: %(OAuth2Enabled),
+                oAuth2ClientId: %(OAuth2ClientId),
+                oAuth2Realm: %(OAuth2Realm),
+                oAuth2AppName: %(OAuth2AppName)
             }
 
             window.swaggerUi = new SwaggerUi({
@@ -43,14 +47,12 @@
                 onComplete: function (swaggerApi, swaggerUi) {
                     log("Loaded SwaggerUI");
 
-                    if (typeof initOAuth == "function") {
-                        /*
+                    if (typeof initOAuth == "function" && sbConfig.oAuth2Enabled) {
                         initOAuth({
-                          clientId: "your-client-id",
-                          realm: "your-realms",
-                          appName: "your-app-name"
+                          clientId: sbConfig.oAuth2ClientId,
+                          realm: sbConfig.oAuth2Realm,
+                          appName: sbConfig.oAuth2AppName
                         });
-                        */
                     }
                     $('pre code').each(function (i, e) {
                         hljs.highlightBlock(e)

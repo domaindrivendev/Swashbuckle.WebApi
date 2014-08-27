@@ -18,9 +18,9 @@ namespace Swashbuckle
             return apiDesc.RelativePath.Split('?').First();
         }
 
-        public static bool IsMarkedObsolete(this ApiDescription apiDesc)
+        public static bool IsNotObsolete(this ApiDescription apiDesc)
         {
-            return apiDesc.ActionDescriptor.GetCustomAttributes<ObsoleteAttribute>().Any();
+            return !apiDesc.ActionDescriptor.GetCustomAttributes<ObsoleteAttribute>().Any();
         }
 
         public static Type ActualResponseType(this ApiDescription apiDesc)

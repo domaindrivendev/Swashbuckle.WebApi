@@ -19,11 +19,11 @@ namespace Swashbuckle.Application
         }
 
         private Func<HttpRequestMessage, string> _targetVersionResolver; // obsolete
-        private Func<ApiDescription, string, bool> _versionSupportResolver; // obsolete
-        private Func<ApiDescription, IEnumerable<string>> _applicableVersionsResolver;
 
         private bool _ignoreObsoleteActions;
-        private Func<ApiDescription, string> _resourceNameResolver;
+        private Func<ApiDescription, string, bool> _versionSupportResolver;
+
+        private Func<ApiDescription, string> _declarationNameResolver;
         private IComparer<string> _resourceNameComparer;
         private readonly Dictionary<Type, Func<DataType>> _customTypeMappings;
         private readonly List<PolymorphicType> _polymorphicTypes;
@@ -37,12 +37,13 @@ namespace Swashbuckle.Application
         public SwaggerSpecConfig()
         {
             BasePathResolver = (req) => req.RequestUri.GetLeftPart(UriPartial.Authority) + req.GetConfiguration().VirtualPathRoot.TrimEnd('/');
-            _targetVersionResolver = (req) => "1.0"; // obsolete
-            _versionSupportResolver = (apiDesc, version) => true; // obsolete
+            Versions = null; 
 
-            _applicableVersionsResolver = (apiDesc) => new[] { "*" };
+            _targetVersionResolver = (req) => "1.0"; // obsolete
             _ignoreObsoleteActions = false;
-            _resourceNameResolver = (apiDesc) => apiDesc.ActionDescriptor.ControllerDescriptor.ControllerName;
+            _versionSupportResolver = (apiDesc, version) => true;
+
+            _declarationNameResolver = (apiDesc) => apiDesc.ActionDescriptor.ControllerDescriptor.ControllerName;
             _resourceNameComparer = Comparer<string>.Default;
             _customTypeMappings = new Dictionary<Type, Func<DataType>>();
             _polymorphicTypes = new List<PolymorphicType>();
@@ -51,6 +52,7 @@ namespace Swashbuckle.Application
         }
 
         internal Func<HttpRequestMessage, string> BasePathResolver { get; private set; }
+        internal IEnumerable<string> Versions { get; private set; }
 
         public SwaggerSpecConfig ResolveBasePathUsing(Func<HttpRequestMessage, string> basePathResolver)
         {
@@ -80,18 +82,9 @@ namespace Swashbuckle.Application
 
         public SwaggerSpecConfig ApiVersion(string apiVersion)
         {
+            Versions = null;
             _targetVersionResolver = (req) => apiVersion;
-            _applicableVersionsResolver = (apiDesc) => new[] { apiVersion };
-            return this;
-        }
-
-        public SwaggerSpecConfig SupportMultipleApiVersions(Func<ApiDescription, IEnumerable<string>> applicableVersionsResolver)
-        {
-            _targetVersionResolver = (req) => req.GetRouteData().Values["apiVersion"].ToString();
-
-            if (applicableVersionsResolver == null)
-                throw new ArgumentNullException("applicableVersionsResolver");
-            _applicableVersionsResolver = applicableVersionsResolver;
+            _versionSupportResolver = (apiDesc, version) => true;
             return this;
         }
 
@@ -101,11 +94,30 @@ namespace Swashbuckle.Application
             return this;
         }
 
-        public SwaggerSpecConfig GroupDeclarationsBy(Func<ApiDescription, string> resourceNameResolver)
+        public SwaggerSpecConfig SupportMultipleApiVersions(
+            IEnumerable<string> versions,
+            Func<ApiDescription, string, bool> versionSupportResolver)
         {
-            if (resourceNameResolver == null)
-                throw new ArgumentNullException("resourceNameResolver");
-            _resourceNameResolver = resourceNameResolver;
+            if (versions == null)
+                throw new ArgumentNullException("versions");
+            if (!versions.Any())
+                throw new ArgumentException("one or more versions must be provided");
+            Versions = versions;
+
+            _targetVersionResolver = (req) => req.GetRouteData().Values["apiVersion"].ToString();
+
+            if (versionSupportResolver == null)
+                throw new ArgumentNullException("versionSupportResolver");
+            _versionSupportResolver = versionSupportResolver;
+
+            return this;
+        }
+
+        public SwaggerSpecConfig GroupDeclarationsBy(Func<ApiDescription, string> declarationNameResolver)
+        {
+            if (declarationNameResolver == null)
+                throw new ArgumentNullException("declarationNameResolver");
+            _declarationNameResolver = declarationNameResolver;
             return this;
         }
 
@@ -176,34 +188,18 @@ namespace Swashbuckle.Application
             return this;
         }
 
-        public IEnumerable<string> GetDiscoveryUrls(HttpRequestMessage swaggerRequest)
-        {
-            var basePath = BasePathResolver(swaggerRequest);
-
-            var apiVersions = swaggerRequest.GetConfiguration().Services.GetApiExplorer()
-                .ApiDescriptions
-                .SelectMany(apiDesc => _applicableVersionsResolver(apiDesc))
-                .Distinct()
-                .OrderBy(v => v);
-
-            if (apiVersions.Contains("*"))
-                return new[] { String.Format("{0}/swagger/api-docs", basePath) };
-
-            return apiVersions
-                .Select(apiVersion => String.Format("{0}/swagger/{1}/api-docs", basePath, apiVersion));
-        }
-
         public SwaggerGenerator GetGenerator(HttpRequestMessage swaggerRequest)
         {
             var basePath = BasePathResolver(swaggerRequest);
             var targetVersion = _targetVersionResolver(swaggerRequest);
 
-            var apiDescriptions = GetApplicableApiDescriptions(
-                swaggerRequest.GetConfiguration().Services.GetApiExplorer().ApiDescriptions,
-                targetVersion);
+            var apiDescriptions = swaggerRequest.GetConfiguration().Services.GetApiExplorer()
+                .ApiDescriptions
+                .Where(apiDesc => !_ignoreObsoleteActions || apiDesc.IsNotObsolete())
+                .Where(apiDesc => _versionSupportResolver(apiDesc, targetVersion));
 
             var options = new SwaggerGeneratorOptions(
-                _resourceNameResolver,
+                _declarationNameResolver,
                 _resourceNameComparer,
                 _customTypeMappings,
                 _polymorphicTypes,
@@ -218,20 +214,6 @@ namespace Swashbuckle.Application
                 targetVersion,
                 apiDescriptions,
                 options);
-        }
-
-        private IEnumerable<ApiDescription> GetApplicableApiDescriptions(
-            IEnumerable<ApiDescription> apiDescriptions,
-            string targetVersion)
-        {
-            return apiDescriptions
-                .Where(apiDesc => _versionSupportResolver(apiDesc, targetVersion)) // obsolete
-                .Where(apiDesc =>
-                {
-                    var applicableVersions = _applicableVersionsResolver(apiDesc);
-                    return applicableVersions.Contains("*") || applicableVersions.Contains(targetVersion);
-                })
-                .Where(apiDesc => !_ignoreObsoleteActions || !apiDesc.IsMarkedObsolete());
         }
     }
 }

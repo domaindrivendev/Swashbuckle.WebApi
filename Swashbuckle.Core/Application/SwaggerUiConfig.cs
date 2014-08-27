@@ -26,6 +26,11 @@ namespace Swashbuckle.Application
         public DocExpansion DocExpansion { get; set; }
         internal IDictionary<string, EmbeddedResource> CustomEmbeddedResources { get; private set; }
 
+        internal bool OAuth2Enabled { get; private set; }
+        internal string OAuth2AppName { get; private set; }
+        internal string OAuth2Realm { get; private set; }
+        internal string OAuth2ClientId { get; private set; }
+
         public static void Customize(Action<SwaggerUiConfig> customize)
         {
             customize(StaticInstance);
@@ -55,6 +60,14 @@ namespace Swashbuckle.Application
         public void CustomRoute(string uiPath, Assembly resourceAssembly, string resourceName)
         {
             CustomEmbeddedResources[uiPath] = new EmbeddedResource(resourceAssembly, resourceName);
+        }
+
+        public void EnableOAuth2Support(string clientId, string realm, string appName)
+        {
+            OAuth2Enabled = true;
+            OAuth2ClientId = clientId;
+            OAuth2Realm = realm;
+            OAuth2AppName = appName;
         }
     }
 

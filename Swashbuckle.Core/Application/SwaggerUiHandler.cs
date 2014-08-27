@@ -57,7 +57,7 @@ namespace Swashbuckle.Application
             var text = new StreamReader(stream).ReadToEnd();
             var outputBuilder = new StringBuilder(text);
 
-            var discoveryUrls = _swaggerSpecConfig.GetDiscoveryUrls(request);
+            var discoveryUrls = GetDiscoveryUrls(request);
             var discoveryUrlsString = String.Join(",", discoveryUrls
                 .Select(url => "'" + url + "'"));
 
@@ -74,7 +74,11 @@ namespace Swashbuckle.Application
                 .Replace("%(SupportHeaderParams)", _swaggerUiConfig.SupportHeaderParams.ToString().ToLower())
                 .Replace("%(SupportedSubmitMethods)", "[" + submitMethodsString + "]")
                 .Replace("%(CustomScripts)", "[" + customScriptsString + "]")
-                .Replace("%(DocExpansion)", "\"" + _swaggerUiConfig.DocExpansion.ToString().ToLower() + "\"");
+                .Replace("%(DocExpansion)", "\"" + _swaggerUiConfig.DocExpansion.ToString().ToLower() + "\"")
+                .Replace("%(OAuth2Enabled)", _swaggerUiConfig.OAuth2Enabled.ToString().ToLower())
+                .Replace("%(OAuth2ClientId)", "\"" + _swaggerUiConfig.OAuth2ClientId + "\"")
+                .Replace("%(OAuth2Realm)", "\"" + _swaggerUiConfig.OAuth2Realm + "\"")
+                .Replace("%(OAuth2AppName)", "\"" + _swaggerUiConfig.OAuth2AppName + "\"");
 
             // Special case - only applicable to index.html
             var stylesheetIncludes = String.Join("\r\n", _swaggerUiConfig.CustomEmbeddedResources.Values
@@ -85,6 +89,16 @@ namespace Swashbuckle.Application
                 .Replace("%(StylesheetIncludes)", stylesheetIncludes);
 
             return new MemoryStream(Encoding.UTF8.GetBytes(outputBuilder.ToString()));
+        }
+
+        private IEnumerable<string> GetDiscoveryUrls(HttpRequestMessage swaggerRequest)
+        {
+            var basePath = _swaggerSpecConfig.BasePathResolver(swaggerRequest);
+            if (_swaggerSpecConfig.Versions == null)
+                return new[] { basePath + "/swagger/api-docs" };
+
+            return _swaggerSpecConfig.Versions
+                .Select(version => String.Format("{0}/swagger/{1}/api-docs", basePath, version));
         }
     }
 }
