@@ -22,7 +22,9 @@ namespace Swashbuckle.Dummy
                 {
                     c.IgnoreObsoleteActions();
 
-                    //c.SupportMultipleApiVersions(GetApplicableVersionsByRouteConstraint);
+                    c.SupportMultipleApiVersions(
+                        new[] { "1.0", "2.0" },
+                        ResolveVersionSupportByRouteConstraint);
 
                     //c.PolymorphicType<Animal>(ac => ac
                     //    .DiscriminateBy(a => a.Type)
@@ -36,7 +38,7 @@ namespace Swashbuckle.Dummy
 
                     c.ApiInfo(new Info
                     {
-                        Title = "Swashbuckle Dummy API",
+                        Title = "Swashbuckle Dummy",
                         Description = "For testing and experimenting with Swashbuckle features",
                         Contact = "domaindrivendev@gmail.com"
                     });
@@ -55,7 +57,7 @@ namespace Swashbuckle.Dummy
                             {
                                 LoginEndpoint = new LoginEndpoint
                                 {
-                                    Url = "https://yourapi/oauth/authorize"
+                                    Url = "http://petstore.swagger.wordnik.com/api/oauth/dialog"
                                 },
                                 TokenName = "access_token"
                             }
@@ -65,12 +67,18 @@ namespace Swashbuckle.Dummy
 
             SwaggerUiConfig.Customize(c =>
             {
+                var thisAssembly = typeof(SwaggerConfig).Assembly;
+
                 c.SupportHeaderParams = true;
                 c.DocExpansion = DocExpansion.List;
                 c.SupportedSubmitMethods = new[] { HttpMethod.Get, HttpMethod.Post, HttpMethod.Put, HttpMethod.Head };
-                //c.EnableDiscoveryUrlSelector();
-                //c.InjectJavaScript(typeof(SwaggerConfig).Assembly, "Swashbuckle.Dummy.SwaggerExtensions.testScript1.js");
-                //c.InjectStylesheet(typeof(SwaggerConfig).Assembly, "Swashbuckle.Dummy.SwaggerExtensions.testStyles1.css");
+                c.EnableDiscoveryUrlSelector();
+                //c.InjectJavaScript(thisAssembly, "Swashbuckle.Dummy.SwaggerExtensions.testScript1.js");
+                //c.InjectStylesheet(thisAssembly, "Swashbuckle.Dummy.SwaggerExtensions.testStyles1.css");
+
+                c.EnableOAuth2Support("test-client-id", "test-realm", "Swagger UI");
+                // Use modified swagger-oauth.js because we need a different callback url
+                c.CustomRoute("lib/swagger-oauth.js", thisAssembly, "Swashbuckle.Dummy.SwaggerExtensions.swagger-oauth.js");
             });
 
         }
@@ -80,15 +88,15 @@ namespace Swashbuckle.Dummy
             return String.Format(@"{0}\XmlComments.xml", AppDomain.CurrentDomain.BaseDirectory);
         }
 
-        private static IEnumerable<string> GetApplicableVersionsByRouteConstraint(ApiDescription apiDesc)
+        private static bool ResolveVersionSupportByRouteConstraint(ApiDescription apiDesc, string version)
         {
             var versionConstraint = (apiDesc.Route.Constraints.ContainsKey("apiVersion"))
                 ? apiDesc.Route.Constraints["apiVersion"] as RegexRouteConstraint
                 : null;
 
             return (versionConstraint == null)
-                ? new string[] {}
-                : versionConstraint.Pattern.Split('|');
+                ? false
+                : versionConstraint.Pattern.Split('|').Contains(version);
         }
     }
 }

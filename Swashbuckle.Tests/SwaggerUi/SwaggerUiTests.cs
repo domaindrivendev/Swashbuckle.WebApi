@@ -62,14 +62,14 @@ namespace Swashbuckle.Tests.SwaggerUi
             var content = GetAsString("http://tempuri.org/swagger/ui/index.html");
 
             StringAssert.Contains(
-                "<link href='ext/Swashbuckle.Dummy.SwaggerExtensions.testStyles1.css' rel='stylesheet' type='text/css'/>\r\n" +
-                "<link href='ext/Swashbuckle.Dummy.SwaggerExtensions.testStyles2.css' rel='stylesheet' type='text/css'/>",
+                "<link href='Swashbuckle.Dummy.SwaggerExtensions.testStyles1.css' rel='stylesheet' type='text/css'/>\r\n" +
+                "<link href='Swashbuckle.Dummy.SwaggerExtensions.testStyles2.css' rel='stylesheet' type='text/css'/>",
                 content);
 
-            content = GetAsString("http://tempuri.org/swagger/ui/ext/Swashbuckle.Dummy.SwaggerExtensions.testStyles1.css");
+            content = GetAsString("http://tempuri.org/swagger/ui/Swashbuckle.Dummy.SwaggerExtensions.testStyles1.css");
             StringAssert.StartsWith("h1", content);
 
-            content = GetAsString("http://tempuri.org/swagger/ui/ext/Swashbuckle.Dummy.SwaggerExtensions.testStyles2.css");
+            content = GetAsString("http://tempuri.org/swagger/ui/Swashbuckle.Dummy.SwaggerExtensions.testStyles2.css");
             StringAssert.StartsWith("h2", content);
         }
 
@@ -83,14 +83,16 @@ namespace Swashbuckle.Tests.SwaggerUi
             var content = GetAsString("http://tempuri.org/swagger/ui/index.html");
 
             StringAssert.Contains(
-                "$.getScript('ext/Swashbuckle.Dummy.SwaggerExtensions.testScript1.js');\r\n" +
-                "$.getScript('ext/Swashbuckle.Dummy.SwaggerExtensions.testScript2.js');",
+                "customScripts: [" +
+                "'Swashbuckle.Dummy.SwaggerExtensions.testScript1.js'," +
+                "'Swashbuckle.Dummy.SwaggerExtensions.testScript2.js'" +
+                "]",
                 content);
 
-            content = GetAsString("http://tempuri.org/swagger/ui/ext/Swashbuckle.Dummy.SwaggerExtensions.testScript1.js");
+            content = GetAsString("http://tempuri.org/swagger/ui/Swashbuckle.Dummy.SwaggerExtensions.testScript1.js");
             StringAssert.StartsWith("var str1", content);
 
-            content = GetAsString("http://tempuri.org/swagger/ui/ext/Swashbuckle.Dummy.SwaggerExtensions.testScript2.js");
+            content = GetAsString("http://tempuri.org/swagger/ui/Swashbuckle.Dummy.SwaggerExtensions.testScript2.js");
             StringAssert.StartsWith("var str2", content);
         }
         
@@ -103,6 +105,19 @@ namespace Swashbuckle.Tests.SwaggerUi
             var content = GetAsString("http://tempuri.org/swagger/ui/index.html");
 
             StringAssert.Contains("My Index", content);
+        }
+
+        [Test]
+        public void It_should_support_an_optional_setting_to_enable_oauth2()
+        {
+            _swaggerUiConfig.EnableOAuth2Support("test-client-id", "test-realm", "test-app-name");
+
+            var content = GetAsString("http://tempuri.org/swagger/ui/index.html");
+
+            StringAssert.Contains("oAuth2Enabled: true", content);
+            StringAssert.Contains("oAuth2ClientId: \"test-client-id\"", content);
+            StringAssert.Contains("oAuth2Realm: \"test-realm\"", content);
+            StringAssert.Contains("oAuth2AppName: \"test-app-name\"", content);
         }
     }
 }

@@ -40,8 +40,9 @@ namespace Swashbuckle.Tests.SwaggerSpec
                 {
                     Product = new
                     {
-                        id = "Product",
                         type = "object",
+                        id = "Product",
+                        required = new object[] {},
                         properties = new
                         {
                             Id = new
@@ -64,7 +65,6 @@ namespace Swashbuckle.Tests.SwaggerSpec
                                 format = "double"
                             }
                         },
-                        required = new object[] {},
                         subTypes = new object[] {}
                     }
                 }
@@ -86,8 +86,9 @@ namespace Swashbuckle.Tests.SwaggerSpec
                 {
                     Elephant = new
                     {
-                        id = "Elephant",
                         type = "object",
+                        id = "Elephant",
+                        required = new object[] { },
                         properties = new
                         {
                             TrunkLength = new
@@ -104,13 +105,13 @@ namespace Swashbuckle.Tests.SwaggerSpec
                                 type = "string"
                             }
                         },
-                        required = new object[] { },
                         subTypes = new object[] { }
                     },
                     Animal = new
                     {
-                        id = "Animal",
                         type = "object",
+                        id = "Animal",
+                        required = new object[] { },
                         properties = new
                         {
                             Type = new
@@ -118,7 +119,6 @@ namespace Swashbuckle.Tests.SwaggerSpec
                                 type = "string"
                             }
                         },
-                        required = new object[] { },
                         subTypes = new object[] { }
                     }
                 }
@@ -140,8 +140,9 @@ namespace Swashbuckle.Tests.SwaggerSpec
                 {
                     Order = new
                     {
-                        id = "Order",
                         type = "object",
+                        id = "Order",
+                        required = new object[] {},
                         properties = new
                         {
                             LineItems = new
@@ -150,13 +151,13 @@ namespace Swashbuckle.Tests.SwaggerSpec
                                 items = JObject.Parse("{ $ref: \"LineItem\" }")
                             }
                         },
-                        required = new object[] {},
                         subTypes = new object[] {}
                     },
                     LineItem = new
                     {
-                        id = "LineItem",
                         type = "object",
+                        id = "LineItem",
+                        required = new object[] {},
                         properties = new
                         {
                             ProductId = new
@@ -170,7 +171,6 @@ namespace Swashbuckle.Tests.SwaggerSpec
                                 format = "int32",
                             }
                         },
-                        required = new object[] {},
                         subTypes = new object[] {}
                     }
                 }
@@ -192,8 +192,9 @@ namespace Swashbuckle.Tests.SwaggerSpec
                 {
                     Component = new
                     {
-                        id = "Component",
                         type = "object",
+                        id = "Component",
+                        required = new object[] {},
                         properties = new
                         {
                             Name = new
@@ -206,7 +207,6 @@ namespace Swashbuckle.Tests.SwaggerSpec
                                 items = JObject.Parse("{ $ref: \"Component\" }")
                             }
                         },
-                        required = new object[] {},
                         subTypes = new object[] {}
                     }
                 }
@@ -299,8 +299,9 @@ namespace Swashbuckle.Tests.SwaggerSpec
                 {
                     Elephant = new
                     {
-                        id = "Elephant",
                         type = "object",
+                        id = "Elephant",
+                        required = new object[] {},
                         properties = new
                         {
                             TrunkLength = new
@@ -309,13 +310,13 @@ namespace Swashbuckle.Tests.SwaggerSpec
                                 format = "int32"
                             }
                         },
-                        required = new object[] {},
                         subTypes = new object[] {}
                     },
                     Animal = new
                     {
-                        id = "Animal",
                         type = "object",
+                        id = "Animal",
+                        required = new object[] {},
                         properties = new
                         {
                             Type = new
@@ -323,14 +324,14 @@ namespace Swashbuckle.Tests.SwaggerSpec
                                 type = "string"
                             }
                         },
-                        required = new object[] {},
                         subTypes = new object[] { "Mamal" },
                         discriminator = "Type"
                     },
                     Mamal = new
                     {
-                        id = "Mamal",
                         type = "object",
+                        id = "Mamal",
+                        required = new object[] {},
                         properties = new
                         {
                             HairColor = new
@@ -338,7 +339,6 @@ namespace Swashbuckle.Tests.SwaggerSpec
                                 type = "string"
                             }
                         },
-                        required = new object[] {},
                         subTypes = new object[] { "Elephant" }
                     }
                 }

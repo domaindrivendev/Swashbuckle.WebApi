@@ -77,9 +77,6 @@
     <Compile Include="SwaggerExtensions\AddStandardResponseCodes.cs" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="SwaggerExtensions\myIndex.html" />
-  </ItemGroup>
-  <ItemGroup>
     <Compile Include="App_Start\SwaggerConfig.cs" />
     <None Include="packages.config" />
   </ItemGroup>
@@ -100,6 +97,12 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="SwaggerExtensions\testStyles2.css" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="SwaggerExtensions\swagger-oauth.js" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="SwaggerExtensions\myIndex.html" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />

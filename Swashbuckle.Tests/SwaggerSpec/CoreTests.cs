@@ -39,12 +39,12 @@ namespace Swashbuckle.Tests.SwaggerSpec
                 new
                 {
                     swaggerVersion = "1.2",
-                    apiVersion = "1.0",
                     apis = new object[]
                     {
                         new { path = "/Customers" },
                         new { path = "/Products" }
-                    }
+                    },
+                    apiVersion = "1.0"
                 });
 
             Assert.AreEqual(expected.ToString(), listing.ToString());
@@ -79,10 +79,8 @@ namespace Swashbuckle.Tests.SwaggerSpec
                                 new
                                 {
                                     method = "POST",
-                                    nickname = "Customers_Create",
                                     summary = "",
-                                    type = "integer",
-                                    format = "int32",
+                                    nickname = "Customers_Create",
                                     parameters = new object[]
                                     {
                                         new
@@ -95,7 +93,9 @@ namespace Swashbuckle.Tests.SwaggerSpec
                                     },
                                     responseMessages = new object[]{},
                                     produces = new []{ "application/json", "text/json", "application/xml", "text/xml" },
-                                    consumes = new []{ "application/json", "text/json", "application/xml", "text/xml", "application/x-www-form-urlencoded" }
+                                    consumes = new []{ "application/json", "text/json", "application/xml", "text/xml", "application/x-www-form-urlencoded" },
+                                    type = "integer",
+                                    format = "int32"
                                 }
                             }
                         },
@@ -107,9 +107,8 @@ namespace Swashbuckle.Tests.SwaggerSpec
                                 new
                                 {
                                     method = "DELETE",
-                                    nickname = "Customers_Delete",
                                     summary = "",
-                                    type = "void",
+                                    nickname = "Customers_Delete",
                                     parameters = new object[]
                                     {
                                         new
@@ -123,14 +122,14 @@ namespace Swashbuckle.Tests.SwaggerSpec
                                     },
                                     responseMessages = new object[]{},
                                     produces = new string[]{},
-                                    consumes = new string[]{}
+                                    consumes = new string[]{},
+                                    type = "void"
                                 },
                                 new
                                 {
                                     method = "PUT",
-                                    nickname = "Customers_Update",
                                     summary = "",
-                                    type = "void",
+                                    nickname = "Customers_Update",
                                     parameters = new object[]
                                     {
                                         new
@@ -151,7 +150,8 @@ namespace Swashbuckle.Tests.SwaggerSpec
                                     },
                                     responseMessages = new object[]{},
                                     produces = new string[]{},
-                                    consumes = new []{ "application/json", "text/json", "application/xml", "text/xml", "application/x-www-form-urlencoded" }
+                                    consumes = new []{ "application/json", "text/json", "application/xml", "text/xml", "application/x-www-form-urlencoded" },
+                                    type = "void"
                                 }
                             }
                         }
@@ -183,22 +183,20 @@ namespace Swashbuckle.Tests.SwaggerSpec
                                 new
                                 {
                                     method = "GET",
-                                    nickname = "Products_FindAll",
                                     summary = "",
-                                    type = "array",
-                                    items = JObject.Parse("{ $ref: \"Product\" }"),
+                                    nickname = "Products_FindAll",
                                     parameters = new object[]{},
                                     responseMessages = new object[]{},
                                     produces = new []{ "application/json", "text/json", "application/xml", "text/xml" },
-                                    consumes = new object[]{}
+                                    consumes = new object[]{},
+                                    type = "array",
+                                    items = JObject.Parse("{ $ref: \"Product\" }"),
                                 },
                                 new
                                 {
                                     method = "GET",
-                                    nickname = "Products_FindByType",
                                     summary = "",
-                                    type = "array",
-                                    items = JObject.Parse("{ $ref: \"Product\" }"),
+                                    nickname = "Products_FindByType",
                                     parameters = new object[]
                                     {
                                         new
@@ -212,15 +210,15 @@ namespace Swashbuckle.Tests.SwaggerSpec
                                     },
                                     responseMessages = new object[]{},
                                     produces = new []{ "application/json", "text/json", "application/xml", "text/xml" },
-                                    consumes = new object[]{}
+                                    consumes = new object[]{},
+                                    type = "array",
+                                    items = JObject.Parse("{ $ref: \"Product\" }")
                                 },
                                 new
                                 {
                                     method = "POST",
-                                    nickname = "Products_Create",
                                     summary = "",
-                                    type = "integer",
-                                    format = "int32",
+                                    nickname = "Products_Create",
                                     parameters = new object[]
                                     {
                                         new
@@ -233,7 +231,9 @@ namespace Swashbuckle.Tests.SwaggerSpec
                                     },
                                     responseMessages = new object[]{},
                                     produces = new []{ "application/json", "text/json", "application/xml", "text/xml" },
-                                    consumes = new []{ "application/json", "text/json", "application/xml", "text/xml", "application/x-www-form-urlencoded" }
+                                    consumes = new []{ "application/json", "text/json", "application/xml", "text/xml", "application/x-www-form-urlencoded" },
+                                    type = "integer",
+                                    format = "int32"
                                 }
                             }
                         },
@@ -245,9 +245,8 @@ namespace Swashbuckle.Tests.SwaggerSpec
                                 new
                                 {
                                     method = "GET",
-                                    nickname = "Products_GetById",
                                     summary = "",
-                                    type = "Product",
+                                    nickname = "Products_GetById",
                                     parameters = new object[]
                                     {
                                         new
@@ -261,7 +260,8 @@ namespace Swashbuckle.Tests.SwaggerSpec
                                     },
                                     responseMessages = new object[]{},
                                     produces = new []{ "application/json", "text/json", "application/xml", "text/xml" },
-                                    consumes = new object[]{}
+                                    consumes = new object[]{},
+                                    type = "Product",
                                 }
                            }
                         },
@@ -335,14 +335,14 @@ namespace Swashbuckle.Tests.SwaggerSpec
                 new
                 {
                     swaggerVersion = "1.2",
-                    apiVersion = "1.0",
                     apis = new object[]
                     {
                         new { path = "/deletes" },
                         new { path = "/gets" },
                         new { path = "/posts" },
                         new { path = "/puts" },
-                    }
+                    },
+                    apiVersion = "1.0"
                 });
             Assert.AreEqual(expected.ToString(), listing.ToString());
 
@@ -363,12 +363,12 @@ namespace Swashbuckle.Tests.SwaggerSpec
                 new
                 {
                     swaggerVersion = "1.2",
-                    apiVersion = "1.0",
                     apis = new object[]
                     {
                         new { path = "/Products" },
                         new { path = "/Customers" }
-                    }
+                    },
+                    apiVersion = "1.0"
                 });
             Assert.AreEqual(expected.ToString(), listing.ToString());
 
@@ -388,6 +388,36 @@ namespace Swashbuckle.Tests.SwaggerSpec
                 declaration.SelectToken("apis[1].operations[0].responseMessages[0]").ToString());
             Assert.AreEqual(expected.ToString(),
                 declaration.SelectToken("apis[1].operations[1].responseMessages[0]").ToString());
+        }
+
+        [Test]
+        public void It_should_support_description_of_additional_api_info()
+        {
+            _swaggerSpecConfig.ApiInfo(new Info
+                {
+                    Title = "Title",
+                    Description = "Description",
+                    TermsOfServiceUrl = "http://tempuri.org/terms",
+                    Contact = "contact@tempuri.org",
+                    License = "Apache 2.0",
+                    LicenseUrl = "http://www.apache.org/licenses/LICENSE-2.0.html"
+                });
+
+            var listing = Get<JObject>("http://tempuri.org/swagger/api-docs");
+            var info = listing["info"];
+
+            var expected = JObject.FromObject(
+                new
+                {
+                    title = "Title",
+                    description = "Description",
+                    termsOfServiceUrl = "http://tempuri.org/terms",
+                    contact = "contact@tempuri.org",
+                    license = "Apache 2.0",
+                    licenseUrl = "http://www.apache.org/licenses/LICENSE-2.0.html"
+                });
+
+            Assert.AreEqual(expected.ToString(), info.ToString());
         }
 
         class AddResponseCodes : IOperationFilter

@@ -16,12 +16,20 @@ namespace Swashbuckle.Application
             SupportedSubmitMethods = new[] { HttpMethod.Get, HttpMethod.Post, HttpMethod.Put };
             DocExpansion = DocExpansion.None;
             CustomEmbeddedResources = new Dictionary<string, EmbeddedResource>();
+
+            // Use Swashbuckle specific index.html
+            CustomRoute("index.html", GetType().Assembly, "Swashbuckle.SwaggerExtensions.index.html");
         }
 
         public bool SupportHeaderParams { get; set; }
         public IEnumerable<HttpMethod> SupportedSubmitMethods { get; set; }
         public DocExpansion DocExpansion { get; set; }
         internal IDictionary<string, EmbeddedResource> CustomEmbeddedResources { get; private set; }
+
+        internal bool OAuth2Enabled { get; private set; }
+        internal string OAuth2AppName { get; private set; }
+        internal string OAuth2Realm { get; private set; }
+        internal string OAuth2ClientId { get; private set; }
 
         public static void Customize(Action<SwaggerUiConfig> customize)
         {
@@ -35,27 +43,31 @@ namespace Swashbuckle.Application
 
         public void InjectJavaScript(Assembly resourceAssembly, string resourceName)
         {
-            var uiPath = String.Format("ext/{0}", resourceName);
-            CustomEmbeddedResources[uiPath] = new EmbeddedResource(
+            CustomEmbeddedResources[resourceName] = new EmbeddedResource(
                 resourceAssembly,
                 resourceName,
-                true,
                 "text/javascript");
         }
 
         public void InjectStylesheet(Assembly resourceAssembly, string resourceName)
         {
-            var uiPath = String.Format("ext/{0}", resourceName);
-            CustomEmbeddedResources[uiPath] = new EmbeddedResource(
+            CustomEmbeddedResources[resourceName] = new EmbeddedResource(
                 resourceAssembly,
                 resourceName,
-                true,
                 "text/css");
         }
 
         public void CustomRoute(string uiPath, Assembly resourceAssembly, string resourceName)
         {
-            CustomEmbeddedResources[uiPath] = new EmbeddedResource(resourceAssembly, resourceName, false);
+            CustomEmbeddedResources[uiPath] = new EmbeddedResource(resourceAssembly, resourceName);
+        }
+
+        public void EnableOAuth2Support(string clientId, string realm, string appName)
+        {
+            OAuth2Enabled = true;
+            OAuth2ClientId = clientId;
+            OAuth2Realm = realm;
+            OAuth2AppName = appName;
         }
     }
 

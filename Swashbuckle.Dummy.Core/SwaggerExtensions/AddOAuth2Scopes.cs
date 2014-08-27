@@ -3,6 +3,7 @@ using System.Web.Http.Description;
 using Swashbuckle.Swagger;
 using System.Web.Http;
 using System.Collections.Generic;
+using System.Web.Http.Controllers;
 
 namespace Swashbuckle.Dummy.SwaggerExtensions
 {
@@ -34,5 +35,11 @@ namespace Swashbuckle.Dummy.SwaggerExtensions
         }
 
         public string[] Scopes { get; private set; }
+
+        protected override bool IsAuthorized(HttpActionContext actionContext)
+        {
+            // TODO: Parse scopes out of access_token
+            return true;
+        }
     }
 }

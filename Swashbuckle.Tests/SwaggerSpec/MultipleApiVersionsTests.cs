@@ -3,6 +3,7 @@ using NUnit.Framework;
 using Swashbuckle.Application;
 using Swashbuckle.Dummy.Controllers;
 using System.Web.Http;
+using System.Linq;
 
 namespace Swashbuckle.Tests.SwaggerSpec
 {
@@ -27,11 +28,13 @@ namespace Swashbuckle.Tests.SwaggerSpec
         [Test]
         public void It_should_support_multiple_api_versions_by_provided_strategy()
         {
-            _swaggerSpecConfig.SupportMultipleApiVersions((apiDesc) =>
+            _swaggerSpecConfig.SupportMultipleApiVersions(
+                new string[] { "1.0", "2.0" },
+                (apiDesc, version) =>
                 {
-                    if (apiDesc.ActionDescriptor.ControllerDescriptor.ControllerName == "Products")
-                        return new[] { "1.0", "2.0" };
-                    return new[] { "2.0" };
+                    var controllerName = apiDesc.ActionDescriptor.ControllerDescriptor.ControllerName;
+                    return (version == "1.0" && controllerName == "Products")
+                        || (version == "2.0" && new[] { "Products", "Customers" }.Contains(controllerName));
                 });
 
             var v1Listing = Get<JObject>("http://tempuri.org/swagger/1.0/api-docs");
@@ -39,11 +42,11 @@ namespace Swashbuckle.Tests.SwaggerSpec
                 new
                 {
                     swaggerVersion = "1.2",
-                    apiVersion = "1.0",
                     apis = new object[]
                     {
                         new { path = "/Products" }
-                    }
+                    },
+                    apiVersion = "1.0"
                 });
             Assert.AreEqual(expected.ToString(), v1Listing.ToString());
 
@@ -52,12 +55,12 @@ namespace Swashbuckle.Tests.SwaggerSpec
                 new
                 {
                     swaggerVersion = "1.2",
-                    apiVersion = "2.0",
                     apis = new object[]
                     {
                         new { path = "/Customers" },
                         new { path = "/Products" }
-                    }
+                    },
+                    apiVersion = "2.0"
                 });
             Assert.AreEqual(expected.ToString(), v2Listing.ToString());
         }
