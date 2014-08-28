@@ -1,4 +1,5 @@
-﻿using System;
+﻿
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -36,7 +37,7 @@ namespace Swashbuckle.SwaggerExtensions
                 var parameter = operation.Parameters.SingleOrDefault(p => p.Name == paramDesc.Name);
                 if (parameter == null) continue;
 
-                parameter.Description = GetChildValueOrDefault(methodNode, String.Format(ParameterExpression, paramDesc.Name));
+                parameter.Description = GetChildValueOrDefault(methodNode, String.Format(ParameterExpression, paramDesc.ParameterDescriptor.ParameterName));
             }
 
             if (methodNode == null) return;
@@ -96,10 +97,10 @@ namespace Swashbuckle.SwaggerExtensions
             while (iterator.MoveNext())
             {
                 yield return new ResponseMessage
-                    {
-                        Code = Int32.Parse(iterator.Current.GetAttribute("code", String.Empty)),
-                        Message = iterator.Current.Value
-                    };
+                {
+                    Code = Int32.Parse(iterator.Current.GetAttribute("code", String.Empty)),
+                    Message = iterator.Current.Value
+                };
             }
         }
     }
