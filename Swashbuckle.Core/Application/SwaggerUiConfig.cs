@@ -16,15 +16,22 @@ namespace Swashbuckle.Application
             SupportedSubmitMethods = new[] { HttpMethod.Get, HttpMethod.Post, HttpMethod.Put };
             DocExpansion = DocExpansion.None;
             CustomEmbeddedResources = new Dictionary<string, EmbeddedResource>();
+            InjectedScriptPaths = new List<string>();
+            InjectedStylesheetPaths = new List<string>();
 
             // Use Swashbuckle specific index.html
             CustomRoute("index.html", GetType().Assembly, "Swashbuckle.SwaggerExtensions.index.html");
+
+            // Use Swashbuckle specific swagger-oauth.js because we need a slightly different callback url
+            CustomRoute("lib/swagger-oauth.js", GetType().Assembly, "Swashbuckle.SwaggerExtensions.swagger-oauth.js");
         }
 
         public bool SupportHeaderParams { get; set; }
         public IEnumerable<HttpMethod> SupportedSubmitMethods { get; set; }
         public DocExpansion DocExpansion { get; set; }
         internal IDictionary<string, EmbeddedResource> CustomEmbeddedResources { get; private set; }
+        internal IList<string> InjectedScriptPaths { get; private set; }
+        internal IList<string> InjectedStylesheetPaths { get; private set; }
 
         internal bool OAuth2Enabled { get; private set; }
         internal string OAuth2AppName { get; private set; }
@@ -47,6 +54,7 @@ namespace Swashbuckle.Application
                 resourceAssembly,
                 resourceName,
                 "text/javascript");
+            InjectedScriptPaths.Add(resourceName);
         }
 
         public void InjectStylesheet(Assembly resourceAssembly, string resourceName)
@@ -55,6 +63,7 @@ namespace Swashbuckle.Application
                 resourceAssembly,
                 resourceName,
                 "text/css");
+            InjectedStylesheetPaths.Add(resourceName);
         }
 
         public void CustomRoute(string uiPath, Assembly resourceAssembly, string resourceName)

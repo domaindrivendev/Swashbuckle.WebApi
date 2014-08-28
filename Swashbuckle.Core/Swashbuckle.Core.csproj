@@ -93,6 +93,7 @@
   <ItemGroup>
     <EmbeddedResource Include="SwaggerExtensions\discoveryUrlSelector.js" />
     <EmbeddedResource Include="SwaggerExtensions\index.html" />
+    <EmbeddedResource Include="SwaggerExtensions\swagger-oauth.js" />
     <Content Include="Swashbuckle.Core.nuspec">
       <SubType>Designer</SubType>
     </Content>

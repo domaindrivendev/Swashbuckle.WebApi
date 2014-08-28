@@ -12,15 +12,6 @@ namespace Swashbuckle.Swagger
 {
     public class DataTypeRegistry
     {
-        private static readonly Dictionary<Type, Func<DataType>> IndeterminateMappings = new Dictionary<Type, Func<DataType>>()
-            {
-                {typeof (object), () => new DataType{Type="string", Format = null}},
-                {typeof (ExpandoObject), () => new DataType{Type="string", Format = null}},
-                {typeof (JObject), () => new DataType{Type="string", Format = null}},
-                {typeof (JToken), () => new DataType{Type="string", Format = null}},
-                {typeof (HttpResponseMessage), () => new DataType{Type="string", Format = null}},
-            };
-
         private static readonly Dictionary<Type, Func<DataType>> PrimitiveMappings = new Dictionary<Type, Func<DataType>>()
             {
                 {typeof (Int16), () => new DataType {Type = "integer", Format = "int32"}},
@@ -37,7 +28,13 @@ namespace Swashbuckle.Swagger
                 {typeof (Byte), () => new DataType {Type = "string", Format = "byte"}},
                 {typeof (Boolean), () => new DataType {Type = "boolean", Format = null}},
                 {typeof (DateTime), () => new DataType {Type = "string", Format = "date-time"}},
-                {typeof (DateTimeOffset), () => new DataType {Type = "string", Format = "date-time"}}
+                {typeof (DateTimeOffset), () => new DataType {Type = "string", Format = "date-time"}},
+                // Can't infer anything from the types below - default to string primitives
+                {typeof (object), () => new DataType{Type="string", Format = null}},
+                {typeof (ExpandoObject), () => new DataType{Type="string", Format = null}},
+                {typeof (JObject), () => new DataType{Type="string", Format = null}},
+                {typeof (JToken), () => new DataType{Type="string", Format = null}},
+                {typeof (HttpResponseMessage), () => new DataType{Type="string", Format = null}},
             };
 
         private readonly IDictionary<Type, Func<DataType>> _customMappings;
@@ -87,9 +84,6 @@ namespace Swashbuckle.Swagger
             if (_customMappings.ContainsKey(type))
                 return _customMappings[type]();
 
-            if (IndeterminateMappings.ContainsKey(type))
-                return IndeterminateMappings[type]();
-
             if (PrimitiveMappings.ContainsKey(type))
                 return PrimitiveMappings[type]();
 
@@ -103,7 +97,7 @@ namespace Swashbuckle.Swagger
             Type itemType;
             if (type.IsEnumerable(out itemType))
             {
-                if (itemType.IsEnumerable() && !IsSupportedEnumerableItem(itemType))
+                if (itemType.IsEnumerable() && !PrimitiveMappings.ContainsKey(itemType))
                     throw new InvalidOperationException(
                         String.Format("Type {0} is not supported. Swagger does not support containers of containers", type));
 
@@ -197,11 +191,6 @@ namespace Swashbuckle.Swagger
             }
 
             return new PolymorphicType(type, true);
-        }
-
-        private static bool IsSupportedEnumerableItem(Type itemType)
-        {
-            return IndeterminateMappings.ContainsKey(itemType) || PrimitiveMappings.ContainsKey(itemType);
         }
     }
 }

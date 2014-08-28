@@ -64,9 +64,8 @@ namespace Swashbuckle.Application
             var submitMethodsString = String.Join(",", _swaggerUiConfig.SupportedSubmitMethods
                 .Select(method => "'" + method.ToString().ToLower() + "'"));
 
-            var customScriptsString = String.Join(",", _swaggerUiConfig.CustomEmbeddedResources.Values
-                .Where(res => res.MediaType == "text/javascript")
-                .Select(res => "'" + res.Name + "'"));
+            var customScriptsString = String.Join(",", _swaggerUiConfig.InjectedScriptPaths
+                .Select(path => "'" + path + "'"));
 
             outputBuilder
                 .Replace("%(DiscoveryUrls)", "[" + discoveryUrlsString + "]")
@@ -81,9 +80,8 @@ namespace Swashbuckle.Application
                 .Replace("%(OAuth2AppName)", "\"" + _swaggerUiConfig.OAuth2AppName + "\"");
 
             // Special case - only applicable to index.html
-            var stylesheetIncludes = String.Join("\r\n", _swaggerUiConfig.CustomEmbeddedResources.Values
-                .Where(res => res.MediaType == "text/css")
-                .Select(res => String.Format("<link href='{0}' rel='stylesheet' type='text/css'/>", res.Name)));
+            var stylesheetIncludes = String.Join("\r\n", _swaggerUiConfig.InjectedStylesheetPaths
+                .Select(path => String.Format("<link href='{0}' rel='stylesheet' type='text/css'/>", path)));
 
             outputBuilder
                 .Replace("%(StylesheetIncludes)", stylesheetIncludes);

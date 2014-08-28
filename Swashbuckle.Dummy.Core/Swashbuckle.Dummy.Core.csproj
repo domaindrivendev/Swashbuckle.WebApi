@@ -99,9 +99,6 @@
     <EmbeddedResource Include="SwaggerExtensions\testStyles2.css" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="SwaggerExtensions\swagger-oauth.js" />
-  </ItemGroup>
-  <ItemGroup>
     <EmbeddedResource Include="SwaggerExtensions\myIndex.html" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

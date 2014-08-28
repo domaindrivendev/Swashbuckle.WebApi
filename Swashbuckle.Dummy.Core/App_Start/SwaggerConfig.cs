@@ -22,9 +22,9 @@ namespace Swashbuckle.Dummy
                 {
                     c.IgnoreObsoleteActions();
 
-                    c.SupportMultipleApiVersions(
-                        new[] { "1.0", "2.0" },
-                        ResolveVersionSupportByRouteConstraint);
+                    //c.SupportMultipleApiVersions(
+                    //    new[] { "1.0", "2.0" },
+                    //    ResolveVersionSupportByRouteConstraint);
 
                     //c.PolymorphicType<Animal>(ac => ac
                     //    .DiscriminateBy(a => a.Type)
@@ -77,8 +77,6 @@ namespace Swashbuckle.Dummy
                 //c.InjectStylesheet(thisAssembly, "Swashbuckle.Dummy.SwaggerExtensions.testStyles1.css");
 
                 c.EnableOAuth2Support("test-client-id", "test-realm", "Swagger UI");
-                // Use modified swagger-oauth.js because we need a different callback url
-                c.CustomRoute("lib/swagger-oauth.js", thisAssembly, "Swashbuckle.Dummy.SwaggerExtensions.swagger-oauth.js");
             });
 
         }
