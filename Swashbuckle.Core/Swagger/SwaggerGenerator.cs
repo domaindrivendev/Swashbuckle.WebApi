@@ -48,7 +48,10 @@ namespace Swashbuckle.Swagger
         {
             var apiDescriptionGroup = _apiDescriptions
                 .GroupBy(apiDesc => _options.ResourceNameResolver(apiDesc))
-                .Single(apiDescGrp => apiDescGrp.Key == resourceName);
+                .SingleOrDefault(apiDescGrp => apiDescGrp.Key == resourceName);
+
+            if (apiDescriptionGroup == null)
+                throw new ApiDeclarationNotFoundException(resourceName);
 
             var dataTypeRegistry = new DataTypeRegistry(
                 _options.CustomTypeMappings,
@@ -90,5 +93,12 @@ namespace Swashbuckle.Swagger
                 Operations = operations
             };
         }
+    }
+
+    public class ApiDeclarationNotFoundException : Exception
+    {
+        public ApiDeclarationNotFoundException(string name)
+            : base(name)
+        {}
     }
 }

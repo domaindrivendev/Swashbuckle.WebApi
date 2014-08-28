@@ -1,4 +1,7 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using System.Net;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using NUnit.Framework;
 using Swashbuckle.Application;
 using System;
 using System.Collections.Generic;
@@ -72,10 +75,13 @@ namespace Swashbuckle.Tests
         protected string GetAsString(string uri)
         {
             var responseMessage = ExecuteGet(uri);
+            Assert.That(responseMessage, Is.Not.Null, "responseMessage");
+            Assert.That(responseMessage.StatusCode, Is.EqualTo(HttpStatusCode.OK));
+            Assert.That(responseMessage.Content, Is.Not.Null, "responseMessage.Content");
             return responseMessage.Content.ReadAsStringAsync().Result;
         }
 
-        private HttpResponseMessage ExecuteGet(string uri)
+        protected HttpResponseMessage ExecuteGet(string uri)
         {
             if (Handler == null)
                 throw new InvalidOperationException("Handler not set");
