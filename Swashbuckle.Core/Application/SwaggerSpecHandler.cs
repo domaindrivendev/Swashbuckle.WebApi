@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using System.Web.Http;
 using Newtonsoft.Json;
 using Swashbuckle.Swagger;
+using System.Net.Http.Formatting;
 
 namespace Swashbuckle.Application
 {
@@ -25,32 +26,44 @@ namespace Swashbuckle.Application
 
         protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
         {
-            var swaggerGenerator = _swaggerSpecConfig.GetGenerator(request);
-            
             object resourceName;
             request.GetRouteData().Values.TryGetValue("resourceName", out resourceName);
 
-            string json = (resourceName == null)
-                ? JsonTextFor(swaggerGenerator.GetListing())
-                : JsonTextFor(swaggerGenerator.GetDeclaration(resourceName.ToString()));
+            try
+            {
+                var swaggerGenerator = _swaggerSpecConfig.GetGenerator(request);
 
-            var content = new StringContent(json, Encoding.UTF8, "application/json");
+                var content = (resourceName == null)
+                    ? ContentFor(request, swaggerGenerator.GetListing())
+                    : ContentFor(request, swaggerGenerator.GetDeclaration(resourceName.ToString()));
 
-            var tsc = new TaskCompletionSource<HttpResponseMessage>();
-            tsc.SetResult(new HttpResponseMessage() { Content = content });
-            return tsc.Task;
+                return TaskFor(new HttpResponseMessage { Content = content });
+            }
+            catch (ApiDeclarationNotFoundException ex)
+            {
+                return TaskFor(request.CreateErrorResponse(HttpStatusCode.NotFound, ex));
+            }
         }
 
-        private static string JsonTextFor(object value)
+        private HttpContent ContentFor<T>(HttpRequestMessage request, T swaggerObject)
         {
-            var serializer = new JsonSerializer { NullValueHandling = NullValueHandling.Ignore };
-            var jsonBuilder = new StringBuilder();
-            using (var writer = new StringWriter(jsonBuilder))
-            {
-                serializer.Serialize(writer, value);
-            }
+            var negotiator = request.GetConfiguration().Services.GetContentNegotiator();
+            var result = negotiator.Negotiate(typeof(T), request, new [] { GetSwaggerJsonFormatter() });
 
-            return jsonBuilder.ToString();
+            return new ObjectContent(typeof(T), swaggerObject, result.Formatter, result.MediaType);
+        }
+
+        private MediaTypeFormatter GetSwaggerJsonFormatter()
+        {
+            var settings = new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore };
+            return new JsonMediaTypeFormatter { SerializerSettings = settings };
+        }
+
+        private Task<HttpResponseMessage> TaskFor(HttpResponseMessage response)
+        {
+            var tsc = new TaskCompletionSource<HttpResponseMessage>();
+            tsc.SetResult(response);
+            return tsc.Task;
         }
     }
 }

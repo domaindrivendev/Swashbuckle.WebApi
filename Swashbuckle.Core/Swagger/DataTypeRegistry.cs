@@ -73,9 +73,9 @@ namespace Swashbuckle.Swagger
             {
                 return _complexMappings.ToDictionary(entry => entry.Value.Id, entry => entry.Value);
             }
-            catch (ArgumentException)
+            catch (ArgumentException ex)
             {
-                throw new InvalidOperationException("Failed to generate Swagger models with unique Id's. Do you have multiple API types with the same class name?");
+                throw new InvalidOperationException("Failed to generate Swagger models with unique Id's. Do you have multiple API types with the same class name?", ex);
             }
         }
 

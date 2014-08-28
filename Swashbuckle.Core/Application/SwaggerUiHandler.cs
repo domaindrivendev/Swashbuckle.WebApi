@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Reflection;
@@ -31,17 +32,16 @@ namespace Swashbuckle.Application
         {
             var uiPath = request.GetRouteData().Values["uiPath"].ToString();
             var embeddedResource = EmbeddedResourceFor(uiPath);
-            
-            var stream = embeddedResource.MediaType.StartsWith("text/")
-                ? ApplyConfigExpressions(embeddedResource.GetStream(), request)
-                : embeddedResource.GetStream();
 
-            var content = new StreamContent(stream);
-            content.Headers.ContentType = new MediaTypeHeaderValue(embeddedResource.MediaType);
-
-            var tsc = new TaskCompletionSource<HttpResponseMessage>();
-            tsc.SetResult(new HttpResponseMessage { Content = content });
-            return tsc.Task;
+            try
+            {
+                var content = ContentFor(request, embeddedResource);
+                return TaskFor(new HttpResponseMessage { Content = content });
+            }
+            catch (FileNotFoundException ex)
+            {
+                return TaskFor(request.CreateErrorResponse(HttpStatusCode.NotFound, ex));
+            }
         }
         
         private EmbeddedResource EmbeddedResourceFor(string uiPath)
@@ -50,6 +50,17 @@ namespace Swashbuckle.Application
             _swaggerUiConfig.CustomEmbeddedResources.TryGetValue(uiPath, out embeddedResource);
 
             return embeddedResource ?? new EmbeddedResource(GetType().Assembly, uiPath);
+        }
+
+        private HttpContent ContentFor(HttpRequestMessage request, EmbeddedResource embeddedResource)
+        {
+            var stream = embeddedResource.GetStream();
+            var content = embeddedResource.MediaType.StartsWith("text/")
+                ? new StreamContent(ApplyConfigExpressions(stream, request))
+                : new StreamContent(stream);
+
+            content.Headers.ContentType = new MediaTypeHeaderValue(embeddedResource.MediaType);
+            return content;
         }
 
         private Stream ApplyConfigExpressions(Stream stream, HttpRequestMessage request)
@@ -97,6 +108,13 @@ namespace Swashbuckle.Application
 
             return _swaggerSpecConfig.Versions
                 .Select(version => String.Format("{0}/swagger/{1}/api-docs", basePath, version));
+        }
+
+        private Task<HttpResponseMessage> TaskFor(HttpResponseMessage response)
+        {
+            var tsc = new TaskCompletionSource<HttpResponseMessage>();
+            tsc.SetResult(response);
+            return tsc.Task;
         }
     }
 }

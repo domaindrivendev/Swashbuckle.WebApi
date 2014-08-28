@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Net;
 using Newtonsoft.Json.Linq;
 using NUnit.Framework;
 using Swashbuckle.Application;
@@ -309,7 +310,7 @@ namespace Swashbuckle.Tests.SwaggerSpec
             var declaration = Get<JObject>("http://tempuri.org/swagger/api-docs/Products");
             Assert.AreEqual("http://custombasepath.com", (string)declaration["basePath"]);
         }
-       
+        
         [Test]
         public void It_should_support_an_optional_setting_to_ignore_any_actions_marked_obsolete()
         {
@@ -418,6 +419,14 @@ namespace Swashbuckle.Tests.SwaggerSpec
                 });
 
             Assert.AreEqual(expected.ToString(), info.ToString());
+        }
+
+        [Test]
+        public void It_should_respond_with_a_404_if_declaration_not_found()
+        {
+            var result = ExecuteGet("http://tempuri.org/swagger/api-docs/NoSuchController");
+
+            Assert.That(result.StatusCode, Is.EqualTo(HttpStatusCode.NotFound));
         }
 
         class AddResponseCodes : IOperationFilter
