@@ -17,7 +17,7 @@ namespace Swashbuckle.SwaggerExtensions
             _navigator = new XPathDocument(xmlCommentsPath).CreateNavigator();
         }
 
-        public void Apply(DataType model, DataTypeRegistry dataTypeRegistry, Type type)
+        public void Apply(Model model, TypeSystem typeSystem, Type type)
         {
             var typeNode = _navigator.SelectSingleNode(String.Format(TypeExpression, type.FullName));
             model.Description = GetChildValueOrDefault(typeNode, SummaryExpression);

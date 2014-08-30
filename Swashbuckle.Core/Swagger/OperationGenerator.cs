@@ -7,12 +7,12 @@ namespace Swashbuckle.Swagger
 {
     public class OperationGenerator
     {
-        private readonly DataTypeRegistry _dataTypeRegistry;
+        private readonly TypeSystem _typeSystem;
         private readonly IEnumerable<IOperationFilter> _operationFilters;
 
-        public OperationGenerator(DataTypeRegistry dataTypeRegistry, IEnumerable<IOperationFilter> operationFilters)
+        public OperationGenerator(TypeSystem typeSystem, IEnumerable<IOperationFilter> operationFilters)
         {
-            _dataTypeRegistry = dataTypeRegistry;
+            _typeSystem = typeSystem;
             _operationFilters = operationFilters;
         }
 
@@ -41,23 +41,16 @@ namespace Swashbuckle.Swagger
             }
             else
             {
-                var dataType = _dataTypeRegistry.GetOrRegister(responseType);
-                if (dataType.Type == "object")
-                {
-                    operation.Type = dataType.Id;
-                }
+                var dataType = _typeSystem.GetDataTypeFor(responseType);
+                if (dataType.Ref != null)
+                    operation.Type = dataType.Ref;
                 else
-                {
-                    operation.Type = dataType.Type;
-                    operation.Format = dataType.Format;
-                    operation.Items = dataType.Items;
-                    operation.Enum = dataType.Enum;
-                }
+                    operation.CopyValuesFrom(dataType);
             }
 
             foreach (var filter in _operationFilters)
             {
-                filter.Apply(operation, _dataTypeRegistry, apiDescription);
+                filter.Apply(operation, _typeSystem, apiDescription);
             }
 
             return operation;
@@ -90,18 +83,11 @@ namespace Swashbuckle.Swagger
                 Required = !apiParamDesc.ParameterDescriptor.IsOptional
             };
 
-            var dataType = _dataTypeRegistry.GetOrRegister(apiParamDesc.ParameterDescriptor.ParameterType);
-            if (dataType.Type == "object")
-            {
-                parameter.Type = dataType.Id;
-            }
+            var dataType = _typeSystem.GetDataTypeFor(apiParamDesc.ParameterDescriptor.ParameterType);
+            if (dataType.Ref != null)
+                parameter.Type = dataType.Ref;
             else
-            {
-                parameter.Type = dataType.Type;
-                parameter.Format = dataType.Format;
-                parameter.Items = dataType.Items;
-                parameter.Enum = dataType.Enum;
-            }
+                parameter.CopyValuesFrom(dataType);
 
             return parameter;
         }

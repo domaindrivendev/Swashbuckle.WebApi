@@ -149,7 +149,7 @@ namespace Swashbuckle.Swagger
         public IList<Api> Apis { get; set; }
 
         [JsonProperty("models")]
-        public IDictionary<string, DataType> Models { get; set; }
+        public IDictionary<string, Model> Models { get; set; }
 
         [JsonProperty("produces")]
         public IList<string> Produces { get; set; }
@@ -173,7 +173,7 @@ namespace Swashbuckle.Swagger
         public IList<Operation> Operations { get; set; }
     }
 
-    public class Operation
+    public class Operation : DataType
     {
         [JsonProperty("method")]
         public string Method { get; set; }
@@ -201,36 +201,9 @@ namespace Swashbuckle.Swagger
 
         [JsonProperty("consumes")]
         public IList<string> Consumes { get; set; }
-
-        [JsonProperty("type")]
-        public string Type { get; set; }
-
-        [JsonProperty("$ref")]
-        public string Ref { get; set; }
-
-        [JsonProperty("format")]
-        public string Format { get; set; }
-
-        [JsonProperty("defaultValue")]
-        public string DefaultValue { get; set; }
-
-        [JsonProperty("enum")]
-        public IList<string> Enum { get; set; }
-
-        [JsonProperty("minimum")]
-        public string Minimum { get; set; }
-
-        [JsonProperty("maximum")]
-        public string Maximum { get; set; }
-     
-        [JsonProperty("items")]
-        public DataType Items { get; set; }
-
-        [JsonProperty("uniqueItems")]
-        public bool? UniqueItems { get; set; }
     }
 
-    public class Parameter
+    public class Parameter : DataType
     {
         [JsonProperty("paramType")]
         public string ParamType { get; set; }
@@ -246,33 +219,6 @@ namespace Swashbuckle.Swagger
 
         [JsonProperty("allowMultiple")]
         public bool? AllowMultiple { get; set; }
-
-        [JsonProperty("type")]
-        public string Type { get; set; }
-
-        [JsonProperty("$ref")]
-        public string Ref { get; set; }
-
-        [JsonProperty("format")]
-        public string Format { get; set; }
-
-        [JsonProperty("defaultValue")]
-        public string DefaultValue { get; set; }
-
-        [JsonProperty("enum")]
-        public IList<string> Enum { get; set; }
-
-        [JsonProperty("minimum")]
-        public string Minimum { get; set; }
-
-        [JsonProperty("maximum")]
-        public string Maximum { get; set; }
-     
-        [JsonProperty("items")]
-        public DataType Items { get; set; }
-
-        [JsonProperty("uniqueItems")]
-        public bool? UniqueItems { get; set; }
     }
 
     public class ResponseMessage
@@ -295,6 +241,9 @@ namespace Swashbuckle.Swagger
         [JsonProperty("format")]
         public string Format { get; set; }
 
+        [JsonProperty("defaultValue")]
+        public string DefaultValue { get; set; }
+
         [JsonProperty("enum")]
         public IList<string> Enum { get; set; }
 
@@ -303,19 +252,16 @@ namespace Swashbuckle.Swagger
 
         [JsonProperty("maximum")]
         public string Maximum { get; set; }
-     
+
         [JsonProperty("items")]
         public DataType Items { get; set; }
 
         [JsonProperty("uniqueItems")]
         public bool? UniqueItems { get; set; }
+    }
 
-        /*
-        NOTE: The properties below should be in a separate "Model" class. Unfortunately,
-        it was modelled incorrectly and can't be fixed until the next major version of
-        Swashbuckle due to backward-comptability
-         */
-
+    public class Model
+    {
         [JsonProperty("id")]
         public string Id { get; set; }
 
@@ -326,12 +272,18 @@ namespace Swashbuckle.Swagger
         public IList<string> Required { get; set; }
 
         [JsonProperty("properties")]
-        public IDictionary<string, DataType> Properties { get; set; }
+        public IDictionary<string, Property> Properties { get; set; }
 
         [JsonProperty("subTypes")]
         public IList<string> SubTypes { get; set; }
 
         [JsonProperty("discriminator")]
         public string Discriminator { get; set; }
+    }
+
+    public class Property : DataType
+    {
+        [JsonProperty("description")]
+        public string Description { get; set; }
     }
 }

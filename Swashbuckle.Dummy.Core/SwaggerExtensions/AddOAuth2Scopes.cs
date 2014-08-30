@@ -9,7 +9,7 @@ namespace Swashbuckle.Dummy.SwaggerExtensions
 {
     public class AddOAuth2Scopes : IOperationFilter
     {
-        public void Apply(Operation operation, DataTypeRegistry dataTypeRegistry, ApiDescription apiDescription)
+        public void Apply(Operation operation, TypeSystem typeSystem, ApiDescription apiDescription)
         {
             var scopeIds = apiDescription.ActionDescriptor.GetFilterPipeline()
                 .Select(filterInfo => filterInfo.Instance)

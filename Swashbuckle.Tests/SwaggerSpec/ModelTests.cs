@@ -40,7 +40,6 @@ namespace Swashbuckle.Tests.SwaggerSpec
                 {
                     Product = new
                     {
-                        type = "object",
                         id = "Product",
                         required = new object[] {},
                         properties = new
@@ -86,7 +85,6 @@ namespace Swashbuckle.Tests.SwaggerSpec
                 {
                     Elephant = new
                     {
-                        type = "object",
                         id = "Elephant",
                         required = new object[] { },
                         properties = new
@@ -109,7 +107,6 @@ namespace Swashbuckle.Tests.SwaggerSpec
                     },
                     Animal = new
                     {
-                        type = "object",
                         id = "Animal",
                         required = new object[] { },
                         properties = new
@@ -140,7 +137,6 @@ namespace Swashbuckle.Tests.SwaggerSpec
                 {
                     Order = new
                     {
-                        type = "object",
                         id = "Order",
                         required = new object[] {},
                         properties = new
@@ -155,7 +151,6 @@ namespace Swashbuckle.Tests.SwaggerSpec
                     },
                     LineItem = new
                     {
-                        type = "object",
                         id = "LineItem",
                         required = new object[] {},
                         properties = new
@@ -192,7 +187,6 @@ namespace Swashbuckle.Tests.SwaggerSpec
                 {
                     Component = new
                     {
-                        type = "object",
                         id = "Component",
                         required = new object[] {},
                         properties = new
@@ -299,7 +293,6 @@ namespace Swashbuckle.Tests.SwaggerSpec
                 {
                     Elephant = new
                     {
-                        type = "object",
                         id = "Elephant",
                         required = new object[] {},
                         properties = new
@@ -314,7 +307,6 @@ namespace Swashbuckle.Tests.SwaggerSpec
                     },
                     Animal = new
                     {
-                        type = "object",
                         id = "Animal",
                         required = new object[] {},
                         properties = new
@@ -329,7 +321,6 @@ namespace Swashbuckle.Tests.SwaggerSpec
                     },
                     Mamal = new
                     {
-                        type = "object",
                         id = "Mamal",
                         required = new object[] {},
                         properties = new
@@ -362,7 +353,7 @@ namespace Swashbuckle.Tests.SwaggerSpec
 
         class OverrideDescription : IModelFilter
         {
-            public void Apply(DataType model, DataTypeRegistry dataTypeRegistry, Type type)
+            public void Apply(Model model, TypeSystem typeSystem, Type type)
             {
                 model.Description = "foobar";
             }

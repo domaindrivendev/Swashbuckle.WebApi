@@ -25,7 +25,7 @@ namespace Swashbuckle.SwaggerExtensions
             _navigator = new XPathDocument(xmlCommentsPath).CreateNavigator();
         }
 
-        public void Apply(Operation operation, DataTypeRegistry dataTypeRegistry, ApiDescription apiDescription)
+        public void Apply(Operation operation, TypeSystem typeSystem, ApiDescription apiDescription)
         {
             var methodNode = _navigator.SelectSingleNode(GetXPathFor(apiDescription.ActionDescriptor));
 

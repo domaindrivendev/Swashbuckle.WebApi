@@ -10,6 +10,7 @@ using System.Net.Http;
 using System.Web.Http;
 using System.Web.Http.Hosting;
 using System.Web.Http.Routing;
+using System.Web.Http.Description;
 
 namespace Swashbuckle.Tests.SwaggerSpec
 {
@@ -431,7 +432,7 @@ namespace Swashbuckle.Tests.SwaggerSpec
 
         class AddResponseCodes : IOperationFilter
         {
-            public void Apply(Operation operation, DataTypeRegistry dataTypeRegistry, System.Web.Http.Description.ApiDescription apiDescription)
+            public void Apply(Operation operation, TypeSystem typeSystem, ApiDescription apiDescription)
             {
                 operation.ResponseMessages.Add(new ResponseMessage { Code = 200, Message = "It's all good!" });
             }

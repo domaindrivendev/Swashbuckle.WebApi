@@ -53,13 +53,13 @@ namespace Swashbuckle.Swagger
             if (apiDescriptionGroup == null)
                 throw new ApiDeclarationNotFoundException(resourceName);
 
-            var dataTypeRegistry = new DataTypeRegistry(
+            var typeSystem = new TypeSystem(
                 _options.CustomTypeMappings,
                 _options.PolymorphicTypes,
                 _options.ModelFilters);
 
             var operationGenerator = new OperationGenerator(
-                dataTypeRegistry,
+                typeSystem,
                 _options.OperationFilters);
 
             // Group further by relative path - each group corresponds to an Api
@@ -76,7 +76,7 @@ namespace Swashbuckle.Swagger
                 BasePath = _basePath,
                 ResourcePath = "/" + resourceName,
                 Apis = apis,
-                Models = dataTypeRegistry.GetModels()
+                Models = typeSystem.GetModels()
             };
         }
 

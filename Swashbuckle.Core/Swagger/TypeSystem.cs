@@ -10,7 +10,7 @@ using Newtonsoft.Json.Linq;
 
 namespace Swashbuckle.Swagger
 {
-    public class DataTypeRegistry
+    public class TypeSystem
     {
         private static readonly Dictionary<Type, Func<DataType>> PrimitiveMappings = new Dictionary<Type, Func<DataType>>()
             {
@@ -40,38 +40,39 @@ namespace Swashbuckle.Swagger
         private readonly IDictionary<Type, Func<DataType>> _customMappings;
         private readonly IEnumerable<PolymorphicType> _polymorphicTypes;
         private readonly IEnumerable<IModelFilter> _modelFilters;
-        private readonly IDictionary<Type, DataType> _complexMappings;
+        private readonly IDictionary<Type, Model> _registeredModels;
 
-        public DataTypeRegistry(IDictionary<Type, Func<DataType>> customMappings, IEnumerable<PolymorphicType> polymorphicTypes, IEnumerable<IModelFilter> modelFilters)
+        public TypeSystem(
+            IDictionary<Type, Func<DataType>> customMappings,
+            IEnumerable<PolymorphicType> polymorphicTypes,
+            IEnumerable<IModelFilter> modelFilters)
         {
             _customMappings = customMappings;
             _polymorphicTypes = polymorphicTypes;
             _modelFilters = modelFilters;
-            _complexMappings = new Dictionary<Type, DataType>();
+            _registeredModels = new Dictionary<Type, Model>();
         }
 
-        public DataType GetOrRegister(Type type)
+        public DataType GetDataTypeFor(Type type)
         {
-            // Defer processing of related models to avoid infinite recursion on self-referential types
-            var deferredTypes = new Queue<Type>();
+            var queue = new Queue<Type>(); // defer processing of complex types
+            var dataType = CreateDataTypeFor(type, queue);
 
-            var rootDataType = GetOrRegister(type, false, deferredTypes);
-
-            // Process any remaining deferred types
-            while (deferredTypes.Any())
+            // Work through the queue of complex types
+            while (queue.Any())
             {
-                var deferredType = deferredTypes.Dequeue();
-                GetOrRegister(deferredType, false, deferredTypes);
+                var model = CreateModelFor(queue.Peek(), queue);
+                _registeredModels.Add(queue.Dequeue(), model);
             }
 
-            return rootDataType;
+            return dataType;
         }
 
-        public IDictionary<string, DataType> GetModels()
+        public IDictionary<string, Model> GetModels()
         {
             try
             {
-                return _complexMappings.ToDictionary(entry => entry.Value.Id, entry => entry.Value);
+                return _registeredModels.ToDictionary(entry => entry.Value.Id, entry => entry.Value);
             }
             catch (ArgumentException ex)
             {
@@ -79,7 +80,7 @@ namespace Swashbuckle.Swagger
             }
         }
 
-        private DataType GetOrRegister(Type type, bool deferIfComplex, Queue<Type> deferredTypes)
+        private DataType CreateDataTypeFor(Type type, Queue<Type> queue)
         {
             if (_customMappings.ContainsKey(type))
                 return _customMappings[type]();
@@ -92,7 +93,7 @@ namespace Swashbuckle.Swagger
 
             Type innerType;
             if (type.IsNullable(out innerType))
-                return GetOrRegister(innerType, deferIfComplex, deferredTypes);
+                return CreateDataTypeFor(innerType, queue);
 
             Type itemType;
             if (type.IsEnumerable(out itemType))
@@ -101,23 +102,17 @@ namespace Swashbuckle.Swagger
                     throw new InvalidOperationException(
                         String.Format("Type {0} is not supported. Swagger does not support containers of containers", type));
 
-                return new DataType { Type = "array", Items = GetOrRegister(itemType, true, deferredTypes) };
+                return new DataType { Type = "array", Items = CreateDataTypeFor(itemType, queue) };
             }
 
-            // Anthing else is complex
-            if (deferIfComplex)
-            {
-                if (!_complexMappings.ContainsKey(type))
-                    deferredTypes.Enqueue(type);
+            // A complex type! If not already registered and not currently queued, queue it up
+            if (!_registeredModels.ContainsKey(type) && !queue.Contains(type))
+                queue.Enqueue(type);
 
-                // Just return a reference for now
-                return new DataType { Ref = UniqueIdFor(type) };
-            }
-
-            return _complexMappings.GetOrAdd(type, () => CreateComplexDataType(type, deferredTypes));
+            return new DataType { Ref = UniqueIdFor(type) };
         }
 
-        private DataType CreateComplexDataType(Type type, Queue<Type> deferredTypes)
+        private Model CreateModelFor(Type type, Queue<Type> queue)
         {
             // Ignore inherited properties if its an explicitly configured polymorphic sub type
             var polymorphicType = PolymorphicTypeFor(type);
@@ -129,22 +124,27 @@ namespace Swashbuckle.Swagger
                 .Where(propInfo => !propInfo.GetIndexParameters().Any())    // Ignore indexer properties
                 .ToArray();
 
-            var properties = propInfos
-                .ToDictionary(propInfo => propInfo.Name, propInfo => GetOrRegister(propInfo.PropertyType, true, deferredTypes));
+            var properties = propInfos.ToDictionary(
+                propInfo => propInfo.Name,
+                propInfo =>
+                {
+                    var property = new Property();
+                    property.CopyValuesFrom(CreateDataTypeFor(propInfo.PropertyType, queue));
+                    return property;
+                });
 
             var required = propInfos.Where(propInfo => Attribute.IsDefined(propInfo, typeof (RequiredAttribute)))
                 .Select(propInfo => propInfo.Name)
                 .ToList();
 
             var subDataTypes = polymorphicType.SubTypes
-                .Select(subType => GetOrRegister(subType.Type, true, deferredTypes))
+                .Select(subType => CreateDataTypeFor(subType.Type, queue))
                 .Select(subDataType => subDataType.Ref)
                 .ToList();
 
-            var dataType = new DataType
+            var dataType = new Model
             {
                 Id = UniqueIdFor(type),
-                Type = "object",
                 Properties = properties,
                 Required = required,
                 SubTypes = subDataTypes,

@@ -4,6 +4,6 @@ namespace Swashbuckle.Swagger
 {
     public interface IOperationFilter
     {
-        void Apply(Operation operation, DataTypeRegistry dataTypeRegistry, ApiDescription apiDescription);
+        void Apply(Operation operation, TypeSystem typeSystem, ApiDescription apiDescription);
     }
 }

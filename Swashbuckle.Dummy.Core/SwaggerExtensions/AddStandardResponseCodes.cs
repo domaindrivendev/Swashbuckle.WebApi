@@ -6,7 +6,7 @@ namespace Swashbuckle.Dummy.SwaggerExtensions
 {
     public class AddStandardResponseCodes : IOperationFilter
     {
-        public void Apply(Operation operation, DataTypeRegistry dataTypeRegistry, ApiDescription apiDescription)
+        public void Apply(Operation operation, TypeSystem typeSystem, ApiDescription apiDescription)
         {
             operation.ResponseMessages.Add(new ResponseMessage
             {

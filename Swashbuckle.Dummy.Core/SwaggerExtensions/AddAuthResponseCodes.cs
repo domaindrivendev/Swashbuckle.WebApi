@@ -8,7 +8,7 @@ namespace Swashbuckle.Dummy.SwaggerExtensions
 {
     public class AddAuthResponseCodes : IOperationFilter
     {
-        public void Apply(Operation operation, DataTypeRegistry dataTypeRegistry, ApiDescription apiDescription)
+        public void Apply(Operation operation, TypeSystem typeSystem, ApiDescription apiDescription)
         {
             if (apiDescription.ActionDescriptor.GetFilters().OfType<AuthorizeAttribute>().Any())
             {
