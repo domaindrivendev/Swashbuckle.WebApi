@@ -70,7 +70,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="HttpMessageHandlerTestFixture.cs" />
     <Compile Include="HttpMessageHandlerTestsBase.cs" />
+    <Compile Include="Swagger2\CoreTests.cs" />
     <Compile Include="SwaggerSpec\OAuth2Tests.cs" />
     <Compile Include="SwaggerSpec\MultipleApiVersionsTests.cs" />
     <Compile Include="SwaggerSpec\XmlCommentsTests.cs" />

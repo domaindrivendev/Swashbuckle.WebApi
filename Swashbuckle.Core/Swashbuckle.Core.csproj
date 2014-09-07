@@ -67,17 +67,28 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Application\EmbeddedResource.cs" />
+    <Compile Include="Application\HttpExtensions.cs" />
     <Compile Include="Application\PolymorphicType.cs" />
     <Compile Include="Application\RedirectHandler.cs" />
+    <Compile Include="Application\SwaggerObjectHandler.cs" />
     <Compile Include="Application\SwaggerSpecConfig.cs" />
     <Compile Include="Application\SwaggerUiConfig.cs" />
     <Compile Include="Application\SwaggerUiHandler.cs" />
+    <Compile Include="Configuration\LicenseBuilder.cs" />
+    <Compile Include="Configuration\ContactBuilder.cs" />
+    <Compile Include="Configuration\InfoBuilder.cs" />
+    <Compile Include="Configuration\Swagger2Config.cs" />
     <Compile Include="Bootstrapper.cs" />
     <Compile Include="Application\SwaggerSpecHandler.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ApiDescriptionExtensions.cs" />
     <Compile Include="DictionaryExtensions.cs" />
-    <Compile Include="Swagger20\SwaggerObject.cs" />
+    <Compile Include="Swagger2\ApiDescriptionExtensions.cs" />
+    <Compile Include="Swagger2\SwaggerGenerator.cs" />
+    <Compile Include="Swagger2\SwaggerGeneratorSettings.cs" />
+    <Compile Include="Swagger2\ISwaggerProvider.cs" />
+    <Compile Include="Swagger2\SwaggerObject.cs" />
+    <Compile Include="Swagger2\SchemaRegistry.cs" />
     <Compile Include="Swagger\DataTypeExtensions.cs" />
     <Compile Include="Swagger\SwaggerGenerator.cs" />
     <Compile Include="SwaggerExtensions\ApplyActionXmlComments.cs" />

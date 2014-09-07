@@ -31,19 +31,12 @@ namespace Swashbuckle.Dummy.Controllers
         }
 
         /// <summary>
-        /// List all products
+        /// List products by type
         /// </summary>
         /// <returns></returns>
         [HttpGet]
         [ScopeAuthorize("products.read")]
-        public IEnumerable<Product> FindAll()
-        {
-            throw new NotImplementedException();
-        }
-        
-        [HttpGet]
-        [ScopeAuthorize("products.read")]
-        public IEnumerable<Product> FindByType(ProductType type)
+        public IEnumerable<Product> GetAllByType(ProductType type)
         {
             throw new NotImplementedException();
         }

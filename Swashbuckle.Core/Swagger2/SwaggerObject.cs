@@ -1,13 +1,15 @@
 ﻿using System.Collections.Generic;
 using Newtonsoft.Json;
 
-namespace Swashbuckle.Swagger20
+namespace Swashbuckle.Swagger2
 {
     public class SwaggerObject
     {
-        public string swagger = "2.0";
+        public readonly string swagger = "2.0";
 
         public Info info;
+
+        public ExternalDocs externalDocs;
 
         public string host;
 
@@ -19,17 +21,21 @@ namespace Swashbuckle.Swagger20
 
         public IList<string> produces;
 
-        public IDictionary<string, Path> paths;
+        public IDictionary<string, PathItem> paths;
 
-        public IDictionary<string, Definition> definitions;
+        public IDictionary<string, Schema> definitions;
 
-        public object security;
+        public IDictionary<string, Parameter> parameters;
+
+        public IList<object> security;
 
         public IList<Tag> tags;
     }
 
     public class Info
     {
+        public string version;
+
         public string title;
 
         public string description;
@@ -39,8 +45,6 @@ namespace Swashbuckle.Swagger20
         public Contact contact;
 
         public License license;
-
-        public string version;
     }
 
     public class Contact
@@ -59,7 +63,14 @@ namespace Swashbuckle.Swagger20
         public string url;
     }
 
-    public class Path
+    public class ExternalDocs
+    {
+        public string description;
+
+        public string url;
+    }
+
+    public class PathItem
     {
         [JsonProperty("$ref")]
         public string @ref;
@@ -89,7 +100,7 @@ namespace Swashbuckle.Swagger20
 
         public string description;
 
-        public ExternalDocumentation externalDocs;
+        public ExternalDocs externalDocs;
 
         public string operationId;
 
@@ -103,14 +114,7 @@ namespace Swashbuckle.Swagger20
 
         public IList<string> schemes;
 
-        public object security;
-    }
-
-    public class ExternalDocumentation
-    {
-        public string description;
-
-        public string url;
+        public IList<string> security;
     }
 
     public class Parameter : SerializableType
@@ -126,21 +130,90 @@ namespace Swashbuckle.Swagger20
         public Schema schema;
     }
 
-    public class Schema
-    {
-        [JsonProperty("$ref")]
-        public string @ref;
-    }
-
     public class Response
     {
         public string description;
 
         public Schema schema;
 
-        public SerializableType headers;
+        public IList<SerializableType> headers;
 
-        public Example example;
+        public object examples;
+    }
+
+    public class Schema
+    {
+        [JsonProperty("$ref")]
+        public string @ref;
+
+        public string format;
+
+        public string title;
+
+        public string description;
+
+        public object @default;
+
+        public int? multipleOf;
+
+        public int? maximum;
+
+        public bool? exclusiveMaximum;
+
+        public int? minimum;
+
+        public bool? exclusiveMinimum;
+
+        public int? maxLength;
+
+        public int? minLength;
+
+        public string pattern;
+
+        public string discriminator;
+
+        public Xml xml;
+
+        public Schema items;
+
+        public int? maxItems;
+
+        public int? minItems;
+
+        public bool? uniqueItems;
+
+        public int? maxProperties;
+
+        public int? minProperties;
+
+        public IList<string> required;
+
+        public ExternalDocs externalDocs;
+
+        public IDictionary<string, Schema> definitions;
+
+        public IDictionary<string, Schema> properties;
+
+        public IList<string> @enum;
+
+        public string type;
+
+        public object example;
+
+        public IList<Schema> allOf;
+    }
+
+    public class Xml
+    {
+        public string name;
+
+        public string @namespace;
+
+        public string prefix;
+
+        public bool? attribute;
+
+        public bool? wrapped;
     }
 
     public class SerializableType
@@ -154,12 +227,11 @@ namespace Swashbuckle.Swagger20
         public string collectionFormat;
     }
 
-    public class Example
-    {}
-
-    public class Definition
-    {}
-
     public class Tag
+    {
+        public ExternalDocs externalDocs;
+    }
+
+    public class VendorExtensible : Dictionary<string, object>
     {}
 }

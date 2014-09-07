@@ -19,9 +19,9 @@
             </summary>
             <returns></returns>
         </member>
-        <member name="M:Swashbuckle.Dummy.Controllers.ProductsController.FindAll">
+        <member name="M:Swashbuckle.Dummy.Controllers.ProductsController.GetAllByType(Swashbuckle.Dummy.Controllers.ProductType)">
             <summary>
-            List all products
+            List products by type
             </summary>
             <returns></returns>
         </member>
