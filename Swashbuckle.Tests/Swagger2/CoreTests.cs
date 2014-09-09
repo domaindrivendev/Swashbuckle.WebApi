@@ -1,20 +1,21 @@
 ﻿using Newtonsoft.Json.Linq;
 using System;
 using NUnit.Framework;
-using Swashbuckle.Application;
-using Swashbuckle.Configuration;
 using Swashbuckle.Dummy.Controllers;
 using System.Collections.Generic;
+using Swashbuckle.Application;
+using Swashbuckle.Configuration;
+using Swashbuckle.Dummy.SwaggerExtensions;
 
 namespace Swashbuckle.Tests.Swagger2
 {
     [TestFixture]
-    public class CoreTests : HttpMessageHandlerTestFixture<SwaggerObjectHandler>
+    public class CoreTests : HttpMessageHandlerTestFixture<SwaggerDocsHandler>
     {
         private Swagger2Config _swaggerConfig;
 
         public CoreTests()
-            : base("swagger/object/{apiVersion}")
+            : base("swagger/docs/{apiVersion}")
         { }
 
         [SetUp]
@@ -27,23 +28,17 @@ namespace Swashbuckle.Tests.Swagger2
         }
 
         [Test]
-        public void It_should_indicate_swagger_version_2()
+        public void It_should_indicate_swagger_version_2_0()
         {
-            var swagger = Get<JObject>("http://tempuri.org/swagger/object/1.0");
+            var swagger = Get<JObject>("http://tempuri.org/swagger/docs/1.0");
 
             Assert.AreEqual("2.0", swagger["swagger"].ToString());
         }
 
         [Test]
-        public void It_should_provide_a_host_and_base_path_for_the_api()
-        {
-            var swagger = Get<JObject>("http://tempuri.org/swagger/object/1.0");
-        }
-
-        [Test]
         public void It_should_provide_info_version_and_title()
         {
-            var swagger = Get<JObject>("http://tempuri.org/swagger/object/1.0");
+            var swagger = Get<JObject>("http://tempuri.org/swagger/docs/1.0");
 
             var info = swagger["info"];
             Assert.IsNotNull(info);
@@ -57,44 +52,23 @@ namespace Swashbuckle.Tests.Swagger2
         }
 
         [Test]
-        public void It_should_provide_additional_info_properties_if_configured()
+        public void It_should_provide_host_base_path_and_schemes()
         {
-            _swaggerConfig.ApiVersion("1.0")
-                .Title("Test API")
-                .Description("A test API")
-                .TermsOfService("Test terms")
-                .Contact(c => c
-                    .Name("Joe Test")
-                    .Url("http://tempuri.org/contact")
-                    .Email("joe.test@tempuri.org"))
-                .License(c => c
-                    .Name("Test License")
-                    .Url("http://tempuri.org/license"));
+            var swagger = Get<JObject>("http://tempuri.org/swagger/docs/1.0");
 
-            var swagger = Get<JObject>("http://tempuri.org/swagger/object/1.0");
+            var host = swagger["host"];
+            Assert.IsNotNull(host);
+            Assert.AreEqual("tempuri.org", host.ToString());
 
-            var info = swagger["info"];
-            Assert.IsNotNull(info);
+            var basePath = swagger["basePath"];
+            Assert.IsNotNull(basePath);
+            Assert.AreEqual("/", basePath.ToString());
 
-            var expected = JObject.FromObject(new
-                {
-                    version = "1.0",
-                    title = "Test API",
-                    description = "A test API",
-                    termsOfService = "Test terms",
-                    contact = new
-                    {
-                        name = "Joe Test",
-                        url = "http://tempuri.org/contact",
-                        email = "joe.test@tempuri.org"
-                    },
-                    license = new
-                    {
-                        name = "Test License",
-                        url = "http://tempuri.org/license"
-                    }
-                });
-            Assert.AreEqual(expected.ToString(), info.ToString());
+            var schemes = swagger["schemes"];
+            Assert.IsNotNull(schemes);
+
+            var expected = JArray.FromObject(new object[] { "http" });
+            Assert.AreEqual(expected.ToString(), schemes.ToString());
         }
 
         [Test]
@@ -102,7 +76,7 @@ namespace Swashbuckle.Tests.Swagger2
         {
             AddDefaultRoutesFor(new[] { typeof(ProductsController), typeof(CustomersController) });
 
-            var swagger = Get<JObject>("http://tempuri.org/swagger/object/1.0");
+            var swagger = Get<JObject>("http://tempuri.org/swagger/docs/1.0");
             var paths = swagger["paths"];
 
             var expected = JObject.FromObject(new Dictionary<string, object>
@@ -124,6 +98,19 @@ namespace Swashbuckle.Tests.Swagger2
                                         required = true,
                                         type = "string"
                                     }
+                                },
+                                responses = new Dictionary<string, object>
+                                {
+                                    {
+                                        "200", new
+                                        {
+                                            schema = new
+                                            {
+                                                items = JObject.Parse("{ $ref: \"#/definitions/Product\" }"),
+                                                type = "array"
+                                            }
+                                        }
+                                    }
                                 }
                             },
                             post = new
@@ -139,6 +126,19 @@ namespace Swashbuckle.Tests.Swagger2
                                         @in = "body",
                                         required = true,
                                         schema = JObject.Parse("{ $ref: \"#/definitions/Product\" }")
+                                    }
+                                },
+                                responses = new Dictionary<string, object>
+                                {
+                                    {
+                                        "200", new
+                                        {
+                                            schema = new
+                                            {
+                                                format = "int32",
+                                                type = "integer"
+                                            }
+                                        }
                                     }
                                 }
                             }
@@ -159,7 +159,17 @@ namespace Swashbuckle.Tests.Swagger2
                                         name = "id",
                                         @in = "path",
                                         required = true,
-                                        type = "integer"
+                                        type = "integer",
+                                        format = "int32"
+                                    }
+                                },
+                                responses = new Dictionary<string, object>
+                                {
+                                    {
+                                        "200", new
+                                        {
+                                            schema = JObject.Parse("{ $ref: \"#/definitions/Product\" }")
+                                        }
                                     }
                                 }
                             }
@@ -182,6 +192,19 @@ namespace Swashbuckle.Tests.Swagger2
                                         required = true,
                                         schema = JObject.Parse("{ $ref: \"#/definitions/Customer\" }")
                                     }
+                                },
+                                responses = new Dictionary<string, object>
+                                {
+                                    {
+                                        "200", new
+                                        {
+                                            schema = new
+                                            {
+                                                format = "int32",
+                                                type = "integer"
+                                            }
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -201,7 +224,8 @@ namespace Swashbuckle.Tests.Swagger2
                                         name = "id",
                                         @in = "path",
                                         required = true,
-                                        type = "integer"
+                                        type = "integer",
+                                        format = "int32",
                                     },
                                     new
                                     {
@@ -209,6 +233,12 @@ namespace Swashbuckle.Tests.Swagger2
                                         @in = "body",
                                         required = true,
                                         schema = JObject.Parse("{ $ref: \"#/definitions/Customer\" }")
+                                    }
+                                },
+                                responses = new Dictionary<string, object>
+                                {
+                                    {
+                                        "200", new { }
                                     }
                                 }
                             },
@@ -224,7 +254,14 @@ namespace Swashbuckle.Tests.Swagger2
                                         name = "id",
                                         @in = "path",
                                         required = true,
-                                        type = "integer"
+                                        type = "integer",
+                                        format = "int32"
+                                    }
+                                },
+                                responses = new Dictionary<string, object>
+                                {
+                                    {
+                                        "200", new { }
                                     }
                                 }
                             }
@@ -236,27 +273,12 @@ namespace Swashbuckle.Tests.Swagger2
         }
 
         [Test]
-        public void It_should_support_a_setting_to_ignore_obsolete_actions()
-        {
-            AddDefaultRouteFor<ObsoleteActionsController>();
-
-            _swaggerConfig.IgnoreObsoleteActions();
-
-            var swagger = Get<JObject>("http://tempuri.org/swagger/object/1.0");
-            var putOp = swagger["paths"]["/obsoleteactions/{id}"]["put"];
-            var deleteOp = swagger["paths"]["/obsoleteactions/{id}"]["delete"];
-
-            Assert.IsNotNull(putOp);
-            Assert.IsNull(deleteOp);
-        }
-
-        [Test]
         public void It_should_handle_additional_route_parameters()
         {
             // i.e. route params that are not included in the action signature
             AddCustomRouteFor<ProductsController>("{apiVersion}/products");
 
-            var swagger = Get<JObject>("http://tempuri.org/swagger/object/1.0");
+            var swagger = Get<JObject>("http://tempuri.org/swagger/docs/1.0");
             var getParams = swagger["paths"]["/{apiVersion}/products"]["get"]["parameters"];
 
             var expected = JArray.FromObject(new []
@@ -285,9 +307,104 @@ namespace Swashbuckle.Tests.Swagger2
         {
             AddAttributeRoutes();
 
-            var swagger = Get<JObject>("http://tempuri.org/swagger/object/1.0");
+            var swagger = Get<JObject>("http://tempuri.org/swagger/docs/1.0");
             var path = swagger["paths"]["/subscriptions/{id}/cancel"];
             Assert.IsNotNull(path);
+        }
+
+        [Test]
+        public void It_should_support_config_to_include_additional_info_properties()
+        {
+            _swaggerConfig.ApiVersion("1.0")
+                .Title("Test API")
+                .Description("A test API")
+                .TermsOfService("Test terms")
+                .Contact(c => c
+                    .Name("Joe Test")
+                    .Url("http://tempuri.org/contact")
+                    .Email("joe.test@tempuri.org"))
+                .License(c => c
+                    .Name("Test License")
+                    .Url("http://tempuri.org/license"));
+
+            var swagger = Get<JObject>("http://tempuri.org/swagger/docs/1.0");
+
+            var info = swagger["info"];
+            Assert.IsNotNull(info);
+
+            var expected = JObject.FromObject(new
+                {
+                    version = "1.0",
+                    title = "Test API",
+                    description = "A test API",
+                    termsOfService = "Test terms",
+                    contact = new
+                    {
+                        name = "Joe Test",
+                        url = "http://tempuri.org/contact",
+                        email = "joe.test@tempuri.org"
+                    },
+                    license = new
+                    {
+                        name = "Test License",
+                        url = "http://tempuri.org/license"
+                    }
+                });
+            Assert.AreEqual(expected.ToString(), info.ToString());
+        }
+
+        [Test]
+        public void It_should_support_config_to_customize_the_host_name()
+        {
+            _swaggerConfig.HostName((req) => "foobar.com");
+
+            var swagger = Get<JObject>("http://tempuri.org/swagger/docs/1.0");
+
+            var host = swagger["host"];
+            Assert.IsNotNull(host);
+            Assert.AreEqual("foobar.com", host.ToString());
+        }
+
+        [Test]
+        public void It_should_support_config_to_ignore_obsolete_actions()
+        {
+            AddDefaultRouteFor<ObsoleteActionsController>();
+
+            _swaggerConfig.IgnoreObsoleteActions();
+
+            var swagger = Get<JObject>("http://tempuri.org/swagger/docs/1.0");
+            var putOp = swagger["paths"]["/obsoleteactions/{id}"]["put"];
+            var deleteOp = swagger["paths"]["/obsoleteactions/{id}"]["delete"];
+
+            Assert.IsNotNull(putOp);
+            Assert.IsNull(deleteOp);
+        }
+
+        [Test]
+        public void It_should_support_config_to_post_modify_the_document()
+        {
+            _swaggerConfig.DocumentFilter<ApplyVendorExtensions>();
+
+            var swagger = Get<JObject>("http://tempuri.org/swagger/docs/1.0");
+            var xProp = swagger["x-foo"];
+
+            Assert.IsNotNull(xProp);
+            Assert.AreEqual("bar", xProp.ToString());
+        }
+
+        [Test]
+        public void It_should_support_config_to_post_modify_operations()
+        {
+            AddDefaultRouteFor<ProductsController>();
+
+            _swaggerConfig.OperationFilter<AddDefaultResponse>();
+
+            var swagger = Get<JObject>("http://tempuri.org/swagger/docs/1.0");
+            var getDefaultResponse = swagger["paths"]["/products"]["get"]["responses"]["default"];
+            var postDefaultResponse = swagger["paths"]["/products"]["post"]["responses"]["default"];
+
+            Assert.IsNotNull(getDefaultResponse);
+            Assert.IsNotNull(postDefaultResponse);
         }
     }
 }

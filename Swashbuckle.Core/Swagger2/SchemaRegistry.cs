@@ -7,6 +7,7 @@ using System.Net.Http;
 using System.Reflection;
 using System.Text;
 using Newtonsoft.Json.Linq;
+using Swashbuckle.Swagger;
 
 namespace Swashbuckle.Swagger2
 {
@@ -14,21 +15,21 @@ namespace Swashbuckle.Swagger2
     {
         private static readonly Dictionary<Type, Func<Schema>> PrimitiveMappings = new Dictionary<Type, Func<Schema>>()
             {
-                {typeof (Int16), () => new Schema {type = "integer"}},
-                {typeof (UInt16), () => new Schema {type = "integer"}},
-                {typeof (Int32), () => new Schema {type = "integer"}},
-                {typeof (UInt32), () => new Schema {type = "integer"}},
-                {typeof (Int64), () => new Schema {type = "integer"}},
-                {typeof (UInt64), () => new Schema {type = "integer"}},
-                {typeof (Single), () => new Schema {type = "number"}},
-                {typeof (Double), () => new Schema {type = "number"}},
-                {typeof (Decimal), () => new Schema {type = "number"}},
+                {typeof (Int16), () => new Schema {type = "integer", format = "int32"}},
+                {typeof (UInt16), () => new Schema {type = "integer", format = "int32"}},
+                {typeof (Int32), () => new Schema {type = "integer", format = "int32"}},
+                {typeof (UInt32), () => new Schema {type = "integer", format = "int32"}},
+                {typeof (Int64), () => new Schema {type = "integer", format = "int64"}},
+                {typeof (UInt64), () => new Schema {type = "integer", format = "int64"}},
+                {typeof (Single), () => new Schema {type = "number", format = "float"}},
+                {typeof (Double), () => new Schema {type = "number", format = "double"}},
+                {typeof (Decimal), () => new Schema {type = "number", format = "double"}},
                 {typeof (String), () => new Schema {type = "string"}},
                 {typeof (Char), () => new Schema {type = "string"}},
-                {typeof (Byte), () => new Schema {type = "string"}},
+                {typeof (Byte), () => new Schema {type = "string", format = "byte"}},
                 {typeof (Boolean), () => new Schema {type = "boolean"}},
-                {typeof (DateTime), () => new Schema {type = "string"}},
-                {typeof (DateTimeOffset), () => new Schema {type = "string"}},
+                {typeof (DateTime), () => new Schema {type = "string", format = "date-time"}},
+                {typeof (DateTimeOffset), () => new Schema {type = "string", format = "date-time"}},
                 // Can't infer anything from the types below - default to string primitives
                 {typeof (object), () => new Schema {type="string"}},
                 {typeof (ExpandoObject), () => new Schema {type="string"}},
@@ -37,12 +38,12 @@ namespace Swashbuckle.Swagger2
                 {typeof (HttpResponseMessage), () => new Schema {type="string"}},
             };
 
-        private readonly Dictionary<string, Schema> _definitions;
-
         public SchemaRegistry()
         {
-            _definitions = new Dictionary<string, Schema>();
+            Definitions = new Dictionary<string, Schema>();
         }
+
+        public IDictionary<string, Schema> Definitions { get; private set; }
 
         public Schema FindOrRegister(Type type)
         {
@@ -85,7 +86,7 @@ namespace Swashbuckle.Swagger2
 
             // A complex type! If not already registered and not currently queued, queue it up
             var reference = "#/definitions/" + UniqueIdFor(type);
-            if (!_definitions.ContainsKey(reference) && !queue.Contains(type))
+            if (!Definitions.ContainsKey(reference) && !queue.Contains(type))
                 queue.Enqueue(type);
 
             return new Schema { @ref = reference };
@@ -93,54 +94,39 @@ namespace Swashbuckle.Swagger2
 
         private void RegisterComplexSchemaFor(Type type, Queue<Type> queue)
         {
+            // Ignore inherited properties if its an explicitly configured polymorphic sub type
+            //var polymorphicType = PolymorphicTypeFor(type);
+            //var bindingFlags = polymorphicType.IsBase
+            //    ? BindingFlags.Instance | BindingFlags.Public
+            //    : BindingFlags.Instance | BindingFlags.Public | BindingFlags.DeclaredOnly;
+            var bindingFlags = BindingFlags.Instance | BindingFlags.Public;
+
+            var propInfos = type.GetProperties(bindingFlags)
+                .Where(propInfo => !propInfo.GetIndexParameters().Any())    // Ignore indexer properties
+                .ToArray();
+
+            var properties = propInfos.ToDictionary(
+                propInfo => propInfo.Name,
+                propInfo => CreateSimpleSchemaFor(propInfo.PropertyType, queue));
+
+            var required = propInfos.Where(propInfo => Attribute.IsDefined(propInfo, typeof(RequiredAttribute)))
+                .Select(propInfo => propInfo.Name)
+                .ToList();
+
+            //var subDataTypes = polymorphicType.SubTypes
+            //    .Select(subType => CreateDataTypeFor(subType.Type, queue))
+            //    .Select(subDataType => subDataType.Ref)
+            //    .ToList();
+
+            var schema = new Schema
+            {
+                required = required,
+                properties = properties,
+                type = "object"
+            };
+
+            Definitions[UniqueIdFor(type)] = schema;
         }
-
-        //private Model CreateModelFor(Type type, Queue<Type> queue)
-        //{, 
-        //    // Ignore inherited properties if its an explicitly configured polymorphic sub type
-        //    var polymorphicType = PolymorphicTypeFor(type);
-        //    var bindingFlags = polymorphicType.IsBase
-        //        ? BindingFlags.Instance | BindingFlags.Public
-        //        : BindingFlags.Instance | BindingFlags.Public | BindingFlags.DeclaredOnly;
-
-        //    var propInfos = type.GetProperties(bindingFlags)
-        //        .Where(propInfo => !propInfo.GetIndexParameters().Any())    // Ignore indexer properties
-        //        .ToArray();
-
-        //    var properties = propInfos.ToDictionary(
-        //        propInfo => propInfo.Name,
-        //        propInfo =>
-        //        {
-        //            var property = new Property();
-        //            property.CopyValuesFrom(CreateDataTypeFor(propInfo.PropertyType, queue));
-        //            return property;
-        //        });
-
-        //    var required = propInfos.Where(propInfo => Attribute.IsDefined(propInfo, typeof (RequiredAttribute)))
-        //        .Select(propInfo => propInfo.Name)
-        //        .ToList();
-
-        //    var subDataTypes = polymorphicType.SubTypes
-        //        .Select(subType => CreateDataTypeFor(subType.Type, queue))
-        //        .Select(subDataType => subDataType.Ref)
-        //        .ToList();
-
-        //    var dataType = new Model
-        //    {
-        //        Id = UniqueIdFor(type),
-        //        Properties = properties,
-        //        Required = required,
-        //        SubTypes = subDataTypes,
-        //        Discriminator = polymorphicType.Discriminator
-        //    };
-
-        //    foreach (var filter in _modelFilters)
-        //    {
-        //        filter.Apply(dataType, this, type);
-        //    }
-
-        //    return dataType;
-        //}
 
         private static string UniqueIdFor(Type type)
         {

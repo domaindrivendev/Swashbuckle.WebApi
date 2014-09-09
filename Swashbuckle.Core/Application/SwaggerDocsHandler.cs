@@ -11,16 +11,16 @@ using Swashbuckle.Swagger2;
 
 namespace Swashbuckle.Application
 {
-    public class SwaggerObjectHandler : HttpMessageHandler
+    public class SwaggerDocsHandler : HttpMessageHandler
     {
         protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
         {
             object apiVersion;
             request.GetRouteData().Values.TryGetValue("apiVersion", out apiVersion);
 
-            var swaggerObject = request.SwaggerProvider().GetSwaggerFor(apiVersion.ToString());
+            var swaggerDoc = request.SwaggerProvider().GetSwaggerFor(apiVersion.ToString());
 
-            var content = ContentFor(request, swaggerObject);
+            var content = ContentFor(request, swaggerDoc);
             return TaskFor(new HttpResponseMessage { Content = content });
         }
 

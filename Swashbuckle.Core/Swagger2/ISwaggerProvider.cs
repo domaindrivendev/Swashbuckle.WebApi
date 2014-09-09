@@ -2,6 +2,6 @@
 {
     public interface ISwaggerProvider
     {
-        SwaggerObject GetSwaggerFor(string apiVersion);
+        SwaggerDocument GetSwaggerFor(string apiVersion);
     }
 }

@@ -3,7 +3,7 @@ using Newtonsoft.Json;
 
 namespace Swashbuckle.Swagger2
 {
-    public class SwaggerObject
+    public class SwaggerDocument : Extensible
     {
         public readonly string swagger = "2.0";
 
@@ -232,6 +232,9 @@ namespace Swashbuckle.Swagger2
         public ExternalDocs externalDocs;
     }
 
-    public class VendorExtensible : Dictionary<string, object>
-    {}
+    public class Extensible
+    {
+        [JsonExtensionData]
+        public IDictionary<string, object> extensions = new Dictionary<string, object>();
+    }
 }

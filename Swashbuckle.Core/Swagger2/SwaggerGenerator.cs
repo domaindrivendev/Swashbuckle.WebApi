@@ -9,7 +9,6 @@ namespace Swashbuckle.Swagger2
     {
         private readonly IApiExplorer _apiExplorer;
         private readonly SwaggerGeneratorSettings _settings;
-        private readonly SchemaRegistry _schemaRegistry;
 
         public SwaggerGenerator(
             IApiExplorer apiExplorer,
@@ -17,20 +16,32 @@ namespace Swashbuckle.Swagger2
         {
             _apiExplorer = apiExplorer;
             _settings = settings;
-            _schemaRegistry = new SchemaRegistry();
         }
 
-        public SwaggerObject GetSwaggerFor(string apiVersion)
+        public SwaggerDocument GetSwaggerFor(string apiVersion)
         {
+            var schemaRegistry = new SchemaRegistry();
+
             var paths = GetApplicableApiDescriptionsFor(apiVersion)
                 .GroupBy(apiDesc => apiDesc.RelativePathSansQueryString())
-                .ToDictionary(group => "/" + group.Key, group => CreatePathItem(group));
+                .ToDictionary(group => "/" + group.Key, group => CreatePathItem(group, schemaRegistry));
 
-            return new SwaggerObject
+            var swaggerDoc = new SwaggerDocument
             {
                 info = _settings.Info,
-                paths = paths
+                host = _settings.Host,
+                basePath = _settings.VirtualPathRoot,
+                schemes = _settings.Schemes.ToList(),
+                paths = paths,
+                definitions = schemaRegistry.Definitions
             };
+
+            foreach(var filter in _settings.DocumentFilters)
+            {
+                filter.Apply(swaggerDoc, schemaRegistry, _apiExplorer);
+            }
+
+            return swaggerDoc;
         }
 
         private IEnumerable<ApiDescription> GetApplicableApiDescriptionsFor(string apiVersion)
@@ -39,7 +50,7 @@ namespace Swashbuckle.Swagger2
                 .Where(apiDesc => !_settings.IgnoreObsoleteActions || apiDesc.IsNotObsolete());
         }
 
-        private PathItem CreatePathItem(IEnumerable<ApiDescription> apiDescriptions)
+        private PathItem CreatePathItem(IEnumerable<ApiDescription> apiDescriptions, SchemaRegistry schemaRegistry)
         {
             var pathItem = new PathItem();
 
@@ -61,25 +72,25 @@ namespace Swashbuckle.Swagger2
                 switch (httpMethod)
                 {
                     case "get":
-                        pathItem.get = CreateOperation(apiDescription);
+                        pathItem.get = CreateOperation(apiDescription, schemaRegistry);
                         break;
                     case "put":
-                        pathItem.put = CreateOperation(apiDescription);
+                        pathItem.put = CreateOperation(apiDescription, schemaRegistry);
                         break;
                     case "post":
-                        pathItem.post = CreateOperation(apiDescription);
+                        pathItem.post = CreateOperation(apiDescription, schemaRegistry);
                         break;
                     case "delete":
-                        pathItem.delete = CreateOperation(apiDescription);
+                        pathItem.delete = CreateOperation(apiDescription, schemaRegistry);
                         break;
                     case "options":
-                        pathItem.options = CreateOperation(apiDescription);
+                        pathItem.options = CreateOperation(apiDescription, schemaRegistry);
                         break;
                     case "head":
-                        pathItem.head = CreateOperation(apiDescription);
+                        pathItem.head = CreateOperation(apiDescription, schemaRegistry);
                         break;
                     case "patch":
-                        pathItem.patch = CreateOperation(apiDescription);
+                        pathItem.patch = CreateOperation(apiDescription, schemaRegistry);
                         break;
                 }
             }
@@ -87,25 +98,38 @@ namespace Swashbuckle.Swagger2
             return pathItem;
         }
 
-        private Operation CreateOperation(ApiDescription apiDescription)
+        private Operation CreateOperation(ApiDescription apiDescription, SchemaRegistry schemaRegistry)
         {
             var parameters = apiDescription.ParameterDescriptions
                 .Select(paramDesc =>
                     {
                         var inPath = apiDescription.RelativePathSansQueryString().Contains("{" + paramDesc.Name + "}");
-                        return CreateParameter(paramDesc, inPath);
-                    });
+                        return CreateParameter(paramDesc, inPath, schemaRegistry);
+                    })
+                 .ToList();
 
-            return new Operation
-            {
+            var responses = new Dictionary<string, Response>{
+                { "200", CreateResponse(apiDescription.SuccessResponseType(), schemaRegistry) }
+            };
+
+            var operation = new Operation
+            { 
                 operationId = apiDescription.OperationId(),
                 produces = apiDescription.Produces().ToList(),
                 consumes = apiDescription.Consumes().ToList(),
-                parameters = parameters.ToList()
+                parameters = parameters,
+                responses = responses
             };
+
+            foreach (var filter in _settings.OperationFilters)
+            {
+                filter.Apply(operation, schemaRegistry, apiDescription);
+            }
+
+            return operation;
         }
 
-        private Parameter CreateParameter(ApiParameterDescription paramDesc, bool inPath)
+        private Parameter CreateParameter(ApiParameterDescription paramDesc, bool inPath, SchemaRegistry schemaRegistry)
         {
             var @in = (inPath)
                 ? "path"
@@ -126,17 +150,27 @@ namespace Swashbuckle.Swagger2
 
             parameter.required = !paramDesc.ParameterDescriptor.IsOptional;
 
-            var schema = _schemaRegistry.FindOrRegister(paramDesc.ParameterDescriptor.ParameterType);
+            var schema = schemaRegistry.FindOrRegister(paramDesc.ParameterDescriptor.ParameterType);
             if (parameter.@in == "body")
             {
                 parameter.schema = schema;
             }
             else
             {
+                parameter.format = schema.format;
                 parameter.type = schema.type;
             }
 
             return parameter;
+        }
+
+        private Response CreateResponse(Type returnType, SchemaRegistry schemaRegistry)
+        {
+            var schema = (returnType != null)
+                ? schemaRegistry.FindOrRegister(returnType)
+                : null;
+
+            return new Response { schema = schema };
         }
     }
 }

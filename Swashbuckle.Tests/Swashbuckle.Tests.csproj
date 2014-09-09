@@ -42,8 +42,9 @@
     <Reference Include="Moq">
       <HintPath>..\packages\Moq.4.0.10827\lib\NET40\Moq.dll</HintPath>
     </Reference>
-    <Reference Include="Newtonsoft.Json">
-      <HintPath>..\packages\Newtonsoft.Json.4.5.11\lib\net40\Newtonsoft.Json.dll</HintPath>
+    <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Newtonsoft.Json.6.0.5\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="nunit.framework">
       <HintPath>..\packages\NUnit.2.6.2\lib\nunit.framework.dll</HintPath>
@@ -72,6 +73,7 @@
   <ItemGroup>
     <Compile Include="HttpMessageHandlerTestFixture.cs" />
     <Compile Include="HttpMessageHandlerTestsBase.cs" />
+    <Compile Include="Swagger2\SchemaTests.cs" />
     <Compile Include="Swagger2\CoreTests.cs" />
     <Compile Include="SwaggerSpec\OAuth2Tests.cs" />
     <Compile Include="SwaggerSpec\MultipleApiVersionsTests.cs" />
