@@ -272,45 +272,6 @@ namespace Swashbuckle.Tests.Swagger2
             Assert.AreEqual(expected.ToString(), paths.ToString());
         }
 
-        [Test]
-        public void It_should_handle_additional_route_parameters()
-        {
-            // i.e. route params that are not included in the action signature
-            AddCustomRouteFor<ProductsController>("{apiVersion}/products");
-
-            var swagger = Get<JObject>("http://tempuri.org/swagger/docs/1.0");
-            var getParams = swagger["paths"]["/{apiVersion}/products"]["get"]["parameters"];
-
-            var expected = JArray.FromObject(new []
-                {
-                    new
-                    {
-                        name = "type",
-                        @in = "query",
-                        required = true,
-                        type = "string"
-                    },
-                    new
-                    {
-                        name = "apiVersion",
-                        @in = "path",
-                        required = true,
-                        type = "string"
-                    }
-                });
-
-            Assert.AreEqual(expected.ToString(), getParams.ToString());
-        }
-
-        [Test]
-        public void It_should_handle_attribute_routes()
-        {
-            AddAttributeRoutes();
-
-            var swagger = Get<JObject>("http://tempuri.org/swagger/docs/1.0");
-            var path = swagger["paths"]["/subscriptions/{id}/cancel"];
-            Assert.IsNotNull(path);
-        }
 
         [Test]
         public void It_should_support_config_to_include_additional_info_properties()
@@ -405,6 +366,55 @@ namespace Swashbuckle.Tests.Swagger2
 
             Assert.IsNotNull(getDefaultResponse);
             Assert.IsNotNull(postDefaultResponse);
+        }
+
+        [Test]
+        public void It_should_handle_additional_route_parameters()
+        {
+            // i.e. route params that are not included in the action signature
+            AddCustomRouteFor<ProductsController>("{apiVersion}/products");
+
+            var swagger = Get<JObject>("http://tempuri.org/swagger/docs/1.0");
+            var getParams = swagger["paths"]["/{apiVersion}/products"]["get"]["parameters"];
+
+            var expected = JArray.FromObject(new []
+                {
+                    new
+                    {
+                        name = "type",
+                        @in = "query",
+                        required = true,
+                        type = "string"
+                    },
+                    new
+                    {
+                        name = "apiVersion",
+                        @in = "path",
+                        required = true,
+                        type = "string"
+                    }
+                });
+
+            Assert.AreEqual(expected.ToString(), getParams.ToString());
+        }
+
+        [Test]
+        public void It_should_handle_attribute_routes()
+        {
+            AddAttributeRoutes();
+
+            var swagger = Get<JObject>("http://tempuri.org/swagger/docs/1.0");
+            var path = swagger["paths"]["/subscriptions/{id}/cancel"];
+            Assert.IsNotNull(path);
+        }
+
+        [Test]
+        [ExpectedException(typeof(NotSupportedException))]
+        public void It_should_error_on_multiple_actions_with_same_path_and_http_method()
+        {
+            AddDefaultRouteFor<UnsupportedActionsController>();
+
+            var swagger = Get<JObject>("http://tempuri.org/swagger/docs/1.0");
         }
     }
 }

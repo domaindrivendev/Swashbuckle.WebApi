@@ -154,13 +154,13 @@ namespace Swashbuckle.Swagger2
 
         public object @default;
 
-        public int? multipleOf;
+        public object multipleOf;
 
-        public int? maximum;
+        public object maximum;
 
         public bool? exclusiveMaximum;
 
-        public int? minimum;
+        public object minimum;
 
         public bool? exclusiveMinimum;
 

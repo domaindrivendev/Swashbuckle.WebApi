@@ -76,13 +76,7 @@ namespace Swashbuckle.Swagger2
 
             Type itemType;
             if (type.IsEnumerable(out itemType))
-            {
-                if (itemType.IsEnumerable() && !PrimitiveMappings.ContainsKey(itemType))
-                    throw new InvalidOperationException(
-                        String.Format("Type {0} is not supported. Swagger does not support containers of containers", type));
-
                 return new Schema { type = "array", items = CreateSimpleSchemaFor(itemType, queue) };
-            }
 
             // A complex type! If not already registered and not currently queued, queue it up
             var reference = "#/definitions/" + UniqueIdFor(type);
@@ -107,7 +101,7 @@ namespace Swashbuckle.Swagger2
 
             var properties = propInfos.ToDictionary(
                 propInfo => propInfo.Name,
-                propInfo => CreateSimpleSchemaFor(propInfo.PropertyType, queue));
+                propInfo => CreateSimpleSchemaFor(propInfo.PropertyType, queue).WithValidations(propInfo));
 
             var required = propInfos.Where(propInfo => Attribute.IsDefined(propInfo, typeof(RequiredAttribute)))
                 .Select(propInfo => propInfo.Name)

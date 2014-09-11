@@ -86,6 +86,7 @@
     <Compile Include="Swagger2\ApiDescriptionExtensions.cs" />
     <Compile Include="Swagger2\IOperationFilter.cs" />
     <Compile Include="Swagger2\IDocumentFilter.cs" />
+    <Compile Include="Swagger2\SchemaExtensions.cs" />
     <Compile Include="Swagger2\SwaggerGenerator.cs" />
     <Compile Include="Swagger2\SwaggerGeneratorSettings.cs" />
     <Compile Include="Swagger2\ISwaggerProvider.cs" />
