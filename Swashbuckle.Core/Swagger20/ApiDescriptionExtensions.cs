@@ -3,7 +3,7 @@ using System.Linq;
 using System.Collections.Generic;
 using System.Web.Http.Description;
 
-namespace Swashbuckle.Swagger2
+namespace Swashbuckle.Swagger20
 {
     public static class ApiDescriptionExtensions
     {
@@ -59,9 +59,9 @@ namespace Swashbuckle.Swagger2
             return apiDesc.ActionDescriptor.ReturnType;
         }
 
-        public static bool IsNotObsolete(this ApiDescription apiDescription)
+        public static bool IsObsolete(this ApiDescription apiDescription)
         {
-            return !apiDescription.ActionDescriptor.GetCustomAttributes<ObsoleteAttribute>().Any();
+            return apiDescription.ActionDescriptor.GetCustomAttributes<ObsoleteAttribute>().Any();
         }
     }
 }

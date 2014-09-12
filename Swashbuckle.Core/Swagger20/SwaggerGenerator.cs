@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Web.Http.Description;
 using System;
 
-namespace Swashbuckle.Swagger2
+namespace Swashbuckle.Swagger20
 {
     public class SwaggerGenerator : ISwaggerProvider
     {
@@ -46,8 +46,7 @@ namespace Swashbuckle.Swagger2
 
         private IEnumerable<ApiDescription> GetApplicableApiDescriptionsFor(string apiVersion)
         {
-            return _apiExplorer.ApiDescriptions
-                .Where(apiDesc => !_settings.IgnoreObsoleteActions || apiDesc.IsNotObsolete());
+            return _apiExplorer.ApiDescriptions;
         }
 
         private PathItem CreatePathItem(IEnumerable<ApiDescription> apiDescriptions, SchemaRegistry schemaRegistry)
@@ -118,7 +117,8 @@ namespace Swashbuckle.Swagger2
                 produces = apiDescription.Produces().ToList(),
                 consumes = apiDescription.Consumes().ToList(),
                 parameters = parameters,
-                responses = responses
+                responses = responses,
+                deprecated = apiDescription.IsObsolete()
             };
 
             foreach (var filter in _settings.OperationFilters)

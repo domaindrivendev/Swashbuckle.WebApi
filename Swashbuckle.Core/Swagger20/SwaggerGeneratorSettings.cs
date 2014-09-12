@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Swashbuckle.Swagger2
+namespace Swashbuckle.Swagger20
 {
     public class SwaggerGeneratorSettings
     {
@@ -9,7 +9,6 @@ namespace Swashbuckle.Swagger2
             string host,
             string virtualPathRoot,
             IEnumerable<string> schemes,
-            bool ignoreObsoleteActions = false,
             IEnumerable<IOperationFilter> operationFilters = null,
             IEnumerable<IDocumentFilter> documentFilters = null)
         {
@@ -17,7 +16,6 @@ namespace Swashbuckle.Swagger2
             Host = host;
             VirtualPathRoot = virtualPathRoot;
             Schemes = schemes;
-            IgnoreObsoleteActions = ignoreObsoleteActions;
             OperationFilters = operationFilters ?? new List<IOperationFilter>();
             DocumentFilters = documentFilters ?? new List<IDocumentFilter>();
         }
@@ -29,8 +27,6 @@ namespace Swashbuckle.Swagger2
         public string VirtualPathRoot { get; private set; }
 
         public IEnumerable<string> Schemes { get; private set; }
-
-        public bool IgnoreObsoleteActions { get; private set; }
 
         public IEnumerable<IOperationFilter> OperationFilters { get; private set; }
 

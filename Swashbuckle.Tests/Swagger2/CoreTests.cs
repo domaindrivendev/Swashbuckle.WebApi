@@ -12,7 +12,7 @@ namespace Swashbuckle.Tests.Swagger2
     [TestFixture]
     public class CoreTests : HttpMessageHandlerTestFixture<SwaggerDocsHandler>
     {
-        private Swagger2Config _swaggerConfig;
+        private Swagger20Config _swaggerConfig;
 
         public CoreTests()
             : base("swagger/docs/{apiVersion}")
@@ -21,7 +21,7 @@ namespace Swashbuckle.Tests.Swagger2
         [SetUp]
         public void SetUp()
         {
-            _swaggerConfig = new Swagger2Config();
+            _swaggerConfig = new Swagger20Config();
             _swaggerConfig.ApiVersion("1.0").Title("Test API");
 
             Configuration.SetSwaggerConfig(_swaggerConfig);
@@ -111,7 +111,8 @@ namespace Swashbuckle.Tests.Swagger2
                                             }
                                         }
                                     }
-                                }
+                                },
+                                deprecated = false
                             },
                             post = new
                             {
@@ -140,7 +141,8 @@ namespace Swashbuckle.Tests.Swagger2
                                             }
                                         }
                                     }
-                                }
+                                },
+                                deprecated = false
                             }
                         }
                     },
@@ -171,7 +173,8 @@ namespace Swashbuckle.Tests.Swagger2
                                             schema = JObject.Parse("{ $ref: \"#/definitions/Product\" }")
                                         }
                                     }
-                                }
+                                },
+                                deprecated = false
                             }
                         }
                     },
@@ -205,7 +208,8 @@ namespace Swashbuckle.Tests.Swagger2
                                             }
                                         }
                                     }
-                                }
+                                },
+                                deprecated = false
                             }
                         }
                     },
@@ -240,7 +244,8 @@ namespace Swashbuckle.Tests.Swagger2
                                     {
                                         "200", new { }
                                     }
-                                }
+                                },
+                                deprecated = false
                             },
                             delete = new
                             {
@@ -263,7 +268,8 @@ namespace Swashbuckle.Tests.Swagger2
                                     {
                                         "200", new { }
                                     }
-                                }
+                                },
+                                deprecated = false
                             }
                         }
                     }
@@ -327,18 +333,16 @@ namespace Swashbuckle.Tests.Swagger2
         }
 
         [Test]
-        public void It_should_support_config_to_ignore_obsolete_actions()
+        public void It_should_mark_an_operation_deprecated_if_the_action_is_obsolete()
         {
             AddDefaultRouteFor<ObsoleteActionsController>();
-
-            _swaggerConfig.IgnoreObsoleteActions();
 
             var swagger = Get<JObject>("http://tempuri.org/swagger/docs/1.0");
             var putOp = swagger["paths"]["/obsoleteactions/{id}"]["put"];
             var deleteOp = swagger["paths"]["/obsoleteactions/{id}"]["delete"];
 
-            Assert.IsNotNull(putOp);
-            Assert.IsNull(deleteOp);
+            Assert.IsFalse((bool)putOp["deprecated"]);
+            Assert.IsTrue((bool)deleteOp["deprecated"]);
         }
 
         [Test]
@@ -410,7 +414,7 @@ namespace Swashbuckle.Tests.Swagger2
 
         [Test]
         [ExpectedException(typeof(NotSupportedException))]
-        public void It_should_error_on_multiple_actions_with_same_path_and_http_method()
+        public void It_should_error_on_multiple_actions_with_same_path_and_method()
         {
             AddDefaultRouteFor<UnsupportedActionsController>();
 

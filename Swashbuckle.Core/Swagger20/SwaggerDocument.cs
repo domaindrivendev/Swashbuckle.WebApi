@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using Newtonsoft.Json;
 
-namespace Swashbuckle.Swagger2
+namespace Swashbuckle.Swagger20
 {
     public class SwaggerDocument : Extensible
     {
@@ -113,6 +113,8 @@ namespace Swashbuckle.Swagger2
         public IDictionary<string, Response> responses;
 
         public IList<string> schemes;
+
+        public bool deprecated;
 
         public IList<string> security;
     }

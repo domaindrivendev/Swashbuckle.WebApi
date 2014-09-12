@@ -12,7 +12,7 @@ namespace Swashbuckle.Tests.Swagger2
     [TestFixture]
     public class SchemaTests : HttpMessageHandlerTestFixture<SwaggerDocsHandler>
     {
-        private Swagger2Config _swaggerConfig;
+        private Swagger20Config _swaggerConfig;
 
         public SchemaTests()
             : base("swagger/docs/{apiVersion}")
@@ -21,7 +21,7 @@ namespace Swashbuckle.Tests.Swagger2
         [SetUp]
         public void SetUp()
         {
-            _swaggerConfig = new Swagger2Config();
+            _swaggerConfig = new Swagger20Config();
             _swaggerConfig.ApiVersion("1.0").Title("Test API");
 
             Configuration.SetSwaggerConfig(_swaggerConfig);
@@ -252,22 +252,35 @@ namespace Swashbuckle.Tests.Swagger2
         }
 
         [Test]
-        public void It_should_handle_jagged_arrays()
+        public void It_should_handle_jagged_container_types()
         {
-            AddDefaultRouteFor<JaggedArraysController>();
+            AddDefaultRouteFor<JaggedContainersController>();
 
             var swagger = Get<JObject>("http://tempuri.org/swagger/docs/1.0");
 
             var definitions = swagger["definitions"];
             Assert.IsNotNull(definitions);
 
-            var expected = JObject.FromObject(new
+            var expected = JObject.FromObject(new Dictionary<string, object>
                 {
-                    //Matrix = new
-                    //{
-                    //    items = JObject.Parse("{ $ref: \"#/definitions/Matrix\" }"),
-                    //    type = "array"
-                    //}
+                    {
+                        "Int32[]", new
+                        {
+                            items = new
+                            {
+                                format = "int32",
+                                type = "integer"
+                            },
+                            type = "array"
+                        }
+                    },
+                    {
+                        "Token", new
+                        {
+                            items = JObject.Parse("{ $ref: \"#/definitions/Token\" }"),
+                            type = "array"
+                        }
+                    }
                 });
             Assert.AreEqual(expected.ToString(), definitions.ToString());
         }

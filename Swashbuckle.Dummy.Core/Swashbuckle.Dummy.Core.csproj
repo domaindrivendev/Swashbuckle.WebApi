@@ -67,7 +67,7 @@
     <Compile Include="Controllers\PolymorphicTypesController.cs" />
     <Compile Include="Controllers\AttributeRoutesController.cs" />
     <Compile Include="Controllers\UnsupportedActionsController.cs" />
-    <Compile Include="Controllers\JaggedArraysController.cs" />
+    <Compile Include="Controllers\JaggedContainersController.cs" />
     <Compile Include="Controllers\NestedTypesController.cs" />
     <Compile Include="Controllers\ObsoleteActionsController.cs" />
     <Compile Include="Controllers\AnnotatedTypesController.cs" />

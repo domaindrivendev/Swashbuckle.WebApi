@@ -2,7 +2,7 @@
 using System.Net.Http;
 using System.Web.Http;
 using Swashbuckle.Configuration;
-using Swashbuckle.Swagger2;
+using Swashbuckle.Swagger20;
 
 namespace Swashbuckle.Application
 {
@@ -10,14 +10,14 @@ namespace Swashbuckle.Application
     {
         private const string SwaggerConfigKey = "Swashbuckle_SwaggerConfig";
 
-        public static void SetSwaggerConfig(this HttpConfiguration httpConfig, Swagger2Config swaggerConfig)
+        public static void SetSwaggerConfig(this HttpConfiguration httpConfig, Swagger20Config swaggerConfig)
         {
             httpConfig.Properties[SwaggerConfigKey] = swaggerConfig;
         }
 
-        public static Swagger2Config GetSwaggerConfig(this HttpConfiguration httpConfig)
+        public static Swagger20Config GetSwaggerConfig(this HttpConfiguration httpConfig)
         {
-            var swaggerConfig = httpConfig.Properties[SwaggerConfigKey] as Swagger2Config;
+            var swaggerConfig = httpConfig.Properties[SwaggerConfigKey] as Swagger20Config;
             if (swaggerConfig == null)
                 throw new InvalidOperationException("SwaggerConfig not found in HttpConfiguration properties");
             return swaggerConfig;

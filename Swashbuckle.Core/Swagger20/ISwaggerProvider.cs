@@ -1,4 +1,4 @@
-﻿namespace Swashbuckle.Swagger2
+﻿namespace Swashbuckle.Swagger20
 {
     public interface ISwaggerProvider
     {

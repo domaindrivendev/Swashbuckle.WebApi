@@ -1,6 +1,6 @@
 ﻿using System.Web.Http.Description;
 
-namespace Swashbuckle.Swagger2
+namespace Swashbuckle.Swagger20
 {
     public interface IDocumentFilter
     {

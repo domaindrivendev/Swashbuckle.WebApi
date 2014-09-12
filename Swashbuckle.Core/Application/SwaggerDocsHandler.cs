@@ -7,7 +7,7 @@ using System.Net.Http.Formatting;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using System.Collections.Generic;
-using Swashbuckle.Swagger2;
+using Swashbuckle.Swagger20;
 
 namespace Swashbuckle.Application
 {

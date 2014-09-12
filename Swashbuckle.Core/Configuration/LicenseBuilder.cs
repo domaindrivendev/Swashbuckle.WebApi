@@ -1,4 +1,4 @@
-﻿using Swashbuckle.Swagger2;
+﻿using Swashbuckle.Swagger20;
 
 namespace Swashbuckle.Configuration
 {

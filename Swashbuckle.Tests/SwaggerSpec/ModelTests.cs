@@ -241,7 +241,7 @@ namespace Swashbuckle.Tests.SwaggerSpec
         [ExpectedException(typeof(InvalidOperationException))]
         public void It_should_honor_the_swagger_spec_and_not_support_containers_of_containers()
         {
-            SetUpDefaultRouteFor<JaggedArraysController>();
+            SetUpDefaultRouteFor<JaggedContainersController>();
 
             Get<JObject>("http://tempuri.org/swagger/api-docs/UnsupportedTypes");
         }

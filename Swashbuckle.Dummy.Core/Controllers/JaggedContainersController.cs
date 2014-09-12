@@ -4,7 +4,7 @@ using System.Web.Http;
 
 namespace Swashbuckle.Dummy.Controllers
 {
-    public class JaggedArraysController : ApiController
+    public class JaggedContainersController : ApiController
     {
         public int Create(int[][] matrix)
         {

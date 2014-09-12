@@ -9,7 +9,7 @@ using System.Text;
 using Newtonsoft.Json.Linq;
 using Swashbuckle.Swagger;
 
-namespace Swashbuckle.Swagger2
+namespace Swashbuckle.Swagger20
 {
     public class SchemaRegistry
     {
@@ -47,19 +47,25 @@ namespace Swashbuckle.Swagger2
 
         public Schema FindOrRegister(Type type)
         {
-            var queue = new Queue<Type>(); // defer processing of complex types
-            var schema = CreateSimpleSchemaFor(type, queue);
+            var referencedTypes = new Queue<KeyValuePair<string, Type>>();
+            var rootSchema = CreateSchema(type, false, true, referencedTypes);
 
-            while (queue.Any())
+            while (referencedTypes.Any())
             {
-                RegisterComplexSchemaFor(queue.Peek(), queue);
-                queue.Dequeue();
+                var next = referencedTypes.Dequeue();
+                if (Definitions.ContainsKey(next.Key)) continue;
+
+                Definitions.Add(next.Key, CreateSchema(next.Value, false, false, referencedTypes));
             }
 
-            return schema;
+            return rootSchema;
         }
 
-        private Schema CreateSimpleSchemaFor(Type type, Queue<Type> queue)
+        private Schema CreateSchema(
+            Type type,
+            bool refIfArray,
+            bool refIfComplex,
+            Queue<KeyValuePair<string, Type>> referencedTypes)
         {
             //if (_customMappings.ContainsKey(type))
             //    return _customMappings[type]();
@@ -72,21 +78,23 @@ namespace Swashbuckle.Swagger2
 
             Type innerType;
             if (type.IsNullable(out innerType))
-                return CreateSimpleSchemaFor(innerType, queue);
+                return CreateSchema(innerType, false, true, referencedTypes);
 
             Type itemType;
-            if (type.IsEnumerable(out itemType))
-                return new Schema { type = "array", items = CreateSimpleSchemaFor(itemType, queue) };
+            if (type.IsEnumerable(out itemType) && !refIfArray)
+                return new Schema { type = "array", items = CreateSchema(itemType, true, true, referencedTypes) };
 
-            // A complex type! If not already registered and not currently queued, queue it up
-            var reference = "#/definitions/" + UniqueIdFor(type);
-            if (!Definitions.ContainsKey(reference) && !queue.Contains(type))
-                queue.Enqueue(type);
+            // None of the above so treat as a complex type
+            if (!refIfComplex)
+                return CreateComplexSchema(type, referencedTypes);
 
-            return new Schema { @ref = reference };
+            // Only a ref was requested so defer the full schema generation
+            var id = UniqueIdFor(type);
+            referencedTypes.Enqueue(new KeyValuePair<string, Type>(id, type));
+            return new Schema { @ref = "#/definitions/" + id };
         }
 
-        private void RegisterComplexSchemaFor(Type type, Queue<Type> queue)
+        private Schema CreateComplexSchema(Type type, Queue<KeyValuePair<string, Type>> referencedTypes)
         {
             // Ignore inherited properties if its an explicitly configured polymorphic sub type
             //var polymorphicType = PolymorphicTypeFor(type);
@@ -101,7 +109,8 @@ namespace Swashbuckle.Swagger2
 
             var properties = propInfos.ToDictionary(
                 propInfo => propInfo.Name,
-                propInfo => CreateSimpleSchemaFor(propInfo.PropertyType, queue).WithValidations(propInfo));
+                propInfo => CreateSchema(propInfo.PropertyType, false, true, referencedTypes)
+                    .WithValidationProperties(propInfo));
 
             var required = propInfos.Where(propInfo => Attribute.IsDefined(propInfo, typeof(RequiredAttribute)))
                 .Select(propInfo => propInfo.Name)
@@ -119,7 +128,7 @@ namespace Swashbuckle.Swagger2
                 type = "object"
             };
 
-            Definitions[UniqueIdFor(type)] = schema;
+            return schema;
         }
 
         private static string UniqueIdFor(Type type)

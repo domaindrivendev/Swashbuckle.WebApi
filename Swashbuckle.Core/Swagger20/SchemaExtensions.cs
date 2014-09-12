@@ -2,11 +2,11 @@
 using System.Linq;
 using System.ComponentModel.DataAnnotations;
 
-namespace Swashbuckle.Swagger2
+namespace Swashbuckle.Swagger20
 {
     public static class SchemaExtensions
     {
-        public static Schema WithValidations(this Schema schema, PropertyInfo context)
+        public static Schema WithValidationProperties(this Schema schema, PropertyInfo context)
         {
             foreach (var attribute in context.GetCustomAttributes(false))
             {
