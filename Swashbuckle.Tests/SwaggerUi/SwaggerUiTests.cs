@@ -128,5 +128,20 @@ namespace Swashbuckle.Tests.SwaggerUi
             StringAssert.Contains("oAuth2Realm: \"test-realm\"", content);
             StringAssert.Contains("oAuth2AppName: \"test-app-name\"", content);
         }
+
+        [Test]
+        public void It_should_support_an_optional_setting_to_enable_oauth2_OpenID_Connect()
+        {
+            _swaggerUiConfig.EnableOAuth2Support("test-client-id", "test-realm", "test-app-name","test-state","test-nonce");
+
+            var content = GetAsString("http://tempuri.org/swagger/ui/index.html");
+
+            StringAssert.Contains("oAuth2Enabled: true", content);
+            StringAssert.Contains("oAuth2ClientId: \"test-client-id\"", content);
+            StringAssert.Contains("oAuth2Realm: \"test-realm\"", content);
+            StringAssert.Contains("oAuth2AppName: \"test-app-name\"", content);
+            StringAssert.Contains("oAuth2State: \"test-state\"", content);
+            StringAssert.Contains("oAuth2Nonce: \"test-nonce\"", content);
+        }
     }
 }
