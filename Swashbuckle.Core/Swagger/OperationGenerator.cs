@@ -21,7 +21,14 @@ namespace Swashbuckle.Swagger
         {
             var apiPath = apiDescription.RelativePathSansQueryString();
             var parameters = apiDescription.ParameterDescriptions
-                .Where(paramDesc => !(paramDesc.ParameterDescriptor.ParameterBinderAttribute.GetType() == typeof(ModelBinderAttribute)))
+                .Where(paramDesc =>
+                       {
+                           var isCustomModelBoundParameter =
+                               paramDesc.ParameterDescriptor != null &&
+                               paramDesc.ParameterDescriptor.ParameterBinderAttribute != null &&
+                               paramDesc.ParameterDescriptor.ParameterBinderAttribute.GetType() == typeof (ModelBinderAttribute);
+                           return !isCustomModelBoundParameter;
+                       })
                 .Select(paramDesc => CreateParameter(paramDesc, apiPath))
                 .ToList();
 
