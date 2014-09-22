@@ -7,7 +7,7 @@ using Swashbuckle.Application;
 using Swashbuckle.Configuration;
 using Swashbuckle.Dummy.SwaggerExtensions;
 
-namespace Swashbuckle.Tests.Swagger2
+namespace Swashbuckle.Tests.Swagger20
 {
     [TestFixture]
     public class SchemaTests : HttpMessageHandlerTestFixture<SwaggerDocsHandler>

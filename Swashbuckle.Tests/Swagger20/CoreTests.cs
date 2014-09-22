@@ -7,7 +7,7 @@ using Swashbuckle.Application;
 using Swashbuckle.Configuration;
 using Swashbuckle.Dummy.SwaggerExtensions;
 
-namespace Swashbuckle.Tests.Swagger2
+namespace Swashbuckle.Tests.Swagger20
 {
     [TestFixture]
     public class CoreTests : HttpMessageHandlerTestFixture<SwaggerDocsHandler>
@@ -277,7 +277,6 @@ namespace Swashbuckle.Tests.Swagger2
 
             Assert.AreEqual(expected.ToString(), paths.ToString());
         }
-
 
         [Test]
         public void It_should_support_config_to_include_additional_info_properties()
