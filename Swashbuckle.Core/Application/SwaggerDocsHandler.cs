@@ -8,6 +8,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using System.Collections.Generic;
 using Swashbuckle.Swagger20;
+using System.Net;
 
 namespace Swashbuckle.Application
 {
@@ -18,10 +19,16 @@ namespace Swashbuckle.Application
             object apiVersion;
             request.GetRouteData().Values.TryGetValue("apiVersion", out apiVersion);
 
-            var swaggerDoc = request.SwaggerProvider().GetSwaggerFor(apiVersion.ToString());
-
-            var content = ContentFor(request, swaggerDoc);
-            return TaskFor(new HttpResponseMessage { Content = content });
+            try
+            {
+                var swaggerDoc = request.SwaggerProvider().GetSwaggerFor(apiVersion.ToString());
+                var content = ContentFor(request, swaggerDoc);
+                return TaskFor(new HttpResponseMessage { Content = content });
+            }
+            catch (UnknownApiVersion ex)
+            {
+                return TaskFor(request.CreateErrorResponse(HttpStatusCode.NotFound, ex));
+            }
         }
 
         private HttpContent ContentFor<T>(HttpRequestMessage request, T swaggerObject)

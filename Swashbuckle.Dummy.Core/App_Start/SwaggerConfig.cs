@@ -86,7 +86,7 @@ namespace Swashbuckle.Dummy
             return String.Format(@"{0}\XmlComments.xml", AppDomain.CurrentDomain.BaseDirectory);
         }
 
-        private static bool ResolveVersionSupportByRouteConstraint(ApiDescription apiDesc, string version)
+        public static bool ResolveVersionSupportByRouteConstraint(ApiDescription apiDesc, string targetApiVersion)
         {
             var versionConstraint = (apiDesc.Route.Constraints.ContainsKey("apiVersion"))
                 ? apiDesc.Route.Constraints["apiVersion"] as RegexRouteConstraint
@@ -94,7 +94,7 @@ namespace Swashbuckle.Dummy
 
             return (versionConstraint == null)
                 ? false
-                : versionConstraint.Pattern.Split('|').Contains(version);
+                : versionConstraint.Pattern.Split('|').Contains(targetApiVersion);
         }
     }
 }

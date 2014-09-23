@@ -6,6 +6,8 @@ using System.Collections.Generic;
 using Swashbuckle.Application;
 using Swashbuckle.Configuration;
 using Swashbuckle.Dummy.SwaggerExtensions;
+using Swashbuckle.Dummy;
+using System.Net;
 
 namespace Swashbuckle.Tests.Swagger20
 {
@@ -22,7 +24,7 @@ namespace Swashbuckle.Tests.Swagger20
         public void SetUp()
         {
             _swaggerConfig = new Swagger20Config();
-            _swaggerConfig.ApiVersion("1.0").Title("Test API");
+            _swaggerConfig.SingleApiVersion("1.0", "Test API");
 
             Configuration.SetSwaggerConfig(_swaggerConfig);
         }
@@ -30,7 +32,7 @@ namespace Swashbuckle.Tests.Swagger20
         [Test]
         public void It_should_indicate_swagger_version_2_0()
         {
-            var swagger = Get<JObject>("http://tempuri.org/swagger/docs/1.0");
+            var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/1.0");
 
             Assert.AreEqual("2.0", swagger["swagger"].ToString());
         }
@@ -38,7 +40,7 @@ namespace Swashbuckle.Tests.Swagger20
         [Test]
         public void It_should_provide_info_version_and_title()
         {
-            var swagger = Get<JObject>("http://tempuri.org/swagger/docs/1.0");
+            var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/1.0");
 
             var info = swagger["info"];
             Assert.IsNotNull(info);
@@ -54,7 +56,7 @@ namespace Swashbuckle.Tests.Swagger20
         [Test]
         public void It_should_provide_host_base_path_and_schemes()
         {
-            var swagger = Get<JObject>("http://tempuri.org/swagger/docs/1.0");
+            var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/1.0");
 
             var host = swagger["host"];
             Assert.IsNotNull(host);
@@ -76,7 +78,7 @@ namespace Swashbuckle.Tests.Swagger20
         {
             AddDefaultRoutesFor(new[] { typeof(ProductsController), typeof(CustomersController) });
 
-            var swagger = Get<JObject>("http://tempuri.org/swagger/docs/1.0");
+            var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/1.0");
             var paths = swagger["paths"];
 
             var expected = JObject.FromObject(new Dictionary<string, object>
@@ -279,10 +281,22 @@ namespace Swashbuckle.Tests.Swagger20
         }
 
         [Test]
+        public void It_should_mark_an_operation_deprecated_if_the_action_is_obsolete()
+        {
+            AddDefaultRouteFor<ObsoleteActionsController>();
+
+            var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/1.0");
+            var putOp = swagger["paths"]["/obsoleteactions/{id}"]["put"];
+            var deleteOp = swagger["paths"]["/obsoleteactions/{id}"]["delete"];
+
+            Assert.IsFalse((bool)putOp["deprecated"]);
+            Assert.IsTrue((bool)deleteOp["deprecated"]);
+        }
+
+        [Test]
         public void It_should_support_config_to_include_additional_info_properties()
         {
-            _swaggerConfig.ApiVersion("1.0")
-                .Title("Test API")
+            _swaggerConfig.SingleApiVersion("1.0", "Test API")
                 .Description("A test API")
                 .TermsOfService("Test terms")
                 .Contact(c => c
@@ -293,7 +307,7 @@ namespace Swashbuckle.Tests.Swagger20
                     .Name("Test License")
                     .Url("http://tempuri.org/license"));
 
-            var swagger = Get<JObject>("http://tempuri.org/swagger/docs/1.0");
+            var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/1.0");
 
             var info = swagger["info"];
             Assert.IsNotNull(info);
@@ -324,7 +338,7 @@ namespace Swashbuckle.Tests.Swagger20
         {
             _swaggerConfig.HostName((req) => "foobar.com");
 
-            var swagger = Get<JObject>("http://tempuri.org/swagger/docs/1.0");
+            var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/1.0");
 
             var host = swagger["host"];
             Assert.IsNotNull(host);
@@ -332,28 +346,15 @@ namespace Swashbuckle.Tests.Swagger20
         }
 
         [Test]
-        public void It_should_mark_an_operation_deprecated_if_the_action_is_obsolete()
-        {
-            AddDefaultRouteFor<ObsoleteActionsController>();
-
-            var swagger = Get<JObject>("http://tempuri.org/swagger/docs/1.0");
-            var putOp = swagger["paths"]["/obsoleteactions/{id}"]["put"];
-            var deleteOp = swagger["paths"]["/obsoleteactions/{id}"]["delete"];
-
-            Assert.IsFalse((bool)putOp["deprecated"]);
-            Assert.IsTrue((bool)deleteOp["deprecated"]);
-        }
-
-        [Test]
         public void It_should_support_config_to_post_modify_the_document()
         {
-            _swaggerConfig.DocumentFilter<ApplyVendorExtensions>();
+            _swaggerConfig.DocumentFilter<ApplyDocumentVendorExtensions>();
 
-            var swagger = Get<JObject>("http://tempuri.org/swagger/docs/1.0");
-            var xProp = swagger["x-foo"];
+            var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/1.0");
+            var xProp = swagger["x-document"];
 
             Assert.IsNotNull(xProp);
-            Assert.AreEqual("bar", xProp.ToString());
+            Assert.AreEqual("foo", xProp.ToString());
         }
 
         [Test]
@@ -363,7 +364,7 @@ namespace Swashbuckle.Tests.Swagger20
 
             _swaggerConfig.OperationFilter<AddDefaultResponse>();
 
-            var swagger = Get<JObject>("http://tempuri.org/swagger/docs/1.0");
+            var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/1.0");
             var getDefaultResponse = swagger["paths"]["/products"]["get"]["responses"]["default"];
             var postDefaultResponse = swagger["paths"]["/products"]["post"]["responses"]["default"];
 
@@ -372,12 +373,50 @@ namespace Swashbuckle.Tests.Swagger20
         }
 
         [Test]
+        public void It_should_support_config_to_describe_multiple_api_versions()
+        {
+            AddAttributeRoutesFrom(typeof(MultipleApiVersionsController).Assembly);
+
+            _swaggerConfig.MultipleApiVersions(
+                (apiDesc, targetApiVersion) => SwaggerConfig.ResolveVersionSupportByRouteConstraint(apiDesc, targetApiVersion),
+                (c) =>
+                {
+                    c.Version("1.0", "Test API V1.0");
+                    c.Version("2.0", "Test API V2.0");
+                });
+            
+            // 1.0
+            var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/1.0");
+            var info = swagger["info"];
+            var expected = JObject.FromObject(new
+                {
+                    version = "1.0",
+                    title = "Test API V1.0",
+                });
+            Assert.AreEqual(expected.ToString(), info.ToString());
+            Assert.IsNotNull(swagger["paths"]["/{apiVersion}/todos"]);
+            Assert.IsNull(swagger["paths"]["/{apiVersion}/todos/{id}"]);
+            
+            // 2.0
+            swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/2.0");
+            info = swagger["info"];
+            expected = JObject.FromObject(new
+                {
+                    version = "2.0",
+                    title = "Test API V2.0",
+                });
+            Assert.AreEqual(expected.ToString(), info.ToString());
+            Assert.IsNotNull(swagger["paths"]["/{apiVersion}/todos"]);
+            Assert.IsNotNull(swagger["paths"]["/{apiVersion}/todos/{id}"]);
+        }
+
+        [Test]
         public void It_should_handle_additional_route_parameters()
         {
             // i.e. route params that are not included in the action signature
             AddCustomRouteFor<ProductsController>("{apiVersion}/products");
 
-            var swagger = Get<JObject>("http://tempuri.org/swagger/docs/1.0");
+            var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/1.0");
             var getParams = swagger["paths"]["/{apiVersion}/products"]["get"]["parameters"];
 
             var expected = JArray.FromObject(new []
@@ -401,14 +440,23 @@ namespace Swashbuckle.Tests.Swagger20
             Assert.AreEqual(expected.ToString(), getParams.ToString());
         }
 
+
         [Test]
         public void It_should_handle_attribute_routes()
         {
-            AddAttributeRoutes();
+            AddAttributeRoutesFrom(typeof(AttributeRoutesController).Assembly);
 
-            var swagger = Get<JObject>("http://tempuri.org/swagger/docs/1.0");
+            var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/1.0");
             var path = swagger["paths"]["/subscriptions/{id}/cancel"];
             Assert.IsNotNull(path);
+        }
+
+        [Test]
+        public void It_should_error_on_unknown_api_version_and_return_status_not_found()
+        {
+            var response = Get("http://tempuri.org/swagger/docs/1.1");
+
+            Assert.AreEqual(HttpStatusCode.NotFound, response.StatusCode);
         }
 
         [Test]
@@ -417,7 +465,7 @@ namespace Swashbuckle.Tests.Swagger20
         {
             AddDefaultRouteFor<UnsupportedActionsController>();
 
-            var swagger = Get<JObject>("http://tempuri.org/swagger/docs/1.0");
+            var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/1.0");
         }
     }
 }

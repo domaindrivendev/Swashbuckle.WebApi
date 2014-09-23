@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using Swashbuckle.Application;
 using Swashbuckle.Configuration;
 using Swashbuckle.Dummy.SwaggerExtensions;
+using Swashbuckle.Swagger20;
 
 namespace Swashbuckle.Tests.Swagger20
 {
@@ -22,7 +23,7 @@ namespace Swashbuckle.Tests.Swagger20
         public void SetUp()
         {
             _swaggerConfig = new Swagger20Config();
-            _swaggerConfig.ApiVersion("1.0").Title("Test API");
+            _swaggerConfig.SingleApiVersion("1.0", "Test Api");
 
             Configuration.SetSwaggerConfig(_swaggerConfig);
         }
@@ -32,7 +33,7 @@ namespace Swashbuckle.Tests.Swagger20
         {
             AddDefaultRouteFor<ProductsController>();
 
-            var swagger = Get<JObject>("http://tempuri.org/swagger/docs/1.0");
+            var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/1.0");
 
             var definitions = swagger["definitions"];
             Assert.IsNotNull(definitions);
@@ -71,11 +72,11 @@ namespace Swashbuckle.Tests.Swagger20
         }
 
         [Test]
-        public void It_should_include_inherited_properties_for_sub_types()
+        public void It_should_include_inherited_members_for_sub_types()
         {
             AddDefaultRouteFor<PolymorphicTypesController>();
 
-            var swagger = Get<JObject>("http://tempuri.org/swagger/docs/1.0");
+            var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/1.0");
 
             var definitions = swagger["definitions"];
             Assert.IsNotNull(definitions);
@@ -124,7 +125,7 @@ namespace Swashbuckle.Tests.Swagger20
         {
             AddDefaultRouteFor<AnnotatedTypesController>();
             
-            var swagger = Get<JObject>("http://tempuri.org/swagger/docs/1.0");
+            var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/1.0");
 
             var definitions = swagger["definitions"];
             Assert.IsNotNull(definitions);
@@ -176,7 +177,7 @@ namespace Swashbuckle.Tests.Swagger20
         {
             AddDefaultRouteFor<NestedTypesController>();
 
-            var swagger = Get<JObject>("http://tempuri.org/swagger/docs/1.0");
+            var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/1.0");
 
             var definitions = swagger["definitions"];
             Assert.IsNotNull(definitions);
@@ -223,7 +224,7 @@ namespace Swashbuckle.Tests.Swagger20
         {
             AddDefaultRouteFor<SelfReferencingTypesController>();
 
-            var swagger = Get<JObject>("http://tempuri.org/swagger/docs/1.0");
+            var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/1.0");
 
             var definitions = swagger["definitions"];
             Assert.IsNotNull(definitions);
@@ -256,7 +257,7 @@ namespace Swashbuckle.Tests.Swagger20
         {
             AddDefaultRouteFor<JaggedContainersController>();
 
-            var swagger = Get<JObject>("http://tempuri.org/swagger/docs/1.0");
+            var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/1.0");
 
             var definitions = swagger["definitions"];
             Assert.IsNotNull(definitions);
@@ -283,6 +284,20 @@ namespace Swashbuckle.Tests.Swagger20
                     }
                 });
             Assert.AreEqual(expected.ToString(), definitions.ToString());
+        }
+        
+        [Test]
+        public void It_should_support_config_to_post_modify_schemas()
+        {
+            AddDefaultRouteFor<ProductsController>();
+
+            _swaggerConfig.SchemaFilter<ApplySchemaVendorExtensions>();
+
+            var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/1.0");
+            var xProp = swagger["definitions"]["Product"]["x-schema"];
+
+            Assert.IsNotNull(xProp);
+            Assert.AreEqual("bar", xProp.ToString());
         }
     }
 }

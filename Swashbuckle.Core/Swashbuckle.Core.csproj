@@ -74,6 +74,7 @@
     <Compile Include="Application\SwaggerSpecConfig.cs" />
     <Compile Include="Application\SwaggerUiConfig.cs" />
     <Compile Include="Application\SwaggerUiHandler.cs" />
+    <Compile Include="Configuration\ApiVersionsBuilder.cs" />
     <Compile Include="Configuration\LicenseBuilder.cs" />
     <Compile Include="Configuration\ContactBuilder.cs" />
     <Compile Include="Configuration\InfoBuilder.cs" />
@@ -84,6 +85,7 @@
     <Compile Include="ApiDescriptionExtensions.cs" />
     <Compile Include="DictionaryExtensions.cs" />
     <Compile Include="Swagger20\ApiDescriptionExtensions.cs" />
+    <Compile Include="Swagger20\ISchemaFilter.cs" />
     <Compile Include="Swagger20\IOperationFilter.cs" />
     <Compile Include="Swagger20\IDocumentFilter.cs" />
     <Compile Include="Swagger20\SchemaExtensions.cs" />

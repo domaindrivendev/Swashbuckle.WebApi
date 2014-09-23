@@ -20,15 +20,20 @@ namespace Swashbuckle.Swagger20
 
         public SwaggerDocument GetSwaggerFor(string apiVersion)
         {
-            var schemaRegistry = new SchemaRegistry();
+            var schemaRegistry = new SchemaRegistry(_settings.SchemaFilters);
 
-            var paths = GetApplicableApiDescriptionsFor(apiVersion)
+            Info info;
+            _settings.ApiVersions.TryGetValue(apiVersion, out info);
+            if (info == null)
+                throw new UnknownApiVersion(apiVersion);
+
+            var paths = GetApiDescriptionsFor(apiVersion)
                 .GroupBy(apiDesc => apiDesc.RelativePathSansQueryString())
                 .ToDictionary(group => "/" + group.Key, group => CreatePathItem(group, schemaRegistry));
 
             var swaggerDoc = new SwaggerDocument
             {
-                info = _settings.Info,
+                info = info,
                 host = _settings.Host,
                 basePath = _settings.VirtualPathRoot,
                 schemes = _settings.Schemes.ToList(),
@@ -44,9 +49,10 @@ namespace Swashbuckle.Swagger20
             return swaggerDoc;
         }
 
-        private IEnumerable<ApiDescription> GetApplicableApiDescriptionsFor(string apiVersion)
+        private IEnumerable<ApiDescription> GetApiDescriptionsFor(string apiVersion)
         {
-            return _apiExplorer.ApiDescriptions;
+            return _apiExplorer.ApiDescriptions
+                .Where(apiDesc => _settings.VersionSupportResolver(apiDesc, apiVersion));
         }
 
         private PathItem CreatePathItem(IEnumerable<ApiDescription> apiDescriptions, SchemaRegistry schemaRegistry)

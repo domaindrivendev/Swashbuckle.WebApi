@@ -38,9 +38,12 @@ namespace Swashbuckle.Swagger20
                 {typeof (HttpResponseMessage), () => new Schema {type="string"}},
             };
 
-        public SchemaRegistry()
+        private readonly IEnumerable<ISchemaFilter> _schemaFilters;
+
+        public SchemaRegistry(IEnumerable<ISchemaFilter> schemaFilters)
         {
             Definitions = new Dictionary<string, Schema>();
+            _schemaFilters = schemaFilters;
         }
 
         public IDictionary<string, Schema> Definitions { get; private set; }
@@ -127,6 +130,11 @@ namespace Swashbuckle.Swagger20
                 properties = properties,
                 type = "object"
             };
+
+            foreach (var filter in _schemaFilters)
+            {
+                filter.Apply(schema, this, type);
+            }
 
             return schema;
         }

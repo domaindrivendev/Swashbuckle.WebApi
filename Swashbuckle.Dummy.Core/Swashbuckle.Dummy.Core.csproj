@@ -78,7 +78,8 @@
     <Compile Include="SwaggerExtensions\AddOAuth2Scopes.cs" />
     <Compile Include="SwaggerExtensions\AddStandardResponseCodes.cs" />
     <Compile Include="SwaggerExtensions\AddDefaultResponse.cs" />
-    <Compile Include="SwaggerExtensions\ApplyVendorExtensions.cs" />
+    <Compile Include="SwaggerExtensions\ApplySchemaVendorExtensions.cs" />
+    <Compile Include="SwaggerExtensions\ApplyDocumentVendorExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="App_Start\SwaggerConfig.cs" />

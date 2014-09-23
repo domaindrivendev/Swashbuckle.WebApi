@@ -12,16 +12,10 @@ namespace Swashbuckle.Configuration
         private readonly ContactBuilder _contactBuilder = new ContactBuilder();
         private readonly LicenseBuilder _licenseBuilder = new LicenseBuilder();
 
-        internal InfoBuilder Version(string version)
+        public InfoBuilder(string version, string title)
         {
             _version = version;
-            return this;
-        }
-
-        public InfoBuilder Title(string title)
-        {
             _title = title;
-            return this;
         }
 
         public InfoBuilder Description(string description)

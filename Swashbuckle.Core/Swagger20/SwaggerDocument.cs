@@ -143,7 +143,7 @@ namespace Swashbuckle.Swagger20
         public object examples;
     }
 
-    public class Schema
+    public class Schema : Extensible
     {
         [JsonProperty("$ref")]
         public string @ref;

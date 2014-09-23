@@ -10,6 +10,8 @@ using System.Threading;
 using System.Web.Http;
 using System.Web.Http.Hosting;
 using System.Web.Http.Routing;
+using Swashbuckle.Dummy.Controllers;
+using System.Reflection;
 
 namespace Swashbuckle.Tests
 {
@@ -62,28 +64,14 @@ namespace Swashbuckle.Tests
             Configuration.Routes.Add(controllerName, route);
         }
 
-        protected void AddAttributeRoutes()
+        protected void AddAttributeRoutesFrom(Assembly assembly)
         {
+            // assembly isn't used but requiring it ensures that it's loaded and, therefore, scanned for attribute routes 
             Configuration.MapHttpAttributeRoutes();
             Configuration.EnsureInitialized();
         }
 
-        protected TContent Get<TContent>(string uri)
-        {
-            var responseMessage = ExecuteGet(uri);
-            return responseMessage.Content.ReadAsAsync<TContent>().Result;
-        }
-
-        protected string GetAsString(string uri)
-        {
-            var responseMessage = ExecuteGet(uri);
-            Assert.That(responseMessage, Is.Not.Null, "responseMessage");
-            Assert.That(responseMessage.StatusCode, Is.EqualTo(HttpStatusCode.OK));
-            Assert.That(responseMessage.Content, Is.Not.Null, "responseMessage.Content");
-            return responseMessage.Content.ReadAsStringAsync().Result;
-        }
-
-        protected HttpResponseMessage ExecuteGet(string uri)
+        protected HttpResponseMessage Get(string uri)
         {
             var request = new HttpRequestMessage(HttpMethod.Get, uri);
             request.Properties[HttpPropertyKeys.HttpConfigurationKey] = Configuration;
@@ -96,6 +84,12 @@ namespace Swashbuckle.Tests
             return new HttpMessageInvoker(_handler)
                 .SendAsync(request, new CancellationToken(false))
                 .Result;
+        }
+
+        protected TContent GetContent<TContent>(string uri)
+        {
+            var responseMessage = Get(uri);
+            return responseMessage.Content.ReadAsAsync<TContent>().Result;
         }
     }
 }
