@@ -11,6 +11,11 @@ namespace Swashbuckle
     {
         public static void Init(HttpConfiguration config)
         {
+            Init(config, true);
+        }
+
+        public static void Init(HttpConfiguration config, bool mapIndex)
+        {
             config.Routes.MapHttpRoute(
                 "swagger_root",
                 "swagger",
@@ -18,12 +23,24 @@ namespace Swashbuckle
                 null,
                 new RedirectHandler("swagger/ui/index.html"));
 
-            config.Routes.MapHttpRoute(
-                "swagger_ui",
-                "swagger/ui/{*uiPath}",
-                null,
-                new { uiPath = @".+" },
-                new SwaggerUiHandler());
+            if (mapIndex)
+            {
+                config.Routes.MapHttpRoute(
+                    "swagger_ui",
+                    "swagger/ui/{*uiPath}",
+                    null,
+                    new { uiPath = @".+" },
+                    new SwaggerUiHandler());
+            }
+            else
+            {
+                config.Routes.MapHttpRoute(
+                    "swagger_ui",
+                    "swagger/ui/{*uiPath}",
+                    null,
+                    new { uiPath = @"^(?!index\.html).+$" },
+                    new SwaggerUiHandler());
+            }
 
             config.Routes.MapHttpRoute(
                 "swagger_versioned_api_docs",
