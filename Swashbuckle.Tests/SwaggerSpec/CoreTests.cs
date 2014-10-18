@@ -88,6 +88,7 @@ namespace Swashbuckle.Tests.SwaggerSpec
                                         {
                                             paramType = "body",
                                             name = "customer",
+                                            description = "",
                                             required = true,
                                             type = "Customer",
                                         }
@@ -116,6 +117,7 @@ namespace Swashbuckle.Tests.SwaggerSpec
                                         {
                                             paramType = "path",
                                             name = "id",
+                                            description = "",
                                             required = true,
                                             type = "integer",
                                             format = "int32"
@@ -137,6 +139,7 @@ namespace Swashbuckle.Tests.SwaggerSpec
                                         {
                                             paramType = "path",
                                             name = "id",
+                                            description = "",
                                             required = true,
                                             type = "integer",
                                             format = "int32"
@@ -145,6 +148,7 @@ namespace Swashbuckle.Tests.SwaggerSpec
                                         {
                                             paramType = "body",
                                             name = "customer",
+                                            description = "",
                                             required = true,
                                             type = "Customer",
                                         }
@@ -204,6 +208,7 @@ namespace Swashbuckle.Tests.SwaggerSpec
                                         {
                                             paramType = "query",
                                             name = "type",
+                                            description = "",
                                             required = true,
                                             type = "string",
                                             @enum = new[] { "Book", "Album" }
@@ -226,6 +231,7 @@ namespace Swashbuckle.Tests.SwaggerSpec
                                         {
                                             paramType = "body",
                                             name = "product",
+                                            description = "",
                                             required = true,
                                             type = "Product",
                                         }
@@ -254,6 +260,7 @@ namespace Swashbuckle.Tests.SwaggerSpec
                                         {
                                             paramType = "path",
                                             name = "id",
+                                            description = "",
                                             required = true,
                                             type = "integer",
                                             format = "int32"
