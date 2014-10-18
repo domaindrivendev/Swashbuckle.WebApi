@@ -4,7 +4,6 @@ using NUnit.Framework;
 using Swashbuckle.Dummy.Controllers;
 using System.Collections.Generic;
 using Swashbuckle.Application;
-using Swashbuckle.Configuration;
 using Swashbuckle.Dummy.SwaggerExtensions;
 using Swashbuckle.Dummy;
 using System.Net;
@@ -14,7 +13,7 @@ namespace Swashbuckle.Tests.Swagger20
     [TestFixture]
     public class CoreTests : HttpMessageHandlerTestFixture<SwaggerDocsHandler>
     {
-        private Swagger20Config _swaggerConfig;
+        private SwaggerDocsConfig _swaggerDocsConfig;
 
         public CoreTests()
             : base("swagger/docs/{apiVersion}")
@@ -23,10 +22,10 @@ namespace Swashbuckle.Tests.Swagger20
         [SetUp]
         public void SetUp()
         {
-            _swaggerConfig = new Swagger20Config();
-            _swaggerConfig.SingleApiVersion("1.0", "Test API");
+            _swaggerDocsConfig = new SwaggerDocsConfig();
+            _swaggerDocsConfig.SingleApiVersion("1.0", "Test API");
 
-            Configuration.SetSwaggerConfig(_swaggerConfig);
+            Configuration.SetSwaggerDocsConfig(_swaggerDocsConfig);
         }
 
         [Test]
@@ -296,7 +295,7 @@ namespace Swashbuckle.Tests.Swagger20
         [Test]
         public void It_should_support_config_to_include_additional_info_properties()
         {
-            _swaggerConfig.SingleApiVersion("1.0", "Test API")
+            _swaggerDocsConfig.SingleApiVersion("1.0", "Test API")
                 .Description("A test API")
                 .TermsOfService("Test terms")
                 .Contact(c => c
@@ -336,7 +335,7 @@ namespace Swashbuckle.Tests.Swagger20
         [Test]
         public void It_should_support_config_to_customize_the_host_name()
         {
-            _swaggerConfig.HostName((req) => "foobar.com");
+            _swaggerDocsConfig.HostName((req) => "foobar.com");
 
             var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/1.0");
 
@@ -348,7 +347,7 @@ namespace Swashbuckle.Tests.Swagger20
         [Test]
         public void It_should_support_config_to_post_modify_the_document()
         {
-            _swaggerConfig.DocumentFilter<ApplyDocumentVendorExtensions>();
+            _swaggerDocsConfig.DocumentFilter<ApplyDocumentVendorExtensions>();
 
             var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/1.0");
             var xProp = swagger["x-document"];
@@ -362,7 +361,7 @@ namespace Swashbuckle.Tests.Swagger20
         {
             AddDefaultRouteFor<ProductsController>();
 
-            _swaggerConfig.OperationFilter<AddDefaultResponse>();
+            _swaggerDocsConfig.OperationFilter<AddDefaultResponse>();
 
             var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/1.0");
             var getDefaultResponse = swagger["paths"]["/products"]["get"]["responses"]["default"];
@@ -377,7 +376,7 @@ namespace Swashbuckle.Tests.Swagger20
         {
             AddAttributeRoutesFrom(typeof(MultipleApiVersionsController).Assembly);
 
-            _swaggerConfig.MultipleApiVersions(
+            _swaggerDocsConfig.MultipleApiVersions(
                 (apiDesc, targetApiVersion) => SwaggerConfig.ResolveVersionSupportByRouteConstraint(apiDesc, targetApiVersion),
                 (c) =>
                 {

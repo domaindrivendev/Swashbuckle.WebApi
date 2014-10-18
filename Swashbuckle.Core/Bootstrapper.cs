@@ -1,9 +1,10 @@
 ﻿using System.Web.Http;
-using Swashbuckle.Application;
 using System.Web.Http.Routing;
 using System.Net.Http;
 using System.Collections.Generic;
 using System.Linq;
+using System;
+using Swashbuckle.Application;
 
 namespace Swashbuckle
 {
@@ -23,7 +24,7 @@ namespace Swashbuckle
                 "swagger/ui/{*uiPath}",
                 null,
                 new { uiPath = @".+" },
-                new SwaggerUiHandler());
+                new SwaggerUi20Handler());
 
             config.Routes.MapHttpRoute(
                 "swagger_versioned_api_docs",

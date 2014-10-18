@@ -70,17 +70,22 @@
     <Compile Include="Application\HttpExtensions.cs" />
     <Compile Include="Application\PolymorphicType.cs" />
     <Compile Include="Application\RedirectHandler.cs" />
+    <Compile Include="Application\SwaggerUi20Config.cs" />
+    <Compile Include="Application\SwaggerUi20Handler.cs" />
     <Compile Include="Application\SwaggerDocsHandler.cs" />
     <Compile Include="Application\SwaggerSpecConfig.cs" />
     <Compile Include="Application\SwaggerUiConfig.cs" />
     <Compile Include="Application\SwaggerUiHandler.cs" />
-    <Compile Include="Configuration\ApiVersionsBuilder.cs" />
-    <Compile Include="Configuration\LicenseBuilder.cs" />
-    <Compile Include="Configuration\ContactBuilder.cs" />
-    <Compile Include="Configuration\InfoBuilder.cs" />
-    <Compile Include="Configuration\Swagger20Config.cs" />
+    <Compile Include="Configuration.cs" />
+    <Compile Include="Application\VersionInfoBuilder.cs" />
+    <Compile Include="Application\LicenseBuilder.cs" />
+    <Compile Include="Application\ContactBuilder.cs" />
+    <Compile Include="Application\InfoBuilder.cs" />
+    <Compile Include="Application\SwaggerDocsConfig.cs" />
     <Compile Include="Bootstrapper.cs" />
     <Compile Include="Application\SwaggerSpecHandler.cs" />
+    <Compile Include="SwaggerFilters\ApplyXmlActionComments.cs" />
+    <Compile Include="WebAssets\EmbeddedResourceDescriptor.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ApiDescriptionExtensions.cs" />
     <Compile Include="DictionaryExtensions.cs" />
@@ -94,6 +99,7 @@
     <Compile Include="Swagger20\ISwaggerProvider.cs" />
     <Compile Include="Swagger20\SwaggerDocument.cs" />
     <Compile Include="Swagger20\SchemaRegistry.cs" />
+    <Compile Include="WebAssets\EmbeddedWebAssetProvider.cs" />
     <Compile Include="Swagger\DataTypeExtensions.cs" />
     <Compile Include="Swagger\SwaggerGenerator.cs" />
     <Compile Include="SwaggerExtensions\ApplyActionXmlComments.cs" />
@@ -106,6 +112,8 @@
     <Compile Include="PolymorphicType.cs" />
     <Compile Include="Swagger\SwaggerGeneratorOptions.cs" />
     <Compile Include="TypeExtensions.cs" />
+    <Compile Include="WebAssets\IWebAssetProvider.cs" />
+    <Compile Include="WebAssets\StreamExtensions.cs" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>

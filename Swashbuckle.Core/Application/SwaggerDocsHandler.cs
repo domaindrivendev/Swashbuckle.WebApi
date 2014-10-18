@@ -31,12 +31,12 @@ namespace Swashbuckle.Application
             }
         }
 
-        private HttpContent ContentFor<T>(HttpRequestMessage request, T swaggerObject)
+        private HttpContent ContentFor(HttpRequestMessage request, SwaggerDocument swaggerDoc)
         {
             var negotiator = request.GetConfiguration().Services.GetContentNegotiator();
-            var result = negotiator.Negotiate(typeof(T), request, GetSupportedSwaggerFormatters());
+            var result = negotiator.Negotiate(typeof(SwaggerDocument), request, GetSupportedSwaggerFormatters());
 
-            return new ObjectContent(typeof(T), swaggerObject, result.Formatter, result.MediaType);
+            return new ObjectContent(typeof(SwaggerDocument), swaggerDoc, result.Formatter, result.MediaType);
         }
 
         private IEnumerable<MediaTypeFormatter> GetSupportedSwaggerFormatters()

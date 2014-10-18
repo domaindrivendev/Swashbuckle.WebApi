@@ -1,6 +1,6 @@
 ﻿using Swashbuckle.Swagger20;
 
-namespace Swashbuckle.Configuration
+namespace Swashbuckle.Application
 {
     public class ContactBuilder
     {

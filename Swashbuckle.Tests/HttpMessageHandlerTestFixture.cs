@@ -91,5 +91,11 @@ namespace Swashbuckle.Tests
             var responseMessage = Get(uri);
             return responseMessage.Content.ReadAsAsync<TContent>().Result;
         }
+
+        protected string GetContentAsString(string uri)
+        {
+            var responseMessage = Get(uri);
+            return responseMessage.Content.ReadAsStringAsync().Result;
+        }
     }
 }

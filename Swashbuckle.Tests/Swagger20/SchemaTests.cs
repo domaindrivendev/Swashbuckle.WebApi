@@ -4,7 +4,6 @@ using NUnit.Framework;
 using Swashbuckle.Dummy.Controllers;
 using System.Collections.Generic;
 using Swashbuckle.Application;
-using Swashbuckle.Configuration;
 using Swashbuckle.Dummy.SwaggerExtensions;
 using Swashbuckle.Swagger20;
 
@@ -13,7 +12,7 @@ namespace Swashbuckle.Tests.Swagger20
     [TestFixture]
     public class SchemaTests : HttpMessageHandlerTestFixture<SwaggerDocsHandler>
     {
-        private Swagger20Config _swaggerConfig;
+        private SwaggerDocsConfig _swaggerDocsConfig;
 
         public SchemaTests()
             : base("swagger/docs/{apiVersion}")
@@ -22,10 +21,10 @@ namespace Swashbuckle.Tests.Swagger20
         [SetUp]
         public void SetUp()
         {
-            _swaggerConfig = new Swagger20Config();
-            _swaggerConfig.SingleApiVersion("1.0", "Test Api");
+            _swaggerDocsConfig = new SwaggerDocsConfig();
+            _swaggerDocsConfig.SingleApiVersion("1.0", "Test Api");
 
-            Configuration.SetSwaggerConfig(_swaggerConfig);
+            Configuration.SetSwaggerDocsConfig(_swaggerDocsConfig);
         }
 
         [Test]
@@ -72,7 +71,59 @@ namespace Swashbuckle.Tests.Swagger20
         }
 
         [Test]
-        public void It_should_include_inherited_members_for_sub_types()
+        public void It_should_provide_validation_properties_for_annotated_types()
+        {
+            AddDefaultRouteFor<AnnotatedTypesController>();
+            
+            var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/1.0");
+
+            var definitions = swagger["definitions"];
+            Assert.IsNotNull(definitions);
+
+            var expected = JObject.FromObject(new
+                {
+                    Payment = new
+                    {
+                        required = new string[] { "Amount", "CardNumber", "ExpMonth", "ExpYear" },
+                        properties = new
+                        {
+                            Amount = new
+                            {
+                                format = "double",
+                                type = "number",
+                            },
+                            CardNumber = new
+                            {
+                                pattern = "^[3-6]?\\d{12,15}$",
+                                type = "string"
+                            },
+                            ExpMonth = new
+                            {
+                                format = "int32",
+                                maximum = 12,
+                                minimum = 1,
+                                type = "integer",
+                            },
+                            ExpYear = new
+                            {
+                                format = "int32",
+                                maximum = 99,
+                                minimum = 14,
+                                type = "integer",
+                            },
+                            Note = new
+                            {
+                                type = "string"
+                            }
+                        },
+                        type = "object"
+                    }
+                });
+            Assert.AreEqual(expected.ToString(), definitions.ToString());
+        }
+
+        [Test]
+        public void It_should_include_inherited_properties_for_sub_types()
         {
             AddDefaultRouteFor<PolymorphicTypesController>();
 
@@ -121,10 +172,10 @@ namespace Swashbuckle.Tests.Swagger20
         }
 
         [Test]
-        public void It_should_include_validation_properties_for_annotated_types()
+        public void It_should_ignore_indexer_properties()
         {
-            AddDefaultRouteFor<AnnotatedTypesController>();
-            
+            AddDefaultRouteFor<IndexerTypesController>();
+
             var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/1.0");
 
             var definitions = swagger["definitions"];
@@ -132,38 +183,15 @@ namespace Swashbuckle.Tests.Swagger20
 
             var expected = JObject.FromObject(new
                 {
-                    Payment = new
+                    Lookup = new
                     {
-                        required = new string[] { "Amount", "CardNumber", "ExpMonth", "ExpYear" },
+                        required = new string[] { },
                         properties = new
                         {
-                            Amount = new
-                            {
-                                format = "double",
-                                type = "number",
-                            },
-                            CardNumber = new
-                            {
-                                pattern = "^[3-6]?\\d{12,15}$",
-                                type = "string"
-                            },
-                            ExpMonth = new
+                            TotalEntries = new
                             {
                                 format = "int32",
-                                maximum = 12,
-                                minimum = 1,
-                                type = "integer",
-                            },
-                            ExpYear = new
-                            {
-                                format = "int32",
-                                maximum = 99,
-                                minimum = 14,
-                                type = "integer",
-                            },
-                            Note = new
-                            {
-                                type = "string"
+                                type = "integer"
                             }
                         },
                         type = "object"
@@ -291,7 +319,7 @@ namespace Swashbuckle.Tests.Swagger20
         {
             AddDefaultRouteFor<ProductsController>();
 
-            _swaggerConfig.SchemaFilter<ApplySchemaVendorExtensions>();
+            _swaggerDocsConfig.SchemaFilter<ApplySchemaVendorExtensions>();
 
             var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/1.0");
             var xProp = swagger["definitions"]["Product"]["x-schema"];

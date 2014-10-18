@@ -300,7 +300,7 @@ namespace Swashbuckle.Tests.SwaggerSpec
                     type = "string"
                 });
 
-            Assert.AreEqual(expected, versionParam);
+            Assert.AreEqual(expected.ToString(), versionParam.ToString());
         }
 
         [Test]

@@ -27,6 +27,7 @@ namespace Swashbuckle.Swagger20
                 {typeof (String), () => new Schema {type = "string"}},
                 {typeof (Char), () => new Schema {type = "string"}},
                 {typeof (Byte), () => new Schema {type = "string", format = "byte"}},
+                {typeof (Guid), () => new Schema {type = "string"}},
                 {typeof (Boolean), () => new Schema {type = "boolean"}},
                 {typeof (DateTime), () => new Schema {type = "string", format = "date-time"}},
                 {typeof (DateTimeOffset), () => new Schema {type = "string", format = "date-time"}},

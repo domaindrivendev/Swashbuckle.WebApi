@@ -35,5 +35,11 @@
             Uniquely identifies the product
             </summary>
         </member>
+        <member name="M:Swashbuckle.Dummy.Controllers.XmlAnnotatedController.Create(Swashbuckle.Dummy.Controllers.Account)">
+            <summary>
+            Registers a new Account
+            </summary>
+            <remarks>With a registered account, you can access restricted resources</remarks>
+        </member>
     </members>
 </doc>
