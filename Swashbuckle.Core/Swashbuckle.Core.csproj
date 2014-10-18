@@ -84,6 +84,7 @@
     <Compile Include="Application\SwaggerDocsConfig.cs" />
     <Compile Include="Bootstrapper.cs" />
     <Compile Include="Application\SwaggerSpecHandler.cs" />
+    <Compile Include="SwaggerFilters\ApplyXmlTypeComments.cs" />
     <Compile Include="SwaggerFilters\ApplyXmlActionComments.cs" />
     <Compile Include="WebAssets\EmbeddedResourceDescriptor.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

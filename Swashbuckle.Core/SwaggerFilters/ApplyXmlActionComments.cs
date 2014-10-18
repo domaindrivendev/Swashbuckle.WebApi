@@ -14,7 +14,7 @@ namespace Swashbuckle.SwaggerFilters
         private const string MethodExpression = "/doc/members/member[@name='M:{0}.{1}{2}']";
         private const string SummaryExpression = "summary";
         private const string RemarksExpression = "remarks";
-        private const string ParameterExpression = "param[@name=\"{0}\"]";
+        private const string ParameterExpression = "param";
         private const string ResponseExpression = "response";
 
         private readonly XPathNavigator _navigator;
@@ -26,38 +26,47 @@ namespace Swashbuckle.SwaggerFilters
 
         public void Apply(Operation operation, SchemaRegistry schemaRegistry, ApiDescription apiDescription)
         {
-            var methodNode = _navigator.SelectSingleNode(GetXPathFor(apiDescription.ActionDescriptor));
+            var methodNode = _navigator.SelectSingleNode(XPathFor(apiDescription.ActionDescriptor));
             if (methodNode == null) return;
 
-            var summary = methodNode.SelectSingleNode(SummaryExpression);
-            if (summary != null)
-                operation.summary = summary.Value.Trim();
+            var summaryNode = methodNode.SelectSingleNode(SummaryExpression);
+            if (summaryNode != null)
+                operation.summary = summaryNode.Value.Trim();
 
-            var remarks = methodNode.SelectSingleNode(RemarksExpression);
-            if (remarks != null)
-                operation.description = remarks.Value.Trim();
+            var remarksNode = methodNode.SelectSingleNode(RemarksExpression);
+            if (remarksNode != null)
+                operation.description = remarksNode.Value.Trim();
 
-        //    foreach (var paramDesc in apiDescription.ParameterDescriptions)
-        //    {
-        //        if (paramDesc.ParameterDescriptor == null) continue; // not in action signature (e.g. route parameter)
+            ApplyParamComments(operation, methodNode);
 
-        //        var parameter = operation.Parameters.SingleOrDefault(p => p.Name == paramDesc.Name);
-        //        if (parameter == null) continue;
-
-        //        parameter.Description = GetChildValueOrDefault(
-        //            methodNode,
-        //            String.Format(ParameterExpression, paramDesc.ParameterDescriptor.ParameterName));
-        //    }
-
-        //    if (methodNode == null) return;
-
-        //    foreach (var responseMessage in GetResponseMessages(methodNode))
-        //    {
-        //        operation.ResponseMessages.Add(responseMessage);
-        //    }
+            // TODO: Not sure about this feature???
+            //ApplyResponseComments(operation, methodNode);
         }
 
-        private static string GetXPathFor(HttpActionDescriptor actionDescriptor)
+        private static void ApplyParamComments(Operation operation, XPathNavigator methodNode)
+        {
+            var paramNodes = methodNode.Select(ParameterExpression);
+            while (paramNodes.MoveNext())
+            {
+                var paramNode = paramNodes.Current;
+                var parameter = operation.parameters.SingleOrDefault(param => param.name == paramNode.GetAttribute("name", ""));
+                if (parameter != null)
+                    parameter.description = paramNode.Value.Trim();
+            }
+        }
+
+        private static void ApplyResponseComments(Operation operation, XPathNavigator methodNode)
+        {
+            var responseNodes = methodNode.Select(ResponseExpression);
+            while (responseNodes.MoveNext())
+            {
+                var responseNode = responseNodes.Current;
+                var response = new Response { description = responseNode.Value.Trim() };
+                operation.responses[responseNode.GetAttribute("code", "")] = response;
+            }
+        }
+
+        private static string XPathFor(HttpActionDescriptor actionDescriptor)
         {
             var controllerName = actionDescriptor.ControllerDescriptor.ControllerType.FullName;
             var actionName = actionDescriptor.ActionName;
@@ -91,18 +100,5 @@ namespace Swashbuckle.SwaggerFilters
 
             return type.Namespace + "." + type.Name;
         }
-
-        //private static IEnumerable<ResponseMessage> GetResponseMessages(XPathNavigator node)
-        //{
-        //    var iterator = node.Select(ResponseExpression);
-        //    while (iterator.MoveNext())
-        //    {
-        //        yield return new ResponseMessage
-        //        {
-        //            Code = Int32.Parse(iterator.Current.GetAttribute("code", String.Empty)),
-        //            Message = iterator.Current.Value
-        //        };
-        //    }
-        //}
     }
 }

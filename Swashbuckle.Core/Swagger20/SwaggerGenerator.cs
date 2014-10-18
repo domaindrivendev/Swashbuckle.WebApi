@@ -113,6 +113,7 @@ namespace Swashbuckle.Swagger20
                     })
                  .ToList();
 
+            // TODO: Always 200 - is this a little presumptious?
             var responses = new Dictionary<string, Response>{
                 { "200", CreateResponse(apiDescription.SuccessResponseType(), schemaRegistry) }
             };

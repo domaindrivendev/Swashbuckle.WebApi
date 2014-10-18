@@ -76,6 +76,7 @@ namespace Swashbuckle.Application
         public void IncludeXmlComments(string filePath)
         {
             _operationFilters.Add(() => new ApplyXmlActionComments(filePath));
+            _schemaFilters.Add(() => new ApplyXmlTypeComments(filePath));
         }
 
         internal ISwaggerProvider GetSwaggerProvider(HttpRequestMessage request)

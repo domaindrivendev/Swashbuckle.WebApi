@@ -3,6 +3,7 @@ using NUnit.Framework;
 using Newtonsoft.Json.Linq;
 using Swashbuckle.Application;
 using Swashbuckle.Dummy.Controllers;
+using System.Collections.Generic;
 
 namespace Swashbuckle.Tests.SwaggerFilters
 {
@@ -22,14 +23,13 @@ namespace Swashbuckle.Tests.SwaggerFilters
             _swaggerDocsConfig = new SwaggerDocsConfig();
             _swaggerDocsConfig.SingleApiVersion("1.0", "Test API");
             _swaggerDocsConfig.IncludeXmlComments(String.Format(@"{0}\XmlComments.xml", AppDomain.CurrentDomain.BaseDirectory));
-            
 
             Configuration.SetSwaggerDocsConfig(_swaggerDocsConfig);
             AddDefaultRouteFor<XmlAnnotatedController>();
         }
 
         [Test]
-        public void It_should_document_operations_using_xml_action_summaries_and_remarks()
+        public void It_documents_operations_from_action_summary_and_remarks_tags()
         {
             var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/1.0");
 
@@ -39,7 +39,46 @@ namespace Swashbuckle.Tests.SwaggerFilters
             Assert.AreEqual("Registers a new Account", postOp["summary"].ToString());
 
             Assert.IsNotNull(postOp["description"]);
-            Assert.AreEqual("With a registered account, you can access restricted resources", postOp["description"].ToString());
+            Assert.AreEqual("Create an account to access restricted resources", postOp["description"].ToString());
+        }
+
+        [Test]
+        public void It_documents_parameters_from_action_param_tags()
+        {
+            var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/1.0");
+
+            var accountParam = swagger["paths"]["/xmlannotated"]["post"]["parameters"][0];
+            Assert.IsNotNull(accountParam["description"]);
+            Assert.AreEqual("Details for the account to be created", accountParam["description"].ToString());
+
+            var keywordsParam = swagger["paths"]["/xmlannotated"]["get"]["parameters"][0];
+            Assert.IsNotNull(keywordsParam["description"]);
+            Assert.AreEqual("List of search keywords", keywordsParam["description"].ToString());
+        }
+
+        [Test]
+        public void It_documents_schemas_from_type_summary_tags()
+        {
+            var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/1.0");
+
+            var accountSchema = swagger["definitions"]["Account"];
+
+            Assert.IsNotNull(accountSchema["description"]);
+            Assert.AreEqual("Account details", accountSchema["description"].ToString());
+        }
+
+        [Test]
+        public void It_documents_schema_properties_from_property_summary_tags()
+        {
+            var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/1.0");
+
+            var usernameProperty = swagger["definitions"]["Account"]["properties"]["Username"];
+            Assert.IsNotNull(usernameProperty["description"]);
+            Assert.AreEqual("Uniquely identifies the account", usernameProperty["description"].ToString());
+
+            var passwordProperty = swagger["definitions"]["Account"]["properties"]["Password"];
+            Assert.IsNotNull(passwordProperty["description"]);
+            Assert.AreEqual("For authentication", passwordProperty["description"].ToString());
         }
     }
 }
