@@ -20,19 +20,23 @@ namespace Swashbuckle.SwaggerExtensions
         public void Apply(DataType model, DataTypeRegistry dataTypeRegistry, Type type)
         {
             var typeNode = _navigator.SelectSingleNode(String.Format(TypeExpression, type.FullName));
-            model.Description = GetChildValueOrDefault(typeNode, SummaryExpression);
+            if (typeNode == null) return;
+
+            var summary = GetChildValue(typeNode, SummaryExpression);
+            if (summary != null) model.Description = summary; 
 
             foreach (var property in model.Properties)
             {
                 var propertyNode = _navigator.SelectSingleNode(String.Format(PropertyExpression, type.FullName, property.Key));
-                property.Value.Description = GetChildValueOrDefault(propertyNode, SummaryExpression);
+                if (propertyNode == null) continue;
+
+                summary = GetChildValue(propertyNode, SummaryExpression);
+                if (summary != null) property.Value.Description = summary;
             }
         }
 
-        private static string GetChildValueOrDefault(XPathNavigator node, string childExpression)
+        private static string GetChildValue(XPathNavigator node, string childExpression)
         {
-            if (node == null) return null;
-
             var childNode = node.SelectSingleNode(childExpression);
             return (childNode == null) ? null : childNode.Value.Trim();
         }

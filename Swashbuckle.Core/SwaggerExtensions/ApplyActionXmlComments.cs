@@ -1,5 +1,4 @@
-﻿
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -29,9 +28,13 @@ namespace Swashbuckle.SwaggerExtensions
         public void Apply(Operation operation, DataTypeRegistry dataTypeRegistry, ApiDescription apiDescription)
         {
             var methodNode = _navigator.SelectSingleNode(GetXPathFor(apiDescription.ActionDescriptor));
+            if (methodNode == null) return;
 
-            operation.Summary = GetChildValueOrDefault(methodNode, SummaryExpression);
-            operation.Notes = GetChildValueOrDefault(methodNode, RemarksExpression);
+            var summary = GetChildValue(methodNode, SummaryExpression);
+            if (summary != null) operation.Summary = summary;
+
+            var remarks = GetChildValue(methodNode, RemarksExpression);
+            if (remarks != null) operation.Notes = remarks; 
 
             foreach (var paramDesc in apiDescription.ParameterDescriptions)
             {
@@ -40,12 +43,12 @@ namespace Swashbuckle.SwaggerExtensions
                 var parameter = operation.Parameters.SingleOrDefault(p => p.Name == paramDesc.Name);
                 if (parameter == null) continue;
 
-                parameter.Description = GetChildValueOrDefault(
+                var description = GetChildValue(
                     methodNode,
                     String.Format(ParameterExpression, paramDesc.ParameterDescriptor.ParameterName));
-            }
 
-            if (methodNode == null) return;
+                if (description != null) parameter.Description = description;
+            }
 
             foreach (var responseMessage in GetResponseMessages(methodNode))
             {
@@ -97,12 +100,10 @@ namespace Swashbuckle.SwaggerExtensions
             return type.Namespace + "." + type.Name;
         }
 
-        private static string GetChildValueOrDefault(XPathNavigator node, string childExpression)
+        private static string GetChildValue(XPathNavigator node, string childExpression)
         {
-            if (node == null) return String.Empty;
-
             var childNode = node.SelectSingleNode(childExpression);
-            return (childNode == null) ? String.Empty : childNode.Value.Trim();
+            return (childNode == null) ? null : childNode.Value.Trim();
         }
 
         private static IEnumerable<ResponseMessage> GetResponseMessages(XPathNavigator node)
