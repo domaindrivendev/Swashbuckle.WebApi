@@ -35,7 +35,7 @@ namespace Swashbuckle.Swagger20
             {
                 info = info,
                 host = _settings.Host,
-                basePath = _settings.VirtualPathRoot,
+                basePath = (_settings.VirtualPathRoot != "/") ? _settings.VirtualPathRoot : null,
                 schemes = _settings.Schemes.ToList(),
                 paths = paths,
                 definitions = schemaRegistry.Definitions
@@ -120,10 +120,11 @@ namespace Swashbuckle.Swagger20
 
             var operation = new Operation
             { 
+                tags = new [] { apiDescription.ActionDescriptor.ControllerDescriptor.ControllerName },
                 operationId = apiDescription.OperationId(),
                 produces = apiDescription.Produces().ToList(),
                 consumes = apiDescription.Consumes().ToList(),
-                parameters = parameters,
+                parameters = parameters.Any() ? parameters : null, // parameters can be null but not empty
                 responses = responses,
                 deprecated = apiDescription.IsObsolete()
             };
@@ -177,7 +178,11 @@ namespace Swashbuckle.Swagger20
                 ? schemaRegistry.FindOrRegister(returnType)
                 : null;
 
-            return new Response { schema = schema };
+            return new Response
+            {
+                description = "OK",
+                schema = schema
+            };
         }
     }
 }

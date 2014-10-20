@@ -2,7 +2,7 @@
 using System.Xml.XPath;
 using Swashbuckle.Swagger20;
 
-namespace Swashbuckle.SwaggerFilters
+namespace Swashbuckle.SwaggerExtensions
 {
     public class ApplyXmlTypeComments : ISchemaFilter
     {

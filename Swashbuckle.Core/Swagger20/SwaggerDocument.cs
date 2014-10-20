@@ -1,11 +1,13 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using Newtonsoft.Json;
 
 namespace Swashbuckle.Swagger20
 {
     public class SwaggerDocument : Extensible
     {
-        public readonly string swagger = "2.0";
+        // TODO: Spec says this should be a string but UI fails if it's not an integer
+        public readonly int swagger = 2;
 
         public Info info;
 

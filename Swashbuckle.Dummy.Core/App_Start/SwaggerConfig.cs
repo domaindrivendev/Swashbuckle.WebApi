@@ -19,6 +19,10 @@ namespace Swashbuckle.Dummy
             Swashbuckle.Configuration.Instance
                 .SwaggerDocs(c =>
                     {
+                        c.SingleApiVersion("1.0", "Swashbuckle Dummy API")
+                            .Description("A sample API for testing and prototyping Swashbuckle features");
+
+                        c.IncludeXmlComments(GetXmlCommentsPath());
                     })
                 .SwaggerUi(c =>
                     {

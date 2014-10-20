@@ -5,7 +5,7 @@ using System.Linq;
 using System.Collections.Generic;
 using System.Web.Http.Description;
 using Swashbuckle.Swagger20;
-using Swashbuckle.SwaggerFilters;
+using Swashbuckle.SwaggerExtensions;
 
 namespace Swashbuckle.Application
 {
@@ -23,7 +23,7 @@ namespace Swashbuckle.Application
         public SwaggerDocsConfig()
         {
             _versionInfoBuilder = new VersionInfoBuilder();
-            _hostNameResolver = (req) => req.RequestUri.Host;
+            _hostNameResolver = (req) => req.RequestUri.Host + ":" + req.RequestUri.Port;
             _schemaFilters = new List<Func<ISchemaFilter>>();
             _operationFilters = new List<Func<IOperationFilter>>();
             _documentFilters = new List<Func<IDocumentFilter>>();

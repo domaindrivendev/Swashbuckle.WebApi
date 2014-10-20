@@ -1,12 +1,13 @@
 ﻿using Newtonsoft.Json.Linq;
 using System;
 using NUnit.Framework;
-using Swashbuckle.Dummy.Controllers;
 using System.Collections.Generic;
-using Swashbuckle.Application;
-using Swashbuckle.Dummy.SwaggerExtensions;
-using Swashbuckle.Dummy;
 using System.Net;
+using System.Web.Http;
+using Swashbuckle.Application;
+using Swashbuckle.Dummy;
+using Swashbuckle.Dummy.Controllers;
+using Swashbuckle.Dummy.SwaggerExtensions;
 
 namespace Swashbuckle.Tests.Swagger20
 {
@@ -33,11 +34,12 @@ namespace Swashbuckle.Tests.Swagger20
         {
             var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/1.0");
 
-            Assert.AreEqual("2.0", swagger["swagger"].ToString());
+            // TODO: Spec says this should be a string but UI fails if it's not an integer
+            Assert.AreEqual("2", swagger["swagger"].ToString());
         }
 
         [Test]
-        public void It_should_provide_info_version_and_title()
+        public void It_provides_info_version_and_title()
         {
             var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/1.0");
 
@@ -53,23 +55,18 @@ namespace Swashbuckle.Tests.Swagger20
         }
 
         [Test]
-        public void It_should_provide_host_base_path_and_schemes()
+        public void It_provides_host_base_path_and_schemes()
         {
-            var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/1.0");
+            var swagger = GetContent<JObject>("http://tempuri.org:1234/swagger/docs/1.0");
 
             var host = swagger["host"];
-            Assert.IsNotNull(host);
-            Assert.AreEqual("tempuri.org", host.ToString());
+            Assert.AreEqual("tempuri.org:1234", host.ToString());
 
             var basePath = swagger["basePath"];
-            Assert.IsNotNull(basePath);
-            Assert.AreEqual("/", basePath.ToString());
+            Assert.IsNull(basePath); // TODO: test virtual path case - i.e when VirtualPathRoot is not "/"
 
             var schemes = swagger["schemes"];
-            Assert.IsNotNull(schemes);
-
-            var expected = JArray.FromObject(new object[] { "http" });
-            Assert.AreEqual(expected.ToString(), schemes.ToString());
+            Assert.NotNull(schemes);
         }
 
         [Test]
@@ -87,7 +84,8 @@ namespace Swashbuckle.Tests.Swagger20
                         {
                             get = new
                             {
-                                operationId = "Products.GetAllByType",
+                                tags = new [] { "Products" },
+                                operationId = "Products_GetAllByType",
                                 consumes = new object[]{},
                                 produces = new []{ "application/json", "text/json", "application/xml", "text/xml" },
                                 parameters = new []
@@ -105,6 +103,7 @@ namespace Swashbuckle.Tests.Swagger20
                                     {
                                         "200", new
                                         {
+                                            description = "OK",
                                             schema = new
                                             {
                                                 items = JObject.Parse("{ $ref: \"#/definitions/Product\" }"),
@@ -117,7 +116,8 @@ namespace Swashbuckle.Tests.Swagger20
                             },
                             post = new
                             {
-                                operationId = "Products.Create",
+                                tags = new [] { "Products" },
+                                operationId = "Products_Create",
                                 consumes = new []{ "application/json", "text/json", "application/xml", "text/xml", "application/x-www-form-urlencoded" },
                                 produces = new []{ "application/json", "text/json", "application/xml", "text/xml" },
                                 parameters = new []
@@ -135,6 +135,7 @@ namespace Swashbuckle.Tests.Swagger20
                                     {
                                         "200", new
                                         {
+                                            description = "OK",
                                             schema = new
                                             {
                                                 format = "int32",
@@ -152,7 +153,8 @@ namespace Swashbuckle.Tests.Swagger20
                         {
                             get = new
                             {
-                                operationId = "Products.GetById",
+                                tags = new [] { "Products" },
+                                operationId = "Products_GetById",
                                 consumes = new object[]{},
                                 produces = new []{ "application/json", "text/json", "application/xml", "text/xml" },
                                 parameters = new []
@@ -171,6 +173,7 @@ namespace Swashbuckle.Tests.Swagger20
                                     {
                                         "200", new
                                         {
+                                            description = "OK",
                                             schema = JObject.Parse("{ $ref: \"#/definitions/Product\" }")
                                         }
                                     }
@@ -184,7 +187,8 @@ namespace Swashbuckle.Tests.Swagger20
                         {
                             post = new
                             {
-                                operationId = "Customers.Create",
+                                tags = new [] { "Customers" },
+                                operationId = "Customers_Create",
                                 consumes = new []{ "application/json", "text/json", "application/xml", "text/xml", "application/x-www-form-urlencoded" },
                                 produces = new []{ "application/json", "text/json", "application/xml", "text/xml" },
                                 parameters = new []
@@ -202,6 +206,7 @@ namespace Swashbuckle.Tests.Swagger20
                                     {
                                         "200", new
                                         {
+                                            description = "OK",
                                             schema = new
                                             {
                                                 format = "int32",
@@ -219,7 +224,8 @@ namespace Swashbuckle.Tests.Swagger20
                         {
                             put = new
                             {
-                                operationId = "Customers.Update",
+                                tags = new [] { "Customers" },
+                                operationId = "Customers_Update",
                                 consumes = new []{ "application/json", "text/json", "application/xml", "text/xml", "application/x-www-form-urlencoded" },
                                 produces = new string[]{},
                                 parameters = new object []
@@ -243,14 +249,18 @@ namespace Swashbuckle.Tests.Swagger20
                                 responses = new Dictionary<string, object>
                                 {
                                     {
-                                        "200", new { }
+                                        "200", new
+                                        {
+                                            description = "OK",
+                                        }
                                     }
                                 },
                                 deprecated = false
                             },
                             delete = new
                             {
-                                operationId = "Customers.Delete",
+                                tags = new [] { "Customers" },
+                                operationId = "Customers_Delete",
                                 consumes = new string[]{},
                                 produces = new string[]{},
                                 parameters = new []
@@ -267,7 +277,10 @@ namespace Swashbuckle.Tests.Swagger20
                                 responses = new Dictionary<string, object>
                                 {
                                     {
-                                        "200", new { }
+                                        "200", new
+                                        {
+                                            description = "OK",
+                                        }
                                     }
                                 },
                                 deprecated = false

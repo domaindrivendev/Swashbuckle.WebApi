@@ -9,7 +9,7 @@ namespace Swashbuckle.Swagger20
     {
         public static string OperationId(this ApiDescription apiDescription)
         {
-            return String.Format("{0}.{1}",
+            return String.Format("{0}_{1}",
                 apiDescription.ActionDescriptor.ControllerDescriptor.ControllerName,
                 apiDescription.ActionDescriptor.ActionName);
         }

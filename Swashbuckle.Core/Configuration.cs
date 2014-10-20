@@ -55,7 +55,7 @@ namespace Swashbuckle
                 "swagger/docs/{apiVersion}",
                 new { resourceName = RouteParameter.Optional },
                 null,
-                new SwaggerSpecHandler());
+                new SwaggerDocsHandler());
         }
     }
 }

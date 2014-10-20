@@ -41,8 +41,6 @@
             </summary>
             <remarks>Create an account to access restricted resources</remarks>
             <param name="account">Details for the account to be created</param>
-            <response code="400">You gotta fix it!</response>
-            <response code="500">We gotta fix it!</response>
         </member>
         <member name="M:Swashbuckle.Dummy.Controllers.XmlAnnotatedController.Search(System.Collections.Generic.IEnumerable{System.String})">
             <summary>
