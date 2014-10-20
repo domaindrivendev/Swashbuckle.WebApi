@@ -7,9 +7,8 @@ using System.Net.Http;
 using System.Reflection;
 using System.Text;
 using Newtonsoft.Json.Linq;
-using Swashbuckle.Swagger;
 
-namespace Swashbuckle.Swagger20
+namespace Swashbuckle.Swagger
 {
     public class SchemaRegistry
     {

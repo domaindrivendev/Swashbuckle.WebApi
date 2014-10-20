@@ -2,7 +2,7 @@
 using System.Linq;
 using Newtonsoft.Json;
 
-namespace Swashbuckle.Swagger20
+namespace Swashbuckle.Swagger
 {
     public class SwaggerDocument : Extensible
     {

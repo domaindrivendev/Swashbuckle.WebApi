@@ -1,5 +1,5 @@
 ﻿using System;
-using Swashbuckle.Swagger20;
+using Swashbuckle.Swagger;
 
 namespace Swashbuckle.Application
 {

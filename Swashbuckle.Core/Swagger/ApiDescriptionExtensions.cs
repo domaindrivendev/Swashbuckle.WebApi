@@ -3,7 +3,7 @@ using System.Linq;
 using System.Collections.Generic;
 using System.Web.Http.Description;
 
-namespace Swashbuckle.Swagger20
+namespace Swashbuckle.Swagger
 {
     public static class ApiDescriptionExtensions
     {

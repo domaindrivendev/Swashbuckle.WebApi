@@ -4,37 +4,6 @@
         <name>Swashbuckle.Dummy.Core</name>
     </assembly>
     <members>
-        <member name="M:Swashbuckle.Dummy.Controllers.ProductsController.Create(Swashbuckle.Dummy.Controllers.Product)">
-            <summary>
-            Create a new product 
-            </summary>
-            <remarks>Requires admin priveleges</remarks>
-            <param name="product">New product details</param>
-            <returns></returns>
-            <response code="200">It's all good!</response>
-        </member>
-        <member name="M:Swashbuckle.Dummy.Controllers.ProductsController.GetById(System.Int32)">
-            <summary>
-            Retrieve product by unique Id
-            </summary>
-            <returns></returns>
-        </member>
-        <member name="M:Swashbuckle.Dummy.Controllers.ProductsController.GetAllByType(Swashbuckle.Dummy.Controllers.ProductType)">
-            <summary>
-            List products by type
-            </summary>
-            <returns></returns>
-        </member>
-        <member name="T:Swashbuckle.Dummy.Controllers.Product">
-            <summary>
-            Describes a product
-            </summary>
-        </member>
-        <member name="P:Swashbuckle.Dummy.Controllers.Product.Id">
-            <summary>
-            Uniquely identifies the product
-            </summary>
-        </member>
         <member name="M:Swashbuckle.Dummy.Controllers.XmlAnnotatedController.Create(Swashbuckle.Dummy.Controllers.Account)">
             <summary>
             Registers a new Account

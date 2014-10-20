@@ -2,7 +2,7 @@
 using System.Linq;
 using System.ComponentModel.DataAnnotations;
 
-namespace Swashbuckle.Swagger20
+namespace Swashbuckle.Swagger
 {
     public static class SchemaExtensions
     {

@@ -5,7 +5,7 @@ using System.Text;
 using System.Web.Http.Controllers;
 using System.Web.Http.Description;
 using System.Xml.XPath;
-using Swashbuckle.Swagger20;
+using Swashbuckle.Swagger;
 
 namespace Swashbuckle.SwaggerExtensions
 {

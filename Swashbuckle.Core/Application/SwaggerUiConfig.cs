@@ -1,82 +1,94 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Net.Http;
-using System.Reflection;
 using System.Linq;
+using System.Net.Http;
+using System.Collections.Generic;
+using System.Reflection;
+using System.Text;
+using Swashbuckle.WebAssets;
 
 namespace Swashbuckle.Application
 {
     public class SwaggerUiConfig
     {
-        internal static readonly SwaggerUiConfig StaticInstance = new SwaggerUiConfig();
+        private readonly Dictionary<string, string> _replacements;
+        private readonly Dictionary<string, EmbeddedResourceDescriptor> _customWebAssets;
 
         public SwaggerUiConfig()
         {
-            SupportHeaderParams = false;
-            SupportedSubmitMethods = new[] { HttpMethod.Get, HttpMethod.Post, HttpMethod.Put };
-            DocExpansion = DocExpansion.None;
-            CustomEmbeddedResources = new Dictionary<string, EmbeddedResource>();
-            InjectedScriptPaths = new List<string>();
-            InjectedStylesheetPaths = new List<string>();
+            _replacements = new Dictionary<string, string>
+            {
+                { "%(StylesheetIncludes)", "" },
+                { "%(SupportHeaderParams)", "false" },
+                { "%(SupportedSubmitMethods)", "['get', 'post', 'put', 'delete']" },
+                { "%(CustomScripts)", "[]" },
+                { "%(DocExpansion)", "\"none\"" }
+            };
+            _customWebAssets = new Dictionary<string, EmbeddedResourceDescriptor>();
 
             // Use Swashbuckle specific index.html
-            CustomRoute("index.html", GetType().Assembly, "Swashbuckle.SwaggerExtensions.index.html");
-
-            // Use Swashbuckle specific swagger-oauth.js because we need a slightly different callback url
-            CustomRoute("lib/swagger-oauth.js", GetType().Assembly, "Swashbuckle.SwaggerExtensions.swagger-oauth.js");
+            CustomWebAsset("index.html", GetType().Assembly, "Swashbuckle.SwaggerExtensions.index.html");
         }
 
-        public bool SupportHeaderParams { get; set; }
-        public IEnumerable<HttpMethod> SupportedSubmitMethods { get; set; }
-        public DocExpansion DocExpansion { get; set; }
-        internal IDictionary<string, EmbeddedResource> CustomEmbeddedResources { get; private set; }
-        internal IList<string> InjectedScriptPaths { get; private set; }
-        internal IList<string> InjectedStylesheetPaths { get; private set; }
+        public Func<HttpRequestMessage, string> HostNameResolver { get; internal set; }
 
-        internal bool OAuth2Enabled { get; private set; }
-        internal string OAuth2AppName { get; private set; }
-        internal string OAuth2Realm { get; private set; }
-        internal string OAuth2ClientId { get; private set; }
-
-        public static void Customize(Action<SwaggerUiConfig> customize)
+        public SwaggerUiConfig InjectStylesheet(Assembly resourceAssembly, string resourceName)
         {
-            customize(StaticInstance);
+            var path = "ext/" + resourceName;
+            var stringBuilder = new StringBuilder(_replacements["%(StylesheetIncludes)"]);
+
+            stringBuilder.AppendLine("<link href='" + path + "' media='screen' rel='stylesheet' type='text/css' />");
+            _replacements["%(StylesheetIncludes)"] = stringBuilder.ToString();
+
+            _customWebAssets[path] = new EmbeddedResourceDescriptor(resourceAssembly, resourceName);
+            return this;
         }
 
-        public void EnableDiscoveryUrlSelector()
+        public SwaggerUiConfig SupportHeaderParams()
         {
-            InjectJavaScript(GetType().Assembly, "Swashbuckle.SwaggerExtensions.discoveryUrlSelector.js");
+            _replacements["%(SupportHeaderParams)"] = "true";
+            return this;
         }
 
-        public void InjectJavaScript(Assembly resourceAssembly, string resourceName)
+        public SwaggerUiConfig SupportedSubmitMethods(HttpMethod[] httpMethods)
         {
-            CustomEmbeddedResources[resourceName] = new EmbeddedResource(
-                resourceAssembly,
-                resourceName,
-                "text/javascript");
-            InjectedScriptPaths.Add(resourceName);
+            var httpMethodsString = String.Join(",",
+                httpMethods.Select(method => "'" + method.ToString().ToLower() + "'"));
+
+            _replacements["%(SupportedSubmitMethods)"] = "[" + httpMethodsString + "]";
+            return this;
         }
 
-        public void InjectStylesheet(Assembly resourceAssembly, string resourceName)
+        public SwaggerUiConfig DocExpansion(DocExpansion docExpansion)
         {
-            CustomEmbeddedResources[resourceName] = new EmbeddedResource(
-                resourceAssembly,
-                resourceName,
-                "text/css");
-            InjectedStylesheetPaths.Add(resourceName);
+            _replacements["%(DocExpansion)"] = "\"" + docExpansion.ToString().ToLower() + "\"";
+            return this;
         }
 
-        public void CustomRoute(string uiPath, Assembly resourceAssembly, string resourceName)
+        public SwaggerUiConfig InjectJavaScript(Assembly resourceAssembly, string resourceName)
         {
-            CustomEmbeddedResources[uiPath] = new EmbeddedResource(resourceAssembly, resourceName);
+            var path = "ext/" + resourceName;
+            var stringBuilder = new StringBuilder(_replacements["%(CustomScripts)"]);
+
+            if (stringBuilder.Length == 2)
+                stringBuilder.Replace("[]", "[ '" + path + "' ]");
+            else
+                stringBuilder.Replace(" ]", ", '" + path + "' ]");
+
+            _replacements["%(CustomScripts)"] = stringBuilder.ToString();
+
+            _customWebAssets[path] = new EmbeddedResourceDescriptor(resourceAssembly, resourceName);
+            return this;
         }
 
-        public void EnableOAuth2Support(string clientId, string realm, string appName)
+        public SwaggerUiConfig CustomWebAsset(string path, Assembly resourceAssembly, string resourceName)
         {
-            OAuth2Enabled = true;
-            OAuth2ClientId = clientId;
-            OAuth2Realm = realm;
-            OAuth2AppName = appName;
+            _customWebAssets[path] = new EmbeddedResourceDescriptor(resourceAssembly, resourceName);
+            return this;
+        }
+
+        internal IWebAssetProvider GetSwaggerUiProvider(HttpRequestMessage request)
+        {
+            return new EmbeddedWebAssetProvider(_replacements, _customWebAssets);
         }
     }
 

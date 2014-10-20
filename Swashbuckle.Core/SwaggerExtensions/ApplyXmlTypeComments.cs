@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Xml.XPath;
-using Swashbuckle.Swagger20;
+using Swashbuckle.Swagger;
 
 namespace Swashbuckle.SwaggerExtensions
 {

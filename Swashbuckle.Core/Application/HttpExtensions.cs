@@ -1,6 +1,6 @@
 ﻿using System.Net.Http;
 using System.Web.Http;
-using Swashbuckle.Swagger20;
+using Swashbuckle.Swagger;
 using Swashbuckle.WebAssets;
 using System;
 
@@ -24,14 +24,14 @@ namespace Swashbuckle.Application
             return swaggerDocsConfig;
         }
 
-        public static void SetSwaggerUiConfig(this HttpConfiguration httpConfig, SwaggerUi20Config swaggerUiConfig)
+        public static void SetSwaggerUiConfig(this HttpConfiguration httpConfig, SwaggerUiConfig swaggerUiConfig)
         {
             httpConfig.Properties[SwaggerUiConfigKey] = swaggerUiConfig;
         }
 
-        public static SwaggerUi20Config GetSwaggerUiConfig(this HttpConfiguration httpConfig)
+        public static SwaggerUiConfig GetSwaggerUiConfig(this HttpConfiguration httpConfig)
         {
-            var swaggerUiConfig = httpConfig.Properties[SwaggerUiConfigKey] as SwaggerUi20Config;
+            var swaggerUiConfig = httpConfig.Properties[SwaggerUiConfigKey] as SwaggerUiConfig;
             if (swaggerUiConfig == null)
                 throw new InvalidOperationException("SwaggerUiConfig not found in HttpConfiguration properties");
             return swaggerUiConfig;

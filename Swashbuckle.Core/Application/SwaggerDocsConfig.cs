@@ -4,7 +4,7 @@ using System.Web.Http;
 using System.Linq;
 using System.Collections.Generic;
 using System.Web.Http.Description;
-using Swashbuckle.Swagger20;
+using Swashbuckle.Swagger;
 using Swashbuckle.SwaggerExtensions;
 
 namespace Swashbuckle.Application
@@ -91,7 +91,7 @@ namespace Swashbuckle.Application
             var settings = new SwaggerGeneratorSettings(
                 versionSupportResolver: _versionSupportResolver, // TODO: handle null value
                 apiVersions: _versionInfoBuilder.Build(),
-                host: _hostNameResolver(request),
+                hostName: _hostNameResolver(request),
                 virtualPathRoot: httpConfig.VirtualPathRoot,
                 schemes: schemes,
                 schemaFilters: _schemaFilters.Select(factory => factory()),

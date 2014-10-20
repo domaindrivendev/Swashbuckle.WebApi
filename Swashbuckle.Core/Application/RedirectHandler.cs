@@ -6,25 +6,31 @@ using System.Threading.Tasks;
 
 namespace Swashbuckle.Application
 {
-    public class RedirectHandler : HttpMessageHandler
-    {
-        private readonly string _redirectPath;
-        private readonly Func<HttpRequestMessage, string> _basePathResolver;
+    //public class RedirectHandler : HttpMessageHandler
+    //{
+    //    private readonly string _redirectPath;
 
-        public RedirectHandler(string redirectPath)
-        {
-            _redirectPath = redirectPath;
-            _basePathResolver = SwaggerSpecConfig.StaticInstance.BasePathResolver;
-        }
+    //    public RedirectHandler(
+    //        string redirectPath)
+    //    {
+    //        _redirectPath = redirectPath;
+    //    }
 
-        protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
-        {
-            var redirectUri = String.Format("{0}/{1}", _basePathResolver(request).TrimEnd('/'), _redirectPath);
+    //    protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+    //    {
+    //        var httpConfig = request.GetConfiguration();
+    //        var virtualPathRoot = httpConfig.VirtualPathRoot;
 
-            var response = request.CreateResponse(HttpStatusCode.Moved);
-            response.Headers.Location = new Uri(redirectUri);
+    //        var uriString = String.Format("{0}{1}/{2}",
+    //            (virtualPathRoot != "/") ? virtualPathRoot : "",
+    //            _redirectPath);
 
-            return Task.Factory.StartNew(() => response);
-        }
-    }
+    //        var response = request.CreateResponse(HttpStatusCode.Moved);
+    //        response.Headers.Location = new Uri(uriString);
+
+    //        var tsc = new TaskCompletionSource<HttpResponseMessage>();
+    //        tsc.SetResult(response);
+    //        return tsc.Task;
+    //    }
+    //}
 }

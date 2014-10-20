@@ -2,14 +2,14 @@
 using System.Collections.Generic;
 using System.Web.Http.Description;
 
-namespace Swashbuckle.Swagger20
+namespace Swashbuckle.Swagger
 {
     public class SwaggerGeneratorSettings
     {
         public SwaggerGeneratorSettings(
             Func<ApiDescription, string, bool> versionSupportResolver,
             IDictionary<string, Info> apiVersions,
-            string host,
+            string hostName,
             string virtualPathRoot,
             IEnumerable<string> schemes,
             IEnumerable<ISchemaFilter> schemaFilters = null,
@@ -18,7 +18,7 @@ namespace Swashbuckle.Swagger20
         {
             VersionSupportResolver = versionSupportResolver;
             ApiVersions = apiVersions;
-            Host = host;
+            Host = hostName;
             VirtualPathRoot = virtualPathRoot;
             Schemes = schemes;
             SchemaFilters = schemaFilters ?? new List<ISchemaFilter>();

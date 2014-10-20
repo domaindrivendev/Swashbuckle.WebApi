@@ -9,7 +9,7 @@ using Swashbuckle.Dummy;
 using Swashbuckle.Dummy.Controllers;
 using Swashbuckle.Dummy.SwaggerExtensions;
 
-namespace Swashbuckle.Tests.Swagger20
+namespace Swashbuckle.Tests.Swagger
 {
     [TestFixture]
     public class CoreTests : HttpMessageHandlerTestFixture<SwaggerDocsHandler>
@@ -30,7 +30,7 @@ namespace Swashbuckle.Tests.Swagger20
         }
 
         [Test]
-        public void It_should_indicate_swagger_version_2_0()
+        public void It_provides_swagger_version_2_0()
         {
             var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/1.0");
 
@@ -70,7 +70,7 @@ namespace Swashbuckle.Tests.Swagger20
         }
 
         [Test]
-        public void It_should_provide_a_description_for_each_path_in_the_api()
+        public void It_provides_a_description_for_each_path_in_the_api()
         {
             AddDefaultRoutesFor(new[] { typeof(ProductsController), typeof(CustomersController) });
 
@@ -293,7 +293,7 @@ namespace Swashbuckle.Tests.Swagger20
         }
 
         [Test]
-        public void It_should_mark_an_operation_deprecated_if_the_action_is_obsolete()
+        public void It_sets_the_deprecated_flag_on_actions_that_are_obsolete()
         {
             AddDefaultRouteFor<ObsoleteActionsController>();
 
@@ -306,7 +306,7 @@ namespace Swashbuckle.Tests.Swagger20
         }
 
         [Test]
-        public void It_should_support_config_to_include_additional_info_properties()
+        public void It_exposes_config_to_include_additional_info_properties()
         {
             _swaggerDocsConfig.SingleApiVersion("1.0", "Test API")
                 .Description("A test API")
@@ -346,19 +346,7 @@ namespace Swashbuckle.Tests.Swagger20
         }
 
         [Test]
-        public void It_should_support_config_to_customize_the_host_name()
-        {
-            _swaggerDocsConfig.HostName((req) => "foobar.com");
-
-            var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/1.0");
-
-            var host = swagger["host"];
-            Assert.IsNotNull(host);
-            Assert.AreEqual("foobar.com", host.ToString());
-        }
-
-        [Test]
-        public void It_should_support_config_to_post_modify_the_document()
+        public void It_exposes_config_to_post_modify_the_document()
         {
             _swaggerDocsConfig.DocumentFilter<ApplyDocumentVendorExtensions>();
 
@@ -370,7 +358,7 @@ namespace Swashbuckle.Tests.Swagger20
         }
 
         [Test]
-        public void It_should_support_config_to_post_modify_operations()
+        public void It_exposes_config_to_post_modify_operations()
         {
             AddDefaultRouteFor<ProductsController>();
 
@@ -385,7 +373,7 @@ namespace Swashbuckle.Tests.Swagger20
         }
 
         [Test]
-        public void It_should_support_config_to_describe_multiple_api_versions()
+        public void It_exposes_config_to_describe_multiple_api_versions()
         {
             AddAttributeRoutesFrom(typeof(MultipleApiVersionsController).Assembly);
 
@@ -423,7 +411,7 @@ namespace Swashbuckle.Tests.Swagger20
         }
 
         [Test]
-        public void It_should_handle_additional_route_parameters()
+        public void It_handles_additional_route_parameters()
         {
             // i.e. route params that are not included in the action signature
             AddCustomRouteFor<ProductsController>("{apiVersion}/products");
@@ -452,9 +440,8 @@ namespace Swashbuckle.Tests.Swagger20
             Assert.AreEqual(expected.ToString(), getParams.ToString());
         }
 
-
         [Test]
-        public void It_should_handle_attribute_routes()
+        public void It_handles_attribute_routes()
         {
             AddAttributeRoutesFrom(typeof(AttributeRoutesController).Assembly);
 
@@ -464,7 +451,7 @@ namespace Swashbuckle.Tests.Swagger20
         }
 
         [Test]
-        public void It_should_error_on_unknown_api_version_and_return_status_not_found()
+        public void It_errors_on_unknown_api_version_and_returns_status_not_found()
         {
             var response = Get("http://tempuri.org/swagger/docs/1.1");
 
@@ -473,7 +460,7 @@ namespace Swashbuckle.Tests.Swagger20
 
         [Test]
         [ExpectedException(typeof(NotSupportedException))]
-        public void It_should_error_on_multiple_actions_with_same_path_and_method()
+        public void It_errors_on_multiple_actions_with_same_path_and_method()
         {
             AddDefaultRouteFor<UnsupportedActionsController>();
 

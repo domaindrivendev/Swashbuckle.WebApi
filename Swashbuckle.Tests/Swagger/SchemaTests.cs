@@ -5,9 +5,9 @@ using Swashbuckle.Dummy.Controllers;
 using System.Collections.Generic;
 using Swashbuckle.Application;
 using Swashbuckle.Dummy.SwaggerExtensions;
-using Swashbuckle.Swagger20;
+using Swashbuckle.Swagger;
 
-namespace Swashbuckle.Tests.Swagger20
+namespace Swashbuckle.Tests.Swagger
 {
     [TestFixture]
     public class SchemaTests : HttpMessageHandlerTestFixture<SwaggerDocsHandler>
@@ -28,7 +28,7 @@ namespace Swashbuckle.Tests.Swagger20
         }
 
         [Test]
-        public void It_should_provide_definition_schemas_for_complex_types()
+        public void It_provides_definition_schemas_for_complex_types()
         {
             AddDefaultRouteFor<ProductsController>();
 
@@ -71,7 +71,7 @@ namespace Swashbuckle.Tests.Swagger20
         }
 
         [Test]
-        public void It_should_provide_validation_properties_for_annotated_types()
+        public void It_provides_validation_properties_for_annotated_types()
         {
             AddDefaultRouteFor<AnnotatedTypesController>();
             
@@ -123,7 +123,7 @@ namespace Swashbuckle.Tests.Swagger20
         }
 
         [Test]
-        public void It_should_include_inherited_properties_for_sub_types()
+        public void It_includes_inherited_properties_for_sub_types()
         {
             AddDefaultRouteFor<PolymorphicTypesController>();
 
@@ -172,7 +172,7 @@ namespace Swashbuckle.Tests.Swagger20
         }
 
         [Test]
-        public void It_should_ignore_indexer_properties()
+        public void It_omits_indexer_properties()
         {
             AddDefaultRouteFor<IndexerTypesController>();
 
@@ -201,7 +201,7 @@ namespace Swashbuckle.Tests.Swagger20
         }
 
         [Test]
-        public void It_should_handle_nested_types()
+        public void It_handles_nested_types()
         {
             AddDefaultRouteFor<NestedTypesController>();
 
@@ -248,7 +248,7 @@ namespace Swashbuckle.Tests.Swagger20
         }
 
         [Test]
-        public void It_should_handle_self_referencing_types()
+        public void It_handles_self_referencing_types()
         {
             AddDefaultRouteFor<SelfReferencingTypesController>();
 
@@ -281,7 +281,7 @@ namespace Swashbuckle.Tests.Swagger20
         }
 
         [Test]
-        public void It_should_handle_jagged_container_types()
+        public void It_handles_jagged_container_types()
         {
             AddDefaultRouteFor<JaggedContainersController>();
 
@@ -315,7 +315,7 @@ namespace Swashbuckle.Tests.Swagger20
         }
         
         [Test]
-        public void It_should_support_config_to_post_modify_schemas()
+        public void It_exposes_config_to_post_modify_schemas()
         {
             AddDefaultRouteFor<ProductsController>();
 
