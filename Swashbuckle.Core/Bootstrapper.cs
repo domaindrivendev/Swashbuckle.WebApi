@@ -11,19 +11,40 @@ namespace Swashbuckle
     {
         public static void Init(HttpConfiguration config)
         {
-            config.Routes.MapHttpRoute(
+            Init(config, false);
+        }
+
+        public static void Init(HttpConfiguration config, bool skipRegisteringUI)
+        {
+            if (!skipRegisteringUI)
+            {
+                config.Routes.MapHttpRoute(
                 "swagger_root",
                 "swagger",
                 null,
                 null,
                 new RedirectHandler("swagger/ui/index.html"));
 
-            config.Routes.MapHttpRoute(
-                "swagger_ui",
-                "swagger/ui/{*uiPath}",
-                null,
-                new { uiPath = @".+" },
-                new SwaggerUiHandler());
+                //if (customIndexName == null)
+                //{
+                    config.Routes.MapHttpRoute(
+                        "swagger_ui",
+                        "swagger/ui/{*uiPath}",
+                        null,
+                        new { uiPath = @".+" },
+                        new SwaggerUiHandler());
+                //}
+                //else
+                //{
+                //    config.Routes.MapHttpRoute(
+                //        "swagger_ui",
+                //        "swagger/ui/{*uiPath}",
+                //        null,
+                //        new { uiPath = string.Format(@"^(?!{0}).+$", customIndexName.Replace(".", @"\.")) },
+                //        new SwaggerUiHandler());
+                //}
+            }
+            
 
             config.Routes.MapHttpRoute(
                 "swagger_versioned_api_docs",
