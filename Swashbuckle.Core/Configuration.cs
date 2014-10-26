@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Net.Http;
 using System.Web.Http;
+using System.Linq;
 using Swashbuckle.Application;
 
 namespace Swashbuckle
@@ -10,14 +11,12 @@ namespace Swashbuckle
         public static Configuration Instance = new Configuration();
 
         private Func<HttpRequestMessage, string> _hostNameResolver;
-        private readonly SwaggerDocsConfig _swaggerDocsConfig;
-        private readonly SwaggerUiConfig _swaggerUiConfig;
+        private Action<SwaggerDocsConfig> _configureDocs;
+        private Action<SwaggerUiConfig> _configureUi;
 
         private Configuration()
         {
             _hostNameResolver = (req) => req.RequestUri.Host + ":" + req.RequestUri.Port;
-            _swaggerDocsConfig = new SwaggerDocsConfig();
-            _swaggerUiConfig = new SwaggerUiConfig();
         }
 
         public Configuration HostName(Func<HttpRequestMessage, string> hostNameResolver)
@@ -28,42 +27,50 @@ namespace Swashbuckle
 
         public Configuration SwaggerDocs(Action<SwaggerDocsConfig> configure)
         {
-            configure(_swaggerDocsConfig);
+            _configureDocs = configure;
             return this;
         }
 
         public Configuration SwaggerUi(Action<SwaggerUiConfig> configure)
         {
-            configure(_swaggerUiConfig);
+            _configureUi = configure;
             return this;
         }
 
-        public void Init(HttpConfiguration httpConfig)
+        public void Init(HttpConfiguration httpConfig, string routePrefix = "swagger")
         {
-            httpConfig.SetSwaggerDocsConfig(_swaggerDocsConfig);
-            httpConfig.SetSwaggerUiConfig(_swaggerUiConfig);
-            
-            //httpConfig.Routes.MapHttpRoute(
-            //    "swagger_root",
-            //    "swagger",
-            //    null,
-            //    null,
-            //    new RedirectHandler("swagger/ui/index.html"));
+            var swaggerDocsConfig = new SwaggerDocsConfig();
+            _configureDocs(swaggerDocsConfig);
 
-            httpConfig.Routes.MapHttpRoute(
-                "swagger_ui",
-                "swagger/ui/{*uiPath}",
-                null,
-                new { uiPath = @".+" },
-                new SwaggerUiHandler());
+            var discoveryPaths = swaggerDocsConfig.VersionInfoBuilder.Build()
+                .Select(entry => String.Format("/{0}/docs/{1}", routePrefix, entry.Key));
 
-            // TODO: Use config to assign constraint on apiVersion
+            var swaggerUiConfig = new SwaggerUiConfig(discoveryPaths);
+            _configureUi(swaggerUiConfig);
+
+            if (swaggerUiConfig.Enabled)
+            {
+                httpConfig.Routes.MapHttpRoute(
+                    "swagger_root",
+                    routePrefix,
+                    null,
+                    null,
+                    new RedirectHandler(_hostNameResolver, routePrefix + "/ui/index.html"));
+
+                httpConfig.Routes.MapHttpRoute(
+                    "swagger_ui",
+                    routePrefix + "/ui/{*uiPath}",
+                    null,
+                    new { uiPath = @".+" },
+                    new SwaggerUiHandler(swaggerUiConfig));
+            }
+
             httpConfig.Routes.MapHttpRoute(
                 "swagger_docs",
-                "swagger/docs/{apiVersion}",
+                routePrefix + "/docs/{apiVersion}",
                 new { resourceName = RouteParameter.Optional },
                 null,
-                new SwaggerDocsHandler());
+                new SwaggerDocsHandler(_hostNameResolver, swaggerDocsConfig));
         }
     }
 }

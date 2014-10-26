@@ -10,34 +10,45 @@ namespace Swashbuckle.Application
 {
     public class SwaggerUiConfig
     {
-        private readonly Dictionary<string, string> _replacements;
         private readonly Dictionary<string, EmbeddedResourceDescriptor> _customWebAssets;
+        private readonly Dictionary<string, string> _textReplacements;
 
-        public SwaggerUiConfig()
+        public SwaggerUiConfig(IEnumerable<string> discoveryPaths)
         {
-            _replacements = new Dictionary<string, string>
+            Enabled = true;
+
+            _customWebAssets = new Dictionary<string, EmbeddedResourceDescriptor>();
+
+            _textReplacements = new Dictionary<string, string>
             {
                 { "%(StylesheetIncludes)", "" },
                 { "%(SupportHeaderParams)", "false" },
-                { "%(SupportedSubmitMethods)", "['get', 'post', 'put', 'delete']" },
-                { "%(CustomScripts)", "[]" },
+                { "%(SupportedSubmitMethods)", "'get','post','put','delete'" },
+                { "%(CustomScripts)", "" },
                 { "%(DocExpansion)", "\"none\"" }
             };
-            _customWebAssets = new Dictionary<string, EmbeddedResourceDescriptor>();
+
+            var discoveryPathStrings = discoveryPaths.Select(path => "'" + path + "'");
+            _textReplacements["%(DiscoveryPaths)"] = String.Join(",", discoveryPathStrings);
 
             // Use Swashbuckle specific index.html
             CustomWebAsset("index.html", GetType().Assembly, "Swashbuckle.SwaggerExtensions.index.html");
         }
 
-        public Func<HttpRequestMessage, string> HostNameResolver { get; internal set; }
+        internal bool Enabled { get; private set; }
+
+        public void Disable()
+        {
+            Enabled = false;
+        }
 
         public SwaggerUiConfig InjectStylesheet(Assembly resourceAssembly, string resourceName)
         {
             var path = "ext/" + resourceName;
-            var stringBuilder = new StringBuilder(_replacements["%(StylesheetIncludes)"]);
+            var stringBuilder = new StringBuilder(_textReplacements["%(StylesheetIncludes)"]);
 
             stringBuilder.AppendLine("<link href='" + path + "' media='screen' rel='stylesheet' type='text/css' />");
-            _replacements["%(StylesheetIncludes)"] = stringBuilder.ToString();
+            _textReplacements["%(StylesheetIncludes)"] = stringBuilder.ToString();
 
             _customWebAssets[path] = new EmbeddedResourceDescriptor(resourceAssembly, resourceName);
             return this;
@@ -45,7 +56,7 @@ namespace Swashbuckle.Application
 
         public SwaggerUiConfig SupportHeaderParams()
         {
-            _replacements["%(SupportHeaderParams)"] = "true";
+            _textReplacements["%(SupportHeaderParams)"] = "true";
             return this;
         }
 
@@ -54,28 +65,28 @@ namespace Swashbuckle.Application
             var httpMethodsString = String.Join(",",
                 httpMethods.Select(method => "'" + method.ToString().ToLower() + "'"));
 
-            _replacements["%(SupportedSubmitMethods)"] = "[" + httpMethodsString + "]";
+            _textReplacements["%(SupportedSubmitMethods)"] = httpMethodsString;
             return this;
         }
 
         public SwaggerUiConfig DocExpansion(DocExpansion docExpansion)
         {
-            _replacements["%(DocExpansion)"] = "\"" + docExpansion.ToString().ToLower() + "\"";
+            _textReplacements["%(DocExpansion)"] = "\"" + docExpansion.ToString().ToLower() + "\"";
             return this;
         }
 
         public SwaggerUiConfig InjectJavaScript(Assembly resourceAssembly, string resourceName)
         {
             var path = "ext/" + resourceName;
-            var stringBuilder = new StringBuilder(_replacements["%(CustomScripts)"]);
 
-            if (stringBuilder.Length == 2)
-                stringBuilder.Replace("[]", "[ '" + path + "' ]");
-            else
-                stringBuilder.Replace(" ]", ", '" + path + "' ]");
+            var stringBuilder = new StringBuilder(_textReplacements["%(CustomScripts)"]);
 
-            _replacements["%(CustomScripts)"] = stringBuilder.ToString();
+            if (stringBuilder.Length > 0)
+                stringBuilder.Append(",");
 
+            stringBuilder.Append("'" + path + "'");
+
+            _textReplacements["%(CustomScripts)"] = stringBuilder.ToString();
             _customWebAssets[path] = new EmbeddedResourceDescriptor(resourceAssembly, resourceName);
             return this;
         }
@@ -86,9 +97,9 @@ namespace Swashbuckle.Application
             return this;
         }
 
-        internal IWebAssetProvider GetSwaggerUiProvider(HttpRequestMessage request)
+        internal EmbeddedWebAssetProviderSettings ToUiProviderSettings()
         {
-            return new EmbeddedWebAssetProvider(_replacements, _customWebAssets);
+            return new EmbeddedWebAssetProviderSettings(_customWebAssets, _textReplacements);
         }
     }
 

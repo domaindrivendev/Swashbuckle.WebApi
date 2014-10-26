@@ -19,8 +19,9 @@ namespace Swashbuckle.Tests.SwaggerUi
         [SetUp]
         public void SetUp()
         {
-            _swaggerUiConfig = new SwaggerUiConfig();
-            Configuration.SetSwaggerUiConfig(_swaggerUiConfig);
+            _swaggerUiConfig = new SwaggerUiConfig(new []{ "swagger/docs/1.0" });
+
+            Handler = new SwaggerUiHandler(_swaggerUiConfig);
         }
 
         [Test]
@@ -28,6 +29,7 @@ namespace Swashbuckle.Tests.SwaggerUi
         {
             var content = GetContentAsString("http://tempuri.org/swagger/ui/index.html");
 
+            StringAssert.Contains("discoveryPaths: [ 'swagger/docs/1.0' ]", content);
             StringAssert.Contains("swagger-ui-container", content);
         }
         
@@ -63,7 +65,7 @@ namespace Swashbuckle.Tests.SwaggerUi
             var content = GetContentAsString("http://tempuri.org/swagger/ui/index.html");
 
             StringAssert.Contains("supportHeaderParams: true", content);
-            StringAssert.Contains("supportedSubmitMethods: ['get','post','put','head']", content);
+            StringAssert.Contains("supportedSubmitMethods: [ 'get','post','put','head' ]", content);
             StringAssert.Contains("docExpansion: \"full\"", content);
         }
         
@@ -78,7 +80,7 @@ namespace Swashbuckle.Tests.SwaggerUi
 
             StringAssert.Contains(
                 "customScripts: [ " +
-                "'ext/Swashbuckle.Dummy.SwaggerExtensions.testScript1.js', " +
+                "'ext/Swashbuckle.Dummy.SwaggerExtensions.testScript1.js'," +
                 "'ext/Swashbuckle.Dummy.SwaggerExtensions.testScript2.js' " +
                 "]",
                 content);

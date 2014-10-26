@@ -7,15 +7,12 @@ namespace Swashbuckle.WebAssets
 {
     public class EmbeddedWebAssetProvider : IWebAssetProvider
     {
-        private IDictionary<string, string> _replacements;
-        private IDictionary<string, EmbeddedResourceDescriptor> _customWebAssets;
+        private readonly EmbeddedWebAssetProviderSettings _settings;
 
         public EmbeddedWebAssetProvider(
-            IDictionary<string, string> replacements,
-            IDictionary<string, EmbeddedResourceDescriptor> customWebAssets)
+            EmbeddedWebAssetProviderSettings settings)
         {
-            _replacements = replacements;
-            _customWebAssets = customWebAssets;
+            _settings = settings;
         }
 
         public WebAsset GetWebAssetFor(string path)
@@ -28,7 +25,7 @@ namespace Swashbuckle.WebAssets
         private Stream GetEmbeddedResourceStreamFor(string path)
         {
             EmbeddedResourceDescriptor customEmbeddedResource;
-            var isCustom = _customWebAssets.TryGetValue(path, out customEmbeddedResource);
+            var isCustom = _settings.CustomAssets.TryGetValue(path, out customEmbeddedResource);
 
             var assembly = isCustom ? customEmbeddedResource.ContainingAssembly : GetType().Assembly;
             var name = isCustom ? customEmbeddedResource.Name : path;
@@ -37,7 +34,7 @@ namespace Swashbuckle.WebAssets
             if (stream == null)
                 throw new WebAssetNotFound();
 
-            return isCustom ? stream.FindAndReplace(_replacements) : stream;
+            return isCustom ? stream.FindAndReplace(_settings.TextReplacements) : stream;
         }
 
         private static string InferMediaTypeFrom(string path)

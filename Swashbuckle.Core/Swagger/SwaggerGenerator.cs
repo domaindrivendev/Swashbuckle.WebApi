@@ -7,13 +7,19 @@ namespace Swashbuckle.Swagger
 {
     public class SwaggerGenerator : ISwaggerProvider
     {
+        private readonly string _hostName;
+        private readonly string _virtualPathRoot;
         private readonly IApiExplorer _apiExplorer;
         private readonly SwaggerGeneratorSettings _settings;
 
         public SwaggerGenerator(
+            string hostName,
+            string virtualPathRoot,
             IApiExplorer apiExplorer,
             SwaggerGeneratorSettings settings)
         {
+            _hostName = hostName;
+            _virtualPathRoot = virtualPathRoot;
             _apiExplorer = apiExplorer;
             _settings = settings;
         }
@@ -34,9 +40,9 @@ namespace Swashbuckle.Swagger
             var swaggerDoc = new SwaggerDocument
             {
                 info = info,
-                host = _settings.Host,
-                basePath = (_settings.VirtualPathRoot != "/") ? _settings.VirtualPathRoot : null,
-                schemes = _settings.Schemes.ToList(),
+                host = _hostName,
+                basePath = (_virtualPathRoot != "/") ? _virtualPathRoot : null,
+                schemes = (_settings.Schemes != null) ? _settings.Schemes.ToList() : null,
                 paths = paths,
                 definitions = schemaRegistry.Definitions
             };

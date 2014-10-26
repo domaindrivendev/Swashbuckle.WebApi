@@ -17,22 +17,22 @@ namespace Swashbuckle.Tests
 {
     [TestFixture]
     public abstract class HttpMessageHandlerTestFixture<THandler>
-        where THandler : HttpMessageHandler, new()
+        where THandler : HttpMessageHandler
     {
         private string _routeTemplate;
-        private THandler _handler;
 
         protected HttpMessageHandlerTestFixture(string routeTemplate) 
         {
             _routeTemplate = routeTemplate;
         }
 
-        protected HttpConfiguration Configuration { get; private set; }
+        protected HttpConfiguration Configuration { get; set; }
+
+        protected THandler Handler { get; set; }
 
         [SetUp]
         public void BaseSetUp()
         {
-            _handler = new THandler();
             Configuration = new HttpConfiguration();
         }
 
@@ -73,6 +73,9 @@ namespace Swashbuckle.Tests
 
         protected HttpResponseMessage Get(string uri)
         {
+            if (Handler == null)
+                throw new InvalidOperationException("Handler must be set by fixture subclass");
+
             var request = new HttpRequestMessage(HttpMethod.Get, uri);
             request.Properties[HttpPropertyKeys.HttpConfigurationKey] = Configuration;
 
@@ -81,7 +84,7 @@ namespace Swashbuckle.Tests
 
             request.Properties[HttpPropertyKeys.HttpRouteDataKey] = routeData;
 
-            return new HttpMessageInvoker(_handler)
+            return new HttpMessageInvoker(Handler)
                 .SendAsync(request, new CancellationToken(false))
                 .Result;
         }

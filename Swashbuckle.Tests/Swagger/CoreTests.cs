@@ -3,6 +3,7 @@ using System;
 using NUnit.Framework;
 using System.Collections.Generic;
 using System.Net;
+using System.Net.Http;
 using System.Web.Http;
 using Swashbuckle.Application;
 using Swashbuckle.Dummy;
@@ -26,7 +27,8 @@ namespace Swashbuckle.Tests.Swagger
             _swaggerDocsConfig = new SwaggerDocsConfig();
             _swaggerDocsConfig.SingleApiVersion("1.0", "Test API");
 
-            Configuration.SetSwaggerDocsConfig(_swaggerDocsConfig);
+            Func<HttpRequestMessage, string> hostNameResolver = (req) => req.RequestUri.Host + ":" + req.RequestUri.Port;
+            Handler = new SwaggerDocsHandler(hostNameResolver, _swaggerDocsConfig);
         }
 
         [Test]
@@ -55,7 +57,7 @@ namespace Swashbuckle.Tests.Swagger
         }
 
         [Test]
-        public void It_provides_host_base_path_and_schemes()
+        public void It_provides_host_and_base_path_if_applicable()
         {
             var swagger = GetContent<JObject>("http://tempuri.org:1234/swagger/docs/1.0");
 
@@ -63,10 +65,17 @@ namespace Swashbuckle.Tests.Swagger
             Assert.AreEqual("tempuri.org:1234", host.ToString());
 
             var basePath = swagger["basePath"];
-            Assert.IsNull(basePath); // TODO: test virtual path case - i.e when VirtualPathRoot is not "/"
+            Assert.IsNull(basePath);
 
             var schemes = swagger["schemes"];
-            Assert.NotNull(schemes);
+            Assert.IsNull(schemes);
+
+            // When there is a virtual directory
+            Configuration = new HttpConfiguration(new HttpRouteCollection("/foobar"));
+            swagger = GetContent<JObject>("http://tempuri.org:1234/swagger/docs/1.0");
+
+            basePath = swagger["basePath"];
+            Assert.AreEqual("/foobar", basePath.ToString());
         }
 
         [Test]
@@ -343,6 +352,18 @@ namespace Swashbuckle.Tests.Swagger
                     }
                 });
             Assert.AreEqual(expected.ToString(), info.ToString());
+        }
+
+        [Test]
+        public void It_exposes_config_to_explictly_provide_supported_schemes()
+        {
+            _swaggerDocsConfig.Schemes(new[] { "http", "https" });
+
+            var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/1.0");
+            var schemes = swagger["schemes"];
+            var expected = JArray.FromObject(new[] { "http", "https" });
+
+            Assert.AreEqual(expected.ToString(), schemes.ToString());
         }
 
         [Test]

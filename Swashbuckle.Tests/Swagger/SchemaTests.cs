@@ -3,9 +3,10 @@ using System;
 using NUnit.Framework;
 using Swashbuckle.Dummy.Controllers;
 using System.Collections.Generic;
+using System.Net.Http;
 using Swashbuckle.Application;
-using Swashbuckle.Dummy.SwaggerExtensions;
 using Swashbuckle.Swagger;
+using Swashbuckle.Dummy.SwaggerExtensions;
 
 namespace Swashbuckle.Tests.Swagger
 {
@@ -24,7 +25,8 @@ namespace Swashbuckle.Tests.Swagger
             _swaggerDocsConfig = new SwaggerDocsConfig();
             _swaggerDocsConfig.SingleApiVersion("1.0", "Test Api");
 
-            Configuration.SetSwaggerDocsConfig(_swaggerDocsConfig);
+            Func<HttpRequestMessage, string> hostNameResolver = (req) => req.RequestUri.Host + ":" + req.RequestUri.Port;
+            Handler = new SwaggerDocsHandler(hostNameResolver, _swaggerDocsConfig);
         }
 
         [Test]

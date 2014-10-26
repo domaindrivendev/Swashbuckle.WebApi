@@ -14,14 +14,25 @@ namespace Swashbuckle.Application
 {
     public class SwaggerDocsHandler : HttpMessageHandler
     {
+        private readonly Func<HttpRequestMessage, string> _hostNameResolver;
+        private readonly SwaggerDocsConfig _swaggerDocsConfig;
+
+        public SwaggerDocsHandler(Func<HttpRequestMessage, string> hostNameResolver, SwaggerDocsConfig swaggerDocsConfig)
+        {
+            _hostNameResolver = hostNameResolver;
+            _swaggerDocsConfig = swaggerDocsConfig;
+        }
+
         protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
         {
+            var swaggerProvider = GetSwaggerProvider(request);
+
             object apiVersion;
             request.GetRouteData().Values.TryGetValue("apiVersion", out apiVersion);
 
             try
             {
-                var swaggerDoc = request.SwaggerProvider().GetSwaggerFor(apiVersion.ToString());
+                var swaggerDoc = swaggerProvider.GetSwaggerFor(apiVersion.ToString());
                 var content = ContentFor(request, swaggerDoc);
                 return TaskFor(new HttpResponseMessage { Content = content });
             }
@@ -29,6 +40,17 @@ namespace Swashbuckle.Application
             {
                 return TaskFor(request.CreateErrorResponse(HttpStatusCode.NotFound, ex));
             }
+        }
+
+        private ISwaggerProvider GetSwaggerProvider(HttpRequestMessage request)
+        {
+            var hostName = _hostNameResolver(request);
+            var virtualPathRoot = request.GetConfiguration().VirtualPathRoot;
+            var apiExplorer = request.GetConfiguration().Services.GetApiExplorer();
+
+            var settings = _swaggerDocsConfig.ToGeneratorSettings();
+
+            return new SwaggerGenerator(hostName, virtualPathRoot, apiExplorer, settings);
         }
 
         private HttpContent ContentFor(HttpRequestMessage request, SwaggerDocument swaggerDoc)

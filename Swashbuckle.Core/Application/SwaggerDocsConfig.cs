@@ -13,8 +13,6 @@ namespace Swashbuckle.Application
     {
         private Func<ApiDescription, string, bool> _versionSupportResolver;
 
-        private VersionInfoBuilder _versionInfoBuilder;
-        private Func<HttpRequestMessage, string> _hostNameResolver;
         private IEnumerable<string> _schemes;
         private readonly IList<Func<ISchemaFilter>> _schemaFilters;
         private readonly IList<Func<IOperationFilter>> _operationFilters;
@@ -22,18 +20,20 @@ namespace Swashbuckle.Application
 
         public SwaggerDocsConfig()
         {
-            _versionInfoBuilder = new VersionInfoBuilder();
-            _hostNameResolver = (req) => req.RequestUri.Host + ":" + req.RequestUri.Port;
+            VersionInfoBuilder = new VersionInfoBuilder();
+            _schemes = null; // i.e. default to scheme used to accesss the swagger docs
             _schemaFilters = new List<Func<ISchemaFilter>>();
             _operationFilters = new List<Func<IOperationFilter>>();
             _documentFilters = new List<Func<IDocumentFilter>>();
         }
 
+        internal VersionInfoBuilder VersionInfoBuilder { get; private set; }
+
         public InfoBuilder SingleApiVersion(string version, string title)
         {
             _versionSupportResolver = (apiDesc, requestedApiVersion) => requestedApiVersion == version;
-            _versionInfoBuilder = new VersionInfoBuilder();
-            return _versionInfoBuilder.Version(version, title);
+            VersionInfoBuilder = new VersionInfoBuilder();
+            return VersionInfoBuilder.Version(version, title);
         }
 
         public void MultipleApiVersions(
@@ -41,13 +41,8 @@ namespace Swashbuckle.Application
             Action<VersionInfoBuilder> configureVersionInfos)
         {
             _versionSupportResolver = versionSupportResolver;
-            _versionInfoBuilder = new VersionInfoBuilder();
-            configureVersionInfos(_versionInfoBuilder);
-        }
-
-        public void HostName(Func<HttpRequestMessage, string> hostNameResolver)
-        {
-            _hostNameResolver = hostNameResolver;
+            VersionInfoBuilder = new VersionInfoBuilder();
+            configureVersionInfos(VersionInfoBuilder);
         }
 
         public void Schemes(IEnumerable<string> schemes)
@@ -79,26 +74,16 @@ namespace Swashbuckle.Application
             _schemaFilters.Add(() => new ApplyXmlTypeComments(filePath));
         }
 
-        internal ISwaggerProvider GetSwaggerProvider(HttpRequestMessage request)
+        internal SwaggerGeneratorSettings ToGeneratorSettings()
         {
-            var httpConfig = request.GetConfiguration();
-
-            var apiExplorer = httpConfig.Services.GetApiExplorer();
-
-            // If not explicitly configured, default to the scheme currently being used to access swagger enpoints
-            var schemes = _schemes ?? new[] { request.RequestUri.Scheme.ToLower() };
-
-            var settings = new SwaggerGeneratorSettings(
+            return new SwaggerGeneratorSettings(
                 versionSupportResolver: _versionSupportResolver, // TODO: handle null value
-                apiVersions: _versionInfoBuilder.Build(),
-                hostName: _hostNameResolver(request),
-                virtualPathRoot: httpConfig.VirtualPathRoot,
-                schemes: schemes,
+                apiVersions: VersionInfoBuilder.Build(),
+                schemes: _schemes,
                 schemaFilters: _schemaFilters.Select(factory => factory()),
                 operationFilters: _operationFilters.Select(factory => factory()),
-                documentFilters: _documentFilters.Select(factory => factory()));
-
-            return new SwaggerGenerator(apiExplorer, settings);
+                documentFilters: _documentFilters.Select(factory => factory())
+            );
         }
     }
 }

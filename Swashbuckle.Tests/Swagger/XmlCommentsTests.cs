@@ -1,9 +1,10 @@
 ﻿using System;
 using NUnit.Framework;
 using Newtonsoft.Json.Linq;
+using System.Collections.Generic;
+using System.Net.Http;
 using Swashbuckle.Application;
 using Swashbuckle.Dummy.Controllers;
-using System.Collections.Generic;
 
 namespace Swashbuckle.Tests.SwaggerFilters
 {
@@ -20,12 +21,14 @@ namespace Swashbuckle.Tests.SwaggerFilters
         [SetUp]
         public void SetUp()
         {
+            AddDefaultRouteFor<XmlAnnotatedController>();
+
             _swaggerDocsConfig = new SwaggerDocsConfig();
             _swaggerDocsConfig.SingleApiVersion("1.0", "Test API");
             _swaggerDocsConfig.IncludeXmlComments(String.Format(@"{0}\XmlComments.xml", AppDomain.CurrentDomain.BaseDirectory));
 
-            Configuration.SetSwaggerDocsConfig(_swaggerDocsConfig);
-            AddDefaultRouteFor<XmlAnnotatedController>();
+            Func<HttpRequestMessage, string> hostNameResolver = (req) => req.RequestUri.Host + ":" + req.RequestUri.Port;
+            Handler = new SwaggerDocsHandler(hostNameResolver, _swaggerDocsConfig);
         }
 
         [Test]
