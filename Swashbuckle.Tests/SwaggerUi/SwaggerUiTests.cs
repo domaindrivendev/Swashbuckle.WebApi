@@ -66,7 +66,20 @@ namespace Swashbuckle.Tests.SwaggerUi
 
             StringAssert.Contains("supportHeaderParams: true", content);
             StringAssert.Contains("supportedSubmitMethods: [ 'get','post','put','head' ]", content);
-            StringAssert.Contains("docExpansion: \"full\"", content);
+            StringAssert.Contains("docExpansion: 'full'", content);
+        }
+        
+        [Test]
+        public void It_exposes_config_for_swagger_ui_outh2_settings()
+        {
+            _swaggerUiConfig.EnableOAuth2Support("test-client-id", "test-realm", "Swagger UI");
+
+            var content = GetContentAsString("http://tempuri.org/swagger/ui/index.html");
+
+            StringAssert.Contains("oAuth2Enabled: true", content);
+            StringAssert.Contains("oAuth2ClientId: 'test-client-id'", content);
+            StringAssert.Contains("oAuth2Realm: 'test-realm'", content);
+            StringAssert.Contains("oAuth2AppName: 'Swagger UI'", content);
         }
         
         [Test]

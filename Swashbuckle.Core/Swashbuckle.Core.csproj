@@ -64,6 +64,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Application\RedirectHandler.cs" />
+    <Compile Include="Application\SecuritySchemeBuilder.cs" />
     <Compile Include="Application\SwaggerUiConfig.cs" />
     <Compile Include="Application\SwaggerUiHandler.cs" />
     <Compile Include="Application\SwaggerDocsHandler.cs" />

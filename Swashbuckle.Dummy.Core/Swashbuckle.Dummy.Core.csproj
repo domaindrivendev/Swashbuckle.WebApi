@@ -59,6 +59,7 @@
     <Compile Include="Controllers\CollectionOfPrimitivesController.cs" />
     <Compile Include="Controllers\IndexerTypesController.cs" />
     <Compile Include="Controllers\MultipleApiVersionsController.cs" />
+    <Compile Include="Controllers\ProtectedResourcesController.cs" />
     <Compile Include="Controllers\SelfReferencingTypesController.cs" />
     <Compile Include="Controllers\CustomersController.cs" />
     <Compile Include="Controllers\DynamicTypesController.cs" />
@@ -76,6 +77,7 @@
     <Compile Include="SwaggerExtensions\AddDefaultResponse.cs" />
     <Compile Include="SwaggerExtensions\ApplySchemaVendorExtensions.cs" />
     <Compile Include="SwaggerExtensions\ApplyDocumentVendorExtensions.cs" />
+    <Compile Include="SwaggerExtensions\AssignOAuth2SecurityRequirements.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="App_Start\SwaggerConfig.cs" />

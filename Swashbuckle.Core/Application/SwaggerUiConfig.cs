@@ -25,7 +25,11 @@ namespace Swashbuckle.Application
                 { "%(SupportHeaderParams)", "false" },
                 { "%(SupportedSubmitMethods)", "'get','post','put','delete'" },
                 { "%(CustomScripts)", "" },
-                { "%(DocExpansion)", "\"none\"" }
+                { "%(DocExpansion)", "'none'" },
+                { "%(OAuth2Enabled)", "false" },
+                { "%(OAuth2ClientId)", "null" },
+                { "%(OAuth2Realm)", "null" },
+                { "%(OAuth2AppName)", "null" }
             };
 
             var discoveryPathStrings = discoveryPaths.Select(path => "'" + path + "'");
@@ -71,7 +75,7 @@ namespace Swashbuckle.Application
 
         public SwaggerUiConfig DocExpansion(DocExpansion docExpansion)
         {
-            _textReplacements["%(DocExpansion)"] = "\"" + docExpansion.ToString().ToLower() + "\"";
+            _textReplacements["%(DocExpansion)"] = "'" + docExpansion.ToString().ToLower() + "'";
             return this;
         }
 
@@ -94,6 +98,15 @@ namespace Swashbuckle.Application
         public SwaggerUiConfig CustomWebAsset(string path, Assembly resourceAssembly, string resourceName)
         {
             _customWebAssets[path] = new EmbeddedResourceDescriptor(resourceAssembly, resourceName);
+            return this;
+        }
+
+        public SwaggerUiConfig EnableOAuth2Support(string clientId, string realm, string appName)
+        {
+            _textReplacements["%(OAuth2Enabled)"] = "true";
+            _textReplacements["%(OAuth2ClientId)"] = "'" + clientId + "'";
+            _textReplacements["%(OAuth2Realm)"] = "'" + realm + "'";
+            _textReplacements["%(OAuth2AppName)"] = "'" + appName + "'";
             return this;
         }
 

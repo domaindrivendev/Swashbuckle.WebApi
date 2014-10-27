@@ -44,7 +44,8 @@ namespace Swashbuckle.Swagger
                 basePath = (_virtualPathRoot != "/") ? _virtualPathRoot : null,
                 schemes = (_settings.Schemes != null) ? _settings.Schemes.ToList() : null,
                 paths = paths,
-                definitions = schemaRegistry.Definitions
+                definitions = schemaRegistry.Definitions,
+                securityDefinitions = _settings.SecurityDefinitions
             };
 
             foreach(var filter in _settings.DocumentFilters)

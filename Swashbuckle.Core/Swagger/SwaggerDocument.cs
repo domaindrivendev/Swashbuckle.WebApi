@@ -29,7 +29,9 @@ namespace Swashbuckle.Swagger
 
         public IDictionary<string, Parameter> parameters;
 
-        public IList<object> security;
+        public IDictionary<string, SecurityScheme> securityDefinitions;
+
+        public IList<IDictionary<string, IEnumerable<string>>> security;
 
         public IList<Tag> tags;
     }
@@ -118,7 +120,7 @@ namespace Swashbuckle.Swagger
 
         public bool deprecated;
 
-        public IList<string> security;
+        public IList<IDictionary<string, IEnumerable<string>>> security;
     }
 
     public class Parameter : SerializableType
@@ -224,11 +226,30 @@ namespace Swashbuckle.Swagger
     {
         public string type;
 
-        public string format;
+        public string format; 
 
         public object items;
 
         public string collectionFormat;
+    }
+
+    public class SecurityScheme : Extensible
+    {
+        public string type;
+
+        public string description;
+
+        public string name;
+
+        public string @in;
+
+        public string flow;
+
+        public string authorizationUrl;
+
+        public string tokenUrl;
+
+        public IDictionary<string, string> scopes;
     }
 
     public class Tag

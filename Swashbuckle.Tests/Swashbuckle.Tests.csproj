@@ -69,6 +69,7 @@
     <Compile Include="HttpMessageHandlerTestsBase.cs" />
     <Compile Include="Swagger\SchemaTests.cs" />
     <Compile Include="Swagger\CoreTests.cs" />
+    <Compile Include="Swagger\SecurityTests.cs" />
     <Compile Include="Swagger\XmlCommentsTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SwaggerUi\SwaggerUiTests.cs" />

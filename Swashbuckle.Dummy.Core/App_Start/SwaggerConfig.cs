@@ -41,13 +41,39 @@ namespace Swashbuckle.Dummy
                         //    });
 
                         // If schemes are not specifically provided in a Swagger 2.0 document, then the scheme used to access
-                        // is inferred to be that of the API. If your API support multiple schemes and you want to be explicit
-                        // about them, you can use the "Schemes" option as shown below.
+                        // the docs is inferred to be that of the API. If your API supports multiple schemes and you want to
+                        // be explicit about them, you can use the "Schemes" option as shown below.
                         //
                         c.Schemes(new[] { "http", "https" });
 
+                        // You can use the "BasicAuth", "ApiKey" or "OAuth2" options to define security schemes for the API
+                        // See https://github.com/swagger-api/swagger-spec/blob/master/versions/2.0.md for more details
+                        // NOTE: These definitions only define the schemes and need to be coupled with a corresponding "security"
+                        // property at the document or operation level to indicate which schemes are required for an operation.
+                        // To do this, you'll need to implement a custom IDocumentFilter and/or IOperationFilter to set these
+                        // properties according to your specific authorization implementation
+                        //
+                        //c.BasicAuth("basic")
+                        //    .Description("Basic HTTP Authentication");
+                        //
+                        //c.ApiKey("apiKey")
+                        //    .Description("API Key Authentication")
+                        //    .Name("apiKey")
+                        //    .In("header");
+                        //
+                        c.OAuth2("oauth2")
+                            .Description("OAuth2 Authorization Code Grant")
+                            .Flow("implicit")
+                            .AuthorizationUrl("https://tempuri.org/auth")
+                            //.TokenUrl("https://tempuri.org/token")
+                            .Scopes(s =>
+                            {
+                                s.Add("read", "Read access to protected resources");
+                                s.Add("write", "Write access to protected resources");
+                            });
+
                         // Swashbuckle makes a best attempt at generating Swagger compliant JSON schemas for the various types
-                        // exposed in your API. However, there may be times occassions when more control of the output is required
+                        // exposed in your API. However, there may be occassions when more control of the output is required
                         // In this case, you can post-modify each of the generated schemas by wiring up one or more schema filters
                         //
                         c.SchemaFilter<ApplySchemaVendorExtensions>();
@@ -56,6 +82,11 @@ namespace Swashbuckle.Dummy
                         // post-modified by wiring up one or more operation filters
                         //
                         c.OperationFilter<AddDefaultResponse>();
+                        //
+                        // If you've defined an OAuth2 flow as described above, you could use a custom filter
+                        // to inspect some attribute on each action and infer which (if any) OAuth2 scopes are required
+                        // to execute the operation
+                        c.OperationFilter<AssignOAuth2SecurityRequirements>();
 
                         // Similar to a schema and operation filters, Swashubuckle allows the entire Swagger document to be
                         // post-modified by wiring up one or more document filters
@@ -63,7 +94,7 @@ namespace Swashbuckle.Dummy
                         c.DocumentFilter<ApplyDocumentVendorExtensions>();
 
                         // If you annotate your controllers and API types with XML comments, you can use the resulting
-                        // XML file (or files) to doucment the Operations and Schema's in the Swagger output 
+                        // XML file (or files) to document the Operations and Schema's in the Swagger output 
                         //
                         c.IncludeXmlComments(GetXmlCommentsPath());
                     })
@@ -105,68 +136,6 @@ namespace Swashbuckle.Dummy
                         c.DocExpansion(DocExpansion.List);
                     })
                 .Init(httpConfig);
-
-            //SwaggerSpecConfig.Customize(c =>
-            //    {
-            //        c.IgnoreObsoleteActions();
-
-            //        //c.SupportMultipleApiVersions(
-            //        //    new[] { "1.0", "2.0" },
-            //        //    ResolveVersionSupportByRouteConstraint);
-
-            //        //c.PolymorphicType<Animal>(ac => ac
-            //        //    .DiscriminateBy(a => a.Type)
-            //        //    .SubType<Kitten>());
-
-            //        c.OperationFilter<AddStandardResponseCodes>();
-            //        c.OperationFilter<AddAuthResponseCodes>();
-            //        c.OperationFilter<AddOAuth2Scopes>();
-
-            //        c.IncludeXmlComments(GetXmlCommentsPath());
-
-            //        c.ApiInfo(new Info
-            //        {
-            //            Title = "Swashbuckle Dummy",
-            //            Description = "For testing and experimenting with Swashbuckle features",
-            //            Contact = "domaindrivendev@gmail.com"
-            //        });
-
-            //        c.Authorization("oauth2", new Authorization
-            //        {
-            //            Type = "oauth2",
-            //            Scopes = new List<Scope>
-            //            {
-            //                new Scope { ScopeId = "products.read", Description = "View products" },
-            //                new Scope { ScopeId = "products.manage", Description = "Manage products" }
-            //            },
-            //            GrantTypes = new GrantTypes
-            //            {
-            //                ImplicitGrant = new ImplicitGrant
-            //                {
-            //                    LoginEndpoint = new LoginEndpoint
-            //                    {
-            //                        Url = "http://petstore.swagger.wordnik.com/api/oauth/dialog"
-            //                    },
-            //                    TokenName = "access_token"
-            //                }
-            //            }
-            //        });
-            //    });
-
-            //SwaggerUiConfig.Customize(c =>
-            //{
-            //    var thisAssembly = typeof(SwaggerConfig).Assembly;
-
-            //    c.SupportHeaderParams = true;
-            //    c.DocExpansion = DocExpansions.List;
-            //    c.SupportedSubmitMethods = new[] { HttpMethod.Get, HttpMethod.Post, HttpMethod.Put, HttpMethod.Head };
-            //    c.EnableDiscoveryUrlSelector();
-            //    //c.InjectJavaScript(thisAssembly, "Swashbuckle.Dummy.SwaggerExtensions.testScript1.js");
-            //    //c.InjectStylesheet(thisAssembly, "Swashbuckle.Dummy.SwaggerExtensions.testStyles1.css");
-
-            //    c.EnableOAuth2Support("test-client-id", "test-realm", "Swagger UI");
-            //});
-
         }
 
         private static string GetXmlCommentsPath()
