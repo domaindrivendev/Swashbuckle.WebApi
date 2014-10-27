@@ -6,8 +6,7 @@ namespace Swashbuckle.Swagger
 {
     public class SwaggerDocument : Extensible
     {
-        // TODO: Spec says this should be a string but UI fails if it's not an integer
-        public readonly int swagger = 2;
+        public readonly string swagger = "2.0";
 
         public Info info;
 

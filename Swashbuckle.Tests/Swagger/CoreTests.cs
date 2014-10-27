@@ -36,8 +36,7 @@ namespace Swashbuckle.Tests.Swagger
         {
             var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/1.0");
 
-            // TODO: Spec says this should be a string but UI fails if it's not an integer
-            Assert.AreEqual("2", swagger["swagger"].ToString());
+            Assert.AreEqual("2.0", swagger["swagger"].ToString());
         }
 
         [Test]
