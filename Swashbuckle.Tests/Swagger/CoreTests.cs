@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
+using System.Linq;
 using Swashbuckle.Application;
 using Swashbuckle.Dummy;
 using Swashbuckle.Dummy.Controllers;
@@ -24,11 +25,11 @@ namespace Swashbuckle.Tests.Swagger
         [SetUp]
         public void SetUp()
         {
-            _swaggerDocsConfig = new SwaggerDocsConfig();
+            var hostNameResolver = Swashbuckle.Configuration.DefaultHostNameResolver();
+            _swaggerDocsConfig = new SwaggerDocsConfig(hostNameResolver);
             _swaggerDocsConfig.SingleApiVersion("1.0", "Test API");
 
-            Func<HttpRequestMessage, string> hostNameResolver = (req) => req.RequestUri.Host + ":" + req.RequestUri.Port;
-            Handler = new SwaggerDocsHandler(hostNameResolver, _swaggerDocsConfig);
+            Handler = new SwaggerDocsHandler(_swaggerDocsConfig);
         }
 
         [Test]
@@ -56,7 +57,7 @@ namespace Swashbuckle.Tests.Swagger
         }
 
         [Test]
-        public void It_provides_host_and_base_path_if_applicable()
+        public void It_provides_host_base_path_and_default_schemes()
         {
             var swagger = GetContent<JObject>("http://tempuri.org:1234/swagger/docs/1.0");
 
@@ -67,7 +68,7 @@ namespace Swashbuckle.Tests.Swagger
             Assert.IsNull(basePath);
 
             var schemes = swagger["schemes"];
-            Assert.IsNull(schemes);
+            var expected = JArray.FromObject(new[] { "http" });
 
             // When there is a virtual directory
             Configuration = new HttpConfiguration(new HttpRouteCollection("/foobar"));
@@ -431,6 +432,19 @@ namespace Swashbuckle.Tests.Swagger
         }
 
         [Test]
+        public void It_exposes_config_to_workaround_multiple_actions_with_same_path_and_method()
+        {
+            AddDefaultRouteFor<ConflictingActionsController>();
+
+            _swaggerDocsConfig.ResolveConflictingActions(apiDescriptions => apiDescriptions.First());
+
+            var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/1.0");
+            var operations = swagger["paths"]["/conflictingactions"];
+
+            Assert.AreEqual(1, operations.Count());
+        }
+
+        [Test]
         public void It_handles_additional_route_parameters()
         {
             // i.e. route params that are not included in the action signature
@@ -482,7 +496,7 @@ namespace Swashbuckle.Tests.Swagger
         [ExpectedException(typeof(NotSupportedException))]
         public void It_errors_on_multiple_actions_with_same_path_and_method()
         {
-            AddDefaultRouteFor<UnsupportedActionsController>();
+            AddDefaultRouteFor<ConflictingActionsController>();
 
             var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/1.0");
         }

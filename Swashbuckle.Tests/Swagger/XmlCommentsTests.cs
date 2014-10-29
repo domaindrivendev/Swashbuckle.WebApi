@@ -23,12 +23,12 @@ namespace Swashbuckle.Tests.SwaggerFilters
         {
             AddDefaultRouteFor<XmlAnnotatedController>();
 
-            _swaggerDocsConfig = new SwaggerDocsConfig();
+            var hostNameResolver = Swashbuckle.Configuration.DefaultHostNameResolver();
+            _swaggerDocsConfig = new SwaggerDocsConfig(hostNameResolver);
             _swaggerDocsConfig.SingleApiVersion("1.0", "Test API");
             _swaggerDocsConfig.IncludeXmlComments(String.Format(@"{0}\XmlComments.xml", AppDomain.CurrentDomain.BaseDirectory));
 
-            Func<HttpRequestMessage, string> hostNameResolver = (req) => req.RequestUri.Host + ":" + req.RequestUri.Port;
-            Handler = new SwaggerDocsHandler(hostNameResolver, _swaggerDocsConfig);
+            Handler = new SwaggerDocsHandler(_swaggerDocsConfig);
         }
 
         [Test]

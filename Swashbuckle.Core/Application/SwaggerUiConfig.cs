@@ -10,18 +10,19 @@ namespace Swashbuckle.Application
 {
     public class SwaggerUiConfig
     {
+        private readonly Func<HttpRequestMessage, string> _hostNameResolver;
         private readonly Dictionary<string, EmbeddedResourceDescriptor> _customWebAssets;
         private readonly Dictionary<string, string> _textReplacements;
 
-        public SwaggerUiConfig(IEnumerable<string> discoveryPaths)
+        public SwaggerUiConfig(Func<HttpRequestMessage, string> hostNameResolver, IEnumerable<string> discoveryPaths)
         {
-            Enabled = true;
-
+            _hostNameResolver = hostNameResolver;
             _customWebAssets = new Dictionary<string, EmbeddedResourceDescriptor>();
 
             _textReplacements = new Dictionary<string, string>
             {
                 { "%(StylesheetIncludes)", "" },
+                { "%(DiscoveryBaseUrl)", "''" },
                 { "%(SupportHeaderParams)", "false" },
                 { "%(SupportedSubmitMethods)", "'get','post','put','delete'" },
                 { "%(CustomScripts)", "" },
@@ -37,6 +38,9 @@ namespace Swashbuckle.Application
 
             // Use Swashbuckle specific index.html
             CustomWebAsset("index.html", GetType().Assembly, "Swashbuckle.SwaggerExtensions.index.html");
+
+            // Enable swagger-ui by default
+            Enabled = true;
         }
 
         internal bool Enabled { get; private set; }
@@ -101,6 +105,12 @@ namespace Swashbuckle.Application
             return this;
         }
 
+        public SwaggerUiConfig EnableDiscoveryUrlSelector()
+        {
+            InjectJavaScript(GetType().Assembly, "Swashbuckle.SwaggerExtensions.discoveryUrlSelector.js");
+            return this;
+        }
+
         public SwaggerUiConfig EnableOAuth2Support(string clientId, string realm, string appName)
         {
             _textReplacements["%(OAuth2Enabled)"] = "true";
@@ -110,9 +120,18 @@ namespace Swashbuckle.Application
             return this;
         }
 
-        internal EmbeddedWebAssetProviderSettings ToUiProviderSettings()
+        internal IWebAssetProvider GetSwaggerUiProvider(HttpRequestMessage swaggerRequest)
         {
-            return new EmbeddedWebAssetProviderSettings(_customWebAssets, _textReplacements);
+            var virtualPathRoot = swaggerRequest.GetConfiguration().VirtualPathRoot;
+
+            _textReplacements["%(DiscoveryBaseUrl)"] = String.Format("'{0}://{1}{2}'",
+                swaggerRequest.RequestUri.Scheme,
+                _hostNameResolver(swaggerRequest),
+                (virtualPathRoot != "/") ? virtualPathRoot : "");
+
+            var settings = new EmbeddedWebAssetProviderSettings(_customWebAssets, _textReplacements);
+
+            return new EmbeddedWebAssetProvider(settings);
         }
     }
 

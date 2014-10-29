@@ -22,11 +22,11 @@ namespace Swashbuckle.Tests.Swagger
         [SetUp]
         public void SetUp()
         {
-            _swaggerDocsConfig = new SwaggerDocsConfig();
+            var hostNameResolver = Swashbuckle.Configuration.DefaultHostNameResolver();
+            _swaggerDocsConfig = new SwaggerDocsConfig(hostNameResolver);
             _swaggerDocsConfig.SingleApiVersion("1.0", "Test Api");
 
-            Func<HttpRequestMessage, string> hostNameResolver = (req) => req.RequestUri.Host + ":" + req.RequestUri.Port;
-            Handler = new SwaggerDocsHandler(hostNameResolver, _swaggerDocsConfig);
+            Handler = new SwaggerDocsHandler(_swaggerDocsConfig);
         }
 
         [Test]

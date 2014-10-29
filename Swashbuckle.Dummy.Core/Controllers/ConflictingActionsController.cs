@@ -5,7 +5,7 @@ using System.Web.Http;
 
 namespace Swashbuckle.Dummy.Controllers
 {
-    public class UnsupportedActionsController : ApiController
+    public class ConflictingActionsController : ApiController
     {
         public IEnumerable<string> GetAll()
         {

@@ -7,19 +7,11 @@ namespace Swashbuckle.Swagger
 {
     public class SwaggerGenerator : ISwaggerProvider
     {
-        private readonly string _hostName;
-        private readonly string _virtualPathRoot;
         private readonly IApiExplorer _apiExplorer;
         private readonly SwaggerGeneratorSettings _settings;
 
-        public SwaggerGenerator(
-            string hostName,
-            string virtualPathRoot,
-            IApiExplorer apiExplorer,
-            SwaggerGeneratorSettings settings)
+        public SwaggerGenerator(IApiExplorer apiExplorer, SwaggerGeneratorSettings settings)
         {
-            _hostName = hostName;
-            _virtualPathRoot = virtualPathRoot;
             _apiExplorer = apiExplorer;
             _settings = settings;
         }
@@ -40,8 +32,8 @@ namespace Swashbuckle.Swagger
             var swaggerDoc = new SwaggerDocument
             {
                 info = info,
-                host = _hostName,
-                basePath = (_virtualPathRoot != "/") ? _virtualPathRoot : null,
+                host = _settings.HostName,
+                basePath = (_settings.VirtualPathRoot != "/") ? _settings.VirtualPathRoot : null,
                 schemes = (_settings.Schemes != null) ? _settings.Schemes.ToList() : null,
                 paths = paths,
                 definitions = schemaRegistry.Definitions,
@@ -74,13 +66,10 @@ namespace Swashbuckle.Swagger
             {
                 var httpMethod = group.Key;
 
-                if (group.Count() > 1)
-                    throw new NotSupportedException(String.Format(
-                        "Not supported by Swagger 2.0: Multiple operations with path '{0}' and method '{1}'",
-                        "/" + group.First().RelativePathSansQueryString(),
-                        httpMethod));
+                var apiDescription = (group.Count() == 1)
+                    ? group.First()
+                    : _settings.ConflictingActionsResolver(group);
 
-                var apiDescription = group.Single();
                 switch (httpMethod)
                 {
                     case "get":

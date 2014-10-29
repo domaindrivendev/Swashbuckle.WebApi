@@ -19,10 +19,8 @@ namespace Swashbuckle.Application
 
         protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
         {
-            var swaggerUiProvider = GetSwaggerUiProvider(request);
-
-            object uiPath;
-            request.GetRouteData().Values.TryGetValue("uiPath", out uiPath);
+            var swaggerUiProvider = _swaggerUiConfig.GetSwaggerUiProvider(request);
+            var uiPath = request.GetRouteData().Values["uiPath"].ToString();
 
             try
             {
@@ -34,12 +32,6 @@ namespace Swashbuckle.Application
             {
                 return TaskFor(request.CreateErrorResponse(HttpStatusCode.NotFound, ex));
             }
-        }
-
-        private IWebAssetProvider GetSwaggerUiProvider(HttpRequestMessage request)
-        {
-            var settings = _swaggerUiConfig.ToUiProviderSettings();
-            return new EmbeddedWebAssetProvider(settings);
         }
 
         private HttpContent ContentFor(WebAsset webAsset)

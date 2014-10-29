@@ -11,23 +11,25 @@ namespace Swashbuckle.Application
 {
     public class SwaggerDocsConfig
     {
-        private Func<ApiDescription, string, bool> _versionSupportResolver;
-
+        private Func<HttpRequestMessage, string> _hostNameResolver;
         private IEnumerable<string> _schemes;
         private IDictionary<string, SecuritySchemeBuilder> _securitySchemeBuilders;
         private readonly IList<Func<ISchemaFilter>> _schemaFilters;
         private readonly IList<Func<IOperationFilter>> _operationFilters;
         private readonly IList<Func<IDocumentFilter>> _documentFilters;
 
-        public SwaggerDocsConfig()
-        {
-            VersionInfoBuilder = new VersionInfoBuilder();
+        private Func<ApiDescription, string, bool> _versionSupportResolver;
+        private Func<IEnumerable<ApiDescription>, ApiDescription> _conflictingActionsResolver;
 
-            _schemes = null; // i.e. default to scheme used to accesss the swagger docs
+        public SwaggerDocsConfig(Func<HttpRequestMessage, string> hostNameResolver)
+        {
+            _hostNameResolver = hostNameResolver;
             _securitySchemeBuilders = new Dictionary<string, SecuritySchemeBuilder>();
             _schemaFilters = new List<Func<ISchemaFilter>>();
             _operationFilters = new List<Func<IOperationFilter>>();
             _documentFilters = new List<Func<IDocumentFilter>>();
+
+            VersionInfoBuilder = new VersionInfoBuilder();
         }
 
         internal VersionInfoBuilder VersionInfoBuilder { get; private set; }
@@ -92,21 +94,34 @@ namespace Swashbuckle.Application
             _schemaFilters.Add(() => new ApplyXmlTypeComments(filePath));
         }
 
-        internal SwaggerGeneratorSettings ToGeneratorSettings()
+        public void ResolveConflictingActions(Func<IEnumerable<ApiDescription>, ApiDescription> conflictingActionsResolver)
         {
+            _conflictingActionsResolver = conflictingActionsResolver;
+        }
+
+        internal ISwaggerProvider GetSwaggerProvider(HttpRequestMessage swaggerRequest)
+        {
+            // If schemes have not been explicitly provided, default to scheme from the swagger request
+            var schemes = _schemes ?? new[] { swaggerRequest.RequestUri.Scheme };
+
             var securityDefintitions = _securitySchemeBuilders.Any()
                 ? _securitySchemeBuilders.ToDictionary(kvp => kvp.Key, kvp => kvp.Value.Build())
                 : null;
 
-            return new SwaggerGeneratorSettings(
+            var settings = new SwaggerGeneratorSettings(
                 versionSupportResolver: _versionSupportResolver, // TODO: handle null value
                 apiVersions: VersionInfoBuilder.Build(),
-                schemes: _schemes,
+                hostName: _hostNameResolver(swaggerRequest),
+                virtualPathRoot: swaggerRequest.GetConfiguration().VirtualPathRoot,
+                schemes: schemes, 
                 securityDefinitions: securityDefintitions, 
                 schemaFilters: _schemaFilters.Select(factory => factory()),
                 operationFilters: _operationFilters.Select(factory => factory()),
-                documentFilters: _documentFilters.Select(factory => factory())
+                documentFilters: _documentFilters.Select(factory => factory()),
+                conflictingActionsResolver: _conflictingActionsResolver
             );
+
+            return new SwaggerGenerator(swaggerRequest.GetConfiguration().Services.GetApiExplorer(), settings);
         }
 
         private T AddSecuritySchemeBuilder<T>(string name)

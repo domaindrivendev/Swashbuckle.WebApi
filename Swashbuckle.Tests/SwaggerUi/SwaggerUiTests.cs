@@ -19,7 +19,8 @@ namespace Swashbuckle.Tests.SwaggerUi
         [SetUp]
         public void SetUp()
         {
-            _swaggerUiConfig = new SwaggerUiConfig(new []{ "swagger/docs/1.0" });
+            var hostNameResolver = Swashbuckle.Configuration.DefaultHostNameResolver();
+            _swaggerUiConfig = new SwaggerUiConfig(hostNameResolver, new []{ "swagger/docs/1.0" });
 
             Handler = new SwaggerUiHandler(_swaggerUiConfig);
         }
@@ -81,7 +82,18 @@ namespace Swashbuckle.Tests.SwaggerUi
             StringAssert.Contains("oAuth2Realm: 'test-realm'", content);
             StringAssert.Contains("oAuth2AppName: 'Swagger UI'", content);
         }
+
+        [Test]
+        public void It_exposes_config_to_enable_a_discovery_url_selector()
+        {
+            _swaggerUiConfig.EnableDiscoveryUrlSelector();
+
+            var content = GetContentAsString("http://tempuri.org/swagger/ui/index.html");
+
+            StringAssert.Contains("Swashbuckle.SwaggerExtensions.discoveryUrlSelector.js", content);
+        }
         
+
         [Test]
         public void It_exposes_config_to_inject_custom_javascripts()
         {

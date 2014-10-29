@@ -14,8 +14,7 @@ namespace Swashbuckle.Dummy
             config.Routes.MapHttpRoute(
                 name: "DefaultApi",
                 routeTemplate: "{controller}/{id}",
-                defaults: new { id = RouteParameter.Optional },
-                constraints: new { controller = @"(?!UnsupportedActions).*" }
+                defaults: new { id = RouteParameter.Optional }
             );
         }
     }

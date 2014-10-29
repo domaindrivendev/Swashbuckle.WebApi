@@ -97,6 +97,13 @@ namespace Swashbuckle.Dummy
                         // XML file (or files) to document the Operations and Schema's in the Swagger output 
                         //
                         c.IncludeXmlComments(GetXmlCommentsPath());
+
+                        // In contrast to WebApi, Swagger 2.0 does not include the query string component when mapping a URL
+                        // to an action. As a result, Swashbuckle will raise an exception if it encounters multiple actions
+                        // with the same path (sans query string) and HTTP method. You can workaround this by providing a
+                        // custom strategy to pick a winner or merge the descriptions for the purposes of the Swagger docs 
+                        //
+                        c.ResolveConflictingActions(apiDescriptions => apiDescriptions.First());
                     })
                 .SwaggerUi(c =>
                     {
@@ -134,6 +141,12 @@ namespace Swashbuckle.Dummy
                         // See https://github.com/swagger-api/swagger-ui for more details
                         //
                         c.DocExpansion(DocExpansion.List);
+
+                        // If you're API has multiple versions and you've applied the "MultipleApiVersions" setting
+                        // as described above, you can also enable a select box that displays the corresponding discovery
+                        // URL's. This provides a convenient way for users to view documentation for different API versions
+                        //
+                        c.EnableDiscoveryUrlSelector();
                     })
                 .Init(httpConfig);
         }

@@ -16,7 +16,7 @@ namespace Swashbuckle
 
         private Configuration()
         {
-            _hostNameResolver = (req) => req.RequestUri.Host + ":" + req.RequestUri.Port;
+            _hostNameResolver = DefaultHostNameResolver();
         }
 
         public Configuration HostName(Func<HttpRequestMessage, string> hostNameResolver)
@@ -39,16 +39,16 @@ namespace Swashbuckle
 
         public void Init(HttpConfiguration httpConfig, string routePrefix = "swagger")
         {
-            var swaggerDocsConfig = new SwaggerDocsConfig();
-            _configureDocs(swaggerDocsConfig);
+            var docsConfig = new SwaggerDocsConfig(_hostNameResolver);
+            _configureDocs(docsConfig);
 
-            var discoveryPaths = swaggerDocsConfig.VersionInfoBuilder.Build()
+            var discoveryPaths = docsConfig.VersionInfoBuilder.Build()
                 .Select(entry => String.Format("/{0}/docs/{1}", routePrefix, entry.Key));
 
-            var swaggerUiConfig = new SwaggerUiConfig(discoveryPaths);
-            _configureUi(swaggerUiConfig);
+            var uiConfig = new SwaggerUiConfig(_hostNameResolver, discoveryPaths);
+            _configureUi(uiConfig);
 
-            if (swaggerUiConfig.Enabled)
+            if (uiConfig.Enabled)
             {
                 httpConfig.Routes.MapHttpRoute(
                     "swagger_root",
@@ -62,7 +62,7 @@ namespace Swashbuckle
                     routePrefix + "/ui/{*uiPath}",
                     null,
                     new { uiPath = @".+" },
-                    new SwaggerUiHandler(swaggerUiConfig));
+                    new SwaggerUiHandler(uiConfig));
             }
 
             httpConfig.Routes.MapHttpRoute(
@@ -70,7 +70,12 @@ namespace Swashbuckle
                 routePrefix + "/docs/{apiVersion}",
                 new { resourceName = RouteParameter.Optional },
                 null,
-                new SwaggerDocsHandler(_hostNameResolver, swaggerDocsConfig));
+                new SwaggerDocsHandler(docsConfig));
+        }
+
+        public static Func<HttpRequestMessage, string> DefaultHostNameResolver()
+        {
+            return (req) => req.RequestUri.Host + ":" + req.RequestUri.Port;
         }
     }
 }
