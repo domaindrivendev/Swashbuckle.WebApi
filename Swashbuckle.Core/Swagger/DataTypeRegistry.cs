@@ -6,6 +6,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Reflection;
 using System.Text;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 namespace Swashbuckle.Swagger
@@ -129,12 +130,21 @@ namespace Swashbuckle.Swagger
                 .Where(propInfo => !propInfo.GetIndexParameters().Any())    // Ignore indexer properties
                 .ToArray();
 
-            var properties = propInfos
-                .ToDictionary(propInfo => propInfo.Name, propInfo => GetOrRegister(propInfo.PropertyType, true, deferredTypes));
+            var properties = propInfos.Where(propInfo => !MemberHasJsonIgnore(propInfo))
+                .ToDictionary(propInfo => GetMemberName(propInfo), propInfo => GetOrRegister(propInfo.PropertyType, true, deferredTypes));
 
-            var required = propInfos.Where(propInfo => Attribute.IsDefined(propInfo, typeof (RequiredAttribute)))
-                .Select(propInfo => propInfo.Name)
+            var fieldInfos = type.GetFields(bindingFlags).ToArray();
+            fieldInfos.Where(propInfo => !MemberHasJsonIgnore(propInfo)).ToList().ForEach(fieldInfo => properties.Add(GetMemberName(fieldInfo), GetOrRegister(fieldInfo.FieldType, true, deferredTypes)));
+
+            var requiredFields = fieldInfos.Where(propInfo => Attribute.IsDefined(propInfo, typeof(RequiredAttribute)))
+                .Select(propInfo => GetMemberName(propInfo))
                 .ToList();
+
+            var required = propInfos.Where(propInfo => Attribute.IsDefined(propInfo, typeof(RequiredAttribute)))
+                .Select(propInfo => GetMemberName(propInfo))
+                .ToList();
+
+            requiredFields.ForEach(requiredField => required.Add(requiredField));
 
             var subDataTypes = polymorphicType.SubTypes
                 .Select(subType => GetOrRegister(subType.Type, true, deferredTypes))
@@ -159,6 +169,21 @@ namespace Swashbuckle.Swagger
             return dataType;
         }
 
+        private string GetMemberName(MemberInfo member)
+        {
+            List<JsonPropertyAttribute> attributes = Attribute.GetCustomAttributes(member, typeof(JsonPropertyAttribute), true).Select(attr => (JsonPropertyAttribute)attr).ToList();
+            JsonPropertyAttribute propertyNameAttribute = attributes.FirstOrDefault(attribute => !string.IsNullOrEmpty(attribute.PropertyName));
+            if (propertyNameAttribute != null)
+                return propertyNameAttribute.PropertyName;
+            else
+                return member.Name;
+        }
+
+        private bool MemberHasJsonIgnore(MemberInfo member)
+        {
+            return member.GetCustomAttributes(true).Any(attribute => attribute is JsonIgnoreAttribute);
+        }
+
         private static string UniqueIdFor(Type type)
         {
             if (type.IsGenericType)
@@ -175,14 +200,24 @@ namespace Swashbuckle.Swagger
                     .ToString();
             }
 
-            return type.Name;
+            return GetJsonObjectName(type);
+        }
+
+        private static string GetJsonObjectName(Type type)
+        {
+            List<JsonObjectAttribute> attributes = Attribute.GetCustomAttributes(type, typeof(JsonObjectAttribute), true).Select(attr => (JsonObjectAttribute)attr).ToList();
+            JsonObjectAttribute propertyNameAttribute = attributes.FirstOrDefault(attribute => !string.IsNullOrEmpty(attribute.Id));
+            if (propertyNameAttribute != null)
+                return propertyNameAttribute.Id;
+            else
+                return type.Name;
         }
 
         private PolymorphicType PolymorphicTypeFor(Type type)
         {
             var polymorphicType = _polymorphicTypes.SingleOrDefault(t => t.Type == type);
             if (polymorphicType != null) return polymorphicType;
-            
+
             // Is it nested?
             foreach (var baseType in _polymorphicTypes)
             {
