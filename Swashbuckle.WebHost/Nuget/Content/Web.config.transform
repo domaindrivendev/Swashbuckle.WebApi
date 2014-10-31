@@ -1,7 +1,8 @@
 ﻿<configuration>
   <system.webServer>
-    <handlers>
-      <add name="SwashbuckleUiHandler" verb="*" path="swagger/ui/*" type="Swashbuckle.Application.SwaggerUiHandler, Swashbuckle.Core" preCondition="managedHandler"/>
-    </handlers>
+    <modules>
+      <remove name="UrlRoutingModule-4.0" />
+      <add name="UrlRoutingModule-4.0" type="System.Web.Routing.UrlRoutingModule" preCondition="" />
+    </modules>
   </system.webServer>
 </configuration>

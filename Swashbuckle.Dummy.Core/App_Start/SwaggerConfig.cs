@@ -61,16 +61,16 @@ namespace Swashbuckle.Dummy
                         //    .Name("apiKey")
                         //    .In("header");
                         //
-                        c.OAuth2("oauth2")
-                            .Description("OAuth2 Authorization Code Grant")
-                            .Flow("implicit")
-                            .AuthorizationUrl("https://tempuri.org/auth")
-                            //.TokenUrl("https://tempuri.org/token")
-                            .Scopes(s =>
-                            {
-                                s.Add("read", "Read access to protected resources");
-                                s.Add("write", "Write access to protected resources");
-                            });
+                        //c.OAuth2("oauth2")
+                        //    .Description("OAuth2 Authorization Code Grant")
+                        //    .Flow("implicit")
+                        //    .AuthorizationUrl("https://tempuri.org/auth")
+                        //    //.TokenUrl("https://tempuri.org/token")
+                        //    .Scopes(s =>
+                        //    {
+                        //        s.Add("read", "Read access to protected resources");
+                        //        s.Add("write", "Write access to protected resources");
+                        //    });
 
                         // Swashbuckle makes a best attempt at generating Swagger compliant JSON schemas for the various types
                         // exposed in your API. However, there may be occassions when more control of the output is required
