@@ -258,7 +258,6 @@ namespace Swashbuckle.Swagger
 
     public class Extensible
     {
-        [JsonExtensionData]
         public IDictionary<string, object> extensions = new Dictionary<string, object>();
     }
 }

@@ -50,8 +50,14 @@ namespace Swashbuckle.Application
         {
             var jsonFormatter = new JsonMediaTypeFormatter
             {
-                SerializerSettings = new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore }
+                SerializerSettings = new JsonSerializerSettings
+                {
+                    NullValueHandling = NullValueHandling.Ignore,
+                    Converters = new[] { new ExtensibleTypeConverter() }
+                }
             };
+            // NOTE: The custom converter would not be neccessary in Newtonsoft.Json >= 5.0.5 as JsonExtensionData
+            // provides similar functionality. But, need to stick with older version for WebApi 5.0.0 compatibility 
             return new[] { jsonFormatter };
         }
 
