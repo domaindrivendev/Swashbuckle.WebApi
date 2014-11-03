@@ -5,14 +5,13 @@ using System.Collections.Generic;
 using System.Net.Http;
 using Swashbuckle.Application;
 using Swashbuckle.Dummy.Controllers;
+using Swashbuckle.Tests.Swagger;
 
-namespace Swashbuckle.Tests.SwaggerFilters
+namespace Swashbuckle.Tests.Swagger
 {
     [TestFixture]
-    public class XmlCommentsTests : HttpMessageHandlerTestFixture<SwaggerDocsHandler>
+    public class XmlCommentsTests : SwaggerTestBase
     {
-        private SwaggerDocsConfig _swaggerDocsConfig;
-
         public XmlCommentsTests()
             : base("swagger/docs/{apiVersion}")
         {
@@ -21,14 +20,8 @@ namespace Swashbuckle.Tests.SwaggerFilters
         [SetUp]
         public void SetUp()
         {
-            AddDefaultRouteFor<XmlAnnotatedController>();
-
-            var hostNameResolver = Swashbuckle.Configuration.DefaultHostNameResolver();
-            _swaggerDocsConfig = new SwaggerDocsConfig(hostNameResolver);
-            _swaggerDocsConfig.SingleApiVersion("1.0", "Test API");
-            _swaggerDocsConfig.IncludeXmlComments(String.Format(@"{0}\XmlComments.xml", AppDomain.CurrentDomain.BaseDirectory));
-
-            Handler = new SwaggerDocsHandler(_swaggerDocsConfig);
+            SetUpDefaultRouteFor<XmlAnnotatedController>();
+            SetUpHandler(c => c.IncludeXmlComments(String.Format(@"{0}\XmlComments.xml", AppDomain.CurrentDomain.BaseDirectory)));
         }
 
         [Test]

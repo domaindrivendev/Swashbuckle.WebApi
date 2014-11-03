@@ -5,7 +5,7 @@ namespace Swashbuckle.WebAssets
 {
     public interface IWebAssetProvider
     {
-        WebAsset GetWebAssetFor(string path);
+        WebAsset GetWebAssetFor(string path, string rootUrl);
     }
 
     public class WebAsset

@@ -14,21 +14,25 @@ namespace Swashbuckle.Application
 {
     public class SwaggerDocsHandler : HttpMessageHandler
     {
-        private readonly SwaggerDocsConfig _swaggerDocsConfig;
+        private readonly Func<HttpRequestMessage, string> _rootUrlResolver;
+        private readonly ISwaggerProvider _swaggerProvider;
 
-        public SwaggerDocsHandler(SwaggerDocsConfig swaggerDocsConfig)
+        public SwaggerDocsHandler(
+            Func<HttpRequestMessage, string> rootUrlResolver,
+            ISwaggerProvider swaggerProvider)
         {
-            _swaggerDocsConfig = swaggerDocsConfig;
+            _rootUrlResolver = rootUrlResolver;
+            _swaggerProvider = swaggerProvider;
         }
 
         protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
         {
-            var swaggerProvider = _swaggerDocsConfig.GetSwaggerProvider(request);
             var apiVersion = request.GetRouteData().Values["apiVersion"].ToString();
+            var apiRootUrl = _rootUrlResolver(request);
 
             try
             {
-                var swaggerDoc = swaggerProvider.GetSwaggerFor(apiVersion);
+                var swaggerDoc = _swaggerProvider.GetSwaggerFor(apiVersion, apiRootUrl);
                 var content = ContentFor(request, swaggerDoc);
                 return TaskFor(new HttpResponseMessage { Content = content });
             }

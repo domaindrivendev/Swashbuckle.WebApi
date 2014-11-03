@@ -64,14 +64,16 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="HttpMessageHandlerTestFixture.cs" />
-    <Compile Include="HttpMessageHandlerTestsBase.cs" />
+    <Compile Include="HttpMessageHandlerTestBase.cs" />
+    <Compile Include="SwaggerUi\SwaggerUiTests.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Swagger\SchemaTests.cs" />
     <Compile Include="Swagger\CoreTests.cs" />
     <Compile Include="Swagger\SecurityTests.cs" />
+    <Compile Include="Swagger\SwaggerTestBase.cs" />
     <Compile Include="Swagger\XmlCommentsTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SwaggerUi\SwaggerUiTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

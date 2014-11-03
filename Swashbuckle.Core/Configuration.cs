@@ -3,6 +3,8 @@ using System.Net.Http;
 using System.Web.Http;
 using System.Linq;
 using Swashbuckle.Application;
+using Swashbuckle.Swagger;
+using Swashbuckle.WebAssets;
 
 namespace Swashbuckle
 {
@@ -10,18 +12,20 @@ namespace Swashbuckle
     {
         public static Configuration Instance = new Configuration();
 
-        private Func<HttpRequestMessage, string> _hostNameResolver;
+        private Func<HttpRequestMessage, string> _rootUrlResolver;
         private Action<SwaggerDocsConfig> _configureDocs;
         private Action<SwaggerUiConfig> _configureUi;
 
         private Configuration()
         {
-            _hostNameResolver = DefaultHostNameResolver();
+            _rootUrlResolver = DefaultRootUrlResolver;
+            _configureDocs = (c) => {}; 
+            _configureUi = (c) => {}; 
         }
 
-        public Configuration HostName(Func<HttpRequestMessage, string> hostNameResolver)
+        public Configuration RootUrl(Func<HttpRequestMessage, string> rootUrlResolver)
         {
-            _hostNameResolver = hostNameResolver;
+            _rootUrlResolver = rootUrlResolver;
             return this;
         }
 
@@ -39,43 +43,60 @@ namespace Swashbuckle
 
         public void Init(HttpConfiguration httpConfig, string routePrefix = "swagger")
         {
-            var docsConfig = new SwaggerDocsConfig(_hostNameResolver);
-            _configureDocs(docsConfig);
+            var swaggerDocsConfig = new SwaggerDocsConfig();
+            _configureDocs(swaggerDocsConfig);
 
-            var discoveryPaths = docsConfig.VersionInfoBuilder.Build()
-                .Select(entry => String.Format("/{0}/docs/{1}", routePrefix, entry.Key));
+            var discoveryPaths = swaggerDocsConfig.VersionInfoBuilder.Build()
+                .Select(entry => routePrefix + "/docs/" + entry.Key);
+            var swaggerUiConfig = new SwaggerUiConfig(discoveryPaths);
+            _configureUi(swaggerUiConfig);
 
-            var uiConfig = new SwaggerUiConfig(_hostNameResolver, discoveryPaths);
-            _configureUi(uiConfig);
-
-            if (uiConfig.Enabled)
+            if (swaggerUiConfig.Enabled)
             {
-                httpConfig.Routes.MapHttpRoute(
-                    "swagger_root",
-                    routePrefix,
-                    null,
-                    null,
-                    new RedirectHandler(_hostNameResolver, routePrefix + "/ui/index.html"));
-
-                httpConfig.Routes.MapHttpRoute(
-                    "swagger_ui",
-                    routePrefix + "/ui/{*uiPath}",
-                    null,
-                    new { uiPath = @".+" },
-                    new SwaggerUiHandler(uiConfig));
+                RegisterUiRoutes(httpConfig, routePrefix, swaggerUiConfig);
             }
+
+            RegisterDocsRoutes(httpConfig, routePrefix, swaggerDocsConfig);
+        }
+
+        private void RegisterDocsRoutes(HttpConfiguration httpConfig, string routePrefix, SwaggerDocsConfig swaggerDocsConfig)
+        {
+            var swaggerProvider = new SwaggerGenerator(
+                httpConfig.Services.GetApiExplorer(),
+                swaggerDocsConfig.ToGeneratorSettings());
 
             httpConfig.Routes.MapHttpRoute(
                 "swagger_docs",
                 routePrefix + "/docs/{apiVersion}",
                 new { resourceName = RouteParameter.Optional },
                 null,
-                new SwaggerDocsHandler(docsConfig));
+                new SwaggerDocsHandler(_rootUrlResolver, swaggerProvider));
         }
 
-        public static Func<HttpRequestMessage, string> DefaultHostNameResolver()
+        private void RegisterUiRoutes(HttpConfiguration httpConfig, string routePrefix, SwaggerUiConfig swaggerUiConfig)
         {
-            return (req) => req.RequestUri.Host + ":" + req.RequestUri.Port;
+            var swaggerUiProvider = new EmbeddedWebAssetProvider(swaggerUiConfig.ToUiProviderSettings());
+
+            httpConfig.Routes.MapHttpRoute(
+                "swagger_root",
+                routePrefix,
+                null,
+                null,
+                new RedirectHandler(_rootUrlResolver, routePrefix + "/ui/index.html"));
+
+            httpConfig.Routes.MapHttpRoute(
+                "swagger_ui",
+                routePrefix + "/ui/{*uiPath}",
+                null,
+                new { uiPath = @".+" },
+                new SwaggerUiHandler(_rootUrlResolver, swaggerUiProvider));
+        }
+
+        public static string DefaultRootUrlResolver(HttpRequestMessage request)
+        {
+            var virtualPathRoot = request.GetConfiguration().VirtualPathRoot;
+            var requestUri = request.RequestUri;
+            return String.Format("{0}://{1}:{2}{3}", requestUri.Scheme, requestUri.Host, requestUri.Port, virtualPathRoot);
         }
     }
 }

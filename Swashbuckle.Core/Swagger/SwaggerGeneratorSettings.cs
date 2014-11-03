@@ -10,8 +10,6 @@ namespace Swashbuckle.Swagger
         public SwaggerGeneratorSettings(
             Func<ApiDescription, string, bool> versionSupportResolver,
             IDictionary<string, Info> apiVersions,
-            string hostName,
-            string virtualPathRoot,
             IEnumerable<string> schemes,
             IDictionary<string, SecurityScheme> securityDefinitions = null,
             IEnumerable<ISchemaFilter> schemaFilters = null,
@@ -21,8 +19,6 @@ namespace Swashbuckle.Swagger
         {
             VersionSupportResolver = versionSupportResolver;
             ApiVersions = apiVersions;
-            HostName = hostName;
-            VirtualPathRoot = virtualPathRoot;
             Schemes = schemes;
             SecurityDefinitions = securityDefinitions;
             SchemaFilters = schemaFilters ?? new List<ISchemaFilter>();
@@ -34,10 +30,6 @@ namespace Swashbuckle.Swagger
         public Func<ApiDescription, string, bool> VersionSupportResolver { get; private set; }
 
         public IDictionary<string, Info> ApiVersions { get; private set; }
-
-        public string HostName { get; private set; }
-
-        public string VirtualPathRoot { get; private set; }
 
         public IEnumerable<string> Schemes { get; private set; }
 

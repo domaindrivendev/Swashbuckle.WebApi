@@ -10,16 +10,14 @@ namespace Swashbuckle.Application
 {
     public class SwaggerUiConfig
     {
-        private readonly Func<HttpRequestMessage, string> _hostNameResolver;
         private readonly Dictionary<string, EmbeddedResourceDescriptor> _customWebAssets;
-        private readonly Dictionary<string, string> _textReplacements;
+        private readonly Dictionary<string, string> _templateValues;
 
-        public SwaggerUiConfig(Func<HttpRequestMessage, string> hostNameResolver, IEnumerable<string> discoveryPaths)
+        public SwaggerUiConfig(IEnumerable<string> discoveryPaths)
         {
-            _hostNameResolver = hostNameResolver;
             _customWebAssets = new Dictionary<string, EmbeddedResourceDescriptor>();
 
-            _textReplacements = new Dictionary<string, string>
+            _templateValues = new Dictionary<string, string>
             {
                 { "%(StylesheetIncludes)", "" },
                 { "%(DiscoveryBaseUrl)", "''" },
@@ -34,7 +32,7 @@ namespace Swashbuckle.Application
             };
 
             var discoveryPathStrings = discoveryPaths.Select(path => "'" + path + "'");
-            _textReplacements["%(DiscoveryPaths)"] = String.Join(",", discoveryPathStrings);
+            _templateValues["%(DiscoveryPaths)"] = String.Join(",", discoveryPathStrings);
 
             // Use Swashbuckle specific index.html
             CustomWebAsset("index.html", GetType().Assembly, "Swashbuckle.SwaggerExtensions.index.html");
@@ -53,10 +51,10 @@ namespace Swashbuckle.Application
         public SwaggerUiConfig InjectStylesheet(Assembly resourceAssembly, string resourceName)
         {
             var path = "ext/" + resourceName;
-            var stringBuilder = new StringBuilder(_textReplacements["%(StylesheetIncludes)"]);
+            var stringBuilder = new StringBuilder(_templateValues["%(StylesheetIncludes)"]);
 
             stringBuilder.AppendLine("<link href='" + path + "' media='screen' rel='stylesheet' type='text/css' />");
-            _textReplacements["%(StylesheetIncludes)"] = stringBuilder.ToString();
+            _templateValues["%(StylesheetIncludes)"] = stringBuilder.ToString();
 
             _customWebAssets[path] = new EmbeddedResourceDescriptor(resourceAssembly, resourceName);
             return this;
@@ -64,7 +62,7 @@ namespace Swashbuckle.Application
 
         public SwaggerUiConfig SupportHeaderParams()
         {
-            _textReplacements["%(SupportHeaderParams)"] = "true";
+            _templateValues["%(SupportHeaderParams)"] = "true";
             return this;
         }
 
@@ -73,13 +71,13 @@ namespace Swashbuckle.Application
             var httpMethodsString = String.Join(",",
                 httpMethods.Select(method => "'" + method.ToString().ToLower() + "'"));
 
-            _textReplacements["%(SupportedSubmitMethods)"] = httpMethodsString;
+            _templateValues["%(SupportedSubmitMethods)"] = httpMethodsString;
             return this;
         }
 
         public SwaggerUiConfig DocExpansion(DocExpansion docExpansion)
         {
-            _textReplacements["%(DocExpansion)"] = "'" + docExpansion.ToString().ToLower() + "'";
+            _templateValues["%(DocExpansion)"] = "'" + docExpansion.ToString().ToLower() + "'";
             return this;
         }
 
@@ -87,14 +85,14 @@ namespace Swashbuckle.Application
         {
             var path = "ext/" + resourceName;
 
-            var stringBuilder = new StringBuilder(_textReplacements["%(CustomScripts)"]);
+            var stringBuilder = new StringBuilder(_templateValues["%(CustomScripts)"]);
 
             if (stringBuilder.Length > 0)
                 stringBuilder.Append(",");
 
             stringBuilder.Append("'" + path + "'");
 
-            _textReplacements["%(CustomScripts)"] = stringBuilder.ToString();
+            _templateValues["%(CustomScripts)"] = stringBuilder.ToString();
             _customWebAssets[path] = new EmbeddedResourceDescriptor(resourceAssembly, resourceName);
             return this;
         }
@@ -113,25 +111,16 @@ namespace Swashbuckle.Application
 
         public SwaggerUiConfig EnableOAuth2Support(string clientId, string realm, string appName)
         {
-            _textReplacements["%(OAuth2Enabled)"] = "true";
-            _textReplacements["%(OAuth2ClientId)"] = "'" + clientId + "'";
-            _textReplacements["%(OAuth2Realm)"] = "'" + realm + "'";
-            _textReplacements["%(OAuth2AppName)"] = "'" + appName + "'";
+            _templateValues["%(OAuth2Enabled)"] = "true";
+            _templateValues["%(OAuth2ClientId)"] = "'" + clientId + "'";
+            _templateValues["%(OAuth2Realm)"] = "'" + realm + "'";
+            _templateValues["%(OAuth2AppName)"] = "'" + appName + "'";
             return this;
         }
 
-        internal IWebAssetProvider GetSwaggerUiProvider(HttpRequestMessage swaggerRequest)
+        public EmbeddedWebAssetProviderSettings ToUiProviderSettings()
         {
-            var virtualPathRoot = swaggerRequest.GetConfiguration().VirtualPathRoot;
-
-            _textReplacements["%(DiscoveryBaseUrl)"] = String.Format("'{0}://{1}{2}'",
-                swaggerRequest.RequestUri.Scheme,
-                _hostNameResolver(swaggerRequest),
-                (virtualPathRoot != "/") ? virtualPathRoot : "");
-
-            var settings = new EmbeddedWebAssetProviderSettings(_customWebAssets, _textReplacements);
-
-            return new EmbeddedWebAssetProvider(settings);
+            return new EmbeddedWebAssetProviderSettings(_customWebAssets, _templateValues);
         }
     }
 

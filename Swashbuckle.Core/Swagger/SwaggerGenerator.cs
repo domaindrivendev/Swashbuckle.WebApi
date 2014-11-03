@@ -16,7 +16,7 @@ namespace Swashbuckle.Swagger
             _settings = settings;
         }
 
-        public SwaggerDocument GetSwaggerFor(string apiVersion)
+        public SwaggerDocument GetSwaggerFor(string apiVersion, string apiRootUrl)
         {
             var schemaRegistry = new SchemaRegistry(_settings.SchemaFilters);
 
@@ -29,12 +29,14 @@ namespace Swashbuckle.Swagger
                 .GroupBy(apiDesc => apiDesc.RelativePathSansQueryString())
                 .ToDictionary(group => "/" + group.Key, group => CreatePathItem(group, schemaRegistry));
 
+            var apiRootUri = new Uri(apiRootUrl);
+
             var swaggerDoc = new SwaggerDocument
             {
                 info = info,
-                host = _settings.HostName,
-                basePath = (_settings.VirtualPathRoot != "/") ? _settings.VirtualPathRoot : null,
-                schemes = (_settings.Schemes != null) ? _settings.Schemes.ToList() : null,
+                host = apiRootUri.Host + ":" + apiRootUri.Port,
+                basePath = (apiRootUri.AbsolutePath != "/") ? apiRootUri.AbsolutePath : null,
+                schemes = (_settings.Schemes != null) ? _settings.Schemes.ToList() : new[] { apiRootUri.Scheme }.ToList(),
                 paths = paths,
                 definitions = schemaRegistry.Definitions,
                 securityDefinitions = _settings.SecurityDefinitions

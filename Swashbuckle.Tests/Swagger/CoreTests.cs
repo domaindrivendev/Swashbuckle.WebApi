@@ -14,10 +14,8 @@ using Swashbuckle.Dummy.SwaggerExtensions;
 namespace Swashbuckle.Tests.Swagger
 {
     [TestFixture]
-    public class CoreTests : HttpMessageHandlerTestFixture<SwaggerDocsHandler>
+    public class CoreTests : SwaggerTestBase
     {
-        private SwaggerDocsConfig _swaggerDocsConfig;
-
         public CoreTests()
             : base("swagger/docs/{apiVersion}")
         { }
@@ -25,11 +23,8 @@ namespace Swashbuckle.Tests.Swagger
         [SetUp]
         public void SetUp()
         {
-            var hostNameResolver = Swashbuckle.Configuration.DefaultHostNameResolver();
-            _swaggerDocsConfig = new SwaggerDocsConfig(hostNameResolver);
-            _swaggerDocsConfig.SingleApiVersion("1.0", "Test API");
-
-            Handler = new SwaggerDocsHandler(_swaggerDocsConfig);
+            // Default set-up
+            SetUpHandler();
         }
 
         [Test]
@@ -81,7 +76,7 @@ namespace Swashbuckle.Tests.Swagger
         [Test]
         public void It_provides_a_description_for_each_path_in_the_api()
         {
-            AddDefaultRoutesFor(new[] { typeof(ProductsController), typeof(CustomersController) });
+            SetUpDefaultRoutesFor(new[] { typeof(ProductsController), typeof(CustomersController) });
 
             var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/1.0");
             var paths = swagger["paths"];
@@ -304,7 +299,7 @@ namespace Swashbuckle.Tests.Swagger
         [Test]
         public void It_sets_the_deprecated_flag_on_actions_that_are_obsolete()
         {
-            AddDefaultRouteFor<ObsoleteActionsController>();
+            SetUpDefaultRouteFor<ObsoleteActionsController>();
 
             var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/1.0");
             var putOp = swagger["paths"]["/obsoleteactions/{id}"]["put"];
@@ -317,16 +312,19 @@ namespace Swashbuckle.Tests.Swagger
         [Test]
         public void It_exposes_config_to_include_additional_info_properties()
         {
-            _swaggerDocsConfig.SingleApiVersion("1.0", "Test API")
-                .Description("A test API")
-                .TermsOfService("Test terms")
-                .Contact(c => c
-                    .Name("Joe Test")
-                    .Url("http://tempuri.org/contact")
-                    .Email("joe.test@tempuri.org"))
-                .License(c => c
-                    .Name("Test License")
-                    .Url("http://tempuri.org/license"));
+            SetUpHandler(c =>
+                {
+                    c.SingleApiVersion("1.0", "Test API")
+                        .Description("A test API")
+                        .TermsOfService("Test terms")
+                        .Contact(cc => cc
+                            .Name("Joe Test")
+                            .Url("http://tempuri.org/contact")
+                            .Email("joe.test@tempuri.org"))
+                        .License(lc => lc
+                            .Name("Test License")
+                            .Url("http://tempuri.org/license"));
+                });
 
             var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/1.0");
 
@@ -357,7 +355,7 @@ namespace Swashbuckle.Tests.Swagger
         [Test]
         public void It_exposes_config_to_explictly_provide_supported_schemes()
         {
-            _swaggerDocsConfig.Schemes(new[] { "http", "https" });
+            SetUpHandler(c => c.Schemes(new[] { "http", "https" }));
 
             var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/1.0");
             var schemes = swagger["schemes"];
@@ -369,7 +367,7 @@ namespace Swashbuckle.Tests.Swagger
         [Test]
         public void It_exposes_config_to_post_modify_the_document()
         {
-            _swaggerDocsConfig.DocumentFilter<ApplyDocumentVendorExtensions>();
+            SetUpHandler(c => c.DocumentFilter<ApplyDocumentVendorExtensions>());
 
             var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/1.0");
             var xProp = swagger["x-document"];
@@ -381,9 +379,8 @@ namespace Swashbuckle.Tests.Swagger
         [Test]
         public void It_exposes_config_to_post_modify_operations()
         {
-            AddDefaultRouteFor<ProductsController>();
-
-            _swaggerDocsConfig.OperationFilter<AddDefaultResponse>();
+            SetUpDefaultRouteFor<ProductsController>();
+            SetUpHandler(c => c.OperationFilter<AddDefaultResponse>());
 
             var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/1.0");
             var getDefaultResponse = swagger["paths"]["/products"]["get"]["responses"]["default"];
@@ -396,14 +393,16 @@ namespace Swashbuckle.Tests.Swagger
         [Test]
         public void It_exposes_config_to_describe_multiple_api_versions()
         {
-            AddAttributeRoutesFrom(typeof(MultipleApiVersionsController).Assembly);
-
-            _swaggerDocsConfig.MultipleApiVersions(
-                (apiDesc, targetApiVersion) => SwaggerConfig.ResolveVersionSupportByRouteConstraint(apiDesc, targetApiVersion),
-                (c) =>
+            SetUpAttributeRoutesFrom(typeof(MultipleApiVersionsController).Assembly);
+            SetUpHandler(c =>
                 {
-                    c.Version("1.0", "Test API V1.0");
-                    c.Version("2.0", "Test API V2.0");
+                    c.MultipleApiVersions(
+                        (apiDesc, targetApiVersion) => SwaggerConfig.ResolveVersionSupportByRouteConstraint(apiDesc, targetApiVersion),
+                        (vc) =>
+                        {
+                            vc.Version("1.0", "Test API V1.0");
+                            vc.Version("2.0", "Test API V2.0");
+                        });
                 });
             
             // 1.0
@@ -434,9 +433,8 @@ namespace Swashbuckle.Tests.Swagger
         [Test]
         public void It_exposes_config_to_workaround_multiple_actions_with_same_path_and_method()
         {
-            AddDefaultRouteFor<ConflictingActionsController>();
-
-            _swaggerDocsConfig.ResolveConflictingActions(apiDescriptions => apiDescriptions.First());
+            SetUpDefaultRouteFor<ConflictingActionsController>();
+            SetUpHandler(c => c.ResolveConflictingActions(apiDescriptions => apiDescriptions.First()));
 
             var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/1.0");
             var operations = swagger["paths"]["/conflictingactions"];
@@ -448,7 +446,7 @@ namespace Swashbuckle.Tests.Swagger
         public void It_handles_additional_route_parameters()
         {
             // i.e. route params that are not included in the action signature
-            AddCustomRouteFor<ProductsController>("{apiVersion}/products");
+            SetUpCustomRouteFor<ProductsController>("{apiVersion}/products");
 
             var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/1.0");
             var getParams = swagger["paths"]["/{apiVersion}/products"]["get"]["parameters"];
@@ -477,7 +475,7 @@ namespace Swashbuckle.Tests.Swagger
         [Test]
         public void It_handles_attribute_routes()
         {
-            AddAttributeRoutesFrom(typeof(AttributeRoutesController).Assembly);
+            SetUpAttributeRoutesFrom(typeof(AttributeRoutesController).Assembly);
 
             var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/1.0");
             var path = swagger["paths"]["/subscriptions/{id}/cancel"];
@@ -496,7 +494,7 @@ namespace Swashbuckle.Tests.Swagger
         [ExpectedException(typeof(NotSupportedException))]
         public void It_errors_on_multiple_actions_with_same_path_and_method()
         {
-            AddDefaultRouteFor<ConflictingActionsController>();
+            SetUpDefaultRouteFor<ConflictingActionsController>();
 
             var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/1.0");
         }

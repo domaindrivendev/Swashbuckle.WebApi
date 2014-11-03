@@ -34,7 +34,7 @@
 
       // Get Swashbuckle config into JavaScript
       var sbConfig = {
-          discoveryBaseUrl: %(DiscoveryBaseUrl),
+          rootUrl: %(RootUrl),
           discoveryPaths: [ %(DiscoveryPaths) ],
           supportHeaderParams: %(SupportHeaderParams),
           supportedSubmitMethods: [ %(SupportedSubmitMethods) ],
@@ -47,7 +47,7 @@
       };
 
       window.swaggerUi = new SwaggerUi({
-        url: sbConfig.discoveryBaseUrl + sbConfig.discoveryPaths[0],
+        url: sbConfig.rootUrl + sbConfig.discoveryPaths[0],
         dom_id: "swagger-ui-container",
         supportHeaderParams: sbConfig.supportHeaderParams,
         supportedSubmitMethods: sbConfig.supportedSubmitMethods,

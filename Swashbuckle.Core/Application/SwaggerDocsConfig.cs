@@ -11,7 +11,6 @@ namespace Swashbuckle.Application
 {
     public class SwaggerDocsConfig
     {
-        private Func<HttpRequestMessage, string> _hostNameResolver;
         private IEnumerable<string> _schemes;
         private IDictionary<string, SecuritySchemeBuilder> _securitySchemeBuilders;
         private readonly IList<Func<ISchemaFilter>> _schemaFilters;
@@ -21,9 +20,8 @@ namespace Swashbuckle.Application
         private Func<ApiDescription, string, bool> _versionSupportResolver;
         private Func<IEnumerable<ApiDescription>, ApiDescription> _conflictingActionsResolver;
 
-        public SwaggerDocsConfig(Func<HttpRequestMessage, string> hostNameResolver)
+        public SwaggerDocsConfig()
         {
-            _hostNameResolver = hostNameResolver;
             _securitySchemeBuilders = new Dictionary<string, SecuritySchemeBuilder>();
             _schemaFilters = new List<Func<ISchemaFilter>>();
             _operationFilters = new List<Func<IOperationFilter>>();
@@ -99,29 +97,22 @@ namespace Swashbuckle.Application
             _conflictingActionsResolver = conflictingActionsResolver;
         }
 
-        internal ISwaggerProvider GetSwaggerProvider(HttpRequestMessage swaggerRequest)
+        public SwaggerGeneratorSettings ToGeneratorSettings()
         {
-            // If schemes have not been explicitly provided, default to scheme from the swagger request
-            var schemes = _schemes ?? new[] { swaggerRequest.RequestUri.Scheme };
-
             var securityDefintitions = _securitySchemeBuilders.Any()
                 ? _securitySchemeBuilders.ToDictionary(kvp => kvp.Key, kvp => kvp.Value.Build())
                 : null;
 
-            var settings = new SwaggerGeneratorSettings(
+            return new SwaggerGeneratorSettings(
                 versionSupportResolver: _versionSupportResolver, // TODO: handle null value
                 apiVersions: VersionInfoBuilder.Build(),
-                hostName: _hostNameResolver(swaggerRequest),
-                virtualPathRoot: swaggerRequest.GetConfiguration().VirtualPathRoot,
-                schemes: schemes, 
+                schemes: _schemes, 
                 securityDefinitions: securityDefintitions, 
                 schemaFilters: _schemaFilters.Select(factory => factory()),
                 operationFilters: _operationFilters.Select(factory => factory()),
                 documentFilters: _documentFilters.Select(factory => factory()),
                 conflictingActionsResolver: _conflictingActionsResolver
             );
-
-            return new SwaggerGenerator(swaggerRequest.GetConfiguration().Services.GetApiExplorer(), settings);
         }
 
         private T AddSecuritySchemeBuilder<T>(string name)

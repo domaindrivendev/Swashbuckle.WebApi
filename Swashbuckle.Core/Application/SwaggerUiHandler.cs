@@ -10,21 +10,23 @@ namespace Swashbuckle.Application
 {
     public class SwaggerUiHandler : HttpMessageHandler
     {
-        private SwaggerUiConfig _swaggerUiConfig;
+        private readonly Func<HttpRequestMessage, string> _rootUrlResolver;
+        private readonly IWebAssetProvider _swaggerUiProvider;
 
-        public SwaggerUiHandler(SwaggerUiConfig swaggerUiConfig)
+        public SwaggerUiHandler(Func<HttpRequestMessage, string> rootUrlResolver, IWebAssetProvider swaggerUiProvider)
         {
-            _swaggerUiConfig = swaggerUiConfig;
+            _rootUrlResolver = rootUrlResolver;
+            _swaggerUiProvider = swaggerUiProvider;
         }
 
         protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
         {
-            var swaggerUiProvider = _swaggerUiConfig.GetSwaggerUiProvider(request);
             var uiPath = request.GetRouteData().Values["uiPath"].ToString();
+            var rootUrl = _rootUrlResolver(request);
 
             try
             {
-                var webAsset = swaggerUiProvider.GetWebAssetFor(uiPath.ToString());
+                var webAsset = _swaggerUiProvider.GetWebAssetFor(uiPath.ToString(), rootUrl);
                 var content = ContentFor(webAsset);
                 return TaskFor(new HttpResponseMessage { Content = content });
             }

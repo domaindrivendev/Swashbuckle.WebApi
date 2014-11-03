@@ -6,14 +6,14 @@ namespace Swashbuckle.WebAssets
     {
         public EmbeddedWebAssetProviderSettings(
             IDictionary<string, EmbeddedResourceDescriptor> customAssets,
-            IDictionary<string, string> textReplacements)
+            IDictionary<string, string> templateValues)
         {
             CustomAssets = customAssets;
-            TextReplacements = textReplacements;
+            TemplateValues = templateValues;
         }
 
         public IDictionary<string, EmbeddedResourceDescriptor> CustomAssets { get; private set; }
 
-        public IDictionary<string, string> TextReplacements { get; private set; }
+        public IDictionary<string, string> TemplateValues { get; private set; }
     }
 }

@@ -4,14 +4,13 @@ using System.Net;
 using NUnit.Framework;
 using Swashbuckle.Application;
 using Swashbuckle.Dummy;
+using Swashbuckle.WebAssets;
 
 namespace Swashbuckle.Tests.SwaggerUi
 {
     [TestFixture]
-    public class SwaggerUiTests : HttpMessageHandlerTestFixture<SwaggerUiHandler>
+    public class SwaggerUiTests : HttpMessageHandlerTestBase<SwaggerUiHandler>
     {
-        private SwaggerUiConfig _swaggerUiConfig;
-
         public SwaggerUiTests()
             : base("swagger/ui/{*uiPath}")
         { }
@@ -19,10 +18,8 @@ namespace Swashbuckle.Tests.SwaggerUi
         [SetUp]
         public void SetUp()
         {
-            var hostNameResolver = Swashbuckle.Configuration.DefaultHostNameResolver();
-            _swaggerUiConfig = new SwaggerUiConfig(hostNameResolver, new []{ "swagger/docs/1.0" });
-
-            Handler = new SwaggerUiHandler(_swaggerUiConfig);
+            // Default set-up
+            SetUpHandler();
         }
 
         [Test]
@@ -30,6 +27,7 @@ namespace Swashbuckle.Tests.SwaggerUi
         {
             var content = GetContentAsString("http://tempuri.org/swagger/ui/index.html");
 
+            StringAssert.Contains("rootUrl: 'http://tempuri.org:80/'", content);
             StringAssert.Contains("discoveryPaths: [ 'swagger/docs/1.0' ]", content);
             StringAssert.Contains("swagger-ui-container", content);
         }
@@ -37,9 +35,13 @@ namespace Swashbuckle.Tests.SwaggerUi
         [Test]
         public void It_exposes_config_to_inject_custom_stylesheets()
         {
-            var assembly = typeof(SwaggerConfig).Assembly;
-            _swaggerUiConfig.InjectStylesheet(assembly, "Swashbuckle.Dummy.SwaggerExtensions.testStyles1.css");
-            _swaggerUiConfig.InjectStylesheet(assembly, "Swashbuckle.Dummy.SwaggerExtensions.testStyles2.css");
+            SetUpHandler(c =>
+                {
+                    var assembly = typeof(SwaggerConfig).Assembly;
+                    c.InjectStylesheet(assembly, "Swashbuckle.Dummy.SwaggerExtensions.testStyles1.css");
+                    c.InjectStylesheet(assembly, "Swashbuckle.Dummy.SwaggerExtensions.testStyles2.css");
+                });
+
 
             var content = GetContentAsString("http://tempuri.org/swagger/ui/index.html");
 
@@ -58,10 +60,12 @@ namespace Swashbuckle.Tests.SwaggerUi
         [Test]
         public void It_exposes_config_for_swagger_ui_settings()
         {
-            _swaggerUiConfig
-                .SupportHeaderParams()
-                .SupportedSubmitMethods(new[] { HttpMethod.Get, HttpMethod.Post, HttpMethod.Put, HttpMethod.Head })
-                .DocExpansion(DocExpansion.Full);
+            SetUpHandler(c =>
+                {
+                    c.SupportHeaderParams();
+                    c.SupportedSubmitMethods(new[] { HttpMethod.Get, HttpMethod.Post, HttpMethod.Put, HttpMethod.Head });
+                    c.DocExpansion(DocExpansion.Full);
+                });
 
             var content = GetContentAsString("http://tempuri.org/swagger/ui/index.html");
 
@@ -73,7 +77,7 @@ namespace Swashbuckle.Tests.SwaggerUi
         [Test]
         public void It_exposes_config_for_swagger_ui_outh2_settings()
         {
-            _swaggerUiConfig.EnableOAuth2Support("test-client-id", "test-realm", "Swagger UI");
+            SetUpHandler(c => c.EnableOAuth2Support("test-client-id", "test-realm", "Swagger UI"));
 
             var content = GetContentAsString("http://tempuri.org/swagger/ui/index.html");
 
@@ -86,7 +90,7 @@ namespace Swashbuckle.Tests.SwaggerUi
         [Test]
         public void It_exposes_config_to_enable_a_discovery_url_selector()
         {
-            _swaggerUiConfig.EnableDiscoveryUrlSelector();
+            SetUpHandler(c => c.EnableDiscoveryUrlSelector());
 
             var content = GetContentAsString("http://tempuri.org/swagger/ui/index.html");
 
@@ -97,9 +101,12 @@ namespace Swashbuckle.Tests.SwaggerUi
         [Test]
         public void It_exposes_config_to_inject_custom_javascripts()
         {
-            var assembly = typeof(SwaggerConfig).Assembly;
-            _swaggerUiConfig.InjectJavaScript(assembly, "Swashbuckle.Dummy.SwaggerExtensions.testScript1.js");
-            _swaggerUiConfig.InjectJavaScript(assembly, "Swashbuckle.Dummy.SwaggerExtensions.testScript2.js");
+            SetUpHandler(c =>
+                {
+                    var assembly = typeof(SwaggerConfig).Assembly;
+                    c.InjectJavaScript(assembly, "Swashbuckle.Dummy.SwaggerExtensions.testScript1.js");
+                    c.InjectJavaScript(assembly, "Swashbuckle.Dummy.SwaggerExtensions.testScript2.js");
+                });
 
             var content = GetContentAsString("http://tempuri.org/swagger/ui/index.html");
 
@@ -120,8 +127,11 @@ namespace Swashbuckle.Tests.SwaggerUi
         [Test]
         public void It_exposes_config_to_serve_custom_web_assets()
         {
-            var assembly = typeof(SwaggerConfig).Assembly;
-            _swaggerUiConfig.CustomWebAsset("index.html", assembly, "Swashbuckle.Dummy.SwaggerExtensions.myIndex.html");
+            SetUpHandler(c =>
+                {
+                    var assembly = typeof(SwaggerConfig).Assembly;
+                    c.CustomWebAsset("index.html", assembly, "Swashbuckle.Dummy.SwaggerExtensions.myIndex.html");
+                });
 
             var content = GetContentAsString("http://tempuri.org/swagger/ui/index.html");
 
@@ -134,6 +144,17 @@ namespace Swashbuckle.Tests.SwaggerUi
             var response = Get("http://tempuri.org/swagger/ui/ext/foobar");
 
             Assert.AreEqual(HttpStatusCode.NotFound, response.StatusCode);
+        }
+
+        private void SetUpHandler(Action<SwaggerUiConfig> configure = null)
+        {
+            var swaggerUiConfig = new SwaggerUiConfig(new[] { "swagger/docs/1.0" });
+            if (configure != null)
+                configure(swaggerUiConfig);
+
+            var swaggerUiProvider = new EmbeddedWebAssetProvider(swaggerUiConfig.ToUiProviderSettings());
+
+            Handler = new SwaggerUiHandler(Swashbuckle.Configuration.DefaultRootUrlResolver, swaggerUiProvider);
         }
     }
 }

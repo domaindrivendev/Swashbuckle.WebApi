@@ -15,14 +15,14 @@ namespace Swashbuckle.WebAssets
             _settings = settings;
         }
 
-        public WebAsset GetWebAssetFor(string path)
+        public WebAsset GetWebAssetFor(string path, string rootUrl)
         {
-            var stream = GetEmbeddedResourceStreamFor(path);
+            var stream = GetEmbeddedResourceStreamFor(path, rootUrl);
             var mediaType = InferMediaTypeFrom(path);
             return new WebAsset(stream, mediaType);
         }
 
-        private Stream GetEmbeddedResourceStreamFor(string path)
+        private Stream GetEmbeddedResourceStreamFor(string path, string rootUrl)
         {
             EmbeddedResourceDescriptor customEmbeddedResource;
             var isCustom = _settings.CustomAssets.TryGetValue(path, out customEmbeddedResource);
@@ -34,7 +34,9 @@ namespace Swashbuckle.WebAssets
             if (stream == null)
                 throw new WebAssetNotFound();
 
-            return isCustom ? stream.FindAndReplace(_settings.TextReplacements) : stream;
+            _settings.TemplateValues["%(RootUrl)"] = "'" + rootUrl + "'";
+
+            return isCustom ? stream.FindAndReplace(_settings.TemplateValues) : stream;
         }
 
         private static string InferMediaTypeFrom(string path)

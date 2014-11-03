@@ -11,28 +11,23 @@ using Swashbuckle.Dummy.SwaggerExtensions;
 namespace Swashbuckle.Tests.Swagger
 {
     [TestFixture]
-    public class SchemaTests : HttpMessageHandlerTestFixture<SwaggerDocsHandler>
+    public class SchemaTests : SwaggerTestBase
     {
-        private SwaggerDocsConfig _swaggerDocsConfig;
-
         public SchemaTests()
             : base("swagger/docs/{apiVersion}")
         { }
 
         [SetUp]
-        public void SetUp()
+        public void SetUP()
         {
-            var hostNameResolver = Swashbuckle.Configuration.DefaultHostNameResolver();
-            _swaggerDocsConfig = new SwaggerDocsConfig(hostNameResolver);
-            _swaggerDocsConfig.SingleApiVersion("1.0", "Test Api");
-
-            Handler = new SwaggerDocsHandler(_swaggerDocsConfig);
+            // Default set-up
+            SetUpHandler();
         }
 
         [Test]
         public void It_provides_definition_schemas_for_complex_types()
         {
-            AddDefaultRouteFor<ProductsController>();
+            SetUpDefaultRouteFor<ProductsController>();
 
             var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/1.0");
 
@@ -75,7 +70,7 @@ namespace Swashbuckle.Tests.Swagger
         [Test]
         public void It_provides_validation_properties_for_annotated_types()
         {
-            AddDefaultRouteFor<AnnotatedTypesController>();
+            SetUpDefaultRouteFor<AnnotatedTypesController>();
             
             var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/1.0");
 
@@ -127,7 +122,7 @@ namespace Swashbuckle.Tests.Swagger
         [Test]
         public void It_includes_inherited_properties_for_sub_types()
         {
-            AddDefaultRouteFor<PolymorphicTypesController>();
+            SetUpDefaultRouteFor<PolymorphicTypesController>();
 
             var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/1.0");
 
@@ -176,7 +171,7 @@ namespace Swashbuckle.Tests.Swagger
         [Test]
         public void It_omits_indexer_properties()
         {
-            AddDefaultRouteFor<IndexerTypesController>();
+            SetUpDefaultRouteFor<IndexerTypesController>();
 
             var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/1.0");
 
@@ -205,7 +200,7 @@ namespace Swashbuckle.Tests.Swagger
         [Test]
         public void It_handles_nested_types()
         {
-            AddDefaultRouteFor<NestedTypesController>();
+            SetUpDefaultRouteFor<NestedTypesController>();
 
             var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/1.0");
 
@@ -252,7 +247,7 @@ namespace Swashbuckle.Tests.Swagger
         [Test]
         public void It_handles_self_referencing_types()
         {
-            AddDefaultRouteFor<SelfReferencingTypesController>();
+            SetUpDefaultRouteFor<SelfReferencingTypesController>();
 
             var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/1.0");
 
@@ -285,7 +280,7 @@ namespace Swashbuckle.Tests.Swagger
         [Test]
         public void It_handles_jagged_container_types()
         {
-            AddDefaultRouteFor<JaggedContainersController>();
+            SetUpDefaultRouteFor<JaggedContainersController>();
 
             var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/1.0");
 
@@ -319,9 +314,8 @@ namespace Swashbuckle.Tests.Swagger
         [Test]
         public void It_exposes_config_to_post_modify_schemas()
         {
-            AddDefaultRouteFor<ProductsController>();
-
-            _swaggerDocsConfig.SchemaFilter<ApplySchemaVendorExtensions>();
+            SetUpDefaultRouteFor<ProductsController>();
+            SetUpHandler(c => c.SchemaFilter<ApplySchemaVendorExtensions>());
 
             var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/1.0");
             var xProp = swagger["definitions"]["Product"]["x-schema"];

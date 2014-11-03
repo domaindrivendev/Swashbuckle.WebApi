@@ -16,12 +16,12 @@ using System.Reflection;
 namespace Swashbuckle.Tests
 {
     [TestFixture]
-    public abstract class HttpMessageHandlerTestFixture<THandler>
+    public abstract class HttpMessageHandlerTestBase<THandler>
         where THandler : HttpMessageHandler
     {
         private string _routeTemplate;
 
-        protected HttpMessageHandlerTestFixture(string routeTemplate) 
+        protected HttpMessageHandlerTestBase(string routeTemplate) 
         {
             _routeTemplate = routeTemplate;
         }
@@ -36,7 +36,7 @@ namespace Swashbuckle.Tests
             Configuration = new HttpConfiguration();
         }
 
-        protected void AddDefaultRoutesFor(IEnumerable<Type> controllerTypes)
+        protected void SetUpDefaultRoutesFor(IEnumerable<Type> controllerTypes)
         {
             foreach (var type in controllerTypes)
             {
@@ -48,13 +48,13 @@ namespace Swashbuckle.Tests
             }
         }
 
-        protected void AddDefaultRouteFor<TController>()
+        protected void SetUpDefaultRouteFor<TController>()
             where TController : ApiController
         {
-            AddDefaultRoutesFor(new[] { typeof(TController) });
+            SetUpDefaultRoutesFor(new[] { typeof(TController) });
         }
         
-        protected void AddCustomRouteFor<TController>(string routeTemplate)
+        protected void SetUpCustomRouteFor<TController>(string routeTemplate)
             where TController : ApiController
         {
             var controllerName = typeof(TController).Name.ToLower().Replace("controller", String.Empty);
@@ -64,7 +64,7 @@ namespace Swashbuckle.Tests
             Configuration.Routes.Add(controllerName, route);
         }
 
-        protected void AddAttributeRoutesFrom(Assembly assembly)
+        protected void SetUpAttributeRoutesFrom(Assembly assembly)
         {
             // assembly isn't used but requiring it ensures that it's loaded and, therefore, scanned for attribute routes 
             Configuration.MapHttpAttributeRoutes();

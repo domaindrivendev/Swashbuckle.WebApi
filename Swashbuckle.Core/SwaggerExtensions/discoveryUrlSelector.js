@@ -1,7 +1,7 @@
 ﻿(function () {
     // Get Swashbuckle config into JavaScript
     var sbConfig = {
-        discoveryBaseUrl: %(DiscoveryBaseUrl),
+        rootUrl: %(RootUrl),
         discoveryPaths: [ %(DiscoveryPaths) ]
     };
 
@@ -18,10 +18,12 @@
                     .css('width', '400px')
                     .css('font-size', '0.9em');
 
-                _.each(this.options.discoveryUrls, function(url) {
-                    var option = $('<option>' + url + '</option>');
+                var rootUrl = this.options.rootUrl;
+                _.each(this.options.discoveryPaths, function(path) {
+                    var option = $('<option>' + rootUrl + path + '</option>');
                     select.append(option);
-                })
+                });
+
                 select.val(defaultVal);
                 this.$el.replaceWith(select);
             }
@@ -31,8 +33,7 @@
 
     new DiscoveryUrlSelector({
         el: $('#input_baseUrl'),
-        discoveryUrls: _.map(sbConfig.discoveryPaths, function(path) {
-            return sbConfig.discoveryBaseUrl + path;
-        }) 
+        rootUrl: sbConfig.rootUrl,
+        discoveryPaths: sbConfig.discoveryPaths
     }).render();
 })();

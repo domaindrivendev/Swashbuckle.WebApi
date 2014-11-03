@@ -5,14 +5,13 @@ using System.Collections.Generic;
 using System.Net.Http;
 using Swashbuckle.Application;
 using Swashbuckle.Dummy.Controllers;
+using Swashbuckle.Tests.Swagger;
 
 namespace Swashbuckle.Tests.SwaggerFilters
 {
     [TestFixture]
-    public class SecurityTests : HttpMessageHandlerTestFixture<SwaggerDocsHandler>
+    public class SecurityTests : SwaggerTestBase
     {
-        private SwaggerDocsConfig _swaggerDocsConfig;
-
         public SecurityTests()
             : base("swagger/docs/{apiVersion}")
         {
@@ -21,20 +20,17 @@ namespace Swashbuckle.Tests.SwaggerFilters
         [SetUp]
         public void SetUp()
         {
-            AddDefaultRouteFor<ProtectedResourcesController>();
-
-            var hostNameResolver = Swashbuckle.Configuration.DefaultHostNameResolver();
-            _swaggerDocsConfig = new SwaggerDocsConfig(hostNameResolver);
-            _swaggerDocsConfig.SingleApiVersion("1.0", "Test API");
-
-            Handler = new SwaggerDocsHandler(_swaggerDocsConfig);
+            SetUpDefaultRouteFor<ProtectedResourcesController>();
         }
 
         [Test]
         public void It_exposes_config_to_define_a_basic_auth_scheme_for_the_api()
         {
-            _swaggerDocsConfig.BasicAuth("basic")
-                .Description("Basic HTTP Authentication");
+            SetUpHandler(c =>
+                {
+                    c.BasicAuth("basic")
+                        .Description("Basic HTTP Authentication");
+                });
 
             var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/1.0");
             var securityDefinitions = swagger["securityDefinitions"];
@@ -53,10 +49,13 @@ namespace Swashbuckle.Tests.SwaggerFilters
         [Test]
         public void It_exposes_config_to_define_an_api_key_auth_scheme_for_the_api()
         {
-            _swaggerDocsConfig.ApiKey("apiKey")
-                .Description("API Key Authentication")
-                .Name("apiKey")
-                .In("header");
+            SetUpHandler(c =>
+                {
+                    c.ApiKey("apiKey")
+                        .Description("API Key Authentication")
+                        .Name("apiKey")
+                        .In("header");
+                });
 
             var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/1.0");
             var securityDefinitions = swagger["securityDefinitions"];
@@ -77,15 +76,18 @@ namespace Swashbuckle.Tests.SwaggerFilters
         [Test]
         public void It_exposes_config_to_define_oauth2_flows_for_the_api()
         {
-            _swaggerDocsConfig.OAuth2("oauth2")
-                .Description("OAuth2 Authorization Code Grant")
-                .Flow("accessCode")
-                .AuthorizationUrl("https://tempuri.org/auth")
-                .TokenUrl("https://tempuri.org/token")
-                .Scopes(s =>
+            SetUpHandler(c =>
                 {
-                    s.Add("read", "Read access to protected resources");
-                    s.Add("write", "Write access to protected resources");
+                    c.OAuth2("oauth2")
+                        .Description("OAuth2 Authorization Code Grant")
+                        .Flow("accessCode")
+                        .AuthorizationUrl("https://tempuri.org/auth")
+                        .TokenUrl("https://tempuri.org/token")
+                        .Scopes(s =>
+                        {
+                            s.Add("read", "Read access to protected resources");
+                            s.Add("write", "Write access to protected resources");
+                        });
                 });
 
             var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/1.0");
