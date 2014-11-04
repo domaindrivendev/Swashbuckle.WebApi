@@ -310,6 +310,18 @@ namespace Swashbuckle.Tests.Swagger
                 });
             Assert.AreEqual(expected.ToString(), definitions.ToString());
         }
+
+        [Test]
+        public void It_handles_newtonsoft_serialization_attributes()
+        {
+            SetUpDefaultRouteFor<NewtonsoftedTypesController>();
+
+            var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/1.0");
+            var model = swagger["definitions"]["NewtonsoftedModel"];
+
+            Assert.IsNull(model["properties"]["IgnoredProperty"], "Expected the IgnoredProperty to be ignored");
+            Assert.IsNotNull(model["properties"]["myCustomNamedProperty"], "Expected the CustomNamedProperty to have the custom name");
+        }
         
         [Test]
         public void It_exposes_config_to_post_modify_schemas()

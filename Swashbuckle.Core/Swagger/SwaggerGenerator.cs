@@ -2,23 +2,27 @@
 using System.Collections.Generic;
 using System.Web.Http.Description;
 using System;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 
 namespace Swashbuckle.Swagger
 {
     public class SwaggerGenerator : ISwaggerProvider
     {
         private readonly IApiExplorer _apiExplorer;
+        private readonly IContractResolver _jsonContractResolver;
         private readonly SwaggerGeneratorSettings _settings;
 
-        public SwaggerGenerator(IApiExplorer apiExplorer, SwaggerGeneratorSettings settings)
+        public SwaggerGenerator(IApiExplorer apiExplorer, IContractResolver jsonContractResolver, SwaggerGeneratorSettings settings)
         {
             _apiExplorer = apiExplorer;
+            _jsonContractResolver = jsonContractResolver;
             _settings = settings;
         }
 
         public SwaggerDocument GetSwaggerFor(string apiVersion, string apiRootUrl)
         {
-            var schemaRegistry = new SchemaRegistry(_settings.SchemaFilters);
+            var schemaRegistry = new SchemaRegistry(_settings.SchemaFilters, _jsonContractResolver);
 
             Info info;
             _settings.ApiVersions.TryGetValue(apiVersion, out info);

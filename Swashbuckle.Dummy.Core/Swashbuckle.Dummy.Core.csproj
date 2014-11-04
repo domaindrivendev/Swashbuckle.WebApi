@@ -59,6 +59,7 @@
     <Compile Include="Controllers\ConflictingActionsController.cs" />
     <Compile Include="Controllers\IndexerTypesController.cs" />
     <Compile Include="Controllers\MultipleApiVersionsController.cs" />
+    <Compile Include="Controllers\NewtonsoftedTypesController.cs" />
     <Compile Include="Controllers\ProtectedResourcesController.cs" />
     <Compile Include="Controllers\SelfReferencingTypesController.cs" />
     <Compile Include="Controllers\CustomersController.cs" />

@@ -1,14 +1,19 @@
-﻿using System.Reflection;
-using System.Linq;
+﻿using System;
+using System.Reflection;
 using System.ComponentModel.DataAnnotations;
+using Newtonsoft.Json.Serialization;
 
 namespace Swashbuckle.Swagger
 {
     public static class SchemaExtensions
     {
-        public static Schema WithValidationProperties(this Schema schema, PropertyInfo context)
+        public static Schema WithValidationProperties(this Schema schema, JsonProperty jsonProperty)
         {
-            foreach (var attribute in context.GetCustomAttributes(false))
+            var propInfo = jsonProperty.PropertyInfo();
+            if (propInfo == null)
+                return schema;
+
+            foreach (var attribute in propInfo.GetCustomAttributes(false))
             {
                 var regex = attribute as RegularExpressionAttribute;
                 if (regex != null)
@@ -23,6 +28,18 @@ namespace Swashbuckle.Swagger
             }
 
             return schema;
+        }
+
+        public static bool IsRequired(this JsonProperty jsonProperty)
+        {
+            var propInfo = jsonProperty.PropertyInfo();
+
+            return propInfo != null && Attribute.IsDefined(propInfo, typeof (RequiredAttribute));
+        }
+
+        private static PropertyInfo PropertyInfo(this JsonProperty jsonProperty)
+        {
+            return jsonProperty.DeclaringType.GetProperty(jsonProperty.UnderlyingName);
         }
     }
 }
