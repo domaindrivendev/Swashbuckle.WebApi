@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Web.Http;
+using Newtonsoft.Json;
 using Swashbuckle.Application;
 using Swashbuckle.Swagger;
 using NUnit.Framework;
@@ -22,6 +23,7 @@ namespace Swashbuckle.Tests.Swagger
 
             var swaggerProvider = new SwaggerGenerator(
                 Configuration.Services.GetApiExplorer(),
+                Configuration.Formatters.JsonFormatter.SerializerSettings.ContractResolver, 
                 swaggerDocsConfig.ToGeneratorSettings());
 
             Handler = new SwaggerDocsHandler(Swashbuckle.Configuration.DefaultRootUrlResolver, swaggerProvider);

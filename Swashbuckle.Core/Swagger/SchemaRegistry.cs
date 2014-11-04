@@ -6,7 +6,9 @@ using System.Linq;
 using System.Net.Http;
 using System.Reflection;
 using System.Text;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Newtonsoft.Json.Serialization;
 
 namespace Swashbuckle.Swagger
 {
@@ -39,11 +41,13 @@ namespace Swashbuckle.Swagger
             };
 
         private readonly IEnumerable<ISchemaFilter> _schemaFilters;
+        private readonly IContractResolver _contractResolver;
 
-        public SchemaRegistry(IEnumerable<ISchemaFilter> schemaFilters)
+        public SchemaRegistry(IEnumerable<ISchemaFilter> schemaFilters, IContractResolver contractResolver)
         {
             Definitions = new Dictionary<string, Schema>(StringComparer.OrdinalIgnoreCase);
             _schemaFilters = schemaFilters;
+            _contractResolver = contractResolver;
         }
 
         public IDictionary<string, Schema> Definitions { get; private set; }
@@ -88,8 +92,9 @@ namespace Swashbuckle.Swagger
                 return new Schema { type = "array", items = CreateSchema(itemType, true, true, referencedTypes) };
 
             // None of the above so treat as a complex type
-            if (!refIfComplex)
-                return CreateComplexSchema(type, referencedTypes);
+            var jsonObjectContract = _contractResolver.ResolveContract(type) as JsonObjectContract;
+            if (!refIfComplex && jsonObjectContract != null)
+                return CreateComplexSchema(jsonObjectContract, referencedTypes);
 
             // Only a ref was requested so defer the full schema generation
             var id = UniqueIdFor(type);
@@ -97,26 +102,22 @@ namespace Swashbuckle.Swagger
             return new Schema { @ref = "#/definitions/" + id };
         }
 
-        private Schema CreateComplexSchema(Type type, Queue<KeyValuePair<string, Type>> referencedTypes)
+        private Schema CreateComplexSchema(JsonObjectContract jsonContract, Queue<KeyValuePair<string, Type>> referencedTypes)
         {
             // Ignore inherited properties if its an explicitly configured polymorphic sub type
             //var polymorphicType = PolymorphicTypeFor(type);
             //var bindingFlags = polymorphicType.IsBase
             //    ? BindingFlags.Instance | BindingFlags.Public
             //    : BindingFlags.Instance | BindingFlags.Public | BindingFlags.DeclaredOnly;
-            var bindingFlags = BindingFlags.Instance | BindingFlags.Public;
+            //var bindingFlags = BindingFlags.Instance | BindingFlags.Public;
+            
+            var properties = jsonContract.Properties.Where(p => !p.Ignored).ToDictionary(
+                prop => prop.PropertyName,
+                prop => CreateSchema(prop.PropertyType, false, true, referencedTypes)
+                    .WithValidationProperties(prop));
 
-            var propInfos = type.GetProperties(bindingFlags)
-                .Where(propInfo => !propInfo.GetIndexParameters().Any())    // Ignore indexer properties
-                .ToArray();
-
-            var properties = propInfos.ToDictionary(
-                propInfo => propInfo.Name,
-                propInfo => CreateSchema(propInfo.PropertyType, false, true, referencedTypes)
-                    .WithValidationProperties(propInfo));
-
-            var required = propInfos.Where(propInfo => Attribute.IsDefined(propInfo, typeof(RequiredAttribute)))
-                .Select(propInfo => propInfo.Name)
+            var required = jsonContract.Properties.Where(prop => prop.IsRequired())
+                .Select(propInfo => propInfo.PropertyName)
                 .ToList();
 
             //var subDataTypes = polymorphicType.SubTypes
@@ -133,7 +134,7 @@ namespace Swashbuckle.Swagger
 
             foreach (var filter in _schemaFilters)
             {
-                filter.Apply(schema, this, type);
+                filter.Apply(schema, this, jsonContract.UnderlyingType);
             }
 
             return schema;
