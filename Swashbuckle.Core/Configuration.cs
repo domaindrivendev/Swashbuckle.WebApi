@@ -63,7 +63,7 @@ namespace Swashbuckle
         {
             var swaggerProvider = new SwaggerGenerator(
                 httpConfig.Services.GetApiExplorer(),
-                httpConfig.Formatters.JsonFormatter.SerializerSettings.ContractResolver,
+                httpConfig.GetJsonContractResolver(),
                 swaggerDocsConfig.ToGeneratorSettings());
 
             httpConfig.Routes.MapHttpRoute(
