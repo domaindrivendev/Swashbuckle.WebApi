@@ -56,6 +56,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Controllers\CollectionOfPrimitivesController.cs" />
+    <Compile Include="Controllers\ComplexTypesFromUriContoller.cs" />
     <Compile Include="Controllers\ConflictingActionsController.cs" />
     <Compile Include="Controllers\IndexerTypesController.cs" />
     <Compile Include="Controllers\MultipleApiVersionsController.cs" />

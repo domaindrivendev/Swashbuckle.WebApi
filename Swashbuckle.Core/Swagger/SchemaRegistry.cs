@@ -42,7 +42,7 @@ namespace Swashbuckle.Swagger
 
         public SchemaRegistry(IEnumerable<ISchemaFilter> schemaFilters)
         {
-            Definitions = new Dictionary<string, Schema>();
+            Definitions = new Dictionary<string, Schema>(StringComparer.OrdinalIgnoreCase);
             _schemaFilters = schemaFilters;
         }
 
