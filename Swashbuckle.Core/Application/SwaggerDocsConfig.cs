@@ -28,6 +28,8 @@ namespace Swashbuckle.Application
             _documentFilters = new List<Func<IDocumentFilter>>();
 
             VersionInfoBuilder = new VersionInfoBuilder();
+
+            OperationFilter<HandleComplexTypesFromUri>();
         }
 
         internal VersionInfoBuilder VersionInfoBuilder { get; private set; }

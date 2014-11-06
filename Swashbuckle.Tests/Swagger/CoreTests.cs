@@ -473,6 +473,49 @@ namespace Swashbuckle.Tests.Swagger
         }
 
         [Test]
+        public void It_handles_complex_parameters_from_uri()
+        {
+            SetUpDefaultRouteFor<ComplexTypesFromUriController>();
+            //SetUpHandler();
+            var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/1.0");
+            var getParams = swagger["paths"]["/complextypesfromuri"]["get"]["parameters"];
+
+            var expected = JArray.FromObject(new object[]
+            {
+                new
+                {
+                    name = "param1",
+                    @in = "query",
+                    required = false,
+                    type = "string"
+                },
+                new
+                {
+                    name = "param2",
+                    @in = "query",
+                    required = false,
+                    type = "integer"
+                },
+                new
+                {
+                   name = "param3",
+                   @in = "query",
+                   required = true,
+                   type = "string"
+                },
+                new
+                {
+                    name = "param4",
+                    @in = "query",
+                    required = false,
+                    type = "integer"
+                }
+            });
+
+            Assert.AreEqual(expected.ToString(), getParams.ToString());
+        }
+
+        [Test]
         public void It_handles_attribute_routes()
         {
             SetUpAttributeRoutesFrom(typeof(AttributeRoutesController).Assembly);
