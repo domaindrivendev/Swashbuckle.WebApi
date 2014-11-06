@@ -29,5 +29,10 @@ namespace Swashbuckle.Dummy.Controllers
         {
             throw new NotImplementedException();
         }
+
+        public IHttpActionResult Head()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

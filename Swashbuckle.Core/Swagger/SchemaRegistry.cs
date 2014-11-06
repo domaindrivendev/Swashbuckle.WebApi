@@ -6,6 +6,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Reflection;
 using System.Text;
+using System.Web.Http;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json.Serialization;
@@ -14,7 +15,7 @@ namespace Swashbuckle.Swagger
 {
     public class SchemaRegistry
     {
-        private static readonly Dictionary<Type, Func<Schema>> PrimitiveMappings = new Dictionary<Type, Func<Schema>>()
+        public static readonly Dictionary<Type, Func<Schema>> PrimitiveMappings = new Dictionary<Type, Func<Schema>>()
             {
                 {typeof (Int16), () => new Schema {type = "integer", format = "int32"}},
                 {typeof (UInt16), () => new Schema {type = "integer", format = "int32"}},
@@ -28,26 +29,28 @@ namespace Swashbuckle.Swagger
                 {typeof (String), () => new Schema {type = "string"}},
                 {typeof (Char), () => new Schema {type = "string"}},
                 {typeof (Byte), () => new Schema {type = "string", format = "byte"}},
+                {typeof (SByte), () => new Schema {type = "string", format = "byte"}},
                 {typeof (Guid), () => new Schema {type = "string"}},
                 {typeof (Boolean), () => new Schema {type = "boolean"}},
                 {typeof (DateTime), () => new Schema {type = "string", format = "date-time"}},
-                {typeof (DateTimeOffset), () => new Schema {type = "string", format = "date-time"}},
-                // Can't infer anything from the types below - default to string primitives
-                {typeof (object), () => new Schema {type="string"}},
-                {typeof (ExpandoObject), () => new Schema {type="string"}},
-                {typeof (JObject), () => new Schema {type="string"}},
-                {typeof (JToken), () => new Schema {type="string"}},
-                {typeof (HttpResponseMessage), () => new Schema {type="string"}},
+                {typeof (DateTimeOffset), () => new Schema {type = "string", format = "date-time"}}
             };
 
-        private readonly IEnumerable<ISchemaFilter> _schemaFilters;
-        private readonly IContractResolver _contractResolver;
+        private static readonly IEnumerable<Type> HttpTypes = new[]
+            {
+                typeof(HttpResponseMessage),
+                typeof(IHttpActionResult)
+            };
 
-        public SchemaRegistry(IEnumerable<ISchemaFilter> schemaFilters, IContractResolver contractResolver)
+        private readonly IContractResolver _contractResolver;
+        private readonly IEnumerable<ISchemaFilter> _schemaFilters;
+
+        public SchemaRegistry(IContractResolver contractResolver, IEnumerable<ISchemaFilter> schemaFilters)
         {
-            Definitions = new Dictionary<string, Schema>(StringComparer.OrdinalIgnoreCase);
-            _schemaFilters = schemaFilters;
             _contractResolver = contractResolver;
+            _schemaFilters = schemaFilters;
+
+            Definitions = new Dictionary<string, Schema>(StringComparer.OrdinalIgnoreCase);
         }
 
         public IDictionary<string, Schema> Definitions { get; private set; }
@@ -87,43 +90,53 @@ namespace Swashbuckle.Swagger
             if (type.IsNullable(out innerType))
                 return CreateSchema(innerType, false, true, referencedTypes);
 
-            Type itemType;
-            if (type.IsEnumerable(out itemType) && !refIfArray)
-                return new Schema { type = "array", items = CreateSchema(itemType, true, true, referencedTypes) };
+            // Non-primitive - utilize the Json contract resolver
+            var contract = _contractResolver.ResolveContract(type);
 
-            // None of the above so treat as a complex type
-            var jsonObjectContract = _contractResolver.ResolveContract(type) as JsonObjectContract;
-            if (!refIfComplex && jsonObjectContract != null)
-                return CreateComplexSchema(jsonObjectContract, referencedTypes);
+            if (contract is JsonArrayContract)
+            {
+                return refIfArray
+                    ? CreateRefSchema(type, referencedTypes)
+                    : CreateArraySchema((JsonArrayContract)contract, referencedTypes);
+            }
 
-            // Only a ref was requested so defer the full schema generation
+            if (contract is JsonObjectContract && !HttpTypes.Contains(type))
+            {
+                return refIfComplex
+                    ? CreateRefSchema(type, referencedTypes)
+                    : CreateComplexSchema((JsonObjectContract)contract, referencedTypes);
+            }
+
+            // Falback, describe anything else as a "blank canvas" object
+            return CreateSchema(typeof(object), refIfArray, refIfComplex, referencedTypes);
+        }
+
+        private Schema CreateRefSchema(Type type, Queue<KeyValuePair<string, Type>> referencedTypes)
+        {
             var id = UniqueIdFor(type);
             referencedTypes.Enqueue(new KeyValuePair<string, Type>(id, type));
             return new Schema { @ref = "#/definitions/" + id };
         }
 
-        private Schema CreateComplexSchema(JsonObjectContract jsonContract, Queue<KeyValuePair<string, Type>> referencedTypes)
+        private Schema CreateArraySchema(JsonArrayContract arrayContract, Queue<KeyValuePair<string, Type>> referencedTypes)
         {
-            // Ignore inherited properties if its an explicitly configured polymorphic sub type
-            //var polymorphicType = PolymorphicTypeFor(type);
-            //var bindingFlags = polymorphicType.IsBase
-            //    ? BindingFlags.Instance | BindingFlags.Public
-            //    : BindingFlags.Instance | BindingFlags.Public | BindingFlags.DeclaredOnly;
-            //var bindingFlags = BindingFlags.Instance | BindingFlags.Public;
-            
-            var properties = jsonContract.Properties.Where(p => !p.Ignored).ToDictionary(
+            return new Schema
+                {
+                    type = "array",
+                    items = CreateSchema(arrayContract.CollectionItemType, true, true, referencedTypes)
+                };
+        }
+
+        private Schema CreateComplexSchema(JsonObjectContract objectContract, Queue<KeyValuePair<string, Type>> referencedTypes)
+        {
+            var properties = objectContract.Properties.Where(p => !p.Ignored).ToDictionary(
                 prop => prop.PropertyName,
                 prop => CreateSchema(prop.PropertyType, false, true, referencedTypes)
                     .WithValidationProperties(prop));
 
-            var required = jsonContract.Properties.Where(prop => prop.IsRequired())
+            var required = objectContract.Properties.Where(prop => prop.IsRequired())
                 .Select(propInfo => propInfo.PropertyName)
                 .ToList();
-
-            //var subDataTypes = polymorphicType.SubTypes
-            //    .Select(subType => CreateDataTypeFor(subType.Type, queue))
-            //    .Select(subDataType => subDataType.Ref)
-            //    .ToList();
 
             var schema = new Schema
             {
@@ -134,7 +147,7 @@ namespace Swashbuckle.Swagger
 
             foreach (var filter in _schemaFilters)
             {
-                filter.Apply(schema, this, jsonContract.UnderlyingType);
+                filter.Apply(schema, this, objectContract.UnderlyingType);
             }
 
             return schema;
@@ -158,20 +171,5 @@ namespace Swashbuckle.Swagger
 
             return type.Name;
         }
-
-        //private PolymorphicType PolymorphicTypeFor(Type type)
-        //{
-        //    var polymorphicType = _polymorphicTypes.SingleOrDefault(t => t.Type == type);
-        //    if (polymorphicType != null) return polymorphicType;
-            
-        //    // Is it nested?
-        //    foreach (var baseType in _polymorphicTypes)
-        //    {
-        //        polymorphicType = baseType.FindSubType(type);
-        //        if (polymorphicType != null) return polymorphicType;
-        //    }
-
-        //    return new PolymorphicType(type, true);
-        //}
     }
 }

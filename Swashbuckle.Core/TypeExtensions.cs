@@ -19,24 +19,24 @@ namespace Swashbuckle
             return false;
         }
 
-        public static bool IsEnumerable(this Type type, out Type enumerableTypeArgument)
-        {
-            enumerableTypeArgument = null;
-            var enumerableType = type.GetInterfaces()
-                .Union(new[] {type})
-                .FirstOrDefault(
-                    intfc => intfc.IsGenericType && intfc.GetGenericTypeDefinition() == typeof (IEnumerable<>));
+        //public static bool IsEnumerable(this Type type, out Type enumerableTypeArgument)
+        //{
+        //    enumerableTypeArgument = null;
+        //    var enumerableType = type.GetInterfaces()
+        //        .Union(new[] { type })
+        //        .FirstOrDefault(
+        //            intfc => intfc.IsGenericType && intfc.GetGenericTypeDefinition() == typeof(IEnumerable<>));
 
-            if (enumerableType != null)
-                enumerableTypeArgument = enumerableType.GetGenericArguments().First();
+        //    if (enumerableType != null)
+        //        enumerableTypeArgument = enumerableType.GetGenericArguments().First();
 
-            return enumerableType != null;
-        }
+        //    return enumerableType != null;
+        //}
 
-        public static bool IsEnumerable(this Type type)
-        {
-            Type enumerableTypeArgument;
-            return IsEnumerable(type, out enumerableTypeArgument);
-        }
+        //public static bool IsEnumerable(this Type type)
+        //{
+        //    Type enumerableTypeArgument;
+        //    return IsEnumerable(type, out enumerableTypeArgument);
+        //}
     }
 }

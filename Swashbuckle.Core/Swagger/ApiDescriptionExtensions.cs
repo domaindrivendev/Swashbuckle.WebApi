@@ -33,30 +33,7 @@ namespace Swashbuckle.Swagger
 
         public static Type SuccessResponseType(this ApiDescription apiDesc)
         {
-            // HACK: The ResponseDescription property was introduced in WebApi 5.0 but Swashbuckle requires >= 4.0. The reflection hack below provides support for
-            // the ResponseType attribute if the application is running against a version of WebApi that supports it.
-            var apiDescType = typeof (ApiDescription);
-
-            var responseDescPropInfo = apiDescType.GetProperty("ResponseDescription");
-            if (responseDescPropInfo != null)
-            {
-                var responseDesc = responseDescPropInfo.GetValue(apiDesc, null);
-                if (responseDesc != null)
-                {
-                    var responseDescType = responseDesc.GetType();
-
-                    var responseTypePropInfo = responseDescType.GetProperty("ResponseType");
-                    if (responseTypePropInfo != null)
-                    {
-                        var responseType = responseTypePropInfo.GetValue(responseDesc, null);
-                        if (responseType != null)
-                            return (Type) responseType;
-                    }
-                }
-            }
-
-            // Otherwise, it defaults to the declared response type
-            return apiDesc.ActionDescriptor.ReturnType;
+            return apiDesc.ResponseDescription.ResponseType ?? apiDesc.ResponseDescription.DeclaredType;
         }
 
         public static bool IsObsolete(this ApiDescription apiDescription)

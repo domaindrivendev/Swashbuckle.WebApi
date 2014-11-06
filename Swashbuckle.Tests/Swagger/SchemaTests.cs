@@ -198,6 +198,18 @@ namespace Swashbuckle.Tests.Swagger
         }
 
         [Test]
+        public void It_honors_newtonsoft_serialization_attributes()
+        {
+            SetUpDefaultRouteFor<NewtonsoftedTypesController>();
+
+            var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/1.0");
+            var model = swagger["definitions"]["NewtonsoftedModel"];
+
+            Assert.IsNull(model["properties"]["IgnoredProperty"], "Expected the IgnoredProperty to be ignored");
+            Assert.IsNotNull(model["properties"]["myCustomNamedProperty"], "Expected the CustomNamedProperty to have the custom name");
+        }
+
+        [Test]
         public void It_handles_nested_types()
         {
             SetUpDefaultRouteFor<NestedTypesController>();
@@ -312,17 +324,29 @@ namespace Swashbuckle.Tests.Swagger
         }
 
         [Test]
-        public void It_handles_newtonsoft_serialization_attributes()
+        public void It_handles_dynamic_types()
         {
-            SetUpDefaultRouteFor<NewtonsoftedTypesController>();
+            SetUpDefaultRouteFor<DynamicTypesController>();
 
             var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/1.0");
-            var model = swagger["definitions"]["NewtonsoftedModel"];
 
-            Assert.IsNull(model["properties"]["IgnoredProperty"], "Expected the IgnoredProperty to be ignored");
-            Assert.IsNotNull(model["properties"]["myCustomNamedProperty"], "Expected the CustomNamedProperty to have the custom name");
+            var definitions = swagger["definitions"];
+            Assert.IsNotNull(definitions);
+
+            var expected = JObject.FromObject(new Dictionary<string, object>
+                {
+                    {
+                        "Object", new
+                        {
+                            required = new string[]{},
+                            properties = new Dictionary<string, Schema>(),
+                            type = "object"
+                        }
+                    }
+                });
+            Assert.AreEqual(expected.ToString(), definitions.ToString());
         }
-        
+
         [Test]
         public void It_exposes_config_to_post_modify_schemas()
         {

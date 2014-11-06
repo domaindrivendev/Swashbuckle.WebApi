@@ -22,7 +22,7 @@ namespace Swashbuckle.Swagger
 
         public SwaggerDocument GetSwaggerFor(string apiVersion, string apiRootUrl)
         {
-            var schemaRegistry = new SchemaRegistry(_settings.SchemaFilters, _jsonContractResolver);
+            var schemaRegistry = new SchemaRegistry(_jsonContractResolver, _settings.SchemaFilters);
 
             Info info;
             _settings.ApiVersions.TryGetValue(apiVersion, out info);
