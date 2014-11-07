@@ -38,6 +38,7 @@ namespace Swashbuckle.Swagger
 
         private static readonly IEnumerable<Type> HttpTypes = new[]
             {
+                typeof(HttpRequestMessage),
                 typeof(HttpResponseMessage),
                 typeof(IHttpActionResult)
             };

@@ -29,17 +29,5 @@ namespace Swashbuckle.Swagger
 
             return schema;
         }
-
-        public static bool IsRequired(this JsonProperty jsonProperty)
-        {
-            var propInfo = jsonProperty.PropertyInfo();
-
-            return propInfo != null && Attribute.IsDefined(propInfo, typeof (RequiredAttribute));
-        }
-
-        private static PropertyInfo PropertyInfo(this JsonProperty jsonProperty)
-        {
-            return jsonProperty.DeclaringType.GetProperty(jsonProperty.UnderlyingName);
-        }
     }
 }

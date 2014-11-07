@@ -79,6 +79,7 @@
     <Compile Include="SwaggerExtensions\ApplyXmlTypeComments.cs" />
     <Compile Include="SwaggerExtensions\ApplyXmlActionComments.cs" />
     <Compile Include="SwaggerExtensions\HandleComplexTypesFromUri.cs" />
+    <Compile Include="Swagger\JsonPropertyExtensions.cs" />
     <Compile Include="WebAssets\EmbeddedResourceDescriptor.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Swagger\ApiDescriptionExtensions.cs" />
