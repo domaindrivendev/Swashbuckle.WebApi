@@ -99,7 +99,8 @@ namespace Swashbuckle.Tests.Swagger
                                         name = "type",
                                         @in = "query",
                                         required = true,
-                                        type = "string"
+                                        type = "string",
+                                        @enum = new[] { "Book", "Album" }
                                     }
                                 },
                                 responses = new Dictionary<string, object>
@@ -110,8 +111,8 @@ namespace Swashbuckle.Tests.Swagger
                                             description = "OK",
                                             schema = new
                                             {
-                                                items = JObject.Parse("{ $ref: \"#/definitions/Product\" }"),
-                                                type = "array"
+                                                type = "array",
+                                                items = JObject.Parse("{ $ref: \"#/definitions/Product\" }")
                                             }
                                         }
                                     }
@@ -451,21 +452,22 @@ namespace Swashbuckle.Tests.Swagger
             var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/1.0");
             var getParams = swagger["paths"]["/{apiVersion}/products"]["get"]["parameters"];
 
-            var expected = JArray.FromObject(new []
+            var expected = JArray.FromObject(new object[]
                 {
                     new
                     {
                         name = "type",
                         @in = "query",
                         required = true,
-                        type = "string"
+                        type = "string",
+                        @enum = new[] { "Book", "Album" }
                     },
                     new
                     {
                         name = "apiVersion",
                         @in = "path",
                         required = true,
-                        type = "string"
+                        type = "string",
                     }
                 });
 

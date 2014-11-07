@@ -39,6 +39,7 @@ namespace Swashbuckle.Tests.Swagger
                     Product = new
                     {
                         required = new string[] { },
+                        type = "object",
                         properties = new
                         {
                             Id = new
@@ -60,8 +61,7 @@ namespace Swashbuckle.Tests.Swagger
                                 format = "double",
                                 type = "number"
                             }
-                        },
-                        type = "object"
+                        }
                     }
                 });
             Assert.AreEqual(expected.ToString(), definitions.ToString());
@@ -82,6 +82,7 @@ namespace Swashbuckle.Tests.Swagger
                     Payment = new
                     {
                         required = new string[] { "Amount", "CardNumber", "ExpMonth", "ExpYear" },
+                        type = "object",
                         properties = new
                         {
                             Amount = new
@@ -112,8 +113,7 @@ namespace Swashbuckle.Tests.Swagger
                             {
                                 type = "string"
                             }
-                        },
-                        type = "object"
+                        }
                     }
                 });
             Assert.AreEqual(expected.ToString(), definitions.ToString());
@@ -134,6 +134,7 @@ namespace Swashbuckle.Tests.Swagger
                     Elephant = new
                     {
                         required = new string[] { },
+                        type = "object",
                         properties = new
                         {
                             TrunkLength = new
@@ -149,20 +150,19 @@ namespace Swashbuckle.Tests.Swagger
                             {
                                 type = "string"
                             }
-                        },
-                        type = "object"
+                        }
                     },
                     Animal = new
                     {
                         required = new string[] { },
+                        type = "object",
                         properties = new
                         {
                             Type = new
                             {
                                 type = "string"
                             }
-                        },
-                        type = "object"
+                        }
                     }
                 });
             Assert.AreEqual(expected.ToString(), definitions.ToString());
@@ -183,6 +183,7 @@ namespace Swashbuckle.Tests.Swagger
                     Lookup = new
                     {
                         required = new string[] { },
+                        type = "object",
                         properties = new
                         {
                             TotalEntries = new
@@ -190,8 +191,7 @@ namespace Swashbuckle.Tests.Swagger
                                 format = "int32",
                                 type = "integer"
                             }
-                        },
-                        type = "object"
+                        }
                     }
                 });
             Assert.AreEqual(expected.ToString(), definitions.ToString());
@@ -224,19 +224,20 @@ namespace Swashbuckle.Tests.Swagger
                     Order = new
                     {
                         required = new string[] { },
+                        type = "object",
                         properties = new
                         {
                             LineItems = new
                             {
-                                items = JObject.Parse("{ $ref: \"#/definitions/LineItem\" }"),
-                                type = "array"
+                                type = "array",
+                                items = JObject.Parse("{ $ref: \"#/definitions/LineItem\" }")
                             }
-                        },
-                        type = "object"
+                        }
                     },
                     LineItem = new
                     {
                         required = new string[] { },
+                        type = "object",
                         properties = new
                         {
                             ProductId = new
@@ -249,8 +250,7 @@ namespace Swashbuckle.Tests.Swagger
                                 format = "int32",
                                 type = "integer"
                             }
-                        },
-                        type = "object"
+                        }
                     }
                 });
             Assert.AreEqual(expected.ToString(), definitions.ToString());
@@ -271,6 +271,7 @@ namespace Swashbuckle.Tests.Swagger
                     Component = new
                     {
                         required = new string[] { },
+                        type = "object",
                         properties = new
                         {
                             Name = new
@@ -279,11 +280,10 @@ namespace Swashbuckle.Tests.Swagger
                             },
                             SubComponents = new
                             {
-                                items = JObject.Parse("{ $ref: \"#/definitions/Component\" }"),
-                                type = "array"
+                                type = "array",
+                                items = JObject.Parse("{ $ref: \"#/definitions/Component\" }")
                             }
-                        },
-                        type = "object"
+                        }
                     }
                 });
             Assert.AreEqual(expected.ToString(), definitions.ToString());
@@ -304,19 +304,19 @@ namespace Swashbuckle.Tests.Swagger
                     {
                         "Int32[]", new
                         {
+                            type = "array",
                             items = new
                             {
                                 format = "int32",
                                 type = "integer"
-                            },
-                            type = "array"
+                            }
                         }
                     },
                     {
                         "Token", new
                         {
-                            items = JObject.Parse("{ $ref: \"#/definitions/Token\" }"),
-                            type = "array"
+                            type = "array",
+                            items = JObject.Parse("{ $ref: \"#/definitions/Token\" }")
                         }
                     }
                 });
@@ -339,13 +339,35 @@ namespace Swashbuckle.Tests.Swagger
                         "Object", new
                         {
                             required = new string[]{},
-                            properties = new Dictionary<string, Schema>(),
-                            type = "object"
+                            type = "object",
+                            properties = new Dictionary<string, Schema>()
                         }
                     }
                 });
             Assert.AreEqual(expected.ToString(), definitions.ToString());
         }
+
+        //[Test]
+        //public void It_exposes_config_to_for_explicit_type_to_schema_mapping()
+        //{
+        //    SetUpDefaultRouteFor<PolymorphicTypesController>();
+        //    SetUpHandler(c =>
+        //        {
+        //            c.MapType<Mamal>(() => new Schema
+        //                {
+        //                    type = "object",
+        //                    properties = new Dictionary<string, Schema>
+        //                    {
+        //                        { "HairColor", new Schema { type = "string" }
+        //                    },
+        //                    allOf
+        //                })
+        //        })
+
+
+
+
+        //}
 
         [Test]
         public void It_exposes_config_to_post_modify_schemas()

@@ -62,7 +62,7 @@
     <Reference Include="System.XML" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Application\ExtensibleTypeConverter.cs" />
+    <Compile Include="Application\VendorExtensionsConverter.cs" />
     <Compile Include="Application\RedirectHandler.cs" />
     <Compile Include="Application\SecuritySchemeBuilder.cs" />
     <Compile Include="Application\SwaggerUiConfig.cs" />

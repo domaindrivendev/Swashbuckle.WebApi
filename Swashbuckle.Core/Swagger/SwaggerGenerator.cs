@@ -162,14 +162,9 @@ namespace Swashbuckle.Swagger
 
             var schema = schemaRegistry.FindOrRegister(paramDesc.ParameterDescriptor.ParameterType);
             if (parameter.@in == "body")
-            {
                 parameter.schema = schema;
-            }
             else
-            {
-                parameter.format = schema.format;
-                parameter.type = schema.type;
-            }
+                parameter.PopulateFrom(schema);
 
             return parameter;
         }

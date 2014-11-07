@@ -7,7 +7,7 @@ namespace Swashbuckle.Dummy.SwaggerExtensions
     {
         public void Apply(Schema schema, SchemaRegistry schemaRegistry, Type type)
         {
-            schema.extensions.Add("x-schema", "bar");
+            schema.vendorExtensions.Add("x-schema", "bar");
         }
     }
 }

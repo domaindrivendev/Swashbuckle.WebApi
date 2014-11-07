@@ -57,7 +57,7 @@ namespace Swashbuckle.Application
                 SerializerSettings = new JsonSerializerSettings
                 {
                     NullValueHandling = NullValueHandling.Ignore,
-                    Converters = new[] { new ExtensibleTypeConverter() }
+                    Converters = new[] { new VendorExtensionsConverter() }
                 }
             };
             // NOTE: The custom converter would not be neccessary in Newtonsoft.Json >= 5.0.5 as JsonExtensionData

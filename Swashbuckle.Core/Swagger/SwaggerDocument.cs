@@ -4,13 +4,11 @@ using Newtonsoft.Json;
 
 namespace Swashbuckle.Swagger
 {
-    public class SwaggerDocument : Extensible
+    public class SwaggerDocument
     {
         public readonly string swagger = "2.0";
 
         public Info info;
-
-        public ExternalDocs externalDocs;
 
         public string host;
 
@@ -28,11 +26,17 @@ namespace Swashbuckle.Swagger
 
         public IDictionary<string, Parameter> parameters;
 
+        public IDictionary<string, Response> responses;
+
         public IDictionary<string, SecurityScheme> securityDefinitions;
 
         public IList<IDictionary<string, IEnumerable<string>>> security;
 
         public IList<Tag> tags;
+
+        public ExternalDocs externalDocs;
+
+        public Dictionary<string, object> vendorExtensions = new Dictionary<string, object>();
     }
 
     public class Info
@@ -48,6 +52,8 @@ namespace Swashbuckle.Swagger
         public Contact contact;
 
         public License license;
+
+        public Dictionary<string, object> vendorExtensions = new Dictionary<string, object>();
     }
 
     public class Contact
@@ -62,13 +68,6 @@ namespace Swashbuckle.Swagger
     public class License
     {
         public string name;
-
-        public string url;
-    }
-
-    public class ExternalDocs
-    {
-        public string description;
 
         public string url;
     }
@@ -93,6 +92,8 @@ namespace Swashbuckle.Swagger
         public Operation patch;
 
         public IList<Parameter> parameters;
+
+        public Dictionary<string, object> vendorExtensions = new Dictionary<string, object>();
     }
 
     public class Operation
@@ -120,9 +121,29 @@ namespace Swashbuckle.Swagger
         public bool deprecated;
 
         public IList<IDictionary<string, IEnumerable<string>>> security;
+
+        public Dictionary<string, object> vendorExtensions = new Dictionary<string, object>();
     }
 
-    public class Parameter : SerializableType
+    public class Tag
+    {
+        public string name;
+
+        public string description;
+
+        public ExternalDocs externalDocs;
+
+        public Dictionary<string, object> vendorExtensions = new Dictionary<string, object>();
+    }
+
+    public class ExternalDocs
+    {
+        public string description;
+
+        public string url;
+    }
+
+    public class Parameter : PartialSchema
     {
         public string name;
 
@@ -133,20 +154,11 @@ namespace Swashbuckle.Swagger
         public bool required;
 
         public Schema schema;
+
+        public Dictionary<string, object> vendorExtensions = new Dictionary<string, object>();
     }
 
-    public class Response
-    {
-        public string description;
-
-        public Schema schema;
-
-        public IList<SerializableType> headers;
-
-        public object examples;
-    }
-
-    public class Schema : Extensible
+    public class Schema
     {
         [JsonProperty("$ref")]
         public string @ref;
@@ -159,13 +171,13 @@ namespace Swashbuckle.Swagger
 
         public object @default;
 
-        public object multipleOf;
+        public int? multipleOf;
 
-        public object maximum;
+        public int? maximum;
 
         public bool? exclusiveMaximum;
 
-        public object minimum;
+        public int? minimum;
 
         public bool? exclusiveMinimum;
 
@@ -174,12 +186,6 @@ namespace Swashbuckle.Swagger
         public int? minLength;
 
         public string pattern;
-
-        public string discriminator;
-
-        public Xml xml;
-
-        public Schema items;
 
         public int? maxItems;
 
@@ -193,19 +199,80 @@ namespace Swashbuckle.Swagger
 
         public IList<string> required;
 
-        public ExternalDocs externalDocs;
-
-        public IDictionary<string, Schema> definitions;
-
-        public IDictionary<string, Schema> properties;
-
         public IList<string> @enum;
 
         public string type;
 
+        public Schema items;
+
+        public Schema allOf;
+
+        public IDictionary<string, Schema> properties;
+
+        public string discriminator;
+
+        public bool? readOnly;
+
+        public Xml xml;
+
+        public ExternalDocs externalDocs;
+
         public object example;
 
-        public IList<Schema> allOf;
+        public Dictionary<string, object> vendorExtensions = new Dictionary<string, object>();
+    }
+
+    public class PartialSchema
+    {
+        public string type;
+
+        public string format; 
+
+        public PartialSchema items;
+
+        public string collectionFormat;
+
+        public object @default;
+
+        public int? maximum;
+
+        public bool? exclusiveMaximum;
+
+        public int? minimum;
+
+        public bool? exclusiveMinimum;
+
+        public int? maxLength;
+
+        public int? minLength;
+
+        public string pattern;
+
+        public int? maxItems;
+
+        public int? minItems;
+
+        public bool? uniqueItems;
+
+        public IList<string> @enum;
+
+        public int? multipleOf;
+    }
+
+    public class Response
+    {
+        public string description;
+
+        public Schema schema;
+
+        public IList<Header> headers;
+
+        public object examples;
+    }
+
+    public class Header : PartialSchema
+    {
+        public string description;
     }
 
     public class Xml
@@ -221,18 +288,7 @@ namespace Swashbuckle.Swagger
         public bool? wrapped;
     }
 
-    public class SerializableType
-    {
-        public string type;
-
-        public string format; 
-
-        public object items;
-
-        public string collectionFormat;
-    }
-
-    public class SecurityScheme : Extensible
+    public class SecurityScheme
     {
         public string type;
 
@@ -249,15 +305,7 @@ namespace Swashbuckle.Swagger
         public string tokenUrl;
 
         public IDictionary<string, string> scopes;
-    }
 
-    public class Tag
-    {
-        public ExternalDocs externalDocs;
-    }
-
-    public class Extensible
-    {
-        public IDictionary<string, object> extensions = new Dictionary<string, object>();
+        public Dictionary<string, object> vendorExtensions = new Dictionary<string, object>();
     }
 }
