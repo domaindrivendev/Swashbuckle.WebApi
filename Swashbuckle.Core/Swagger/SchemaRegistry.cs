@@ -78,9 +78,6 @@ namespace Swashbuckle.Swagger
             bool refIfComplex,
             Queue<KeyValuePair<string, Type>> referencedTypes)
         {
-            //if (_customMappings.ContainsKey(type))
-            //    return _customMappings[type]();
-
             if (PrimitiveMappings.ContainsKey(type))
                 return PrimitiveMappings[type]();
 

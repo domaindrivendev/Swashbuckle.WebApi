@@ -205,7 +205,7 @@ namespace Swashbuckle.Swagger
 
         public Schema items;
 
-        public Schema allOf;
+        public IList<Schema> allOf;
 
         public IDictionary<string, Schema> properties;
 
