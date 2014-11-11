@@ -15,17 +15,21 @@ namespace Swashbuckle.SwaggerExtensions
             var complexParameters = operation.parameters.Where(x => x.@in == "query" && !string.IsNullOrWhiteSpace(x.name) && models.ContainsKey(x.name)).ToArray();
             foreach (var parameter in complexParameters)
             {
-                var model = models[parameter.name];
-
                 operation.parameters.Remove(parameter);
 
-                model.properties.Select(x => new Parameter
+                var model = models[parameter.name];
+                foreach (var entry in model.properties)
                 {
-                    name = x.Key.ToLowerInvariant(),
-                    type = x.Value.type,
-                    @in = "query",
-                    required = model.required.Contains(x.Key)
-                }).AddTo(operation.parameters);
+                    var param = new Parameter
+                    {
+                        name = entry.Key.ToLowerInvariant(),
+                        @in = "query",
+                        required = model.required != null && model.required.Contains(entry.Key)
+                    };
+                    param.PopulateFrom(entry.Value);
+
+                    operation.parameters.Add(param);
+                }
             }
         }
     }

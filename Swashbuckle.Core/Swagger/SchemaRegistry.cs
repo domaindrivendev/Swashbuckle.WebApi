@@ -69,6 +69,13 @@ namespace Swashbuckle.Swagger
                 Definitions.Add(next.Key, CreateSchema(next.Value, false, false, referencedTypes));
             }
 
+            // Need to fully qualify references to schema's contained in Definitions
+            // TODO: There has to be a better way - will do for now though!
+            if (rootSchema.@ref != null)
+                rootSchema.@ref = "#/definitions/" + rootSchema.@ref;
+            if (rootSchema.items != null && rootSchema.items.@ref != null)
+                rootSchema.items.@ref = "#/definitions/" + rootSchema.items.@ref;
+
             return rootSchema;
         }
 
@@ -113,7 +120,7 @@ namespace Swashbuckle.Swagger
         {
             var id = UniqueIdFor(type);
             referencedTypes.Enqueue(new KeyValuePair<string, Type>(id, type));
-            return new Schema { @ref = "#/definitions/" + id };
+            return new Schema { @ref = id };
         }
 
         private Schema CreateArraySchema(JsonArrayContract arrayContract, Queue<KeyValuePair<string, Type>> referencedTypes)
@@ -138,7 +145,7 @@ namespace Swashbuckle.Swagger
 
             var schema = new Schema
             {
-                required = required,
+                required = required.Any() ? required : null, // required can be null but not empty
                 properties = properties,
                 type = "object"
             };

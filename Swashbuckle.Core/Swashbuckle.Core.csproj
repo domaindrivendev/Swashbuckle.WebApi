@@ -75,7 +75,6 @@
     <Compile Include="Application\InfoBuilder.cs" />
     <Compile Include="Application\SwaggerDocsConfig.cs" />
     <Compile Include="HttpConfigurationExtensions.cs" />
-    <Compile Include="ListExtensions.cs" />
     <Compile Include="SwaggerExtensions\ApplyXmlTypeComments.cs" />
     <Compile Include="SwaggerExtensions\ApplyXmlActionComments.cs" />
     <Compile Include="SwaggerExtensions\HandleComplexTypesFromUri.cs" />

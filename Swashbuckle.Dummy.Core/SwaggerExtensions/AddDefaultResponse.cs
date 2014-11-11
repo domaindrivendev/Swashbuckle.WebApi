@@ -12,6 +12,7 @@ namespace Swashbuckle.Dummy.SwaggerExtensions
 
             operation.responses.Add("default", new Response
                 {
+                    description = "Error",
                     schema = errorSchema
                 });
         }

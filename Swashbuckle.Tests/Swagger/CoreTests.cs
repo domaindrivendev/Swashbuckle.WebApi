@@ -478,7 +478,7 @@ namespace Swashbuckle.Tests.Swagger
         public void It_handles_complex_parameters_from_uri()
         {
             SetUpDefaultRouteFor<ComplexTypesFromUriController>();
-            //SetUpHandler();
+
             var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/1.0");
             var getParams = swagger["paths"]["/complextypesfromuri"]["get"]["parameters"];
 
@@ -486,31 +486,39 @@ namespace Swashbuckle.Tests.Swagger
             {
                 new
                 {
-                    name = "param1",
+                    name = "city",
                     @in = "query",
                     required = false,
                     type = "string"
                 },
                 new
                 {
-                    name = "param2",
+                    name = "state",
                     @in = "query",
                     required = false,
-                    type = "integer"
+                    type = "string"
                 },
                 new
                 {
-                   name = "param3",
+                   name = "zip",
                    @in = "query",
-                   required = true,
+                   required = false,
                    type = "string"
                 },
                 new
                 {
-                    name = "param4",
+                    name = "currency",
                     @in = "query",
                     required = false,
-                    type = "integer"
+                    type = "string"
+                },
+                new
+                {
+                    name = "amount",
+                    @in = "query",
+                    required = true,
+                    type = "number",
+                    format = "double"
                 }
             });
 

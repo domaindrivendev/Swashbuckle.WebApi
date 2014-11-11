@@ -15,6 +15,9 @@ namespace Swashbuckle.Application
 
         public SwaggerUiConfig(IEnumerable<string> discoveryPaths)
         {
+            // Enable swagger-ui by default
+            Enabled = true;
+
             _customWebAssets = new Dictionary<string, EmbeddedResourceDescriptor>();
 
             _templateValues = new Dictionary<string, string>
@@ -36,9 +39,6 @@ namespace Swashbuckle.Application
 
             // Use Swashbuckle specific index.html
             CustomWebAsset("index.html", GetType().Assembly, "Swashbuckle.SwaggerExtensions.index.html");
-
-            // Enable swagger-ui by default
-            Enabled = true;
         }
 
         internal bool Enabled { get; private set; }

@@ -61,16 +61,16 @@ namespace Swashbuckle.Dummy
                         //    .Name("apiKey")
                         //    .In("header");
                         //
-                        //c.OAuth2("oauth2")
-                        //    .Description("OAuth2 Authorization Code Grant")
-                        //    .Flow("implicit")
-                        //    .AuthorizationUrl("https://tempuri.org/auth")
-                        //    //.TokenUrl("https://tempuri.org/token")
-                        //    .Scopes(s =>
-                        //    {
-                        //        s.Add("read", "Read access to protected resources");
-                        //        s.Add("write", "Write access to protected resources");
-                        //    });
+                        c.OAuth2("oauth2")
+                            .Description("OAuth2 Implicit Grant")
+                            .Flow("implicit")
+                            .AuthorizationUrl("https://tempuri.org/auth")
+                            //.TokenUrl("https://tempuri.org/token")
+                            .Scopes(s =>
+                            {
+                                s.Add("read", "Read access to protected resources");
+                                s.Add("write", "Write access to protected resources");
+                            });
 
                         // Swashbuckle makes a best attempt at generating Swagger compliant JSON schemas for the various types
                         // exposed in your API. However, there may be occassions when more control of the output is required
@@ -147,6 +147,11 @@ namespace Swashbuckle.Dummy
                         // URL's. This provides a convenient way for users to view documentation for different API versions
                         //
                         c.EnableDiscoveryUrlSelector();
+
+                        // If you're API supports the OAuth2 Implicit flow, and you've described it correctly,
+                        // according to the Swagger 2.0 specification (see OAuth config. above), you can
+                        // enable UI support with the following command
+                        c.EnableOAuth2Support("test-client-id", "test-realm", "Swagger UI");
                     })
                 .Init(httpConfig);
         }

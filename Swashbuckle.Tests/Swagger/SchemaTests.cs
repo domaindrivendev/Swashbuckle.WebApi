@@ -38,7 +38,6 @@ namespace Swashbuckle.Tests.Swagger
                 {
                     Product = new
                     {
-                        required = new string[] { },
                         type = "object",
                         properties = new
                         {
@@ -133,7 +132,6 @@ namespace Swashbuckle.Tests.Swagger
                 {
                     Elephant = new
                     {
-                        required = new string[] { },
                         type = "object",
                         properties = new
                         {
@@ -154,7 +152,6 @@ namespace Swashbuckle.Tests.Swagger
                     },
                     Animal = new
                     {
-                        required = new string[] { },
                         type = "object",
                         properties = new
                         {
@@ -182,7 +179,6 @@ namespace Swashbuckle.Tests.Swagger
                 {
                     Lookup = new
                     {
-                        required = new string[] { },
                         type = "object",
                         properties = new
                         {
@@ -223,20 +219,18 @@ namespace Swashbuckle.Tests.Swagger
                 {
                     Order = new
                     {
-                        required = new string[] { },
                         type = "object",
                         properties = new
                         {
                             LineItems = new
                             {
                                 type = "array",
-                                items = JObject.Parse("{ $ref: \"#/definitions/LineItem\" }")
+                                items = JObject.Parse("{ $ref: \"LineItem\" }")
                             }
                         }
                     },
                     LineItem = new
                     {
-                        required = new string[] { },
                         type = "object",
                         properties = new
                         {
@@ -270,7 +264,6 @@ namespace Swashbuckle.Tests.Swagger
                 {
                     Component = new
                     {
-                        required = new string[] { },
                         type = "object",
                         properties = new
                         {
@@ -281,7 +274,7 @@ namespace Swashbuckle.Tests.Swagger
                             SubComponents = new
                             {
                                 type = "array",
-                                items = JObject.Parse("{ $ref: \"#/definitions/Component\" }")
+                                items = JObject.Parse("{ $ref: \"Component\" }")
                             }
                         }
                     }
@@ -290,9 +283,9 @@ namespace Swashbuckle.Tests.Swagger
         }
 
         [Test]
-        public void It_handles_jagged_container_types()
+        public void It_handles_two_dimensional_array_types()
         {
-            SetUpDefaultRouteFor<JaggedContainersController>();
+            SetUpDefaultRouteFor<TwoDimensionalArraysController>();
 
             var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/1.0");
 
@@ -316,7 +309,7 @@ namespace Swashbuckle.Tests.Swagger
                         "Token", new
                         {
                             type = "array",
-                            items = JObject.Parse("{ $ref: \"#/definitions/Token\" }")
+                            items = JObject.Parse("{ $ref: \"Token\" }")
                         }
                     }
                 });
@@ -338,7 +331,6 @@ namespace Swashbuckle.Tests.Swagger
                     {
                         "Object", new
                         {
-                            required = new string[]{},
                             type = "object",
                             properties = new Dictionary<string, Schema>()
                         }
@@ -346,28 +338,6 @@ namespace Swashbuckle.Tests.Swagger
                 });
             Assert.AreEqual(expected.ToString(), definitions.ToString());
         }
-
-        //[Test]
-        //public void It_exposes_config_to_for_explicit_type_to_schema_mapping()
-        //{
-        //    SetUpDefaultRouteFor<PolymorphicTypesController>();
-        //    SetUpHandler(c =>
-        //        {
-        //            c.MapType<Mamal>(() => new Schema
-        //                {
-        //                    type = "object",
-        //                    properties = new Dictionary<string, Schema>
-        //                    {
-        //                        { "HairColor", new Schema { type = "string" }
-        //                    },
-        //                    allOf
-        //                })
-        //        })
-
-
-
-
-        //}
 
         [Test]
         public void It_exposes_config_to_post_modify_schemas()
