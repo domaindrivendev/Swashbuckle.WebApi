@@ -19,7 +19,7 @@ namespace $rootnamespace$
                         // Swagger 2.0 requires version and title at a minimum but you can
                         // also provide additional information
                         //
-                        c.SingleApiVersion("1.0", "$rootnamespace$ API");
+                        c.SingleApiVersion("1.0", "$rootnamespace$");
 
                         // If you API has multiple versions, use "MultipleApiVersions" instead of "SingleApiVersion"
                         // In this case, you must provide a lambda that tells Swashbuckle which actions should be
@@ -140,6 +140,11 @@ namespace $rootnamespace$
                         // URL's. This provides a convenient way for users to view documentation for different API versions
                         //
                         //c.EnableDiscoveryUrlSelector();
+
+                        // If you're API supports the OAuth2 Implicit flow, and you've described it correctly,
+                        // according to the Swagger 2.0 specification (see OAuth config. above), you can
+                        // enable UI support with the following command
+                        //c.EnableOAuth2Support("test-client-id", "test-realm", "Swagger UI");
                     })
                 .Init(GlobalConfiguration.Configuration);
         }

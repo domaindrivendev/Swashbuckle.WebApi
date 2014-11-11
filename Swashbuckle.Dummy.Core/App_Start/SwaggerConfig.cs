@@ -25,7 +25,7 @@ namespace Swashbuckle.Dummy
                         // Swagger 2.0 requires version and title at a minimum but you can
                         // also provide additional information
                         //
-                        c.SingleApiVersion("1.0", "Swashbuckle Dummy API")
+                        c.SingleApiVersion("1.0", "Swashbuckle Dummy")
                             .Description("A sample API for testing and prototyping Swashbuckle features");
 
                         // If you API has multiple versions, use "MultipleApiVersions" instead of "SingleApiVersion"
@@ -64,7 +64,7 @@ namespace Swashbuckle.Dummy
                         c.OAuth2("oauth2")
                             .Description("OAuth2 Implicit Grant")
                             .Flow("implicit")
-                            .AuthorizationUrl("https://tempuri.org/auth")
+                            .AuthorizationUrl("http://petstore.swagger.wordnik.com/api/oauth/dialog")
                             //.TokenUrl("https://tempuri.org/token")
                             .Scopes(s =>
                             {
