@@ -46,6 +46,12 @@ namespace Swashbuckle.Dummy
                         //
                         c.Schemes(new[] { "http", "https" });
 
+                        // Each operation can have one or more assigned tags which may be used by consumers for various
+                        // reasons. For example, the swagger-ui groups operations based on each operations first tag.
+                        // By default, controller name is assigned for this but you can use the following option
+                        // to override this and provide a custom value
+                        //c.GroupOperationsBy(apiDesc => apiDesc.HttpMethod.ToString());
+
                         // You can use the "BasicAuth", "ApiKey" or "OAuth2" options to define security schemes for the API
                         // See https://github.com/swagger-api/swagger-spec/blob/master/versions/2.0.md for more details
                         // NOTE: These definitions only define the schemes and need to be coupled with a corresponding "security"
@@ -73,9 +79,14 @@ namespace Swashbuckle.Dummy
                             });
 
                         // Swashbuckle makes a best attempt at generating Swagger compliant JSON schemas for the various types
-                        // exposed in your API. However, there may be occassions when more control of the output is required
-                        // In this case, you can post-modify each of the generated schemas by wiring up one or more schema filters
+                        // exposed in your API. However, there may be occassions when more control of the output is needed.
+                        // This is supported through the MapType and SchemaFilter options. The former can be used when you
+                        // want to map a Type to a specific Schema (typically a primitive) rather than an auto-generated schema
+                        //c.MapType<ProductType>(() => new Schema { type = "integer", format = "int32" });
                         //
+                        // If you want to post-modify schema's after they've been generated, either across the board or for one
+                        // specific type, you can wire up one or more schema filters. NOTE: schema filters will only be invoked
+                        // for complex schema's i.e. where type = "object"
                         c.SchemaFilter<ApplySchemaVendorExtensions>();
 
                         // Similar to a schema filter, Swashubuckle allows the generated Operation desrciptions to be

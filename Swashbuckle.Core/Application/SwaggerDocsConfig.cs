@@ -13,16 +13,19 @@ namespace Swashbuckle.Application
     {
         private IEnumerable<string> _schemes;
         private IDictionary<string, SecuritySchemeBuilder> _securitySchemeBuilders;
+        private readonly IDictionary<Type, Func<Schema>> _customSchemaMappings;
         private readonly IList<Func<ISchemaFilter>> _schemaFilters;
         private readonly IList<Func<IOperationFilter>> _operationFilters;
         private readonly IList<Func<IDocumentFilter>> _documentFilters;
 
         private Func<ApiDescription, string, bool> _versionSupportResolver;
         private Func<IEnumerable<ApiDescription>, ApiDescription> _conflictingActionsResolver;
+        private Func<ApiDescription, string> _groupingKeySelector;
 
         public SwaggerDocsConfig()
         {
             _securitySchemeBuilders = new Dictionary<string, SecuritySchemeBuilder>();
+            _customSchemaMappings = new Dictionary<Type, Func<Schema>>();
             _schemaFilters = new List<Func<ISchemaFilter>>();
             _operationFilters = new List<Func<IOperationFilter>>();
             _documentFilters = new List<Func<IDocumentFilter>>();
@@ -55,6 +58,11 @@ namespace Swashbuckle.Application
             _schemes = schemes;
         }
 
+        public void GroupOperationsBy(Func<ApiDescription, string> keySelector)
+        {
+            _groupingKeySelector = keySelector;
+        }
+
         public BasicAuthSchemeBuilder BasicAuth(string name)
         {
             return AddSecuritySchemeBuilder<BasicAuthSchemeBuilder>(name);
@@ -68,6 +76,11 @@ namespace Swashbuckle.Application
         public OAuth2SchemeBuilder OAuth2(string name)
         {
             return AddSecuritySchemeBuilder<OAuth2SchemeBuilder>(name);
+        }
+
+        public void MapType<T>(Func<Schema> factory)
+        {
+            _customSchemaMappings.Add(typeof(T), factory);
         }
 
         public void SchemaFilter<TFilter>()
@@ -109,7 +122,9 @@ namespace Swashbuckle.Application
                 versionSupportResolver: _versionSupportResolver, // TODO: handle null value
                 apiVersions: VersionInfoBuilder.Build(),
                 schemes: _schemes, 
+                groupingKeySelector: _groupingKeySelector,
                 securityDefinitions: securityDefintitions, 
+                customSchemaMappings: _customSchemaMappings,
                 schemaFilters: _schemaFilters.Select(factory => factory()),
                 operationFilters: _operationFilters.Select(factory => factory()),
                 documentFilters: _documentFilters.Select(factory => factory()),

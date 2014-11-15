@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 
 namespace Swashbuckle
 {
@@ -19,24 +20,23 @@ namespace Swashbuckle
             return false;
         }
 
-        //public static bool IsEnumerable(this Type type, out Type enumerableTypeArgument)
-        //{
-        //    enumerableTypeArgument = null;
-        //    var enumerableType = type.GetInterfaces()
-        //        .Union(new[] { type })
-        //        .FirstOrDefault(
-        //            intfc => intfc.IsGenericType && intfc.GetGenericTypeDefinition() == typeof(IEnumerable<>));
+        public static string FriendlyId(this Type type)
+        {
+            if (type.IsGenericType)
+            {
+                var genericArguments = type.GetGenericArguments()
+                    .Select(t => t.FriendlyId())
+                    .ToArray();
 
-        //    if (enumerableType != null)
-        //        enumerableTypeArgument = enumerableType.GetGenericArguments().First();
+                var builder = new StringBuilder(type.Name);
 
-        //    return enumerableType != null;
-        //}
+                return builder
+                    .Replace(String.Format("`{0}", genericArguments.Count()), String.Empty)
+                    .Append(String.Format("[{0}]", String.Join(",", genericArguments).TrimEnd(',')))
+                    .ToString();
+            }
 
-        //public static bool IsEnumerable(this Type type)
-        //{
-        //    Type enumerableTypeArgument;
-        //    return IsEnumerable(type, out enumerableTypeArgument);
-        //}
+            return type.Name;
+        }
     }
 }

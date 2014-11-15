@@ -10,13 +10,5 @@ namespace Swashbuckle.Dummy.Controllers
         {
             throw new NotImplementedException();
         }
-
-        public Token GetAll()
-        {
-            throw new NotImplementedException();
-        }
     }
-
-    public class Token : List<Token>
-    {}
 }

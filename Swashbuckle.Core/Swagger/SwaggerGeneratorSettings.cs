@@ -11,7 +11,9 @@ namespace Swashbuckle.Swagger
             Func<ApiDescription, string, bool> versionSupportResolver,
             IDictionary<string, Info> apiVersions,
             IEnumerable<string> schemes,
+            Func<ApiDescription, string> groupingKeySelector,
             IDictionary<string, SecurityScheme> securityDefinitions = null,
+            IDictionary<Type, Func<Schema>> customSchemaMappings = null,
             IEnumerable<ISchemaFilter> schemaFilters = null,
             IEnumerable<IOperationFilter> operationFilters = null,
             IEnumerable<IDocumentFilter> documentFilters = null,
@@ -20,7 +22,9 @@ namespace Swashbuckle.Swagger
             VersionSupportResolver = versionSupportResolver;
             ApiVersions = apiVersions;
             Schemes = schemes;
+            GroupingKeySelector = groupingKeySelector ?? DefaultGroupingKeySelector;
             SecurityDefinitions = securityDefinitions;
+            CustomSchemaMappings = customSchemaMappings ?? new Dictionary<Type, Func<Schema>>();
             SchemaFilters = schemaFilters ?? new List<ISchemaFilter>();
             OperationFilters = operationFilters ?? new List<IOperationFilter>();
             DocumentFilters = documentFilters ?? new List<IDocumentFilter>();
@@ -33,7 +37,11 @@ namespace Swashbuckle.Swagger
 
         public IEnumerable<string> Schemes { get; private set; }
 
+        public Func<ApiDescription, string> GroupingKeySelector { get; private set; }
+
         public IDictionary<string, SecurityScheme> SecurityDefinitions { get; private set; }
+
+        public IDictionary<Type, Func<Schema>> CustomSchemaMappings { get; private set; }
 
         public IEnumerable<ISchemaFilter> SchemaFilters { get; private set; }
 
@@ -42,6 +50,11 @@ namespace Swashbuckle.Swagger
         public IEnumerable<IDocumentFilter> DocumentFilters { get; private set; }
 
         public Func<IEnumerable<ApiDescription>, ApiDescription> ConflictingActionsResolver { get; private set; }
+
+        private string DefaultGroupingKeySelector(ApiDescription apiDescription)
+        {
+            return apiDescription.ActionDescriptor.ControllerDescriptor.ControllerName;
+        }
 
         private ApiDescription DefaultConflictingActionsResolver(IEnumerable<ApiDescription> apiDescriptions)
         {

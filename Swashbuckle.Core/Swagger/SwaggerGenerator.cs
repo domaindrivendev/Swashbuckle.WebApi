@@ -22,7 +22,7 @@ namespace Swashbuckle.Swagger
 
         public SwaggerDocument GetSwaggerFor(string apiVersion, string apiRootUrl)
         {
-            var schemaRegistry = new SchemaRegistry(_jsonContractResolver, _settings.SchemaFilters);
+            var schemaRegistry = new SchemaRegistry(_jsonContractResolver, _settings.CustomSchemaMappings, _settings.SchemaFilters);
 
             Info info;
             _settings.ApiVersions.TryGetValue(apiVersion, out info);
@@ -122,8 +122,8 @@ namespace Swashbuckle.Swagger
 
             var operation = new Operation
             { 
-                tags = new [] { apiDescription.ActionDescriptor.ControllerDescriptor.ControllerName },
-                operationId = apiDescription.OperationId(),
+                tags = new [] { _settings.GroupingKeySelector(apiDescription) },
+                operationId = apiDescription.FriendlyId(),
                 produces = apiDescription.Produces().ToList(),
                 consumes = apiDescription.Consumes().ToList(),
                 parameters = parameters.Any() ? parameters : null, // parameters can be null but not empty

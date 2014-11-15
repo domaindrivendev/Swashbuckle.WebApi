@@ -7,7 +7,7 @@ namespace Swashbuckle.Swagger
 {
     public static class ApiDescriptionExtensions
     {
-        public static string OperationId(this ApiDescription apiDescription)
+        public static string FriendlyId(this ApiDescription apiDescription)
         {
             return String.Format("{0}_{1}",
                 apiDescription.ActionDescriptor.ControllerDescriptor.ControllerName,

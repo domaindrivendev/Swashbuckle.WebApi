@@ -366,6 +366,21 @@ namespace Swashbuckle.Tests.Swagger
         }
 
         [Test]
+        public void It_exposes_config_to_customize_the_grouping_of_operations()
+        {
+            SetUpDefaultRouteFor<ProductsController>();
+            SetUpHandler(c => c.GroupOperationsBy(apiDesc => apiDesc.HttpMethod.ToString()));
+
+            var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/1.0");
+            foreach (var method in new[] { "post", "get" })
+            {
+                var tags = swagger["paths"]["/products"][method]["tags"];
+                CollectionAssert.IsNotEmpty(tags);
+                Assert.AreEqual(method.ToUpper(), tags.First().ToString());
+            }
+        }
+
+        [Test]
         public void It_exposes_config_to_post_modify_the_document()
         {
             SetUpHandler(c => c.DocumentFilter<ApplyDocumentVendorExtensions>());

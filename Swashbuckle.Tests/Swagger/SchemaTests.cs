@@ -30,7 +30,6 @@ namespace Swashbuckle.Tests.Swagger
             SetUpDefaultRouteFor<ProductsController>();
 
             var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/1.0");
-
             var definitions = swagger["definitions"];
             Assert.IsNotNull(definitions);
 
@@ -72,7 +71,6 @@ namespace Swashbuckle.Tests.Swagger
             SetUpDefaultRouteFor<AnnotatedTypesController>();
             
             var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/1.0");
-
             var definitions = swagger["definitions"];
             Assert.IsNotNull(definitions);
 
@@ -124,7 +122,6 @@ namespace Swashbuckle.Tests.Swagger
             SetUpDefaultRouteFor<PolymorphicTypesController>();
 
             var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/1.0");
-
             var definitions = swagger["definitions"];
             Assert.IsNotNull(definitions);
 
@@ -171,7 +168,6 @@ namespace Swashbuckle.Tests.Swagger
             SetUpDefaultRouteFor<IndexerTypesController>();
 
             var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/1.0");
-
             var definitions = swagger["definitions"];
             Assert.IsNotNull(definitions);
 
@@ -203,6 +199,47 @@ namespace Swashbuckle.Tests.Swagger
 
             Assert.IsNull(model["properties"]["IgnoredProperty"], "Expected the IgnoredProperty to be ignored");
             Assert.IsNotNull(model["properties"]["myCustomNamedProperty"], "Expected the CustomNamedProperty to have the custom name");
+        }
+
+        [Test]
+        public void It_exposes_config_to_map_a_type_to_an_explicit_schema()
+        {
+            SetUpDefaultRouteFor<ProductsController>();
+            SetUpHandler(c => c.MapType<ProductType>(() => new Schema
+                {
+                    type = "integer",
+                    format = "int32",
+                    maximum = 2,
+                    minimum = 1
+                }));
+
+            var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/1.0");
+            var parameter = swagger["paths"]["/products"]["get"]["parameters"][0];
+
+            var expected = JObject.FromObject(new
+                {
+                    name = "type",
+                    @in = "query",
+                    required = true,
+                    type = "integer",
+                    format = "int32",
+                    maximum = 2,
+                    minimum = 1
+                });
+            Assert.AreEqual(expected.ToString(), parameter.ToString());
+        }
+
+
+        public void It_exposes_config_to_post_modify_schemas()
+        {
+            SetUpDefaultRouteFor<ProductsController>();
+            SetUpHandler(c => c.SchemaFilter<ApplySchemaVendorExtensions>());
+
+            var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/1.0");
+            var xProp = swagger["definitions"]["Product"]["x-schema"];
+
+            Assert.IsNotNull(xProp);
+            Assert.AreEqual("bar", xProp.ToString());
         }
 
         [Test]
@@ -277,43 +314,43 @@ namespace Swashbuckle.Tests.Swagger
                                 items = JObject.Parse("{ $ref: \"Component\" }")
                             }
                         }
+                    },
+                    ListOfSelf = new
+                    {
+                        type = "array",
+                        items = JObject.Parse("{ $ref: \"ListOfSelf\" }") 
+                    },
+                    DictionaryOfSelf = new
+                    {
+                        type = "object",
+                        additionalProperties = JObject.Parse("{ $ref: \"DictionaryOfSelf\" }") 
                     }
                 });
             Assert.AreEqual(expected.ToString(), definitions.ToString());
         }
 
         [Test]
-        public void It_handles_two_dimensional_array_types()
+        public void It_handles_two_dimensional_arrays()
         {
             SetUpDefaultRouteFor<TwoDimensionalArraysController>();
 
             var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/1.0");
+            var schema = swagger["paths"]["/twodimensionalarrays"]["post"]["parameters"][0]["schema"];
 
-            var definitions = swagger["definitions"];
-            Assert.IsNotNull(definitions);
-
-            var expected = JObject.FromObject(new Dictionary<string, object>
+            var expected = JObject.FromObject(new
                 {
+                    type = "array",
+                    items = new 
                     {
-                        "Int32[]", new
+                        type = "array",
+                        items = new
                         {
-                            type = "array",
-                            items = new
-                            {
-                                format = "int32",
-                                type = "integer"
-                            }
-                        }
-                    },
-                    {
-                        "Token", new
-                        {
-                            type = "array",
-                            items = JObject.Parse("{ $ref: \"Token\" }")
+                            format = "int32",
+                            type = "integer"
                         }
                     }
                 });
-            Assert.AreEqual(expected.ToString(), definitions.ToString());
+            Assert.AreEqual(expected.ToString(), schema.ToString());
         }
 
         [Test]
@@ -322,7 +359,6 @@ namespace Swashbuckle.Tests.Swagger
             SetUpDefaultRouteFor<DynamicTypesController>();
 
             var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/1.0");
-
             var definitions = swagger["definitions"];
             Assert.IsNotNull(definitions);
 
@@ -337,19 +373,6 @@ namespace Swashbuckle.Tests.Swagger
                     }
                 });
             Assert.AreEqual(expected.ToString(), definitions.ToString());
-        }
-
-        [Test]
-        public void It_exposes_config_to_post_modify_schemas()
-        {
-            SetUpDefaultRouteFor<ProductsController>();
-            SetUpHandler(c => c.SchemaFilter<ApplySchemaVendorExtensions>());
-
-            var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/1.0");
-            var xProp = swagger["definitions"]["Product"]["x-schema"];
-
-            Assert.IsNotNull(xProp);
-            Assert.AreEqual("bar", xProp.ToString());
         }
     }
 }

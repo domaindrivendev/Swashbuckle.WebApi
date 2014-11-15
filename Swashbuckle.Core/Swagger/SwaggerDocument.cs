@@ -209,6 +209,8 @@ namespace Swashbuckle.Swagger
 
         public IDictionary<string, Schema> properties;
 
+        public Schema additionalProperties;
+
         public string discriminator;
 
         public bool? readOnly;
