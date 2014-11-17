@@ -39,8 +39,7 @@ namespace Swashbuckle.Swagger
         private static readonly IEnumerable<Type> HttpTypes = new[]
             {
                 typeof(HttpRequestMessage),
-                typeof(HttpResponseMessage),
-                typeof(IHttpActionResult)
+                typeof(HttpResponseMessage)
             };
 
         private readonly IContractResolver _contractResolver;
@@ -64,14 +63,14 @@ namespace Swashbuckle.Swagger
         public Schema FindOrRegister(Type type)
         {
             var referencedTypes = new Queue<KeyValuePair<string, Type>>();
-            var rootSchema = CreateSchema(type, true, referencedTypes);
+            var rootSchema = CreateSchema(type, false, true, referencedTypes);
 
             while (referencedTypes.Any())
             {
                 var next = referencedTypes.Dequeue();
                 if (Definitions.ContainsKey(next.Key)) continue;
 
-                Definitions.Add(next.Key, CreateSchema(next.Value, false, referencedTypes));
+                Definitions.Add(next.Key, CreateSchema(next.Value, false, false, referencedTypes));
             }
 
             // Need to fully qualify any ref to a schema that's contained in Definitions
@@ -86,6 +85,7 @@ namespace Swashbuckle.Swagger
 
         private Schema CreateSchema(
             Type type,
+            bool refIfArray,
             bool refIfComplex,
             Queue<KeyValuePair<string, Type>> referencedTypes)
         {
@@ -97,7 +97,7 @@ namespace Swashbuckle.Swagger
 
             Type innerType;
             if (type.IsNullable(out innerType))
-                return CreateSchema(innerType, refIfComplex, referencedTypes);
+                return CreateSchema(innerType, refIfArray, refIfComplex, referencedTypes);
 
             if (type.IsEnum)
                 return new Schema { type = "string", @enum = type.GetEnumNames() };
@@ -106,20 +106,28 @@ namespace Swashbuckle.Swagger
             var contract = _contractResolver.ResolveContract(type);
 
             if (contract is JsonArrayContract)
-                return CreateArraySchema((JsonArrayContract)contract, referencedTypes);
+            {
+                return refIfArray
+                    ? CreateRefSchema(type, referencedTypes)
+                    : CreateArraySchema((JsonArrayContract)contract, referencedTypes);
+            }
 
             if (contract is JsonDictionaryContract)
-                return CreateDictionarySchema((JsonDictionaryContract)contract, referencedTypes);
-
-            if (contract is JsonObjectContract && !HttpTypes.Contains(type))
+            {
+                return refIfComplex
+                    ? CreateRefSchema(type, referencedTypes)
+                    : CreateDictionarySchema((JsonDictionaryContract)contract, referencedTypes);
+            }
+ 
+            if (contract is JsonObjectContract && CanDescribe(type))
             {
                 return refIfComplex
                     ? CreateRefSchema(type, referencedTypes)
                     : CreateComplexSchema((JsonObjectContract)contract, referencedTypes);
             }
 
-            // Falback, describe anything else as an object
-            return CreateSchema(typeof(object), refIfComplex, referencedTypes);
+            // Falback, describe anything else as plain object
+            return CreateSchema(typeof(object), refIfArray, refIfComplex, referencedTypes);
         }
 
         private Schema CreateRefSchema(Type type, Queue<KeyValuePair<string, Type>> referencedTypes)
@@ -131,27 +139,20 @@ namespace Swashbuckle.Swagger
 
         private Schema CreateArraySchema(JsonArrayContract contract, Queue<KeyValuePair<string, Type>> referencedTypes)
         {
-            var items = (contract.UnderlyingType == contract.CollectionItemType)
-                ? CreateRefSchema(contract.CollectionItemType, referencedTypes) //prevents infinite loop
-                : CreateSchema(contract.CollectionItemType, true, referencedTypes);
-
+            var refForItems = contract.UnderlyingType == contract.CollectionItemType; //prevents infinite loop
             return new Schema
                 {
                     type = "array",
-                    items = items
+                    items = CreateSchema(contract.CollectionItemType, refForItems, true, referencedTypes)
                 };
         }
 
         private Schema CreateDictionarySchema(JsonDictionaryContract contract, Queue<KeyValuePair<string, Type>> referencedTypes)
         {
-            var additionalProperties = (contract.UnderlyingType == contract.DictionaryValueType)
-                ? CreateRefSchema(contract.DictionaryValueType, referencedTypes) //prevents infinite loop
-                : CreateSchema(contract.DictionaryValueType, true, referencedTypes);
-
             return new Schema
                 {
                     type = "object",
-                    additionalProperties = additionalProperties
+                    additionalProperties = CreateSchema(contract.DictionaryValueType, false, true, referencedTypes)
                 };
         }
 
@@ -159,7 +160,7 @@ namespace Swashbuckle.Swagger
         {
             var properties = contract.Properties.Where(p => !p.Ignored).ToDictionary(
                 prop => prop.PropertyName,
-                prop => CreateSchema(prop.PropertyType, true, referencedTypes)
+                prop => CreateSchema(prop.PropertyType, false, true, referencedTypes)
                     .WithValidationProperties(prop));
 
             var required = contract.Properties.Where(prop => prop.IsRequired())
@@ -179,6 +180,11 @@ namespace Swashbuckle.Swagger
             }
 
             return schema;
+        }
+
+        private bool CanDescribe(Type type)
+        {
+            return !HttpTypes.Contains(type) && type.FullName != "System.Web.Http.IHttpActionResult";
         }
     }
 }

@@ -24,15 +24,13 @@ namespace Swashbuckle
         {
             if (type.IsGenericType)
             {
-                var genericArguments = type.GetGenericArguments()
+                var genericArgumentIds = type.GetGenericArguments()
                     .Select(t => t.FriendlyId())
                     .ToArray();
 
-                var builder = new StringBuilder(type.Name);
-
-                return builder
-                    .Replace(String.Format("`{0}", genericArguments.Count()), String.Empty)
-                    .Append(String.Format("[{0}]", String.Join(",", genericArguments).TrimEnd(',')))
+                return new StringBuilder(type.Name)
+                    .Replace(String.Format("`{0}", genericArgumentIds.Count()), String.Empty)
+                    .Append(String.Format("[{0}]", String.Join(",", genericArgumentIds).TrimEnd(',')))
                     .ToString();
             }
 

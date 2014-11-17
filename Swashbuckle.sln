@@ -1,6 +1,8 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2012
+# Visual Studio 2013
+VisualStudioVersion = 12.0.30501.0
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "swagger-ui", "http://localhost:55139", "{DDE07B02-DD45-4ABF-96D3-A4FBB144BBA1}"
 	ProjectSection(WebsiteProperties) = preProject
 		UseIISExpress = "true"
