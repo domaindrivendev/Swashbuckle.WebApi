@@ -1,14 +1,21 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Net.Http;
 using System.Web.Http;
 
 namespace Swashbuckle.Dummy.Controllers
 {
-    public class ComplexTypesFromUriController : ApiController
+    public class ParamsFromUriController : ApiController
     {
         [HttpGet]
         public decimal CalculateTax([FromUri]Address address, [FromUri]Transaction transaction)
+        {
+            throw new NotImplementedException();
+        }
+
+        [HttpHead]
+        public bool SupportsCurrencies([FromUri]IEnumerable<string> currencies)
         {
             throw new NotImplementedException();
         }

@@ -32,7 +32,7 @@ namespace Swashbuckle.Application
 
             VersionInfoBuilder = new VersionInfoBuilder();
 
-            OperationFilter<HandleComplexTypesFromUri>();
+            OperationFilter<HandleParamsFromUri>();
         }
 
         internal VersionInfoBuilder VersionInfoBuilder { get; private set; }

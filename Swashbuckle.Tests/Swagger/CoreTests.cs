@@ -10,6 +10,7 @@ using Swashbuckle.Application;
 using Swashbuckle.Dummy;
 using Swashbuckle.Dummy.Controllers;
 using Swashbuckle.Dummy.SwaggerExtensions;
+using Swashbuckle.SwaggerExtensions;
 
 namespace Swashbuckle.Tests.Swagger
 {
@@ -490,14 +491,15 @@ namespace Swashbuckle.Tests.Swagger
         }
 
         [Test]
-        public void It_handles_complex_parameters_from_uri()
+        public void It_handles_complex_and_array_params_from_uri()
         {
-            SetUpDefaultRouteFor<ComplexTypesFromUriController>();
+            SetUpDefaultRouteFor<ParamsFromUriController>();
 
             var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/1.0");
-            var getParams = swagger["paths"]["/complextypesfromuri"]["get"]["parameters"];
+            var getParams = swagger["paths"]["/paramsfromuri"]["get"]["parameters"];
+            var headParams = swagger["paths"]["/paramsfromuri"]["head"]["parameters"];
 
-            var expected = JArray.FromObject(new object[]
+            var expectedGetParams = JArray.FromObject(new object[]
             {
                 new
                 {
@@ -537,7 +539,24 @@ namespace Swashbuckle.Tests.Swagger
                 }
             });
 
-            Assert.AreEqual(expected.ToString(), getParams.ToString());
+            var expectedHeadParams = JArray.FromObject(new object[]
+            {
+                new
+                {
+                    name = "currencies",
+                    @in = "query",
+                    required = true,
+                    type = "array",
+                    items = new
+                    {
+                        type = "string"
+                    },
+                    collectionFormat = "multi"
+                }
+            });
+
+            Assert.AreEqual(expectedGetParams.ToString(), getParams.ToString());
+            Assert.AreEqual(expectedHeadParams.ToString(), headParams.ToString());
         }
 
         [Test]
