@@ -1,25 +1,27 @@
 Swashbuckle
 =========
 
-Seamlessly adds a [swagger](https://developers.helloreverb.com/swagger) to WebApi projects! Combines ApiExplorer and swagger/swagger-ui to provide a rich discovery and documentation experience to your API consumers.
+Seamlessly adds a [Swagger](http://swagger.io/) to WebApi projects! Combines ApiExplorer and Swagger/swagger-ui to provide a rich discovery and documentation experience to your API consumers.
 
-In addition to it's Swagger generator, Swashbuckle also contains an embedded version of [swagger-ui](https://github.com/wordnik/swagger-ui.git) which it will automatically serve up once Swashbuckle is installed. This means little or no maintenance for discovery and documentation of your service, allowing you to focus on building an awesome API!
+In addition to it's Swagger generator, Swashbuckle also contains an embedded version of [swagger-ui](https://github.com/swagger-api/swagger-ui) which it will automatically serve up once Swashbuckle is installed. This means little or no maintenance for discovery and documentation of your service, allowing you to focus on building an awesome API!
 
 And that's not all ...
 
-Once you have a Web API that can describe itself in Swagger, you've opened the treasure chest of Swagger-based tools including a client generator that can be targetted to a wide range of popular platforms. See [swagger-codegen](https://github.com/wordnik/swagger-codegen) for more details.
+Once you have a Web API that can describe itself in Swagger, you've opened the treasure chest of Swagger-based tools including a client generator that can be targetted to a wide range of popular platforms. See [swagger-codegen](https://github.com/swagger-api/swagger-codegen) for more details.
 
 **Swashbuckle Core Features:**
 
-* Auto-generated [Swagger 1.2](https://github.com/wordnik/swagger-spec/blob/master/versions/1.2.md)
+* Auto-generated [Swagger 2.0](https://github.com/swagger-api/swagger-spec/blob/master/versions/2.0.md)
 * Seamless integration of swagger-ui
-* Reflection-based type/model descriptions ... including support for polymorphic types
-* Extensibility hooks for customizing the generated spec
+* Reflection-based Schema generation for describing API types
+* Extensibility hooks for customizing the generated Swagger doc
 * Extensibility hooks for customizing the swagger-ui
 * Out-of-the-box support for leveraging Xml comments
+* Support for describing ApiKey, Basic Auth and OAuth2 schemes ... including UI support for the Implicit OAuth2 flow
 
-**\*Swashbuckle 4.0**
+**\*Swashbuckle 5.0**
 
+Swashbuckle 5.0 includes a transition to Swagger 2.0. The 2.0 schema is significantly different to it's predecessor - 1.2 and as a result the Swashbuckle config interface has undergone yet another overall 
 As of version 4.0, Swashbuckle has no dependency on ASP.Net MVC. As a result, it's now available to IIS hosted, self-hosted and OWIN-hosted Web API's. However, this introduces several (relatively) trivial breaking changes. Checkout the [transition guide](#transitioning-to-swashbuckle-40) if you're upgrading from a prior version.
 
 ## Getting Started ##
