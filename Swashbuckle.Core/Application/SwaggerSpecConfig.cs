@@ -37,6 +37,7 @@ namespace Swashbuckle.Application
         public SwaggerSpecConfig()
         {
             BasePathResolver = (req) => req.RequestUri.GetLeftPart(UriPartial.Authority) + req.GetConfiguration().VirtualPathRoot.TrimEnd('/');
+            ShouldIgnoreResolver = (desc) => true;
             Versions = null; 
 
             _targetVersionResolver = (req) => "1.0"; // obsolete
@@ -52,6 +53,8 @@ namespace Swashbuckle.Application
         }
 
         internal Func<HttpRequestMessage, string> BasePathResolver { get; private set; }
+        internal Func<ApiDescription, bool> ShouldIgnoreResolver { get; private set; }
+
         internal IEnumerable<string> Versions { get; private set; }
 
         public SwaggerSpecConfig ResolveBasePathUsing(Func<HttpRequestMessage, string> basePathResolver)
@@ -59,6 +62,14 @@ namespace Swashbuckle.Application
             if (basePathResolver == null)
                 throw new ArgumentNullException("basePathResolver");
             BasePathResolver = basePathResolver;
+            return this;
+        }
+
+        public SwaggerSpecConfig ResolverShouldIgnoreWith(Func<ApiDescription, bool> ignoreResolver)
+        {
+            if (ignoreResolver == null)
+                throw new ArgumentNullException("ignoreResolver");
+            ShouldIgnoreResolver = ignoreResolver;
             return this;
         }
 
@@ -196,6 +207,7 @@ namespace Swashbuckle.Application
             var apiDescriptions = swaggerRequest.GetConfiguration().Services.GetApiExplorer()
                 .ApiDescriptions
                 .Where(apiDesc => !_ignoreObsoleteActions || apiDesc.IsNotObsolete())
+                .Where(apiDesc => ShouldIgnoreResolver(apiDesc))
                 .Where(apiDesc => _versionSupportResolver(apiDesc, targetVersion));
 
             var options = new SwaggerGeneratorOptions(
