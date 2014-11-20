@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Web.Http;
 using System.Web.Http.Controllers;
 using System.Web.Http.Description;
 using System.Xml.XPath;
@@ -56,6 +57,15 @@ namespace Swashbuckle.SwaggerExtensions
         {
             var controllerName = actionDescriptor.ControllerDescriptor.ControllerType.FullName;
             var actionName = actionDescriptor.ActionName;
+
+            if (actionDescriptor.GetCustomAttributes<ActionNameAttribute>().Any())
+            {
+                var reflected = actionDescriptor as ReflectedHttpActionDescriptor;
+                if (reflected != null)
+                {
+                    actionName = reflected.MethodInfo.Name;
+                }
+            }
 
             var paramTypeNames = actionDescriptor.GetParameters()
                 .Select(paramDesc => TypeNameFor(paramDesc.ParameterType))

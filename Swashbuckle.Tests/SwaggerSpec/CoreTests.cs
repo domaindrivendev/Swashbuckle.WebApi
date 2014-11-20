@@ -263,6 +263,27 @@ namespace Swashbuckle.Tests.SwaggerSpec
                                     produces = new []{ "application/json", "text/json", "application/xml", "text/xml" },
                                     consumes = new object[]{},
                                     type = "Product",
+                                },
+                                new
+                                {
+                                    method = "POST",
+                                    summary = "",
+                                    nickname = "Products_TestActionName",
+                                    parameters = new object[]
+                                    {
+                                        new
+                                        {
+                                            paramType = "path",
+                                            name = "id",
+                                            required = true,
+                                            type = "integer",
+                                            format = "int32"
+                                        }
+                                    },
+                                    responseMessages = new object[]{},
+                                    produces = new []{ "application/json", "text/json", "application/xml", "text/xml" },
+                                    consumes = new object[]{},
+                                    type = "Product",
                                 }
                            }
                         },
@@ -444,5 +465,8 @@ namespace Swashbuckle.Tests.SwaggerSpec
                 return y.CompareTo(x);
             }
         }
+
+ 
+
     }
 }
