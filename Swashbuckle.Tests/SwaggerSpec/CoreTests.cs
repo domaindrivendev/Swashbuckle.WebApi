@@ -262,7 +262,7 @@ namespace Swashbuckle.Tests.SwaggerSpec
                                     responseMessages = new object[]{},
                                     produces = new []{ "application/json", "text/json", "application/xml", "text/xml" },
                                     consumes = new object[]{},
-                                    type = "Product",
+                                    type = "Product"
                                 }
                            }
                         },
@@ -428,6 +428,66 @@ namespace Swashbuckle.Tests.SwaggerSpec
 
             Assert.That(result.StatusCode, Is.EqualTo(HttpStatusCode.NotFound));
         }
+
+        [Test]
+        public void It_handles_complex_and_array_params_from_uri()
+        {
+            SetUpDefaultRouteFor<ParamsFromUriController>();
+
+            var declarationParams = Get<JObject>("http://tempuri.org/swagger/api-docs/ParamsFromUri")
+                .SelectToken("apis[0].operations[0].parameters");
+
+            var expectedParams = JArray.FromObject(new object[]
+            {
+                new
+                {
+                    paramType = "query",
+                    name = "City",
+                    required = false,
+                    type = "string"
+                },
+                new
+                {
+                    paramType = "query",
+                    name = "State",
+                    required = false,
+                    type = "string"
+                },
+                new
+                {
+                   paramType = "query",
+                   name = "Zip",
+                   required = false,
+                   type = "string"
+                },
+                new
+                {
+                    paramType = "query",
+                    name = "Currency",
+                    required = false,
+                    type = "string"
+                },
+                new
+                {
+                    paramType = "query",
+                    name = "Amount",
+                    required = true,
+                    type = "number",
+                    format = "double"
+                },
+                new 
+                {
+                    paramType = "query",
+                    name = "TransType",
+                    required = false,
+                    type = "string",
+                    @enum = new[] { "TRANSFER", "NETWORK" }
+                }
+            });
+
+            Assert.AreEqual(expectedParams.ToString(), declarationParams.ToString());
+        }
+
 
         class AddResponseCodes : IOperationFilter
         {

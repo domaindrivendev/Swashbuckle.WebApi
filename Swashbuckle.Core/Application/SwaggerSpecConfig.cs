@@ -48,7 +48,7 @@ namespace Swashbuckle.Application
             _customTypeMappings = new Dictionary<Type, Func<DataType>>();
             _polymorphicTypes = new List<PolymorphicType>();
             _modelFilterFactories = new List<Func<IModelFilter>>();
-            _operationFilterFactories = new List<Func<IOperationFilter>>();
+            _operationFilterFactories = new List<Func<IOperationFilter>> { () => new HandleComplexTypesFromUri() };
         }
 
         internal Func<HttpRequestMessage, string> BasePathResolver { get; private set; }
