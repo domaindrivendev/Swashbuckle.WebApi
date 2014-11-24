@@ -31,18 +31,6 @@ namespace Swashbuckle.Dummy.Controllers
         }
 
         /// <summary>
-        /// Test ActionName attribute
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        [HttpPost]
-        [ActionName("TestActionName")]
-        public Product DifferentMethodName(int id)
-        {
-            throw new NotImplementedException();
-        }
-
-        /// <summary>
         /// List all products
         /// </summary>
         /// <returns></returns>

@@ -4,6 +4,13 @@
         <name>Swashbuckle.Dummy.Core</name>
     </assembly>
     <members>
+        <member name="M:Swashbuckle.Dummy.Controllers.CustomActionNamesController.DifferentMethodName(System.Int32)">
+            <summary>
+            Test ActionName attribute
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
         <member name="M:Swashbuckle.Dummy.Controllers.ProductsController.Create(Swashbuckle.Dummy.Controllers.Product)">
             <summary>
             Create a new product 
@@ -17,13 +24,6 @@
             <summary>
             Retrieve product by unique Id
             </summary>
-            <returns></returns>
-        </member>
-        <member name="M:Swashbuckle.Dummy.Controllers.ProductsController.DifferentMethodName(System.Int32)">
-            <summary>
-            Test ActionName attribute
-            </summary>
-            <param name="id"></param>
             <returns></returns>
         </member>
         <member name="M:Swashbuckle.Dummy.Controllers.ProductsController.FindAll">
