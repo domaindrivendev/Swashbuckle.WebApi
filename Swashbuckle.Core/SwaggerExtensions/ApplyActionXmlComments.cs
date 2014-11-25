@@ -27,7 +27,13 @@ namespace Swashbuckle.SwaggerExtensions
 
         public void Apply(Operation operation, DataTypeRegistry dataTypeRegistry, ApiDescription apiDescription)
         {
-            var methodNode = _navigator.SelectSingleNode(GetXPathFor(apiDescription.ActionDescriptor));
+            //Taking first which matches
+            var methodNode =
+                GetXPathsFor(apiDescription.ActionDescriptor)
+                    .Select(x => _navigator.SelectSingleNode(x)).FirstOrDefault(x => x != null);
+
+            //Returning when no method documentation is found
+            if (methodNode == null) return;
 
             operation.Summary = GetChildValueOrDefault(methodNode, SummaryExpression);
             operation.Notes = GetChildValueOrDefault(methodNode, RemarksExpression);
@@ -44,15 +50,13 @@ namespace Swashbuckle.SwaggerExtensions
                     String.Format(ParameterExpression, paramDesc.ParameterDescriptor.ParameterName));
             }
 
-            if (methodNode == null) return;
-
             foreach (var responseMessage in GetResponseMessages(methodNode))
             {
                 operation.ResponseMessages.Add(responseMessage);
             }
         }
 
-        private static string GetXPathFor(HttpActionDescriptor actionDescriptor)
+        private static IEnumerable<String> GetXPathsFor(HttpActionDescriptor actionDescriptor)
         {
             var controllerName = actionDescriptor.ControllerDescriptor.ControllerType.FullName;
             var actionName = actionDescriptor.ActionName;
@@ -65,7 +69,15 @@ namespace Swashbuckle.SwaggerExtensions
                 ? String.Format("({0})", String.Join(",", paramTypeNames))
                 : String.Empty;
 
-            return String.Format(MethodExpression, controllerName, actionName, parameters);
+            yield return String.Format(MethodExpression, controllerName, actionName, parameters);
+
+            foreach (
+                var xpath in
+                    actionDescriptor.ControllerDescriptor.ControllerType.GetInterfaces()
+                        .Select(iface => String.Format(MethodExpression, iface.FullName, actionName, parameters)))
+            {
+                yield return xpath;
+            }
         }
 
         private static string TypeNameFor(Type type)
