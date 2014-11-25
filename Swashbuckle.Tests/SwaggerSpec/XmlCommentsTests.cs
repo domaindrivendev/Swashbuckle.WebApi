@@ -3,10 +3,6 @@ using NUnit.Framework;
 using Swashbuckle.Application;
 using Swashbuckle.Dummy.Controllers;
 using System;
-using System.Net.Http;
-using System.Web.Http;
-using System.Web.Http.Hosting;
-using System.Web.Http.Routing;
 
 namespace Swashbuckle.Tests.SwaggerSpec
 {
@@ -100,5 +96,28 @@ namespace Swashbuckle.Tests.SwaggerSpec
             Assert.IsNotNull(token);
             Assert.AreEqual("Uniquely identifies the product", token.ToString());
         }
+
+        [Test]
+        public void It_should_use_interface_doc_when_no_own_doc_available()
+        {
+            SetUpDefaultRouteFor<ExternallyDocumentedController>();
+            var declaration = Get<JObject>("http://tempuri.org/swagger/api-docs/ExternallyDocumented");
+
+            var token = declaration.SelectToken("apis[0].operations[0].summary");
+            Assert.IsNotNull(token);
+            Assert.AreEqual("This summary is defined on interface level", token.ToString());
+        }
+
+        [Test]
+        public void It_should_override_interface_doc_when_own_doc_available()
+        {
+            SetUpDefaultRouteFor<ExternallyDocumentedController>();
+            var declaration = Get<JObject>("http://tempuri.org/swagger/api-docs/ExternallyDocumented");
+
+            var token = declaration.SelectToken("apis[0].operations[1].summary");
+            Assert.IsNotNull(token);
+            Assert.AreEqual("This summary is defined on instance and overrides interface", token.ToString());
+        }
+
     }
 }
