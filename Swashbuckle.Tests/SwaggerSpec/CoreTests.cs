@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Net;
+using System.Web.Http.Description;
 using Newtonsoft.Json.Linq;
 using NUnit.Framework;
 using Swashbuckle.Application;
@@ -316,6 +318,21 @@ namespace Swashbuckle.Tests.SwaggerSpec
             Assert.IsNotNull(declaration.SelectToken("apis[0].operations[1]"));
 
             _swaggerSpecConfig.IgnoreObsoleteActions();
+
+            declaration = Get<JObject>("http://tempuri.org/swagger/api-docs/ObsoleteActions");
+            Assert.IsNull(declaration.SelectToken("apis[0].operations[1]"));
+        }
+
+        [Test]
+        public void It_should_support_an_optional_setting_to_ignore_any_actions_marked_ignore()
+        {
+            SetUpDefaultRouteFor<ObsoleteActionsController>();
+
+            var declaration = Get<JObject>("http://tempuri.org/swagger/api-docs/ObsoleteActions");
+            Assert.IsNotNull(declaration.SelectToken("apis[0].operations[1]"));
+            
+            Func<System.Web.Http.Description.ApiDescription, bool> ignoreFunc = (api) => api.ActionDescriptor.GetCustomAttributes<ObsoleteAttribute>().Any();
+            _swaggerSpecConfig.IgnoreActionsWhere(ignoreFunc);
 
             declaration = Get<JObject>("http://tempuri.org/swagger/api-docs/ObsoleteActions");
             Assert.IsNull(declaration.SelectToken("apis[0].operations[1]"));

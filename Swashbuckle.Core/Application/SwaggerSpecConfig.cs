@@ -29,6 +29,7 @@ namespace Swashbuckle.Application
         private readonly List<PolymorphicType> _polymorphicTypes;
         private readonly List<Func<IModelFilter>> _modelFilterFactories;
         private readonly List<Func<IOperationFilter>> _operationFilterFactories;
+        private Func<ApiDescription, bool> _shouldIgnoreResolver;
 
         private Info _apiInfo;
         private IDictionary<string, Authorization> _authorizations { get; set; }
@@ -37,6 +38,7 @@ namespace Swashbuckle.Application
         public SwaggerSpecConfig()
         {
             BasePathResolver = (req) => req.RequestUri.GetLeftPart(UriPartial.Authority) + req.GetConfiguration().VirtualPathRoot.TrimEnd('/');
+            _shouldIgnoreResolver = (desc) => false;
             Versions = null; 
 
             _targetVersionResolver = (req) => "1.0"; // obsolete
@@ -52,6 +54,7 @@ namespace Swashbuckle.Application
         }
 
         internal Func<HttpRequestMessage, string> BasePathResolver { get; private set; }
+
         internal IEnumerable<string> Versions { get; private set; }
 
         public SwaggerSpecConfig ResolveBasePathUsing(Func<HttpRequestMessage, string> basePathResolver)
@@ -59,6 +62,14 @@ namespace Swashbuckle.Application
             if (basePathResolver == null)
                 throw new ArgumentNullException("basePathResolver");
             BasePathResolver = basePathResolver;
+            return this;
+        }
+
+        public SwaggerSpecConfig IgnoreActionsWhere(Func<ApiDescription, bool> ignoreResolver)
+        {
+            if (ignoreResolver == null)
+                throw new ArgumentNullException("ignoreResolver");
+            _shouldIgnoreResolver = ignoreResolver;
             return this;
         }
 
@@ -196,6 +207,7 @@ namespace Swashbuckle.Application
             var apiDescriptions = swaggerRequest.GetConfiguration().Services.GetApiExplorer()
                 .ApiDescriptions
                 .Where(apiDesc => !_ignoreObsoleteActions || apiDesc.IsNotObsolete())
+                .Where(apiDesc => !_shouldIgnoreResolver(apiDesc))
                 .Where(apiDesc => _versionSupportResolver(apiDesc, targetVersion));
 
             var options = new SwaggerGeneratorOptions(
