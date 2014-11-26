@@ -335,8 +335,8 @@ namespace Swashbuckle.Tests.SwaggerSpec
             var declaration = Get<JObject>("http://tempuri.org/swagger/api-docs/ObsoleteActions");
             Assert.IsNotNull(declaration.SelectToken("apis[0].operations[1]"));
             
-            Func<System.Web.Http.Description.ApiDescription, bool> ignoreFunc = (api) => !api.ActionDescriptor.GetCustomAttributes<ObsoleteAttribute>().Any();
-            _swaggerSpecConfig.ResolverShouldIgnoreWith(ignoreFunc);
+            Func<System.Web.Http.Description.ApiDescription, bool> ignoreFunc = (api) => api.ActionDescriptor.GetCustomAttributes<ObsoleteAttribute>().Any();
+            _swaggerSpecConfig.IgnoreActionsWhere(ignoreFunc);
 
             declaration = Get<JObject>("http://tempuri.org/swagger/api-docs/ObsoleteActions");
             Assert.IsNull(declaration.SelectToken("apis[0].operations[1]"));
