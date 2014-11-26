@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web.Http.Description;
+using System.Web.Http.ModelBinding;
 
 namespace Swashbuckle.Swagger
 {
@@ -20,6 +21,14 @@ namespace Swashbuckle.Swagger
         {
             var apiPath = apiDescription.RelativePathSansQueryString();
             var parameters = apiDescription.ParameterDescriptions
+                .Where(paramDesc =>
+                       {
+                           var isCustomModelBoundParameter =
+                               paramDesc.ParameterDescriptor != null &&
+                               paramDesc.ParameterDescriptor.ParameterBinderAttribute != null &&
+                               paramDesc.ParameterDescriptor.ParameterBinderAttribute.GetType() == typeof (ModelBinderAttribute);
+                           return !isCustomModelBoundParameter;
+                       })
                 .Select(paramDesc => CreateParameter(paramDesc, apiPath))
                 .ToList();
 
