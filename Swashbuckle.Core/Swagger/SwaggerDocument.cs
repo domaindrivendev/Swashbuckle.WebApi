@@ -199,7 +199,7 @@ namespace Swashbuckle.Swagger
 
         public IList<string> required;
 
-        public IList<string> @enum;
+        public IList<object> @enum;
 
         public string type;
 
@@ -256,7 +256,7 @@ namespace Swashbuckle.Swagger
 
         public bool? uniqueItems;
 
-        public IList<string> @enum;
+        public IList<object> @enum;
 
         public int? multipleOf;
     }

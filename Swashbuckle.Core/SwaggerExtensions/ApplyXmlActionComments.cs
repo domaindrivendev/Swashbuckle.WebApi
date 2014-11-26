@@ -43,33 +43,13 @@ namespace Swashbuckle.SwaggerExtensions
             //ApplyResponseComments(operation, methodNode);
         }
 
-        private static void ApplyParamComments(Operation operation, XPathNavigator methodNode)
-        {
-            var paramNodes = methodNode.Select(ParameterExpression);
-            while (paramNodes.MoveNext())
-            {
-                var paramNode = paramNodes.Current;
-                var parameter = operation.parameters.SingleOrDefault(param => param.name == paramNode.GetAttribute("name", ""));
-                if (parameter != null)
-                    parameter.description = paramNode.Value.Trim();
-            }
-        }
-
-        private static void ApplyResponseComments(Operation operation, XPathNavigator methodNode)
-        {
-            var responseNodes = methodNode.Select(ResponseExpression);
-            while (responseNodes.MoveNext())
-            {
-                var responseNode = responseNodes.Current;
-                var response = new Response { description = responseNode.Value.Trim() };
-                operation.responses[responseNode.GetAttribute("code", "")] = response;
-            }
-        }
-
         private static string XPathFor(HttpActionDescriptor actionDescriptor)
         {
             var controllerName = actionDescriptor.ControllerDescriptor.ControllerType.FullName;
-            var actionName = actionDescriptor.ActionName;
+            var reflectedActionDescriptor = actionDescriptor as ReflectedHttpActionDescriptor;
+            var actionName = (reflectedActionDescriptor != null)
+                ? reflectedActionDescriptor.MethodInfo.Name
+                : actionDescriptor.ActionName;
 
             var paramTypeNames = actionDescriptor.GetParameters()
                 .Select(paramDesc => TypeNameFor(paramDesc.ParameterType))
@@ -99,6 +79,29 @@ namespace Swashbuckle.SwaggerExtensions
             }
 
             return type.Namespace + "." + type.Name;
+        }
+
+        private static void ApplyParamComments(Operation operation, XPathNavigator methodNode)
+        {
+            var paramNodes = methodNode.Select(ParameterExpression);
+            while (paramNodes.MoveNext())
+            {
+                var paramNode = paramNodes.Current;
+                var parameter = operation.parameters.SingleOrDefault(param => param.name == paramNode.GetAttribute("name", ""));
+                if (parameter != null)
+                    parameter.description = paramNode.Value.Trim();
+            }
+        }
+
+        private static void ApplyResponseComments(Operation operation, XPathNavigator methodNode)
+        {
+            var responseNodes = methodNode.Select(ResponseExpression);
+            while (responseNodes.MoveNext())
+            {
+                var responseNode = responseNodes.Current;
+                var response = new Response { description = responseNode.Value.Trim() };
+                operation.responses[responseNode.GetAttribute("code", "")] = response;
+            }
         }
     }
 }

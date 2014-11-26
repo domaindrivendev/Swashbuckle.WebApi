@@ -47,8 +47,9 @@ namespace Swashbuckle.Tests.Swagger
                             },
                             Type = new
                             {
-                                @enum = new[] { "Book", "Album" },
-                                type = "string"
+                                format = "int32",
+                                @enum = new[] { 2, 4 },
+                                type = "integer"
                             },
                             Description = new
                             {
@@ -169,7 +170,6 @@ namespace Swashbuckle.Tests.Swagger
 
             var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/1.0");
             var definitions = swagger["definitions"];
-            Assert.IsNotNull(definitions);
 
             var expected = JObject.FromObject(new
                 {
@@ -190,15 +190,35 @@ namespace Swashbuckle.Tests.Swagger
         }
 
         [Test]
-        public void It_honors_newtonsoft_serialization_attributes()
+        public void It_honors_json_annotated_attributes()
         {
-            SetUpDefaultRouteFor<NewtonsoftedTypesController>();
+            SetUpDefaultRouteFor<JsonAnnotatedTypesController>();
 
             var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/1.0");
-            var model = swagger["definitions"]["NewtonsoftedModel"];
+            
+            var definitions = swagger["definitions"];
+            Assert.IsNotNull(definitions);
 
-            Assert.IsNull(model["properties"]["IgnoredProperty"], "Expected the IgnoredProperty to be ignored");
-            Assert.IsNotNull(model["properties"]["myCustomNamedProperty"], "Expected the CustomNamedProperty to have the custom name");
+            var expected = JObject.FromObject(new
+                {
+                    JsonRequest = new
+                    {
+                        type = "object",
+                        properties = new
+                        {
+                            foobar = new
+                            {
+                                type = "string"
+                            },
+                            Category = new
+                            {
+                                @enum = new[] { "A", "B" },
+                                type = "string"
+                            }
+                        }
+                    }
+                });
+            Assert.AreEqual(expected.ToString(), definitions.ToString());
         }
 
         [Test]

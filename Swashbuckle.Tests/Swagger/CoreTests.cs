@@ -100,8 +100,9 @@ namespace Swashbuckle.Tests.Swagger
                                         name = "type",
                                         @in = "query",
                                         required = true,
-                                        type = "string",
-                                        @enum = new[] { "Book", "Album" }
+                                        type = "integer",
+                                        format = "int32",
+                                        @enum = new[] { 2, 4 }
                                     }
                                 },
                                 responses = new Dictionary<string, object>
@@ -475,8 +476,9 @@ namespace Swashbuckle.Tests.Swagger
                         name = "type",
                         @in = "query",
                         required = true,
-                        type = "string",
-                        @enum = new[] { "Book", "Album" }
+                        type = "integer",
+                        format = "int32",
+                        @enum = new[] { 2, 4 }
                     },
                     new
                     {

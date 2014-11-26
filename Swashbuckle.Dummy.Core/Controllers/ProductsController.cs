@@ -34,7 +34,7 @@ namespace Swashbuckle.Dummy.Controllers
 
     public enum ProductType
     {
-        Book = 1,
-        Album = 2
+        Book = 2,
+        Album = 4
     }
 }

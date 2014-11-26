@@ -10,6 +10,7 @@ using System.Web.Http;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json.Serialization;
+using Newtonsoft.Json.Converters;
 
 namespace Swashbuckle.Swagger
 {
@@ -99,11 +100,16 @@ namespace Swashbuckle.Swagger
             if (type.IsNullable(out innerType))
                 return CreateSchema(innerType, refIfArray, refIfComplex, referencedTypes);
 
-            if (type.IsEnum)
-                return new Schema { type = "string", @enum = type.GetEnumNames() };
-
-            // Non-primitive - utilize the Json contract resolver
+            // Can't be created from the basic primitive mappings - use json contract resolver
             var contract = _contractResolver.ResolveContract(type);
+
+            if (type.IsEnum)
+            {
+                var converter = contract.Converter;
+                return (converter != null && converter.GetType() == typeof(StringEnumConverter))
+                    ? new Schema { type = "string", @enum = type.GetEnumNames() }
+                    : new Schema { type = "integer", format = "int32", @enum = type.GetEnumValues().Cast<object>().ToArray() };
+            }
 
             if (contract is JsonArrayContract)
             {
