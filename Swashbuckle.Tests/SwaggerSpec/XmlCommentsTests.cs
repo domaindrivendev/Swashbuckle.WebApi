@@ -100,5 +100,24 @@ namespace Swashbuckle.Tests.SwaggerSpec
             Assert.IsNotNull(token);
             Assert.AreEqual("Uniquely identifies the product", token.ToString());
         }
+
+        [Test]
+        public void It_should_support_actions_marked_with_actionname()
+        {
+            SetUpCustomRouteFor<CustomActionNamesController>("{action}/{id}");
+           
+            var declaration = Get<JObject>("http://tempuri.org/swagger/api-docs/CustomActionNames");
+
+            // Method name is DifferentMethodName and ActionName attribute is TestActionName
+            // The XML file contains DifferentMethodName, so this verifies that the summary can still be found by that name.
+            var token = declaration.SelectToken("apis[0].operations[0].summary");
+            Assert.IsNotNull(token);
+            Assert.AreEqual("Test ActionName attribute", token.ToString());
+
+            // nickname takes from ApiDescription.ActionDescriptor.ActionName
+            token = declaration.SelectToken("apis[0].operations[0].nickname");
+            Assert.IsNotNull(token);
+            Assert.AreEqual("CustomActionNames_TestActionName", token.ToString());
+        }
     }
 }
