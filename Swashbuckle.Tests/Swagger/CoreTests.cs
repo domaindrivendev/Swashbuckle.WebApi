@@ -85,111 +85,6 @@ namespace Swashbuckle.Tests.Swagger
             var expected = JObject.FromObject(new Dictionary<string, object>
                 {
                     {
-                        "/products", new
-                        {
-                            get = new
-                            {
-                                tags = new [] { "Products" },
-                                operationId = "Products_GetAllByType",
-                                consumes = new object[]{},
-                                produces = new []{ "application/json", "text/json", "application/xml", "text/xml" },
-                                parameters = new []
-                                {
-                                    new
-                                    {
-                                        name = "type",
-                                        @in = "query",
-                                        required = true,
-                                        type = "integer",
-                                        format = "int32",
-                                        @enum = new[] { 2, 4 }
-                                    }
-                                },
-                                responses = new Dictionary<string, object>
-                                {
-                                    {
-                                        "200", new
-                                        {
-                                            description = "OK",
-                                            schema = new
-                                            {
-                                                type = "array",
-                                                items = JObject.Parse("{ $ref: \"#/definitions/Product\" }")
-                                            }
-                                        }
-                                    }
-                                },
-                                deprecated = false
-                            },
-                            post = new
-                            {
-                                tags = new [] { "Products" },
-                                operationId = "Products_Create",
-                                consumes = new []{ "application/json", "text/json", "application/xml", "text/xml", "application/x-www-form-urlencoded" },
-                                produces = new []{ "application/json", "text/json", "application/xml", "text/xml" },
-                                parameters = new []
-                                {
-                                    new
-                                    {
-                                        name = "product",
-                                        @in = "body",
-                                        required = true,
-                                        schema = JObject.Parse("{ $ref: \"#/definitions/Product\" }")
-                                    }
-                                },
-                                responses = new Dictionary<string, object>
-                                {
-                                    {
-                                        "200", new
-                                        {
-                                            description = "OK",
-                                            schema = new
-                                            {
-                                                format = "int32",
-                                                type = "integer"
-                                            }
-                                        }
-                                    }
-                                },
-                                deprecated = false
-                            }
-                        }
-                    },
-                    {
-                        "/products/{id}", new
-                        {
-                            get = new
-                            {
-                                tags = new [] { "Products" },
-                                operationId = "Products_GetById",
-                                consumes = new object[]{},
-                                produces = new []{ "application/json", "text/json", "application/xml", "text/xml" },
-                                parameters = new []
-                                {
-                                    new
-                                    {
-                                        name = "id",
-                                        @in = "path",
-                                        required = true,
-                                        type = "integer",
-                                        format = "int32"
-                                    }
-                                },
-                                responses = new Dictionary<string, object>
-                                {
-                                    {
-                                        "200", new
-                                        {
-                                            description = "OK",
-                                            schema = JObject.Parse("{ $ref: \"#/definitions/Product\" }")
-                                        }
-                                    }
-                                },
-                                deprecated = false
-                            }
-                        }
-                    },
-                    {
                         "/customers", new
                         {
                             post = new
@@ -293,6 +188,111 @@ namespace Swashbuckle.Tests.Swagger
                                 deprecated = false
                             }
                         }
+                    },
+                    {
+                        "/products", new
+                        {
+                            get = new
+                            {
+                                tags = new [] { "Products" },
+                                operationId = "Products_GetAllByType",
+                                consumes = new object[]{},
+                                produces = new []{ "application/json", "text/json", "application/xml", "text/xml" },
+                                parameters = new []
+                                {
+                                    new
+                                    {
+                                        name = "type",
+                                        @in = "query",
+                                        required = true,
+                                        type = "integer",
+                                        format = "int32",
+                                        @enum = new[] { 2, 4 }
+                                    }
+                                },
+                                responses = new Dictionary<string, object>
+                                {
+                                    {
+                                        "200", new
+                                        {
+                                            description = "OK",
+                                            schema = new
+                                            {
+                                                type = "array",
+                                                items = JObject.Parse("{ $ref: \"#/definitions/Product\" }")
+                                            }
+                                        }
+                                    }
+                                },
+                                deprecated = false
+                            },
+                            post = new
+                            {
+                                tags = new [] { "Products" },
+                                operationId = "Products_Create",
+                                consumes = new []{ "application/json", "text/json", "application/xml", "text/xml", "application/x-www-form-urlencoded" },
+                                produces = new []{ "application/json", "text/json", "application/xml", "text/xml" },
+                                parameters = new []
+                                {
+                                    new
+                                    {
+                                        name = "product",
+                                        @in = "body",
+                                        required = true,
+                                        schema = JObject.Parse("{ $ref: \"#/definitions/Product\" }")
+                                    }
+                                },
+                                responses = new Dictionary<string, object>
+                                {
+                                    {
+                                        "200", new
+                                        {
+                                            description = "OK",
+                                            schema = new
+                                            {
+                                                format = "int32",
+                                                type = "integer"
+                                            }
+                                        }
+                                    }
+                                },
+                                deprecated = false
+                            }
+                        }
+                    },
+                    {
+                        "/products/{id}", new
+                        {
+                            get = new
+                            {
+                                tags = new [] { "Products" },
+                                operationId = "Products_GetById",
+                                consumes = new object[]{},
+                                produces = new []{ "application/json", "text/json", "application/xml", "text/xml" },
+                                parameters = new []
+                                {
+                                    new
+                                    {
+                                        name = "id",
+                                        @in = "path",
+                                        required = true,
+                                        type = "integer",
+                                        format = "int32"
+                                    }
+                                },
+                                responses = new Dictionary<string, object>
+                                {
+                                    {
+                                        "200", new
+                                        {
+                                            description = "OK",
+                                            schema = JObject.Parse("{ $ref: \"#/definitions/Product\" }")
+                                        }
+                                    }
+                                },
+                                deprecated = false
+                            }
+                        }
                     }
                 });
 
@@ -368,10 +368,10 @@ namespace Swashbuckle.Tests.Swagger
         }
 
         [Test]
-        public void It_exposes_config_to_customize_the_grouping_of_operations()
+        public void It_exposes_config_to_customize_the_grouping_of_actions()
         {
             SetUpDefaultRouteFor<ProductsController>();
-            SetUpHandler(c => c.GroupOperationsBy(apiDesc => apiDesc.HttpMethod.ToString()));
+            SetUpHandler(c => c.GroupActionsBy(apiDesc => apiDesc.HttpMethod.ToString()));
 
             var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/1.0");
             foreach (var method in new[] { "post", "get" })
@@ -381,6 +381,20 @@ namespace Swashbuckle.Tests.Swagger
                 Assert.AreEqual(method.ToUpper(), tags.First().ToString());
             }
         }
+
+        [Test]
+        public void It_exposes_config_to_customize_the_ordering_of_action_groups()
+        {
+            SetUpDefaultRoutesFor(new[] { typeof(ProductsController), typeof(CustomersController) });
+            SetUpHandler(c => c.OrderActionGroupsBy(new DescendingAlphabeticComparer()));
+
+            var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/1.0");
+            var paths = swagger["paths"].Value<JObject>()
+                .Properties()
+                .Select(prop => prop.Name);
+
+            CollectionAssert.AreEqual(new[] { "/products", "/products/{id}", "/customers", "/customers/{id}" }, paths);
+       }
 
         [Test]
         public void It_exposes_config_to_post_modify_the_document()

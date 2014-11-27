@@ -79,6 +79,7 @@
     <Compile Include="SwaggerExtensions\ApplySchemaVendorExtensions.cs" />
     <Compile Include="SwaggerExtensions\ApplyDocumentVendorExtensions.cs" />
     <Compile Include="SwaggerExtensions\AssignOAuth2SecurityRequirements.cs" />
+    <Compile Include="SwaggerExtensions\DescendingAlphabeticComparer.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="App_Start\SwaggerConfig.cs" />

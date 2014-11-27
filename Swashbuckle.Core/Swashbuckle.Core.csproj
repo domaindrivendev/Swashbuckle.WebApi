@@ -80,7 +80,7 @@
     <Compile Include="HttpConfigurationExtensions.cs" />
     <Compile Include="SwaggerExtensions\ApplyXmlTypeComments.cs" />
     <Compile Include="SwaggerExtensions\ApplyXmlActionComments.cs" />
-    <Compile Include="SwaggerExtensions\HandleParamsFromUri.cs" />
+    <Compile Include="SwaggerExtensions\HandleFromUriParams.cs" />
     <Compile Include="Swagger\JsonPropertyExtensions.cs" />
     <Compile Include="WebAssets\EmbeddedResourceDescriptor.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

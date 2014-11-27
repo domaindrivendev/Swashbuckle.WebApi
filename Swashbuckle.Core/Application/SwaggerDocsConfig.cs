@@ -21,6 +21,7 @@ namespace Swashbuckle.Application
         private Func<ApiDescription, string, bool> _versionSupportResolver;
         private Func<IEnumerable<ApiDescription>, ApiDescription> _conflictingActionsResolver;
         private Func<ApiDescription, string> _groupingKeySelector;
+        private IComparer<string> _groupingKeyComparer;
 
         public SwaggerDocsConfig()
         {
@@ -58,9 +59,14 @@ namespace Swashbuckle.Application
             _schemes = schemes;
         }
 
-        public void GroupOperationsBy(Func<ApiDescription, string> keySelector)
+        public void GroupActionsBy(Func<ApiDescription, string> keySelector)
         {
             _groupingKeySelector = keySelector;
+        }
+
+        public void OrderActionGroupsBy(IComparer<string> keyComparer)
+        {
+            _groupingKeyComparer = keyComparer;
         }
 
         public BasicAuthSchemeBuilder BasicAuth(string name)
@@ -123,6 +129,7 @@ namespace Swashbuckle.Application
                 apiVersions: VersionInfoBuilder.Build(),
                 schemes: _schemes, 
                 groupingKeySelector: _groupingKeySelector,
+                groupingKeyComparer: _groupingKeyComparer,
                 securityDefinitions: securityDefintitions, 
                 customSchemaMappings: _customSchemaMappings,
                 schemaFilters: _schemaFilters.Select(factory => factory()),

@@ -45,12 +45,13 @@ namespace Swashbuckle.SwaggerExtensions
                 var schema = schemaRegistry.Definitions[@ref];
 
                 operation.parameters.Remove(param);
-                AddQueryParameterPerSchemaProperty(operation.parameters, schema);
+                MapSchemaPropertiesToQueryParams(schema, operation.parameters);
             }
         }
 
-        private void AddQueryParameterPerSchemaProperty(IList<Parameter> parameters, Schema schema)
+        private void MapSchemaPropertiesToQueryParams(Schema schema, IList<Parameter> parameters)
         {
+            // TODO: Support nested properties with dot syntax
             foreach (var entry in schema.properties)
             {
                 var param = new Parameter

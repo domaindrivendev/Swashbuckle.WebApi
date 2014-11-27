@@ -43,7 +43,14 @@ namespace $rootnamespace$
                         // reasons. For example, the swagger-ui groups operations based on each operations first tag.
                         // By default, controller name is assigned for this but you can use the following option
                         // to override this and provide a custom value
-                        //c.GroupOperationsBy(apiDesc => apiDesc.HttpMethod.ToString());
+                        //c.GroupActionsBy(apiDesc => apiDesc.HttpMethod.ToString());
+
+                        // You can also specify a custom sort order for groups (as defined by GroupActionsBy) to dictate the
+                        // order in which operations are listed. For example, if the default grouping is in place
+                        // i.e. (by controller name) and you specify a descending alphabetic sort order, then actions from a
+                        // ProductsController will be listed before those from a CustomersController. This would be typically
+                        // used to customize the order of groupings in the swagger-ui
+                        //c.OrderActionGroupsBy(new DescendingAlphabeticComparer());
 
                         // You can use the "BasicAuth", "ApiKey" or "OAuth2" options to define security schemes for the API
                         // See https://github.com/swagger-api/swagger-spec/blob/master/versions/2.0.md for more details

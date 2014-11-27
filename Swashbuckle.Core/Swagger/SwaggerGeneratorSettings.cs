@@ -12,6 +12,7 @@ namespace Swashbuckle.Swagger
             IDictionary<string, Info> apiVersions,
             IEnumerable<string> schemes,
             Func<ApiDescription, string> groupingKeySelector,
+            IComparer<string> groupingKeyComparer,
             IDictionary<string, SecurityScheme> securityDefinitions = null,
             IDictionary<Type, Func<Schema>> customSchemaMappings = null,
             IEnumerable<ISchemaFilter> schemaFilters = null,
@@ -23,6 +24,7 @@ namespace Swashbuckle.Swagger
             ApiVersions = apiVersions;
             Schemes = schemes;
             GroupingKeySelector = groupingKeySelector ?? DefaultGroupingKeySelector;
+            GroupingKeyComparer = groupingKeyComparer ?? Comparer<string>.Default;
             SecurityDefinitions = securityDefinitions;
             CustomSchemaMappings = customSchemaMappings ?? new Dictionary<Type, Func<Schema>>();
             SchemaFilters = schemaFilters ?? new List<ISchemaFilter>();
@@ -38,6 +40,8 @@ namespace Swashbuckle.Swagger
         public IEnumerable<string> Schemes { get; private set; }
 
         public Func<ApiDescription, string> GroupingKeySelector { get; private set; }
+
+        public IComparer<string> GroupingKeyComparer { get; private set; }
 
         public IDictionary<string, SecurityScheme> SecurityDefinitions { get; private set; }
 
