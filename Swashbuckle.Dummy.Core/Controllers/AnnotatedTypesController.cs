@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Web.Http;
+using System.Net.Http;
+using System.Net;
 
 namespace Swashbuckle.Dummy.Controllers
 {
@@ -9,6 +11,9 @@ namespace Swashbuckle.Dummy.Controllers
     {
         public int Create(Payment payment)
         {
+            if (!ModelState.IsValid)
+                throw new HttpResponseException(Request.CreateErrorResponse(HttpStatusCode.BadRequest, ModelState));
+
             throw new NotImplementedException();
         }
     }
