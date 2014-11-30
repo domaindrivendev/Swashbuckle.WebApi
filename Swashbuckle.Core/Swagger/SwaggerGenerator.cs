@@ -9,18 +9,24 @@ namespace Swashbuckle.Swagger
 {
     public class SwaggerGenerator : ISwaggerProvider
     {
+        private readonly string _rootUrl;
         private readonly IApiExplorer _apiExplorer;
         private readonly IContractResolver _jsonContractResolver;
         private readonly SwaggerGeneratorSettings _settings;
 
-        public SwaggerGenerator(IApiExplorer apiExplorer, IContractResolver jsonContractResolver, SwaggerGeneratorSettings settings)
+        public SwaggerGenerator(
+            string rootUrl,
+            IApiExplorer apiExplorer,
+            IContractResolver jsonContractResolver,
+            SwaggerGeneratorSettings settings)
         {
+            _rootUrl = rootUrl;
             _apiExplorer = apiExplorer;
             _jsonContractResolver = jsonContractResolver;
             _settings = settings;
         }
 
-        public SwaggerDocument GetSwaggerFor(string apiVersion, string apiRootUrl)
+        public SwaggerDocument GetSwaggerFor(string apiVersion)
         {
             var schemaRegistry = new SchemaRegistry(_jsonContractResolver, _settings.CustomSchemaMappings, _settings.SchemaFilters);
 
@@ -34,14 +40,14 @@ namespace Swashbuckle.Swagger
                 .GroupBy(apiDesc => apiDesc.RelativePathSansQueryString())
                 .ToDictionary(group => "/" + group.Key, group => CreatePathItem(group, schemaRegistry));
 
-            var apiRootUri = new Uri(apiRootUrl);
+            var rootUrl = new Uri(_rootUrl);
 
             var swaggerDoc = new SwaggerDocument
             {
                 info = info,
-                host = apiRootUri.Host + ":" + apiRootUri.Port,
-                basePath = (apiRootUri.AbsolutePath != "/") ? apiRootUri.AbsolutePath : null,
-                schemes = (_settings.Schemes != null) ? _settings.Schemes.ToList() : new[] { apiRootUri.Scheme }.ToList(),
+                host = rootUrl.Host + ":" + rootUrl.Port,
+                basePath = (rootUrl.AbsolutePath != "/") ? rootUrl.AbsolutePath : null,
+                schemes = (_settings.Schemes != null) ? _settings.Schemes.ToList() : new[] { rootUrl.Scheme }.ToList(),
                 paths = paths,
                 definitions = schemaRegistry.Definitions,
                 securityDefinitions = _settings.SecurityDefinitions

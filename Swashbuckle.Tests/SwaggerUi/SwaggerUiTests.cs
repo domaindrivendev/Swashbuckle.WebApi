@@ -4,7 +4,7 @@ using System.Net;
 using NUnit.Framework;
 using Swashbuckle.Application;
 using Swashbuckle.Dummy;
-using Swashbuckle.WebAssets;
+using Swashbuckle.SwaggerUi;
 
 namespace Swashbuckle.Tests.SwaggerUi
 {
@@ -94,7 +94,7 @@ namespace Swashbuckle.Tests.SwaggerUi
 
             var content = GetContentAsString("http://tempuri.org/swagger/ui/index.html");
 
-            StringAssert.Contains("Swashbuckle.SwaggerExtensions.discoveryUrlSelector.js", content);
+            StringAssert.Contains("Swashbuckle.SwaggerUi.Assets.discoveryUrlSelector.js", content);
         }
         
 
@@ -125,12 +125,12 @@ namespace Swashbuckle.Tests.SwaggerUi
         }
         
         [Test]
-        public void It_exposes_config_to_serve_custom_web_assets()
+        public void It_exposes_config_to_serve_custom_assets()
         {
             SetUpHandler(c =>
                 {
                     var assembly = typeof(SwaggerConfig).Assembly;
-                    c.CustomWebAsset("index.html", assembly, "Swashbuckle.Dummy.SwaggerExtensions.myIndex.html");
+                    c.CustomAsset("index.html", assembly, "Swashbuckle.Dummy.SwaggerExtensions.myIndex.html");
                 });
 
             var content = GetContentAsString("http://tempuri.org/swagger/ui/index.html");
@@ -139,7 +139,7 @@ namespace Swashbuckle.Tests.SwaggerUi
         }
         
         [Test]
-        public void It_errors_on_web_assets_not_found_and_returns_status_not_found()
+        public void It_errors_on_asset_not_found_and_returns_status_not_found()
         {
             var response = Get("http://tempuri.org/swagger/ui/ext/foobar");
 
@@ -148,13 +148,14 @@ namespace Swashbuckle.Tests.SwaggerUi
 
         private void SetUpHandler(Action<SwaggerUiConfig> configure = null)
         {
-            var swaggerUiConfig = new SwaggerUiConfig(new[] { "swagger/docs/1.0" });
+            var swaggerUiConfig = new SwaggerUiConfig(
+                SwaggerDocsConfig.DefaultRootUrlResolver,
+                new[] { "swagger/docs/1.0" });
+
             if (configure != null)
                 configure(swaggerUiConfig);
 
-            var swaggerUiProvider = new EmbeddedWebAssetProvider(swaggerUiConfig.ToUiProviderSettings());
-
-            Handler = new SwaggerUiHandler(Swashbuckle.Configuration.DefaultRootUrlResolver, swaggerUiProvider);
+            Handler = new SwaggerUiHandler(swaggerUiConfig);
         }
     }
 }

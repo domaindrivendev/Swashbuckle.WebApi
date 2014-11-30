@@ -1,10 +1,10 @@
 ﻿using System.Reflection;
 
-namespace Swashbuckle.WebAssets
+namespace Swashbuckle.SwaggerUi
 {
-    public class EmbeddedResourceDescriptor
+    public class EmbeddedAssetDescriptor
     {
-        public EmbeddedResourceDescriptor(Assembly containingAssembly, string name)
+        public EmbeddedAssetDescriptor(Assembly containingAssembly, string name)
         {
             ContainingAssembly = containingAssembly;
             Name = name;

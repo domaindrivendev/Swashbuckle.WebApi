@@ -32,6 +32,9 @@ namespace Swashbuckle.Swagger
                 }
             }
 
+            if (!jsonProperty.Writable)
+                schema.readOnly = true;
+
             return schema;
         }
 

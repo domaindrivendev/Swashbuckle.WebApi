@@ -71,18 +71,17 @@
     <Compile Include="Application\SwaggerUiConfig.cs" />
     <Compile Include="Application\SwaggerUiHandler.cs" />
     <Compile Include="Application\SwaggerDocsHandler.cs" />
-    <Compile Include="Configuration.cs" />
     <Compile Include="Application\VersionInfoBuilder.cs" />
     <Compile Include="Application\LicenseBuilder.cs" />
     <Compile Include="Application\ContactBuilder.cs" />
     <Compile Include="Application\InfoBuilder.cs" />
     <Compile Include="Application\SwaggerDocsConfig.cs" />
-    <Compile Include="HttpConfigurationExtensions.cs" />
-    <Compile Include="SwaggerExtensions\ApplyXmlTypeComments.cs" />
-    <Compile Include="SwaggerExtensions\ApplyXmlActionComments.cs" />
-    <Compile Include="SwaggerExtensions\HandleFromUriParams.cs" />
+    <Compile Include="Application\HttpConfigurationExtensions.cs" />
+    <Compile Include="Swagger\Filters\ApplyXmlTypeComments.cs" />
+    <Compile Include="Swagger\Filters\ApplyXmlActionComments.cs" />
+    <Compile Include="Swagger\Filters\HandleFromUriParams.cs" />
     <Compile Include="Swagger\JsonPropertyExtensions.cs" />
-    <Compile Include="WebAssets\EmbeddedResourceDescriptor.cs" />
+    <Compile Include="SwaggerUi\EmbeddedAssetDescriptor.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Swagger\ApiDescriptionExtensions.cs" />
     <Compile Include="Swagger\ISchemaFilter.cs" />
@@ -94,16 +93,16 @@
     <Compile Include="Swagger\ISwaggerProvider.cs" />
     <Compile Include="Swagger\SwaggerDocument.cs" />
     <Compile Include="Swagger\SchemaRegistry.cs" />
-    <Compile Include="WebAssets\EmbeddedWebAssetProvider.cs" />
+    <Compile Include="SwaggerUi\EmbeddedSwaggerUiProvider.cs" />
     <Compile Include="TypeExtensions.cs" />
-    <Compile Include="WebAssets\EmbeddedWebAssetProviderSettings.cs" />
-    <Compile Include="WebAssets\IWebAssetProvider.cs" />
-    <Compile Include="WebAssets\StreamExtensions.cs" />
+    <Compile Include="SwaggerUi\EmbeddedSwaggerUiProviderSettings.cs" />
+    <Compile Include="SwaggerUi\ISwaggerUiProvider.cs" />
+    <Compile Include="SwaggerUi\StreamExtensions.cs" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
-    <EmbeddedResource Include="SwaggerExtensions\discoveryUrlSelector.js" />
-    <EmbeddedResource Include="SwaggerExtensions\index.html" />
+    <EmbeddedResource Include="SwaggerUi\Assets\discoveryUrlSelector.js" />
+    <EmbeddedResource Include="SwaggerUi\Assets\index.html" />
     <Content Include="Swashbuckle.Core.nuspec">
       <SubType>Designer</SubType>
     </Content>

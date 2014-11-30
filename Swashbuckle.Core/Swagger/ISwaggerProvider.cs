@@ -4,7 +4,7 @@ namespace Swashbuckle.Swagger
 {
     public interface ISwaggerProvider
     {
-        SwaggerDocument GetSwaggerFor(string apiVersion, string apiRootUrl);
+        SwaggerDocument GetSwaggerFor(string apiVersion);
     }
 
     public class UnknownApiVersion : Exception

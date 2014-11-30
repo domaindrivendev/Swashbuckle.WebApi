@@ -4,39 +4,45 @@ using System;
 using System.Threading.Tasks;
 using System.Net;
 using System.Net.Http.Headers;
-using Swashbuckle.WebAssets;
+using Swashbuckle.SwaggerUi;
 
 namespace Swashbuckle.Application
 {
     public class SwaggerUiHandler : HttpMessageHandler
     {
-        private readonly Func<HttpRequestMessage, string> _rootUrlResolver;
-        private readonly IWebAssetProvider _swaggerUiProvider;
+        private readonly SwaggerUiConfig _swaggerUiConfig;
 
-        public SwaggerUiHandler(Func<HttpRequestMessage, string> rootUrlResolver, IWebAssetProvider swaggerUiProvider)
+        public SwaggerUiHandler(
+            SwaggerUiConfig swaggerUiConfig)
         {
-            _rootUrlResolver = rootUrlResolver;
-            _swaggerUiProvider = swaggerUiProvider;
+            _swaggerUiConfig = swaggerUiConfig;
         }
 
         protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
         {
+            var swaggerUiProvider = GetSwaggerUiProvider(request);
             var uiPath = request.GetRouteData().Values["uiPath"].ToString();
-            var rootUrl = _rootUrlResolver(request);
 
             try
             {
-                var webAsset = _swaggerUiProvider.GetWebAssetFor(uiPath.ToString(), rootUrl);
+                var webAsset = swaggerUiProvider.GetAssetFor(uiPath);
                 var content = ContentFor(webAsset);
                 return TaskFor(new HttpResponseMessage { Content = content });
             }
-            catch (WebAssetNotFound ex)
+            catch (AssetNotFound ex)
             {
                 return TaskFor(request.CreateErrorResponse(HttpStatusCode.NotFound, ex));
             }
         }
 
-        private HttpContent ContentFor(WebAsset webAsset)
+        private ISwaggerUiProvider GetSwaggerUiProvider(HttpRequestMessage request)
+        {
+            return new EmbeddedSwaggerUiProvider(
+                _swaggerUiConfig.GetRootUrlResolver()(request),
+                _swaggerUiConfig.GetUiProviderSettings());
+        }
+
+        private HttpContent ContentFor(Asset webAsset)
         {
             var content = new StreamContent(webAsset.Stream);
             content.Headers.ContentType = new MediaTypeHeaderValue(webAsset.MediaType);

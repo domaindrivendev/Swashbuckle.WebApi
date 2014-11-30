@@ -1,6 +1,7 @@
 ﻿using System.Web.Http;
-using $rootnamespace$;
 using WebActivatorEx;
+using $rootnamespace$;
+using Swashbuckle.Application;
 
 [assembly: PreApplicationStartMethod(typeof(SwaggerConfig), "Register")]
 
@@ -12,16 +13,16 @@ namespace $rootnamespace$
         {
             var thisAssembly = typeof(SwaggerConfig).Assembly;
 
-            Swashbuckle.Configuration.Instance
-                .SwaggerDocs(c =>
+            GlobalConfiguration.Configuration 
+                .EnableSwagger(c =>
                     {
-                        // Use "SingleApiVersion" to describe a single version API
+                        // Use "SingleApiVersion" to describe a single version API.
                         // Swagger 2.0 requires version and title at a minimum but you can
-                        // also provide additional information
+                        // also provide additional information with the provided fluent interface
                         //
                         c.SingleApiVersion("1.0", "$rootnamespace$");
 
-                        // If you API has multiple versions, use "MultipleApiVersions" instead of "SingleApiVersion"
+                        // If your API has multiple versions, use "MultipleApiVersions" instead of "SingleApiVersion"
                         // In this case, you must provide a lambda that tells Swashbuckle which actions should be
                         // included in the docs for a given API version
                         //
@@ -46,7 +47,7 @@ namespace $rootnamespace$
                         //c.GroupActionsBy(apiDesc => apiDesc.HttpMethod.ToString());
 
                         // You can also specify a custom sort order for groups (as defined by GroupActionsBy) to dictate the
-                        // order in which operations are listed. For example, if the default grouping is in place
+                        // order in which operations are returned. For example, if the default grouping is in place
                         // i.e. (by controller name) and you specify a descending alphabetic sort order, then actions from a
                         // ProductsController will be listed before those from a CustomersController. This would be typically
                         // used to customize the order of groupings in the swagger-ui
@@ -59,8 +60,7 @@ namespace $rootnamespace$
                         // To do this, you'll need to implement a custom IDocumentFilter and/or IOperationFilter to set these
                         // properties according to your specific authorization implementation
                         //
-                        //c.BasicAuth("basic")
-                        //    .Description("Basic HTTP Authentication");
+                        //c.BasicAuth("basic") .Description("Basic HTTP Authentication");
                         //
                         //c.ApiKey("apiKey")
                         //    .Description("API Key Authentication")
@@ -70,12 +70,12 @@ namespace $rootnamespace$
                         //c.OAuth2("oauth2")
                         //    .Description("OAuth2 Implicit Grant")
                         //    .Flow("implicit")
-                        //    .AuthorizationUrl("https://tempuri.org/auth")
+                        //    .AuthorizationUrl("http://petstore.swagger.wordnik.com/api/oauth/dialog")
                         //    //.TokenUrl("https://tempuri.org/token")
-                        //    .Scopes(s =>
+                        //    .Scopes(scopes =>
                         //    {
-                        //        s.Add("read", "Read access to protected resources");
-                        //        s.Add("write", "Write access to protected resources");
+                        //        scopes.Add("read", "Read access to protected resources");
+                        //        scopes.Add("write", "Write access to protected resources");
                         //    });
 
                         // Swashbuckle makes a best attempt at generating Swagger compliant JSON schemas for the various types
@@ -116,13 +116,8 @@ namespace $rootnamespace$
                         //
                         //c.ResolveConflictingActions(apiDescriptions => apiDescriptions.First());
                     })
-                .SwaggerUi(c =>
+                .EnableSwaggerUi(c =>
                     {
-                        // If you're only using Swashbuckle to expose the raw swagger docs, you can use
-                        // the "Disable" option to completely disable routes to the embedded swagger-ui
-                        //
-                        //c.Disable();
-
                         // Use the "InjectStylesheet" option to apply one or more custom CSS stylesheets
                         // to the embedded swagger-ui that's served up by Swashbuckle
                         // NOTE: It must first be added to your project as an "Embedded Resource", then the
@@ -133,7 +128,7 @@ namespace $rootnamespace$
                         // Set this option to allow header parameters be submitted through the swagger-ui
                         // See https://github.com/swagger-api/swagger-ui for more details
                         //
-                        //c.SupportHeaderParams();
+                        c.SupportHeaderParams();
 
                         // Specify which HTTP methods should be supported through the swagger-ui
                         // See https://github.com/swagger-api/swagger-ui for more details
@@ -163,8 +158,7 @@ namespace $rootnamespace$
                         // according to the Swagger 2.0 specification (see OAuth config. above), you can
                         // enable UI support with the following command
                         //c.EnableOAuth2Support("test-client-id", "test-realm", "Swagger UI");
-                    })
-                .Init(GlobalConfiguration.Configuration);
+                    });
         }
     }
 }

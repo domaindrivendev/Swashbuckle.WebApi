@@ -7,7 +7,7 @@ namespace Swashbuckle.Dummy.Controllers
     public class ProtectedResourcesController : ApiController
     {
         [Authorize(Roles = "read")]
-        public JObject Get(int accountId)
+        public JObject Get(int id)
         {
             throw new NotImplementedException();
         }

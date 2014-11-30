@@ -21,12 +21,7 @@ namespace Swashbuckle.Tests.Swagger
             if (configure != null)
                 configure(swaggerDocsConfig);
 
-            var swaggerProvider = new SwaggerGenerator(
-                Configuration.Services.GetApiExplorer(),
-                Configuration.Formatters.JsonFormatter.SerializerSettings.ContractResolver, 
-                swaggerDocsConfig.ToGeneratorSettings());
-
-            Handler = new SwaggerDocsHandler(Swashbuckle.Configuration.DefaultRootUrlResolver, swaggerProvider);
+            Handler = new SwaggerDocsHandler(swaggerDocsConfig);
         }
     }
 }

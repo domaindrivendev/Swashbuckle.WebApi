@@ -4,22 +4,22 @@ using System.Net.Http;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Text;
-using Swashbuckle.WebAssets;
+using Swashbuckle.SwaggerUi;
 
 namespace Swashbuckle.Application
 {
     public class SwaggerUiConfig
     {
-        private readonly Dictionary<string, EmbeddedResourceDescriptor> _customWebAssets;
+        private readonly Func<HttpRequestMessage, string> _rootUrlResolver;
+
+        private readonly Dictionary<string, EmbeddedAssetDescriptor> _customAssets;
         private readonly Dictionary<string, string> _templateValues;
 
-        public SwaggerUiConfig(IEnumerable<string> discoveryPaths)
+        public SwaggerUiConfig(Func<HttpRequestMessage, string> rootUrlResolver, IEnumerable<string> discoveryPaths)
         {
-            // Enable swagger-ui by default
-            Enabled = true;
+            _rootUrlResolver = rootUrlResolver;
 
-            _customWebAssets = new Dictionary<string, EmbeddedResourceDescriptor>();
-
+            _customAssets = new Dictionary<string, EmbeddedAssetDescriptor>();
             _templateValues = new Dictionary<string, string>
             {
                 { "%(StylesheetIncludes)", "" },
@@ -31,24 +31,17 @@ namespace Swashbuckle.Application
                 { "%(OAuth2Enabled)", "false" },
                 { "%(OAuth2ClientId)", "null" },
                 { "%(OAuth2Realm)", "null" },
-                { "%(OAuth2AppName)", "null" }
+                { "%(OAuth2AppName)", "null" },
             };
 
             var discoveryPathStrings = discoveryPaths.Select(path => "'" + path + "'");
             _templateValues["%(DiscoveryPaths)"] = String.Join(",", discoveryPathStrings);
 
             // Use Swashbuckle specific index.html
-            CustomWebAsset("index.html", GetType().Assembly, "Swashbuckle.SwaggerExtensions.index.html");
+            CustomAsset("index.html", GetType().Assembly, "Swashbuckle.SwaggerUi.Assets.index.html");
         }
 
-        internal bool Enabled { get; private set; }
-
-        public void Disable()
-        {
-            Enabled = false;
-        }
-
-        public SwaggerUiConfig InjectStylesheet(Assembly resourceAssembly, string resourceName)
+        public void InjectStylesheet(Assembly resourceAssembly, string resourceName)
         {
             var path = "ext/" + resourceName;
             var stringBuilder = new StringBuilder(_templateValues["%(StylesheetIncludes)"]);
@@ -56,32 +49,28 @@ namespace Swashbuckle.Application
             stringBuilder.AppendLine("<link href='" + path + "' media='screen' rel='stylesheet' type='text/css' />");
             _templateValues["%(StylesheetIncludes)"] = stringBuilder.ToString();
 
-            _customWebAssets[path] = new EmbeddedResourceDescriptor(resourceAssembly, resourceName);
-            return this;
+            _customAssets[path] = new EmbeddedAssetDescriptor(resourceAssembly, resourceName);
         }
 
-        public SwaggerUiConfig SupportHeaderParams()
+        public void SupportHeaderParams()
         {
             _templateValues["%(SupportHeaderParams)"] = "true";
-            return this;
         }
 
-        public SwaggerUiConfig SupportedSubmitMethods(HttpMethod[] httpMethods)
+        public void SupportedSubmitMethods(HttpMethod[] httpMethods)
         {
             var httpMethodsString = String.Join(",",
                 httpMethods.Select(method => "'" + method.ToString().ToLower() + "'"));
 
             _templateValues["%(SupportedSubmitMethods)"] = httpMethodsString;
-            return this;
         }
 
-        public SwaggerUiConfig DocExpansion(DocExpansion docExpansion)
+        public void DocExpansion(DocExpansion docExpansion)
         {
             _templateValues["%(DocExpansion)"] = "'" + docExpansion.ToString().ToLower() + "'";
-            return this;
         }
 
-        public SwaggerUiConfig InjectJavaScript(Assembly resourceAssembly, string resourceName)
+        public void InjectJavaScript(Assembly resourceAssembly, string resourceName)
         {
             var path = "ext/" + resourceName;
 
@@ -93,34 +82,35 @@ namespace Swashbuckle.Application
             stringBuilder.Append("'" + path + "'");
 
             _templateValues["%(CustomScripts)"] = stringBuilder.ToString();
-            _customWebAssets[path] = new EmbeddedResourceDescriptor(resourceAssembly, resourceName);
-            return this;
+            _customAssets[path] = new EmbeddedAssetDescriptor(resourceAssembly, resourceName);
         }
 
-        public SwaggerUiConfig CustomWebAsset(string path, Assembly resourceAssembly, string resourceName)
+        public void CustomAsset(string path, Assembly resourceAssembly, string resourceName)
         {
-            _customWebAssets[path] = new EmbeddedResourceDescriptor(resourceAssembly, resourceName);
-            return this;
+            _customAssets[path] = new EmbeddedAssetDescriptor(resourceAssembly, resourceName);
         }
 
-        public SwaggerUiConfig EnableDiscoveryUrlSelector()
+        public void EnableDiscoveryUrlSelector()
         {
-            InjectJavaScript(GetType().Assembly, "Swashbuckle.SwaggerExtensions.discoveryUrlSelector.js");
-            return this;
+            InjectJavaScript(GetType().Assembly, "Swashbuckle.SwaggerUi.Assets.discoveryUrlSelector.js");
         }
 
-        public SwaggerUiConfig EnableOAuth2Support(string clientId, string realm, string appName)
+        public void EnableOAuth2Support(string clientId, string realm, string appName)
         {
             _templateValues["%(OAuth2Enabled)"] = "true";
             _templateValues["%(OAuth2ClientId)"] = "'" + clientId + "'";
             _templateValues["%(OAuth2Realm)"] = "'" + realm + "'";
             _templateValues["%(OAuth2AppName)"] = "'" + appName + "'";
-            return this;
         }
 
-        public EmbeddedWebAssetProviderSettings ToUiProviderSettings()
+        internal Func<HttpRequestMessage, string> GetRootUrlResolver()
         {
-            return new EmbeddedWebAssetProviderSettings(_customWebAssets, _templateValues);
+            return _rootUrlResolver;
+        }
+
+        internal EmbeddedSwaggerUiProviderSettings GetUiProviderSettings()
+        {
+            return new EmbeddedSwaggerUiProviderSettings(_customAssets, _templateValues);
         }
     }
 

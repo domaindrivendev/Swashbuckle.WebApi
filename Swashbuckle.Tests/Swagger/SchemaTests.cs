@@ -43,7 +43,8 @@ namespace Swashbuckle.Tests.Swagger
                             Id = new
                             {
                                 format = "int32",
-                                type = "integer"
+                                type = "integer",
+                                readOnly = true
                             },
                             Type = new
                             {

@@ -2,7 +2,7 @@
 using System.IO;
 using System.Text;
 
-namespace Swashbuckle.WebAssets
+namespace Swashbuckle.SwaggerUi
 {
     public static class StreamExtensions
     {

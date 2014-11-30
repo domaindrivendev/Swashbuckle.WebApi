@@ -1,16 +1,16 @@
 ﻿using System;
 using System.IO;
 
-namespace Swashbuckle.WebAssets
+namespace Swashbuckle.SwaggerUi
 {
-    public interface IWebAssetProvider
+    public interface ISwaggerUiProvider
     {
-        WebAsset GetWebAssetFor(string path, string rootUrl);
+        Asset GetAssetFor(string path);
     }
 
-    public class WebAsset
+    public class Asset
     {
-        public WebAsset(Stream stream, string mediaType)
+        public Asset(Stream stream, string mediaType)
         {
             Stream = stream;
             MediaType = mediaType;
@@ -21,6 +21,6 @@ namespace Swashbuckle.WebAssets
         public string MediaType { get; private set; }
     }
 
-    public class WebAssetNotFound : Exception
+    public class AssetNotFound : Exception
     {}
 }

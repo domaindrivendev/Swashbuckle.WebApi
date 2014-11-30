@@ -1,4 +1,5 @@
-﻿using System.Web.Http;
+﻿using Newtonsoft.Json.Serialization;
+using System.Web.Http;
 
 namespace Swashbuckle.Dummy
 {
@@ -16,6 +17,9 @@ namespace Swashbuckle.Dummy
                 routeTemplate: "{controller}/{id}",
                 defaults: new { id = RouteParameter.Optional }
             );
+
+            var formatter = config.Formatters.JsonFormatter;
+            formatter.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
         }
     }
 }

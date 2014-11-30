@@ -3,28 +3,30 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
-namespace Swashbuckle.WebAssets
+namespace Swashbuckle.SwaggerUi
 {
-    public class EmbeddedWebAssetProvider : IWebAssetProvider
+    public class EmbeddedSwaggerUiProvider : ISwaggerUiProvider
     {
-        private readonly EmbeddedWebAssetProviderSettings _settings;
+        private readonly EmbeddedSwaggerUiProviderSettings _settings;
 
-        public EmbeddedWebAssetProvider(
-            EmbeddedWebAssetProviderSettings settings)
+        public EmbeddedSwaggerUiProvider(
+            string rootUrl,
+            EmbeddedSwaggerUiProviderSettings settings)
         {
             _settings = settings;
+            _settings.TemplateValues["%(RootUrl)"] = "'" + rootUrl + "'";
         }
 
-        public WebAsset GetWebAssetFor(string path, string rootUrl)
+        public Asset GetAssetFor(string path)
         {
-            var stream = GetEmbeddedResourceStreamFor(path, rootUrl);
+            var stream = GetEmbeddedResourceStreamFor(path);
             var mediaType = InferMediaTypeFrom(path);
-            return new WebAsset(stream, mediaType);
+            return new Asset(stream, mediaType);
         }
 
-        private Stream GetEmbeddedResourceStreamFor(string path, string rootUrl)
+        private Stream GetEmbeddedResourceStreamFor(string path)
         {
-            EmbeddedResourceDescriptor customEmbeddedResource;
+            EmbeddedAssetDescriptor customEmbeddedResource;
             var isCustom = _settings.CustomAssets.TryGetValue(path, out customEmbeddedResource);
 
             var assembly = isCustom ? customEmbeddedResource.ContainingAssembly : GetType().Assembly;
@@ -32,9 +34,7 @@ namespace Swashbuckle.WebAssets
 
             var stream = assembly.GetManifestResourceStream(name);
             if (stream == null)
-                throw new WebAssetNotFound();
-
-            _settings.TemplateValues["%(RootUrl)"] = "'" + rootUrl + "'";
+                throw new AssetNotFound();
 
             return isCustom ? stream.FindAndReplace(_settings.TemplateValues) : stream;
         }

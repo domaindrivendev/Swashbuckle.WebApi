@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.Web.Http.Description;
 using System.Web.Http.Routing.Constraints;
 using Swashbuckle.Application;
-using Swashbuckle.Swagger;
 using Swashbuckle.Dummy.Controllers;
 using Swashbuckle.Dummy.SwaggerExtensions;
 
@@ -18,10 +17,10 @@ namespace Swashbuckle.Dummy
         {
             var thisAssembly = typeof(SwaggerConfig).Assembly;
 
-            Swashbuckle.Configuration.Instance
-                .SwaggerDocs(c =>
+            httpConfig 
+                .EnableSwagger(c =>
                     {
-                        // Use "SingleApiVersion" to describe a single version API
+                        // Use "SingleApiVersion" to describe a single version API.
                         // Swagger 2.0 requires version and title at a minimum but you can
                         // also provide additional information
                         //
@@ -58,7 +57,7 @@ namespace Swashbuckle.Dummy
                         // ProductsController will be listed before those from a CustomersController. This would be typically
                         // used to customize the order of groupings in the swagger-ui
                         //c.OrderActionGroupsBy(new DescendingAlphabeticComparer());
- 
+
                         // You can use the "BasicAuth", "ApiKey" or "OAuth2" options to define security schemes for the API
                         // See https://github.com/swagger-api/swagger-spec/blob/master/versions/2.0.md for more details
                         // NOTE: These definitions only define the schemes and need to be coupled with a corresponding "security"
@@ -66,24 +65,23 @@ namespace Swashbuckle.Dummy
                         // To do this, you'll need to implement a custom IDocumentFilter and/or IOperationFilter to set these
                         // properties according to your specific authorization implementation
                         //
-                        //c.BasicAuth("basic")
-                        //    .Description("Basic HTTP Authentication");
+                        //c.BasicAuth("basic") .Description("Basic HTTP Authentication");
                         //
                         //c.ApiKey("apiKey")
                         //    .Description("API Key Authentication")
                         //    .Name("apiKey")
                         //    .In("header");
                         //
-                        c.OAuth2("oauth2")
-                            .Description("OAuth2 Implicit Grant")
-                            .Flow("implicit")
-                            .AuthorizationUrl("http://petstore.swagger.wordnik.com/api/oauth/dialog")
-                            //.TokenUrl("https://tempuri.org/token")
-                            .Scopes(s =>
-                            {
-                                s.Add("read", "Read access to protected resources");
-                                s.Add("write", "Write access to protected resources");
-                            });
+                        //c.OAuth2("oauth2")
+                        //    .Description("OAuth2 Implicit Grant")
+                        //    .Flow("implicit")
+                        //    .AuthorizationUrl("http://petstore.swagger.wordnik.com/api/oauth/dialog")
+                        //    //.TokenUrl("https://tempuri.org/token")
+                        //    .Scopes(scopes =>
+                        //    {
+                        //        scopes.Add("read", "Read access to protected resources");
+                        //        scopes.Add("write", "Write access to protected resources");
+                        //    });
 
                         // Swashbuckle makes a best attempt at generating Swagger compliant JSON schemas for the various types
                         // exposed in your API. However, there may be occassions when more control of the output is needed.
@@ -123,13 +121,8 @@ namespace Swashbuckle.Dummy
                         //
                         c.ResolveConflictingActions(apiDescriptions => apiDescriptions.First());
                     })
-                .SwaggerUi(c =>
+                .EnableSwaggerUi(c =>
                     {
-                        // If you're only using Swashbuckle to expose the raw swagger docs, you can use
-                        // the "Disable" option to completely disable routes to the embedded swagger-ui
-                        //
-                        //c.Disable();
-
                         // Use the "InjectStylesheet" option to apply one or more custom CSS stylesheets
                         // to the embedded swagger-ui that's served up by Swashbuckle
                         // NOTE: It must first be added to your project as an "Embedded Resource", then the
@@ -170,8 +163,7 @@ namespace Swashbuckle.Dummy
                         // according to the Swagger 2.0 specification (see OAuth config. above), you can
                         // enable UI support with the following command
                         c.EnableOAuth2Support("test-client-id", "test-realm", "Swagger UI");
-                    })
-                .Init(httpConfig);
+                    });
         }
 
         private static string GetXmlCommentsPath()

@@ -14,25 +14,21 @@ namespace Swashbuckle.Application
 {
     public class SwaggerDocsHandler : HttpMessageHandler
     {
-        private readonly Func<HttpRequestMessage, string> _rootUrlResolver;
-        private readonly ISwaggerProvider _swaggerProvider;
+        private readonly SwaggerDocsConfig _swaggerDocsConfig;
 
-        public SwaggerDocsHandler(
-            Func<HttpRequestMessage, string> rootUrlResolver,
-            ISwaggerProvider swaggerProvider)
+        public SwaggerDocsHandler( SwaggerDocsConfig swaggerDocsConfig)
         {
-            _rootUrlResolver = rootUrlResolver;
-            _swaggerProvider = swaggerProvider;
+            _swaggerDocsConfig = swaggerDocsConfig;
         }
 
         protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
         {
+            var swaggerProvider = GetSwaggerProvider(request);
             var apiVersion = request.GetRouteData().Values["apiVersion"].ToString();
-            var apiRootUrl = _rootUrlResolver(request);
 
             try
             {
-                var swaggerDoc = _swaggerProvider.GetSwaggerFor(apiVersion, apiRootUrl);
+                var swaggerDoc = swaggerProvider.GetSwaggerFor(apiVersion);
                 var content = ContentFor(request, swaggerDoc);
                 return TaskFor(new HttpResponseMessage { Content = content });
             }
@@ -40,6 +36,17 @@ namespace Swashbuckle.Application
             {
                 return TaskFor(request.CreateErrorResponse(HttpStatusCode.NotFound, ex));
             }
+        }
+
+        private ISwaggerProvider GetSwaggerProvider(HttpRequestMessage request)
+        {
+            var httpConfig = request.GetConfiguration();
+
+            return new SwaggerGenerator(
+                _swaggerDocsConfig.GetRootUrlResolver()(request),
+                httpConfig.Services.GetApiExplorer(),
+                httpConfig.GetJsonContractResolver(),
+                _swaggerDocsConfig.GetGeneratorSettings());
         }
 
         private HttpContent ContentFor(HttpRequestMessage request, SwaggerDocument swaggerDoc)

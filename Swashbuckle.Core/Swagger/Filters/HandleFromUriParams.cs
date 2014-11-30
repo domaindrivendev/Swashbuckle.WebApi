@@ -3,7 +3,7 @@ using System.Web.Http.Description;
 using Swashbuckle.Swagger;
 using System.Collections.Generic;
 
-namespace Swashbuckle.SwaggerExtensions
+namespace Swashbuckle.Swagger.Filters
 {
     public class HandleParamsFromUri : IOperationFilter
     {
