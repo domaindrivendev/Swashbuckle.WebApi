@@ -32,7 +32,7 @@ namespace Swashbuckle.Application
                 "swagger_docs",
                 routeTemplate,
                 defaults,
-                null,
+                new { apiVersion = @".+" },
                 new SwaggerDocsHandler(config)
             );
 
@@ -54,7 +54,7 @@ namespace Swashbuckle.Application
 
     public class SwaggerEnabledConfiguration
     {
-        private static readonly string DefaultRouteTemplate = "swagger/ui/{*uiPath}";
+        private static readonly string DefaultRouteTemplate = "swagger/ui/{*assetPath}";
 
         private readonly HttpConfiguration _httpConfig;
         private readonly Func<HttpRequestMessage, string> _rootUrlResolver;
@@ -87,7 +87,7 @@ namespace Swashbuckle.Application
                 "swagger_ui",
                 routeTemplate,
                 defaults,
-                new { uiPath = @".+" },
+                new { assetPath = @".+" },
                 new SwaggerUiHandler(config)
             );
 

@@ -5,7 +5,7 @@ namespace Swashbuckle.SwaggerUi
 {
     public interface ISwaggerUiProvider
     {
-        Asset GetAssetFor(string path);
+        Asset GetAssetFor(string assetPath);
     }
 
     public class Asset

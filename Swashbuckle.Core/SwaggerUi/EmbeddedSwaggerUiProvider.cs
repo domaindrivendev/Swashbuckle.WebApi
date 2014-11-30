@@ -24,13 +24,13 @@ namespace Swashbuckle.SwaggerUi
             return new Asset(stream, mediaType);
         }
 
-        private Stream GetEmbeddedResourceStreamFor(string path)
+        private Stream GetEmbeddedResourceStreamFor(string assetPath)
         {
             EmbeddedAssetDescriptor customEmbeddedResource;
-            var isCustom = _settings.CustomAssets.TryGetValue(path, out customEmbeddedResource);
+            var isCustom = _settings.CustomAssets.TryGetValue(assetPath, out customEmbeddedResource);
 
             var assembly = isCustom ? customEmbeddedResource.ContainingAssembly : GetType().Assembly;
-            var name = isCustom ? customEmbeddedResource.Name : path;
+            var name = isCustom ? customEmbeddedResource.Name : assetPath;
 
             var stream = assembly.GetManifestResourceStream(name);
             if (stream == null)

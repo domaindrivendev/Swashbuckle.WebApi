@@ -21,12 +21,12 @@ namespace Swashbuckle.Application
         protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
         {
             var swaggerUiProvider = GetSwaggerUiProvider(request);
-            var uiPath = request.GetRouteData().Values["uiPath"].ToString();
+            var assetPath = request.GetRouteData().Values["assetPath"].ToString();
 
             try
             {
-                var webAsset = swaggerUiProvider.GetAssetFor(uiPath);
-                var content = ContentFor(webAsset);
+                var asset = swaggerUiProvider.GetAssetFor(assetPath);
+                var content = ContentFor(asset);
                 return TaskFor(new HttpResponseMessage { Content = content });
             }
             catch (AssetNotFound ex)
@@ -42,10 +42,10 @@ namespace Swashbuckle.Application
                 _swaggerUiConfig.GetUiProviderSettings());
         }
 
-        private HttpContent ContentFor(Asset webAsset)
+        private HttpContent ContentFor(Asset asset)
         {
-            var content = new StreamContent(webAsset.Stream);
-            content.Headers.ContentType = new MediaTypeHeaderValue(webAsset.MediaType);
+            var content = new StreamContent(asset.Stream);
+            content.Headers.ContentType = new MediaTypeHeaderValue(asset.MediaType);
             return content;
         }
 
