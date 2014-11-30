@@ -12,7 +12,7 @@ namespace Swashbuckle.Tests.SwaggerUi
     public class SwaggerUiTests : HttpMessageHandlerTestBase<SwaggerUiHandler>
     {
         public SwaggerUiTests()
-            : base("swagger/ui/{*uiPath}")
+            : base("swagger/ui/{*assetPath}")
         { }
 
         [SetUp]
