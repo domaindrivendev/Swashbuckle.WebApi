@@ -25,8 +25,8 @@ namespace Swashbuckle.Application
 
             try
             {
-                var asset = swaggerUiProvider.GetAssetFor(assetPath);
-                var content = ContentFor(asset);
+                var webAsset = swaggerUiProvider.GetAssetFor(assetPath);
+                var content = ContentFor(webAsset);
                 return TaskFor(new HttpResponseMessage { Content = content });
             }
             catch (AssetNotFound ex)
@@ -42,10 +42,10 @@ namespace Swashbuckle.Application
                 _swaggerUiConfig.GetUiProviderSettings());
         }
 
-        private HttpContent ContentFor(Asset asset)
+        private HttpContent ContentFor(Asset webAsset)
         {
-            var content = new StreamContent(asset.Stream);
-            content.Headers.ContentType = new MediaTypeHeaderValue(asset.MediaType);
+            var content = new StreamContent(webAsset.Stream);
+            content.Headers.ContentType = new MediaTypeHeaderValue(webAsset.MediaType);
             return content;
         }
 

@@ -5,6 +5,7 @@ using Newtonsoft.Json.Serialization;
 using Swashbuckle.Application;
 using System.Net.Http;
 using System.Collections.Generic;
+using System.Web.Http.Routing;
 
 namespace Swashbuckle.Application
 {
@@ -16,13 +17,12 @@ namespace Swashbuckle.Application
             this HttpConfiguration httpConfig,
             Action<SwaggerDocsConfig> configure = null)
         {
-            return EnableSwagger(httpConfig, DefaultRouteTemplate, null, configure);
+            return EnableSwagger(httpConfig, DefaultRouteTemplate, configure);
         }
 
         public static SwaggerEnabledConfiguration EnableSwagger(
             this HttpConfiguration httpConfig,
             string routeTemplate,
-            object defaults,
             Action<SwaggerDocsConfig> configure = null)
         {
             var config = new SwaggerDocsConfig();
@@ -31,7 +31,7 @@ namespace Swashbuckle.Application
             httpConfig.Routes.MapHttpRoute(
                 "swagger_docs",
                 routeTemplate,
-                defaults,
+                null,
                 new { apiVersion = @".+" },
                 new SwaggerDocsHandler(config)
             );
@@ -50,7 +50,6 @@ namespace Swashbuckle.Application
                 : new DefaultContractResolver();
         }
     }
-
 
     public class SwaggerEnabledConfiguration
     {
@@ -72,12 +71,11 @@ namespace Swashbuckle.Application
 
         public void EnableSwaggerUi(Action<SwaggerUiConfig> configure = null)
         {
-            EnableSwaggerUi(DefaultRouteTemplate, null, configure);
+            EnableSwaggerUi(DefaultRouteTemplate, configure);
         }
 
         public void EnableSwaggerUi(
             string routeTemplate,
-            object defaults,
             Action<SwaggerUiConfig> configure = null)
         {
             var config = new SwaggerUiConfig(_rootUrlResolver, _discoveryPaths);
@@ -86,7 +84,7 @@ namespace Swashbuckle.Application
             _httpConfig.Routes.MapHttpRoute(
                 "swagger_ui",
                 routeTemplate,
-                defaults,
+                null,
                 new { assetPath = @".+" },
                 new SwaggerUiHandler(config)
             );
