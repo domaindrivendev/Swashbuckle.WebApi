@@ -158,6 +158,12 @@ namespace $rootnamespace$
                         // according to the Swagger 2.0 specification (see OAuth config. above), you can
                         // enable UI support with the following command
                         //c.EnableOAuth2Support("test-client-id", "test-realm", "Swagger UI");
+
+                        // Use the CustomAsset option to provide your own version of assets used in the swagger-ui. A typical use
+                        // would be to provide your own "branded" index.html rather than the embedded version that's served up
+                        // by default. As with the InjectStylesheet and InjectJavaScript options, each custom asset must be
+                        // added to your project as an "Embedded Resource", and then the "Logical Name" is passed as shown below
+                        //c.CustomAsset("index.html", thisAssembly, "Swashbuckle.Dummy.SwaggerExtensions.myIndex.html");
                     });
         }
     }

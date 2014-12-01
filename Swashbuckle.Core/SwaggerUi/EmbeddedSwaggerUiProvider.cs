@@ -8,13 +8,18 @@ namespace Swashbuckle.SwaggerUi
     public class EmbeddedSwaggerUiProvider : ISwaggerUiProvider
     {
         private readonly EmbeddedSwaggerUiProviderSettings _settings;
+        private readonly Dictionary<string, string> _templateValues;
 
         public EmbeddedSwaggerUiProvider(
             string rootUrl,
             EmbeddedSwaggerUiProviderSettings settings)
         {
             _settings = settings;
-            _settings.TemplateValues["%(RootUrl)"] = "'" + rootUrl + "'";
+
+            // By default, add RootUrl to template values
+            _templateValues = _settings.TemplateValues
+                .Union(new Dictionary<string, string> { { "%(RootUrl)", "'" + rootUrl + "'" } })
+                .ToDictionary(entry => entry.Key, entry => entry.Value);
         }
 
         public Asset GetAssetFor(string path)
@@ -36,7 +41,7 @@ namespace Swashbuckle.SwaggerUi
             if (stream == null)
                 throw new AssetNotFound();
 
-            return isCustom ? stream.FindAndReplace(_settings.TemplateValues) : stream;
+            return isCustom ? stream.FindAndReplace(_templateValues) : stream;
         }
 
         private static string InferMediaTypeFrom(string path)
