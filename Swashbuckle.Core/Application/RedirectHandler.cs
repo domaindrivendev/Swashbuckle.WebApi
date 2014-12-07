@@ -19,7 +19,7 @@ namespace Swashbuckle.Application
 
         protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
         {
-            var redirectUrl = _rootUrlResolver(request) + _redirectPath;
+            var redirectUrl = _rootUrlResolver(request) + "/" + _redirectPath;
 
             var response = request.CreateResponse(HttpStatusCode.Moved);
             response.Headers.Location = new Uri(redirectUrl);

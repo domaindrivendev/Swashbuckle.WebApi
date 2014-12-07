@@ -27,8 +27,8 @@ namespace Swashbuckle.Tests.SwaggerUi
         {
             var content = GetContentAsString("http://tempuri.org/swagger/ui/index.html");
 
-            StringAssert.Contains("rootUrl: 'http://tempuri.org:80/'", content);
-            StringAssert.Contains("discoveryPaths: [ 'swagger/docs/1.0' ]", content);
+            StringAssert.Contains("rootUrl: 'http://tempuri.org:80'", content);
+            StringAssert.Contains("discoveryPaths: arrayFrom('swagger/docs/1.0')", content);
             StringAssert.Contains("swagger-ui-container", content);
         }
         
@@ -62,16 +62,14 @@ namespace Swashbuckle.Tests.SwaggerUi
         {
             SetUpHandler(c =>
                 {
-                    c.SupportHeaderParams();
-                    c.SupportedSubmitMethods(new[] { HttpMethod.Get, HttpMethod.Post, HttpMethod.Put, HttpMethod.Head });
                     c.DocExpansion(DocExpansion.Full);
+                    c.BooleanValues(new[] { "1", "0" });
                 });
 
             var content = GetContentAsString("http://tempuri.org/swagger/ui/index.html");
 
-            StringAssert.Contains("supportHeaderParams: true", content);
-            StringAssert.Contains("supportedSubmitMethods: [ 'get','post','put','head' ]", content);
             StringAssert.Contains("docExpansion: 'full'", content);
+            StringAssert.Contains("booleanValues: arrayFrom('1|0')", content);
         }
         
         [Test]
@@ -81,7 +79,7 @@ namespace Swashbuckle.Tests.SwaggerUi
 
             var content = GetContentAsString("http://tempuri.org/swagger/ui/index.html");
 
-            StringAssert.Contains("oAuth2Enabled: true", content);
+            StringAssert.Contains("oAuth2Enabled: Boolean('true')", content);
             StringAssert.Contains("oAuth2ClientId: 'test-client-id'", content);
             StringAssert.Contains("oAuth2Realm: 'test-realm'", content);
             StringAssert.Contains("oAuth2AppName: 'Swagger UI'", content);
@@ -111,10 +109,9 @@ namespace Swashbuckle.Tests.SwaggerUi
             var content = GetContentAsString("http://tempuri.org/swagger/ui/index.html");
 
             StringAssert.Contains(
-                "customScripts: [ " +
-                "'ext/Swashbuckle.Dummy.SwaggerExtensions.testScript1.js'," +
-                "'ext/Swashbuckle.Dummy.SwaggerExtensions.testScript2.js' " +
-                "]",
+                "customScripts: " +
+                "arrayFrom('ext/Swashbuckle.Dummy.SwaggerExtensions.testScript1.js|" +
+                "ext/Swashbuckle.Dummy.SwaggerExtensions.testScript2.js')",
                 content);
 
             content = GetContentAsString("http://tempuri.org/swagger/ui/ext/Swashbuckle.Dummy.SwaggerExtensions.testScript1.js");

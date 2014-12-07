@@ -1,10 +1,4 @@
 ﻿(function () {
-    // Get Swashbuckle config into JavaScript
-    var sbConfig = {
-        rootUrl: %(RootUrl),
-        discoveryPaths: [ %(DiscoveryPaths) ]
-    };
-
     var DiscoveryUrlSelector = Backbone.View.extend({
         render: function() {
             // Don't re-render on subsequent reloads
@@ -20,7 +14,7 @@
 
                 var rootUrl = this.options.rootUrl;
                 _.each(this.options.discoveryPaths, function(path) {
-                    var option = $('<option>' + rootUrl + path + '</option>');
+                    var option = $('<option>' + rootUrl + "/" + path + '</option>');
                     select.append(option);
                 });
 
@@ -33,7 +27,7 @@
 
     new DiscoveryUrlSelector({
         el: $('#input_baseUrl'),
-        rootUrl: sbConfig.rootUrl,
-        discoveryPaths: sbConfig.discoveryPaths
+        rootUrl: swashbuckleConfig.rootUrl,
+        discoveryPaths: swashbuckleConfig.discoveryPaths
     }).render();
 })();

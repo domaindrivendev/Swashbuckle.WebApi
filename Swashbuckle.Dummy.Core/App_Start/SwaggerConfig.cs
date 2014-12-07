@@ -20,26 +20,41 @@ namespace Swashbuckle.Dummy
             httpConfig 
                 .EnableSwagger(c =>
                     {
-                        // Use "SingleApiVersion" to describe a single version API.
-                        // Swagger 2.0 requires version and title at a minimum but you can
-                        // also provide additional information
+                        // By default, the service root url is inferred from the request used to access the docs.
+                        // However, there may be situations (e.g. certain load-balanced environments) where this does not
+                        // resolve correctly. You can workaround this by providing your own code to determine the root URL
+                        //
+                        //c.RootUrl(req => GetRootUrlFromAppConfig());
+
+                        // Use "SingleApiVersion" to describe a single version API. Swagger 2.0 includes an "Info" object to
+                        // hold additional metadata for an API. Version and title are required but you may also provide the
+                        // additional fields with the fluent API on "SingleApiVersion"
                         //
                         c.SingleApiVersion("1.0", "Swashbuckle Dummy")
-                            .Description("A sample API for testing and prototyping Swashbuckle features");
+                            .Description("A sample API for testing and prototyping Swashbuckle features")
+                            .TermsOfService("Some terms")
+                            .Contact(cc => cc
+                                .Name("Some contact")
+                                .Url("http://tempuri.org/contact")
+                                .Email("some.contact@tempuri.org"))
+                            .License(lc => lc
+                                .Name("Some License")
+                                .Url("http://tempuri.org/license"));
 
-                        // If you API has multiple versions, use "MultipleApiVersions" instead of "SingleApiVersion"
+                        // If your API has multiple versions, use "MultipleApiVersions" instead of "SingleApiVersion"
                         // In this case, you must provide a lambda that tells Swashbuckle which actions should be
-                        // included in the docs for a given API version
+                        // included in the docs for a given API version. Like "SingleApiVersion", each call to "Version" returns an
+                        // "Info" builder so you can optonally provide additional metadata per API version.
                         //
                         //c.MultipleApiVersions(
                         //    (apiDesc, targetApiVersion) => ResolveVersionSupportByRouteConstraint(apiDesc, targetApiVersion),
                         //    (vc) =>
                         //    {
-                        //        vc.Version("1.0", "Swashbuckle Dummy API 1.0");
                         //        vc.Version("2.0", "Swashbuckle Dummy API 2.0");
+                        //        vc.Version("1.0", "Swashbuckle Dummy API 1.0");
                         //    });
 
-                        // If schemes are not specifically provided in a Swagger 2.0 document, then the scheme used to access
+                        // If schemes are not explicitly provided in a Swagger 2.0 document, then the scheme used to access
                         // the docs is inferred to be that of the API. If your API supports multiple schemes and you want to
                         // be explicit about them, you can use the "Schemes" option as shown below.
                         //
@@ -72,16 +87,16 @@ namespace Swashbuckle.Dummy
                         //    .Name("apiKey")
                         //    .In("header");
                         //
-                        //c.OAuth2("oauth2")
-                        //    .Description("OAuth2 Implicit Grant")
-                        //    .Flow("implicit")
-                        //    .AuthorizationUrl("http://petstore.swagger.wordnik.com/api/oauth/dialog")
-                        //    //.TokenUrl("https://tempuri.org/token")
-                        //    .Scopes(scopes =>
-                        //    {
-                        //        scopes.Add("read", "Read access to protected resources");
-                        //        scopes.Add("write", "Write access to protected resources");
-                        //    });
+                        c.OAuth2("oauth2")
+                            .Description("OAuth2 Implicit Grant")
+                            .Flow("implicit")
+                            .AuthorizationUrl("http://petstore.swagger.wordnik.com/api/oauth/dialog")
+                            //.TokenUrl("https://tempuri.org/token")
+                            .Scopes(scopes =>
+                            {
+                                scopes.Add("read", "Read access to protected resources");
+                                scopes.Add("write", "Write access to protected resources");
+                            });
 
                         // Swashbuckle makes a best attempt at generating Swagger compliant JSON schemas for the various types
                         // exposed in your API. However, there may be occassions when more control of the output is needed.
@@ -130,15 +145,10 @@ namespace Swashbuckle.Dummy
                         //
                         //c.InjectStylesheet(thisAssembly, "Swashbuckle.Dummy.SwaggerExtensions.testStyles1.css");
 
-                        // Set this option to allow header parameters be submitted through the swagger-ui
-                        // See https://github.com/swagger-api/swagger-ui for more details
-                        //
-                        c.SupportHeaderParams();
-
-                        // Specify which HTTP methods should be supported through the swagger-ui
-                        // See https://github.com/swagger-api/swagger-ui for more details
-                        //
-                        c.SupportedSubmitMethods(new[] { HttpMethod.Post, HttpMethod.Get, HttpMethod.Put, HttpMethod.Delete });
+                        // swagger-ui renders boolean data types as a dropdown. By default it provides "true" and "false"
+                        // strings as the possible choices. You can use the "BooleanValues" option to change these to
+                        // something else.
+                        c.BooleanValues(new[] { "0", "1" });
 
                         // Use the "InjectJavaScript" option to invoke one or more custom Javascripts
                         // after the swagger-ui has loaded

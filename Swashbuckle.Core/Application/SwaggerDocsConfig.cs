@@ -178,7 +178,7 @@ namespace Swashbuckle.Application
 
         public static string DefaultRootUrlResolver(HttpRequestMessage request)
         {
-            var virtualPathRoot = request.GetConfiguration().VirtualPathRoot;
+            var virtualPathRoot = request.GetConfiguration().VirtualPathRoot.TrimEnd('/');
             var requestUri = request.RequestUri;
             return String.Format("{0}://{1}:{2}{3}", requestUri.Scheme, requestUri.Host, requestUri.Port, virtualPathRoot);
         }

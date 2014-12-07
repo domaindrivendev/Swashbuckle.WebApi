@@ -16,10 +16,8 @@ namespace Swashbuckle.SwaggerUi
         {
             _settings = settings;
 
-            // By default, add RootUrl to template values
-            _templateValues = _settings.TemplateValues
-                .Union(new Dictionary<string, string> { { "%(RootUrl)", "'" + rootUrl + "'" } })
-                .ToDictionary(entry => entry.Key, entry => entry.Value);
+            _templateValues = _settings.TemplateValues.ToDictionary(entry => entry.Key, entry => entry.Value);
+            _templateValues["%(RootUrl)"] = rootUrl;
         }
 
         public Asset GetAssetFor(string path)
