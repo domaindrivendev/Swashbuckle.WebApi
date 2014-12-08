@@ -16,6 +16,12 @@ namespace $rootnamespace$
             GlobalConfiguration.Configuration 
                 .EnableSwagger(c =>
                     {
+                        // By default, the service root url is inferred from the request used to access the docs.
+                        // However, there may be situations (e.g. certain load-balanced environments) where this does not
+                        // resolve correctly. You can workaround this by providing your own code to determine the root URL
+                        //
+                        //c.RootUrl(req => GetRootUrlFromAppConfig());
+
                         // Use "SingleApiVersion" to describe a single version API.
                         // Swagger 2.0 requires version and title at a minimum but you can
                         // also provide additional information with the provided fluent interface
@@ -34,7 +40,7 @@ namespace $rootnamespace$
                         //        vc.Version("2.0", "Swashbuckle Dummy API 2.0");
                         //    });
 
-                        // If schemes are not specifically provided in a Swagger 2.0 document, then the scheme used to access
+                        // If schemes are not explicitly provided in a Swagger 2.0 document, then the scheme used to access
                         // the docs is inferred to be that of the API. If your API supports multiple schemes and you want to
                         // be explicit about them, you can use the "Schemes" option as shown below.
                         //
