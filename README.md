@@ -3,7 +3,7 @@ Swashbuckle
 
 Seamlessly adds a [swagger](https://developers.helloreverb.com/swagger) to WebApi projects! Combines ApiExplorer and swagger/swagger-ui to provide a rich discovery and documentation experience to your API consumers.
 
-In addition to it's Swagger generator, Swashbuckle also contains an embedded version of [swagger-ui](https://github.com/wordnik/swagger-ui.git) which it will automatically serve up once Swashbuckle is installed. This means little or no maintenance for discovery and documentation of your service, allowing you to focus on building an awesome API!
+In addition to its Swagger generator, Swashbuckle also contains an embedded version of [swagger-ui](https://github.com/wordnik/swagger-ui.git) which it will automatically serve up once Swashbuckle is installed. This means little or no maintenance for discovery and documentation of your service, allowing you to focus on building an awesome API!
 
 And that's not all ...
 
@@ -26,11 +26,11 @@ As of version 4.0, Swashbuckle has no dependency on ASP.Net MVC. As a result, it
 
 ### IIS Hosted ###
 
-If youre service is hosted in IIS, you can start exposing Swagger docs and a corresponding Swagger UI by simply installing the following Nuget package:
+If your service is hosted in IIS, you can start exposing Swagger docs and a corresponding Swagger UI by simply installing the following Nuget package:
 
     Install-Package Swashbuckle
 
-This will add a reference to Swashbuckle.Core, which contains the generator and embedded swagger-ui. It will also install a bootstrapper (App_Start/SwaggerConfig.cs) that initiates Swashbuckle on app start-up using [WeActivatorEx](https://github.com/davidebbo/WebActivator). Once installed, you should be able to browse the following raw docs and UI endpoints: 
+This will add a reference to Swashbuckle.Core, which contains the generator and embedded swagger-ui. It will also install a bootstrapper (App_Start/SwaggerConfig.cs) that initiates Swashbuckle on app start-up using [WebActivatorEx](https://github.com/davidebbo/WebActivator). Once installed, you should be able to browse the following raw docs and UI endpoints: 
 
 ***\<your-api-endpoint\>/swagger/api-docs***
 
@@ -38,7 +38,7 @@ This will add a reference to Swashbuckle.Core, which contains the generator and 
 
 ### Self-hosted ###
 
-If youre service is self-hosted, you will need to install Swashbuckle.Core directly ...
+If your service is self-hosted, you will need to install Swashbuckle.Core directly ...
 
     Install-Package Swashbuckle.Core
 
@@ -70,7 +70,7 @@ Similarly, if you're using OWIN to self-host your service, you should install Sw
 
 ### OWIN Hosted in IIS ###
 
-If your using OWIN to host your service via the IIS Integrated pipeline (i.e. Microsoft.Owin.Host.SystemWeb), the steps are the same as above but with some additional workarounds.
+If you're using OWIN to host your service via the IIS Integrated pipeline (i.e. Microsoft.Owin.Host.SystemWeb), the steps are the same as above but with some additional workarounds.
 
 1) The following line must be included in your Web.config:
 
@@ -80,13 +80,13 @@ If your using OWIN to host your service via the IIS Integrated pipeline (i.e. Mi
        </system.webServer>
     </configuration>
     
-This is because IIS has a native module for handling static files and when it sees an extension in the URL, it assumes a static file and tries to handle the request itself skipping remaining parts of the pipeline. However, Swashbuckle serves it's UI routes (which do have extensions) through WebApi which is being invoked through the OWIN module. This setting ensures the OWIN module is run for all requests - extension and extensionless.
+This is because IIS has a native module for handling static files and when it sees an extension in the URL, it assumes a static file and tries to handle the request itself skipping remaining parts of the pipeline. However, Swashbuckle serves its UI routes (which do have extensions) through WebApi which is being invoked through the OWIN module. This setting ensures the OWIN module is run for all requests - extension and extensionless.
 
 2) Add the following stage marker AFTER configuring the WebApi middleware (in namespace Microsoft.Owin.Extensions):
 
     app.UseStageMarker(PipelineStage.MapHandler);
     
-This setting causes the WebApi middleware to execute earlier in the pipeline, allowing it to also handle URL's with extensions. See the following article for more information on stage markers (http://www.asp.net/aspnet/overview/owin-and-katana/owin-middleware-in-the-iis-integrated-pipeline) 
+This setting causes the WebApi middleware to execute earlier in the pipeline, allowing it to also handle URLs with extensions. See the following article for more information on stage markers (http://www.asp.net/aspnet/overview/owin-and-katana/owin-middleware-in-the-iis-integrated-pipeline) 
 
 ## Troubleshooting ##
 
@@ -94,7 +94,7 @@ Troubleshooting??? I thought this was all supposed to be "seamless"? OK you've c
 
 ## Extensibility ##
 
-Swashbuckle automatically generates a Swagger spec and UI based off the WebApi ApiExplorer. The out-of-the-box generator caters for the majority of WebApi implementations but also includes some extensibility points for application-specific needs ..
+Swashbuckle automatically generates a Swagger spec and UI based off the WebApi's ApiExplorer. The out-of-the-box generator caters for the majority of WebApi implementations but also includes some extensibility points for application-specific needs ..
 
 ### Customize spec generation ###
 
@@ -231,7 +231,7 @@ This is similar to the **OperationFilter** option. It provides a way to customiz
 
 #### IncludeXmlComments ####
 
-If you annonate Controllers and API Types with [Xml Comments](http://msdn.microsoft.com/en-us/library/b2s063f7(v=vs.110).aspx), you can use this option to incorporate those comments into the generated spec and UI. The Xml tags are mapped to Swagger properties as follows:
+If you annotate Controllers and API Types with [Xml Comments](http://msdn.microsoft.com/en-us/library/b2s063f7(v=vs.110).aspx), you can use this option to incorporate those comments into the generated spec and UI. The Xml tags are mapped to Swagger properties as follows:
 
 * **Action summary** -> Operation.Summary
 * **Action remarks** -> Operation.Notes
@@ -249,7 +249,7 @@ These values will get mapped to the Operation.ResponseMessages.
 
 ### Customize the swagger-ui ###
 
-The Swagger UI supports a number of options to customize it's appearance and behavior. See the [documentation](https://github.com/wordnik/swagger-ui) for a detailed description.
+The Swagger UI supports a number of options to customize its appearance and behavior. See the [documentation](https://github.com/wordnik/swagger-ui) for a detailed description.
 
 All of these options are exposed through Swashbuckle configuration ...
 
@@ -287,7 +287,7 @@ If you're upgrading from a version prior to 4.0, the following information will 
 
 ### Changes to Bootstrapping ###
 
-Because Swashbuckle 4.0 has no dependency on ASP.Net MVC, the approach to bootstrapping is a little different. The upgrade should install a bootstrapper (App_Start/SwaggerConfig.cs) that is invoked on app start-up using [WeActivatorEx](https://github.com/davidebbo/WebActivator). If you're unable to access the Swagger content after upgrading, check out the [bootstrap troubleshooting steps](#missing-bootststrap-one-liner-only-applicable-to-40-and-above).
+Because Swashbuckle 4.0 has no dependency on ASP.Net MVC, the approach to bootstrapping is a little different. The upgrade should install a bootstrapper (App_Start/SwaggerConfig.cs) that is invoked on app start-up using [WebActivatorEx](https://github.com/davidebbo/WebActivator). If you're unable to access the Swagger content after upgrading, check out the [bootstrap troubleshooting steps](#missing-bootststrap-one-liner-only-applicable-to-40-and-above).
 
 ### Changes to the Config API ###
 
@@ -295,7 +295,7 @@ Because Swashbuckle 4.0 has no dependency on ASP.Net MVC, the approach to bootst
 * ApiVersion has been replaced with a method - ResolveTargetVersionUsing that accepts a lambda.
 * IgnoreObsoleteActions has been converted to a method.
 * IOperationFilter interface has moved namespace from Swashbuckle.Models to Swashbuckle.Swagger
-* It's signature has also been simplified - see the [Extensibility](#operationfilter) section for more details
+* Its signature has also been simplified - see the [Extensibility](#operationfilter) section for more details
 * Some of the Swagger types have been renamed to better reflect terminology used in the [Swagger Spec](https://github.com/wordnik/swagger-spec/blob/master/versions/1.2.md)
     * the "Spec" suffix has been removed from several of the class names, e.g. OperationSpec is now called Operation
     * The ModelSpec class has been renamed to DataType as it describes both primitive and complex data types (Models).
@@ -309,7 +309,7 @@ In previous versions this was left up to the app - typically with a custom imple
 
 ### Missing Bootststrap One-liner (*only applicable to 4.0 and above)###
 
-As of version 4.0, Swashbuckle has no dependency on ASP.Net MVC and so, routes are no longer wired up through an MVC Area. Instead, the Swashbuckle package will install a bootstrapper (App_Start/SwaggerConfig.cs) that is invoked on app start-up using [WeActivatorEx](https://github.com/davidebbo/WebActivator). You should ensure that this file exists and is annotated with the following assembly attribute:
+As of version 4.0, Swashbuckle has no dependency on ASP.Net MVC and so, routes are no longer wired up through an MVC Area. Instead, the Swashbuckle package will install a bootstrapper (App_Start/SwaggerConfig.cs) that is invoked on app start-up using [WebActivatorEx](https://github.com/davidebbo/WebActivator). You should ensure that this file exists and is annotated with the following assembly attribute:
 
     [assembly: PreApplicationStartMethod(.....)]
 
@@ -319,7 +319,7 @@ In addition, the referenced static method should contain the following line to i
 
 ### IIS Hosted - UI returning 404 File not Found ###
 
-The [swagger-ui](https://github.com/wordnik/swagger-ui) is a single page application (SPA) consisting of html, JavaScript and CSS. To serve up these files (.html, .js and .css), you're web server must execute the ASP.NET Routing Module on all requests (as opposed to just extensionless URL's). If the setting for this is not present in your Web.config, you'll need to add it manually:
+The [swagger-ui](https://github.com/wordnik/swagger-ui) is a single page application (SPA) consisting of html, JavaScript and CSS. To serve up these files (.html, .js and .css), your web server must execute the ASP.NET Routing Module on all requests (as opposed to just extensionless URLs). If the setting for this is not present in your Web.config, you'll need to add it manually:
 
     <system.webServer>
         <modules runAllManagedModulesForAllRequests="true" />
@@ -361,7 +361,7 @@ I hope to find a permanent fix but in the meantime, you'll need to workaround th
 
 ### Missing Area Registration (*only applicable to 3.x and below)###
 
-Prior to version 4.0, Swashbuckle wires up it's routes as an MVC Area. In MVC projects, all Areas are usually registered at application startup. If the code to do this is not present in your Global.asax.cs, you'll need to add it manually:
+Prior to version 4.0, Swashbuckle wires up its routes as an MVC Area. In MVC projects, all Areas are usually registered at application startup. If the code to do this is not present in your Global.asax.cs, you'll need to add it manually:
 
     protected void Application_Start()
     {
