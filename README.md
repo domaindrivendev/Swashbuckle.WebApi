@@ -3,11 +3,11 @@ Swashbuckle
 
 Seamlessly adds a [Swagger](http://swagger.io/) to WebApi projects! Combines ApiExplorer and Swagger/swagger-ui to provide a rich discovery, documentation and playground experience to your API consumers.
 
-In addition to it's Swagger generator, Swashbuckle also contains an embedded version of [swagger-ui](https://github.com/swagger-api/swagger-ui) which it will automatically serve up once Swashbuckle is installed. This means you can compliment your API with a slick discovery UI to assist consumers with their integration efforts. Best of all, it requires minimal coding and maintenance, allowing you to focus on building an awesome API!
+In addition to its Swagger generator, Swashbuckle also contains an embedded version of [swagger-ui](https://github.com/swagger-api/swagger-ui) which it will automatically serve up once Swashbuckle is installed. This means you can compliment your API with a slick discovery UI to assist consumers with their integration efforts. Best of all, it requires minimal coding and maintenance, allowing you to focus on building an awesome API!
 
 And that's not all ...
 
-Once you have a Web API that can describe itself in Swagger, you've opened the treasure chest of Swagger-based tools including a client generator that can be targetted to a wide range of popular platforms. See [swagger-codegen](https://github.com/swagger-api/swagger-codegen) for more details.
+Once you have a Web API that can describe itself in Swagger, you've opened the treasure chest of Swagger-based tools including a client generator that can be targeted to a wide range of popular platforms. See [swagger-codegen](https://github.com/swagger-api/swagger-codegen) for more details.
 
 **Swashbuckle Core Features:**
 
@@ -21,7 +21,7 @@ Once you have a Web API that can describe itself in Swagger, you've opened the t
 
 **\*Swashbuckle 5.0**
 
-Swashbuckle 5.0 makes the transition to Swagger 2.0. The 2.0 schema is significantly different to it's predecessor - 1.2 and, as a result, the Swashbuckle config interface has undergone yet another overall. Checkout the [transition guide](#transitioning-to-swashbuckle-40) if you're upgrading from a prior version.
+Swashbuckle 5.0 makes the transition to Swagger 2.0. The 2.0 schema is significantly different to its predecessor - 1.2 and, as a result, the Swashbuckle config interface has undergone yet another overall. Checkout the [transition guide](#transitioning-to-swashbuckle-40) if you're upgrading from a prior version.
 
 ## Getting Started ##
 
@@ -39,7 +39,7 @@ If your service is hosted in IIS, you can start exposing Swagger docs and a corr
 
     Install-Package Swashbuckle
 
-This will add a reference to Swashbuckle.Core and also install a bootstrapper (App_Start/SwaggerConfig.cs) that enables the Swagger routes on app start-up using [WeActivatorEx](https://github.com/davidebbo/WebActivator).
+This will add a reference to Swashbuckle.Core and also install a bootstrapper (App_Start/SwaggerConfig.cs) that enables the Swagger routes on app start-up using [WebActivatorEx](https://github.com/davidebbo/WebActivator).
 
 ### Self-hosted ###
 
@@ -65,13 +65,13 @@ Then manually enable the Swagger docs and swagger-ui by invoking the extension m
         .EnableSwagger(c => c.SingleApiVersion("1.0", "A title for your API"));
         .EnableSwaggerUi();
 
-\* If your OWIN middleware is self-hosted then your done! If your using OWIN through the IIS Integrated pipeline then you'll need to apply the following steps to prevent URL's with extensions (i.e. the swagger-ui assets) from being short-circuited by the native static file module.
+\* If your OWIN middleware is self-hosted then you're done! If you're using OWIN through the IIS Integrated pipeline then you'll need to apply the following steps to prevent URLs with extensions (i.e. the swagger-ui assets) from being short-circuited by the native static file module.
 
 1) In your web.config add:
 
     <configuration>
        <system.webServer>
-          <modules runAllManagedModulesForAllRequests=“true” />
+          <modules runAllManagedModulesForAllRequests=â€œtrueâ€ />
        </system.webServer>
     </configuration>
 
@@ -79,7 +79,7 @@ Then manually enable the Swagger docs and swagger-ui by invoking the extension m
 
     app.UseStageMarker(PipelineStage.MapHandler);
     
-This setting causes the WebApi middleware to execute earlier in the pipeline, allowing it to correctly handle URL's with extensions.
+This setting causes the WebApi middleware to execute earlier in the pipeline, allowing it to correctly handle URLs with extensions.
 
 Check out the following articles for more information:
 
@@ -196,7 +196,7 @@ The config. interface exposes a number of methods to hook into the generation pr
                     });
 
                 // Swashbuckle makes a best attempt at generating Swagger compliant JSON schemas for the various types
-                // exposed in your API. However, there may be occassions when more control of the output is needed.
+                // exposed in your API. However, there may be occasions when more control of the output is needed.
                 // This is supported through the MapType and SchemaFilter options. The former can be used when you
                 // want to map a Type to a specific Schema (typically a primitive) rather than an auto-generated schema
                 c.MapType<ProductType>(() => new Schema { type = "integer", format = "int32" });
@@ -206,7 +206,7 @@ The config. interface exposes a number of methods to hook into the generation pr
                 // for complex schema's i.e. where type = "object"
                 c.SchemaFilter<ApplySchemaVendorExtensions>();
 
-                // Similar to a schema filter, Swashubuckle allows the generated Operation desrciptions to be
+                // Similar to a schema filter, Swashubuckle allows the generated Operation descriptions to be
                 // post-modified by wiring up one or more operation filters
                 //
                 c.OperationFilter<AddDefaultResponse>();
@@ -236,7 +236,7 @@ The config. interface exposes a number of methods to hook into the generation pr
 
 #### Including Xml Comments ####
 
-If you annonate Controllers and API Types with [Xml Comments](http://msdn.microsoft.com/en-us/library/b2s063f7(v=vs.110).aspx), you can use this option to incorporate those comments into the generated spec and UI. The Xml tags are mapped to Swagger properties as follows:
+If you annotate Controllers and API Types with [Xml Comments](http://msdn.microsoft.com/en-us/library/b2s063f7(v=vs.110).aspx), you can use this option to incorporate those comments into the generated spec and UI. The Xml tags are mapped to Swagger properties as follows:
 
 * **Action summary** -> Operation.summary
 * **Action remarks** -> Operation.description
@@ -246,21 +246,21 @@ If you annonate Controllers and API Types with [Xml Comments](http://msdn.micros
 
 ### Customizing the swagger-ui ###
 
-Swashbuckle supports two differrent strategies for customizing the swagger-ui
+Swashbuckle supports two different strategies for customizing the swagger-ui
 
 * You can provide your own version of "index.html" and customize it directly ([read about swagger-ui settings here](https://github.com/swagger-api/swagger-ui#swaggerui))
 * OR, you can stick with the default, templated version and use the config. interface to tweak it accordingly
 
 #### Custom "index.html" for swagger-ui ####
 
-This offers more flexibilty but also forces you to maintain some HTML in your WebApi project.
+This offers more flexibility but also forces you to maintain some HTML in your WebApi project.
 
 If you're happy to do this, you'll need to follow these steps to make your "index.html" available to Swashbuckle:
 
 1. Add an "index.html" to your WebApi project (or any project it has access to). You should base it off the default version [here](#).
-2. Then, right click the file and open it's properties window. Change the "Build Action" to "Embedded Resource".
+2. Then, right click the file and open its properties window. Change the "Build Action" to "Embedded Resource".
 
-This will embed the file into your assembly at build-time and register it with a "Logical Name" that Swashbuckle can use to access it at runtime. The Logical Name is based on the Project's default namespace, file location and file extension . For example, if you're project's default namespace is "YourWebApiProject" and you've included the file at "/SwaggerExtensions/index.html", then you can override the default "index.html" as follows.
+This will embed the file into your assembly at build-time and register it with a "Logical Name" that Swashbuckle can use to access it at runtime. The Logical Name is based on the Project's default namespace, file location and file extension . For example, if your project's default namespace is "YourWebApiProject" and you've included the file at "/SwaggerExtensions/index.html", then you can override the default "index.html" as follows.
 
     httpConfiguration
         .EnableSwagger(c => c.SingleApiVersion("1.0", "A title for your API"))
@@ -302,13 +302,13 @@ If you're relatively happy with the default look and feel but would just like a 
                 //
                 c.DocExpansion(DocExpansion.List);
 
-                // If you're API has multiple versions and you've applied the "MultipleApiVersions" setting
+                // If your API has multiple versions and you've applied the "MultipleApiVersions" setting
                 // as described above, you can also enable a select box that displays the corresponding discovery
-                // URL's. This provides a convenient way for users to view documentation for different API versions
+                // URLs. This provides a convenient way for users to view documentation for different API versions
                 //
                 c.EnableDiscoveryUrlSelector();
 
-                // If you're API supports the OAuth2 Implicit flow, and you've described it correctly,
+                // If your API supports the OAuth2 Implicit flow, and you've described it correctly,
                 // according to the Swagger 2.0 specification (see OAuth config. above), you can
                 // enable UI support with the following command
                 c.EnableOAuth2Support("test-client-id", "test-realm", "Swagger UI");
@@ -316,7 +316,7 @@ If you're relatively happy with the default look and feel but would just like a 
 
 ## Transitioning to Swashbuckle 5.0 ##
 
-This version of Swashbuckle makes the transition to Swagger 2.0. The 2.0 specification is significantly different to it's predecessor - 1.2 and forces several breaking changes to Swashbuckle's config. interface. If you're using Swashbuckle without any customizations, i.e. App_Start/SwaggerConfig.cs has never been modified, then you can overwrite it with the new version. The defaults are the same and so the swagger-ui should behave as before.
+This version of Swashbuckle makes the transition to Swagger 2.0. The 2.0 specification is significantly different to its predecessor - 1.2 and forces several breaking changes to Swashbuckle's config. interface. If you're using Swashbuckle without any customizations, i.e. App_Start/SwaggerConfig.cs has never been modified, then you can overwrite it with the new version. The defaults are the same and so the swagger-ui should behave as before.
 
 \* If you have consumers of the raw Swagger document, you should ensure they can accept Swagger 2.0 before making the upgrade.
 
@@ -344,7 +344,7 @@ If you're using the existing config. interface to customize the final Swagger do
 
 ### Missing Bootststrap One-liner (*only applicable to 4.0 and above)###
 
-As of version 4.0, Swashbuckle has no dependency on ASP.Net MVC and so, routes are no longer wired up through an MVC Area. Instead, the Swashbuckle package will install a bootstrapper (App_Start/SwaggerConfig.cs) that is invoked on app start-up using [WeActivatorEx](https://github.com/davidebbo/WebActivator). You should ensure that this file exists and is annotated with the following assembly attribute:
+As of version 4.0, Swashbuckle has no dependency on ASP.Net MVC and so, routes are no longer wired up through an MVC Area. Instead, the Swashbuckle package will install a bootstrapper (App_Start/SwaggerConfig.cs) that is invoked on app start-up using [WebActivatorEx](https://github.com/davidebbo/WebActivator). You should ensure that this file exists and is annotated with the following assembly attribute:
 
     [assembly: PreApplicationStartMethod(.....)]
 
@@ -354,7 +354,7 @@ In addition, the referenced static method should contain the following line to i
 
 ### IIS Hosted - UI returning 404 File not Found ###
 
-The [swagger-ui](https://github.com/wordnik/swagger-ui) is a single page application (SPA) consisting of html, JavaScript and CSS. To serve up these files (.html, .js and .css), you're web server must execute the ASP.NET Routing Module on all requests (as opposed to just extensionless URL's). If the setting for this is not present in your Web.config, you'll need to add it manually:
+The [swagger-ui](https://github.com/wordnik/swagger-ui) is a single page application (SPA) consisting of html, JavaScript and CSS. To serve up these files (.html, .js and .css), your web server must execute the ASP.NET Routing Module on all requests (as opposed to just extensionless URLs). If the setting for this is not present in your Web.config, you'll need to add it manually:
 
     <system.webServer>
         <modules runAllManagedModulesForAllRequests="true" />
@@ -363,7 +363,7 @@ The [swagger-ui](https://github.com/wordnik/swagger-ui) is a single page applica
     
 ### OWIN Hosted in IIS - UI returning 404 File not Found
 
-This is similar to the issue above with an additonal workaround required. To ensure that the OWIN module is run for all requests (extension and extensionless), **runAllManagedModulesForAllRequests** must be set in the Web.config.
+This is similar to the issue above with an additional workaround required. To ensure that the OWIN module is run for all requests (extension and extensionless), **runAllManagedModulesForAllRequests** must be set in the Web.config.
 
 In addition, a stage marker must be used in Startup.cs, AFTER configuring the WebApi middleware, to ensure that routes with extensions are also processed via WebApi:
 
@@ -380,7 +380,7 @@ It's likely because something went wrong during the spec generation. You can dig
 
 ***Failed to generate Swagger models with unique Id's. Do you have multiple API types with the same class name?***
 
-This is by design and will occur if one or more of your API types have conflicting class names - e.g. Namespace1.Customer, Namespace2.Customer etc. Actually, the class names need only be unique within a given ApiDeclaration, the scope if which is customizeable via the [GroupDeclarationsBy](#groupdeclarationsby) option described below. 
+This is by design and will occur if one or more of your API types have conflicting class names - e.g. Namespace1.Customer, Namespace2.Customer etc. Actually, the class names need only be unique within a given ApiDeclaration, the scope if which is customizable via the [GroupDeclarationsBy](#groupdeclarationsby) option described below. 
 
 ### Issues with VS 2013 ###
 
@@ -396,7 +396,7 @@ I hope to find a permanent fix but in the meantime, you'll need to workaround th
 
 ### Missing Area Registration (*only applicable to 3.x and below)###
 
-Prior to version 4.0, Swashbuckle wires up it's routes as an MVC Area. In MVC projects, all Areas are usually registered at application startup. If the code to do this is not present in your Global.asax.cs, you'll need to add it manually:
+Prior to version 4.0, Swashbuckle wires up its routes as an MVC Area. In MVC projects, all Areas are usually registered at application startup. If the code to do this is not present in your Global.asax.cs, you'll need to add it manually:
 
     protected void Application_Start()
     {
