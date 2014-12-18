@@ -9,11 +9,11 @@ namespace Swashbuckle.Swagger
     {
         public SwaggerGeneratorSettings(
             Func<ApiDescription, string, bool> versionSupportResolver,
-            IDictionary<string, Info> apiVersions,
             IEnumerable<string> schemes,
-            Func<ApiDescription, string> groupingKeySelector,
-            IComparer<string> groupingKeyComparer,
+            IDictionary<string, Info> apiVersions,
             IDictionary<string, SecurityScheme> securityDefinitions = null,
+            Func<ApiDescription, string> groupingKeySelector = null,
+            IComparer<string> groupingKeyComparer = null,
             IDictionary<Type, Func<Schema>> customSchemaMappings = null,
             IEnumerable<ISchemaFilter> schemaFilters = null,
             IEnumerable<IOperationFilter> operationFilters = null,
@@ -21,11 +21,11 @@ namespace Swashbuckle.Swagger
             Func<IEnumerable<ApiDescription>, ApiDescription> conflictingActionsResolver = null)
         {
             VersionSupportResolver = versionSupportResolver;
-            ApiVersions = apiVersions;
             Schemes = schemes;
+            ApiVersions = apiVersions;
+            SecurityDefinitions = securityDefinitions;
             GroupingKeySelector = groupingKeySelector ?? DefaultGroupingKeySelector;
             GroupingKeyComparer = groupingKeyComparer ?? Comparer<string>.Default;
-            SecurityDefinitions = securityDefinitions;
             CustomSchemaMappings = customSchemaMappings ?? new Dictionary<Type, Func<Schema>>();
             SchemaFilters = schemaFilters ?? new List<ISchemaFilter>();
             OperationFilters = operationFilters ?? new List<IOperationFilter>();
@@ -35,15 +35,15 @@ namespace Swashbuckle.Swagger
 
         public Func<ApiDescription, string, bool> VersionSupportResolver { get; private set; }
 
+        public IEnumerable<string> Schemes { get; private set; }
+
         public IDictionary<string, Info> ApiVersions { get; private set; }
 
-        public IEnumerable<string> Schemes { get; private set; }
+        public IDictionary<string, SecurityScheme> SecurityDefinitions { get; private set; }
 
         public Func<ApiDescription, string> GroupingKeySelector { get; private set; }
 
         public IComparer<string> GroupingKeyComparer { get; private set; }
-
-        public IDictionary<string, SecurityScheme> SecurityDefinitions { get; private set; }
 
         public IDictionary<Type, Func<Schema>> CustomSchemaMappings { get; private set; }
 

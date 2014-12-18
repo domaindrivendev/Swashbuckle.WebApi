@@ -12,13 +12,12 @@ namespace Swashbuckle.Application
     public class SwaggerDocsConfig
     {
         private Func<HttpRequestMessage, string> _rootUrlResolver;
-
         private Func<ApiDescription, string, bool> _versionSupportResolver;
-        private VersionInfoBuilder _versionInfoBuilder;
         private IEnumerable<string> _schemes;
+        private VersionInfoBuilder _versionInfoBuilder;
+        private IDictionary<string, SecuritySchemeBuilder> _securitySchemeBuilders;
         private Func<ApiDescription, string> _groupingKeySelector;
         private IComparer<string> _groupingKeyComparer;
-        private IDictionary<string, SecuritySchemeBuilder> _securitySchemeBuilders;
         private readonly IDictionary<Type, Func<Schema>> _customSchemaMappings;
         private readonly IList<Func<ISchemaFilter>> _schemaFilters;
         private readonly IList<Func<IOperationFilter>> _operationFilters;
@@ -28,7 +27,6 @@ namespace Swashbuckle.Application
         public SwaggerDocsConfig()
         {
             _rootUrlResolver = DefaultRootUrlResolver; 
-
             _versionInfoBuilder = new VersionInfoBuilder();
             _securitySchemeBuilders = new Dictionary<string, SecuritySchemeBuilder>();
             _customSchemaMappings = new Dictionary<Type, Func<Schema>>();
@@ -42,6 +40,11 @@ namespace Swashbuckle.Application
         public void RootUrl(Func<HttpRequestMessage, string> rootUrlResolver)
         {
             _rootUrlResolver = rootUrlResolver;
+        }
+
+        public void Schemes(IEnumerable<string> schemes)
+        {
+            _schemes = schemes;
         }
 
         public InfoBuilder SingleApiVersion(string version, string title)
@@ -58,21 +61,6 @@ namespace Swashbuckle.Application
             _versionSupportResolver = versionSupportResolver;
             _versionInfoBuilder = new VersionInfoBuilder();
             configure(_versionInfoBuilder);
-        }
-
-        public void Schemes(IEnumerable<string> schemes)
-        {
-            _schemes = schemes;
-        }
-
-        public void GroupActionsBy(Func<ApiDescription, string> keySelector)
-        {
-            _groupingKeySelector = keySelector;
-        }
-
-        public void OrderActionGroupsBy(IComparer<string> keyComparer)
-        {
-            _groupingKeyComparer = keyComparer;
         }
 
         public BasicAuthSchemeBuilder BasicAuth(string name)
@@ -95,6 +83,17 @@ namespace Swashbuckle.Application
             _securitySchemeBuilders[name] = schemeBuilder;
             return schemeBuilder;
         }
+
+        public void GroupActionsBy(Func<ApiDescription, string> keySelector)
+        {
+            _groupingKeySelector = keySelector;
+        }
+
+        public void OrderActionGroupsBy(IComparer<string> keyComparer)
+        {
+            _groupingKeyComparer = keyComparer;
+        }
+
 
         public void MapType<T>(Func<Schema> factory)
         {
@@ -163,11 +162,11 @@ namespace Swashbuckle.Application
 
             return new SwaggerGeneratorSettings(
                 versionSupportResolver: _versionSupportResolver, // TODO: handle null value
-                apiVersions: _versionInfoBuilder.Build(),
                 schemes: _schemes, 
+                apiVersions: _versionInfoBuilder.Build(),
+                securityDefinitions: securityDefintitions, 
                 groupingKeySelector: _groupingKeySelector,
                 groupingKeyComparer: _groupingKeyComparer,
-                securityDefinitions: securityDefintitions, 
                 customSchemaMappings: _customSchemaMappings,
                 schemaFilters: _schemaFilters.Select(factory => factory()),
                 operationFilters: _operationFilters.Select(factory => factory()),

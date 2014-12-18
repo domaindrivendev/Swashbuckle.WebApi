@@ -22,13 +22,19 @@ namespace Swashbuckle.Dummy
                     {
                         // By default, the service root url is inferred from the request used to access the docs.
                         // However, there may be situations (e.g. certain load-balanced environments) where this does not
-                        // resolve correctly. You can workaround this by providing your own code to determine the root URL
+                        // resolve correctly. You can workaround this by providing your own code to determine the root URL.
                         //
                         //c.RootUrl(req => GetRootUrlFromAppConfig());
 
+                        // If schemes are not explicitly provided in a Swagger 2.0 document, then the scheme used to access
+                        // the docs is taken as the default. If your API supports multiple schemes and you want to be explicit
+                        // about them, you can use the "Schemes" option as shown below.
+                        //
+                        c.Schemes(new[] { "http", "https" });
+
                         // Use "SingleApiVersion" to describe a single version API. Swagger 2.0 includes an "Info" object to
                         // hold additional metadata for an API. Version and title are required but you may also provide the
-                        // additional fields with the fluent API on "SingleApiVersion"
+                        // additional fields.
                         //
                         c.SingleApiVersion("1.0", "Swashbuckle Dummy")
                             .Description("A sample API for testing and prototyping Swashbuckle features")
@@ -41,10 +47,10 @@ namespace Swashbuckle.Dummy
                                 .Name("Some License")
                                 .Url("http://tempuri.org/license"));
 
-                        // If your API has multiple versions, use "MultipleApiVersions" instead of "SingleApiVersion"
+                        // If your API has multiple versions, use "MultipleApiVersions" instead of "SingleApiVersion".
                         // In this case, you must provide a lambda that tells Swashbuckle which actions should be
-                        // included in the docs for a given API version. Like "SingleApiVersion", each call to "Version" returns an
-                        // "Info" builder so you can optonally provide additional metadata per API version.
+                        // included in the docs for a given API version. Like "SingleApiVersion", each call to "Version"
+                        // returns an "Info" builder so you can provide additional metadata per API version.
                         //
                         //c.MultipleApiVersions(
                         //    (apiDesc, targetApiVersion) => ResolveVersionSupportByRouteConstraint(apiDesc, targetApiVersion),
@@ -54,31 +60,12 @@ namespace Swashbuckle.Dummy
                         //        vc.Version("1.0", "Swashbuckle Dummy API 1.0");
                         //    });
 
-                        // If schemes are not explicitly provided in a Swagger 2.0 document, then the scheme used to access
-                        // the docs is inferred to be that of the API. If your API supports multiple schemes and you want to
-                        // be explicit about them, you can use the "Schemes" option as shown below.
-                        //
-                        c.Schemes(new[] { "http", "https" });
-
-                        // Each operation can have one or more assigned tags which may be used by consumers for various
-                        // reasons. For example, the swagger-ui groups operations based on each operations first tag.
-                        // By default, controller name is assigned for this but you can use the following option
-                        // to override this and provide a custom value
-                        //c.GroupActionsBy(apiDesc => apiDesc.HttpMethod.ToString());
-
-                        // You can also specify a custom sort order for groups (as defined by GroupActionsBy) to dictate the
-                        // order in which operations are returned. For example, if the default grouping is in place
-                        // i.e. (by controller name) and you specify a descending alphabetic sort order, then actions from a
-                        // ProductsController will be listed before those from a CustomersController. This would be typically
-                        // used to customize the order of groupings in the swagger-ui
-                        //c.OrderActionGroupsBy(new DescendingAlphabeticComparer());
-
-                        // You can use the "BasicAuth", "ApiKey" or "OAuth2" options to define security schemes for the API
-                        // See https://github.com/swagger-api/swagger-spec/blob/master/versions/2.0.md for more details
-                        // NOTE: These definitions only define the schemes and need to be coupled with a corresponding "security"
-                        // property at the document or operation level to indicate which schemes are required for an operation.
-                        // To do this, you'll need to implement a custom IDocumentFilter and/or IOperationFilter to set these
-                        // properties according to your specific authorization implementation
+                        // You can use "BasicAuth", "ApiKey" or "OAuth2" options to describe security schemes for the API.
+                        // See https://github.com/swagger-api/swagger-spec/blob/master/versions/2.0.md for more details.
+                        // NOTE: These only define the schemes and need to be coupled with a corresponding "security" property
+                        // at the document or operation level to indicate which schemes are required for an operation. To do this,
+                        // you'll need to implement a custom IDocumentFilter and/or IOperationFilter to set these properties
+                        // according to your specific authorization implementation
                         //
                         //c.BasicAuth("basic") .Description("Basic HTTP Authentication");
                         //
@@ -98,34 +85,65 @@ namespace Swashbuckle.Dummy
                                 scopes.Add("write", "Write access to protected resources");
                             });
 
+                        // Each operation can have one or more tags which are used by consumers for various reasons.
+                        // For example, the swagger-ui groups operations according to the first tag of each operation.
+                        // By default, this will be controller name but you can use the "GroupActionsBy" option to
+                        // override with any value.
+                        //
+                        //c.GroupActionsBy(apiDesc => apiDesc.HttpMethod.ToString());
+
+                        // You can also specify a custom sort order for groups (as defined by GroupActionsBy) to dictate
+                        // the order in which operations are listed. For example, if the default grouping is in place
+                        // (controller name) and you specify a descending alphabetic sort order, then actions from a
+                        // ProductsController will be listed before those from a CustomersController. This is typically
+                        // used to customize the order of groupings in the swagger-ui.
+                        //
+                        //c.OrderActionGroupsBy(new DescendingAlphabeticComparer());
+
                         // Swashbuckle makes a best attempt at generating Swagger compliant JSON schemas for the various types
                         // exposed in your API. However, there may be occassions when more control of the output is needed.
-                        // This is supported through the MapType and SchemaFilter options. The former can be used when you
-                        // want to map a Type to a specific Schema (typically a primitive) rather than an auto-generated schema
+                        // This is supported through the MapType and SchemaFilter options:
+                        //
+                        // Use the "MapType" option to override the Schema generation for a specific type.
+                        // It should be noted that the resulting Schema will be placed "inline" for any applicable Operations.
+                        // While Swagger 2.0 supports inline definitions for "all" Schema types, the swagger-ui tool does not.
+                        // It expects "complex" Schemas to be defined separately and referenced. For this reason, you should only
+                        // use the MapType option when the resulting Schema is a primitive or array type. If you need to alter a
+                        // complex Schema, use a Schema filter.
+                        //
                         //c.MapType<ProductType>(() => new Schema { type = "integer", format = "int32" });
                         //
-                        // If you want to post-modify schema's after they've been generated, either across the board or for one
-                        // specific type, you can wire up one or more schema filters. NOTE: schema filters will only be invoked
-                        // for complex schema's i.e. where type = "object"
+                        // If you want to post-modify "complex" Schemas once they've been generated, across the board or for a
+                        // specific type, you can wire up one or more Schema filters.
+                        //
                         c.SchemaFilter<ApplySchemaVendorExtensions>();
 
-                        // Similar to a schema filter, Swashubuckle allows the generated Operation desrciptions to be
-                        // post-modified by wiring up one or more operation filters
+                        // Similar to Schema filters, Swashbuckle also supports Operation and Document filters:
+                        //
+                        // Post-modify Operation descriptions once they've been generated by wiring up one or more
+                        // Operation filters.
                         //
                         c.OperationFilter<AddDefaultResponse>();
                         //
                         // If you've defined an OAuth2 flow as described above, you could use a custom filter
                         // to inspect some attribute on each action and infer which (if any) OAuth2 scopes are required
                         // to execute the operation
+                        //
                         c.OperationFilter<AssignOAuth2SecurityRequirements>();
 
-                        // Similar to a schema and operation filters, Swashubuckle allows the entire Swagger document to be
-                        // post-modified by wiring up one or more document filters
+                        // Post-modify the entire Swagger document by wiring up one or more Document filters.
+                        // This gives full control to modify the final SwaggerDocument. You should have a good understanding of
+                        // the Swagger 2.0 spec. - https://github.com/swagger-api/swagger-spec/blob/master/versions/2.0.md
+                        // before using this option.
                         //
                         c.DocumentFilter<ApplyDocumentVendorExtensions>();
+                        //
+                        //c.DocumentFilter<AppendVersionToBasePath>();
 
-                        // If you annotate your controllers and API types with XML comments, you can use the resulting
-                        // XML file (or files) to document the Operations and Schema's in the Swagger output 
+                        // If you annonate Controllers and API Types with
+                        // Xml comments (http://msdn.microsoft.com/en-us/library/b2s063f7(v=vs.110).aspx), you can incorporate
+                        // those comments into the generated docs and UI. You can enable this by providing the path to one or
+                        // more Xml comment files.
                         //
                         c.IncludeXmlComments(GetXmlCommentsPath());
 
@@ -138,47 +156,48 @@ namespace Swashbuckle.Dummy
                     })
                 .EnableSwaggerUi(c =>
                     {
-                        // Use the "InjectStylesheet" option to apply one or more custom CSS stylesheets
-                        // to the embedded swagger-ui that's served up by Swashbuckle
-                        // NOTE: It must first be added to your project as an "Embedded Resource", then the
-                        // resource's "Logical Name" can be passed to the method as shown below  
+                        // Use the "InjectStylesheet" option to enrich the UI with one or more additional CSS stylesheets.
+                        // The file must be included in your project as an "Embedded Resource", and then the resource's
+                        // "Logical Name" is passed to the method as shown below.
                         //
-                        //c.InjectStylesheet(thisAssembly, "Swashbuckle.Dummy.SwaggerExtensions.testStyles1.css");
+                        //c.InjectStylesheet(containingAssembly, "Swashbuckle.Dummy.SwaggerExtensions.testStyles1.css");
 
-                        // swagger-ui renders boolean data types as a dropdown. By default it provides "true" and "false"
-                        // strings as the possible choices. You can use the "BooleanValues" option to change these to
-                        // something else.
-                        c.BooleanValues(new[] { "0", "1" });
-
-                        // Use the "InjectJavaScript" option to invoke one or more custom Javascripts
-                        // after the swagger-ui has loaded
-                        // NOTE: It must first be added to your project as an "Embedded Resource", then the
-                        // resource's "Logical Name" can be passed to the method as shown below  
+                        // Use the "InjectJavaScript" option to invoke one or more custom JavaScripts after the swagger-ui
+                        // has loaded. The file must be included in your project as an "Embedded Resource", and then the resource's
+                        // "Logical Name" is passed to the method as shown above.
                         //
                         //c.InjectJavaScript(thisAssembly, "Swashbuckle.Dummy.SwaggerExtensions.testScript1.js");
 
-                        // Specify the default expansion for sections in the swagger-ui when it initially loads
-                        // Possible values are "None", "List" and "Full"
-                        // See https://github.com/swagger-api/swagger-ui for more details
+                        // The swagger-ui renders boolean data types as a dropdown. By default, it provides "true" and "false"
+                        // strings as the possible choices. You can use this option to change these to something else,
+                        // for example 0 and 1.
+                        //
+                        c.BooleanValues(new[] { "0", "1" });
+
+                        // Use this option to control how the Operation listing is displayed.
+                        // It can be set to "None" (default), "List" (shows operations for each resource),
+                        // or "Full" (fully expanded: shows operations and their details).
                         //
                         c.DocExpansion(DocExpansion.List);
+
+                        // Use the CustomAsset option to provide your own version of assets used in the swagger-ui.
+                        // It's typically used to instruct Swashbuckle to return your version instead of the default
+                        // when a request is made for "index.html". As with all custom content, the file must be included
+                        // in your project as an "Embedded Resource", and then the resource's "Logical Name" is passed to
+                        // the method as shown below.
+                        //
+                        //c.CustomAsset("index.html", containingAssembly, "YourWebApiProject.SwaggerExtensions.index.html");
 
                         // If you're API has multiple versions and you've applied the "MultipleApiVersions" setting
                         // as described above, you can also enable a select box that displays the corresponding discovery
                         // URL's. This provides a convenient way for users to view documentation for different API versions
                         //
-                        c.EnableDiscoveryUrlSelector();
+                        //c.EnableDiscoveryUrlSelector();
 
-                        // If you're API supports the OAuth2 Implicit flow, and you've described it correctly,
-                        // according to the Swagger 2.0 specification (see OAuth config. above), you can
-                        // enable UI support with the following command
+                        // If you're API supports the OAuth2 Implicit flow, and you've described it correctly, according to
+                        // the Swagger 2.0 specification, you can enable UI support as shown below.
+                        //
                         c.EnableOAuth2Support("test-client-id", "test-realm", "Swagger UI");
-
-                        // Use the CustomAsset option to provide your own version of assets used in the swagger-ui. A typical use
-                        // would be to provide your own "branded" index.html rather than the embedded version that's served up
-                        // by default. As with the InjectStylesheet and InjectJavaScript options, each custom asset must be
-                        // added to your project as an "Embedded Resource", and then the "Logical Name" is passed as shown below
-                        //c.CustomAsset("index.html", thisAssembly, "Swashbuckle.Dummy.SwaggerExtensions.myIndex.html");
                     });
         }
 
