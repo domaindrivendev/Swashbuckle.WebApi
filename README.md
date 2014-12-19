@@ -22,6 +22,10 @@ Once you have a Web API that can describe itself in Swagger, you've opened the t
 
 As of version 4.0, Swashbuckle has no dependency on ASP.Net MVC. As a result, it's now available to IIS hosted, self-hosted and OWIN-hosted Web API's. However, this introduces several (relatively) trivial breaking changes. Checkout the [transition guide](#transitioning-to-swashbuckle-40) if you're upgrading from a prior version.
 
+**\*Swashbuckle 5.0 Alpha Pre-released!!!**
+
+Swashbuckle 5.0.0-alpha is now available for download as a pre-release package, including support for Swagger 2.0. See [here](https://github.com/domaindrivendev/Swashbuckle/blob/swagger_2.0/README.md) for corresponding docs.
+
 ## Getting Started ##
 
 ### IIS Hosted ###
