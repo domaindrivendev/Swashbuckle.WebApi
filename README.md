@@ -21,13 +21,13 @@ Once you have a Web API that can describe itself in Swagger, you've opened the t
 
 **\*Swashbuckle 5.0**
 
-Swashbuckle 5.0 makes the transition to Swagger 2.0. The 2.0 schema is significantly different to it's predecessor - 1.2 and, as a result, the Swashbuckle config interface has undergone yet another overall. Checkout the [transition guide](#transitioning-to-swashbuckle-40) if you're upgrading from a prior version.
+Swashbuckle 5.0 makes the transition to Swagger 2.0. The 2.0 schema is significantly different to it's predecessor - 1.2 and, as a result, the Swashbuckle config interface has undergone yet another overhaul. Checkout the [transition guide](#transitioning-to-swashbuckle-50) if you're upgrading from a prior version.
 
 ## Getting Started ##
 
-There are currently two Nuget packages - the Core library (Swashbuckle.Core) and a convenience package (Swashbuckle) that provides automatic bootstrapping. The latter is only applicable to regular IIS hosted WepApi's. For all other hosting environments, you should just install the Core library and then follow the instructions below to manually enable the Swagger routes.
+There are currently two Nuget packages - the Core library (Swashbuckle.Core) and a convenience package (Swashbuckle) that provides automatic bootstrapping. The latter is only applicable to regular IIS hosted WepApi's. For all other hosting environments, you should only install the Core library and then follow the instructions below to manually enable the Swagger routes.
 
-Once installed and enabled, you should be able to browse the following Swagger docs and UI endpoints:
+Once installed and enabled, you should be able to browse the following Swagger docs and UI endpoints respectively:
 
 ***\<your-root-url\>/swagger/docs/1.0***
 
@@ -89,7 +89,7 @@ Check out the following articles for more information:
 
 ## Troubleshooting ##
 
-Troubleshooting??? I thought this was all supposed to be "seamless"? OK you've called me out! Things shouldn't go wrong, but if they do, take a look at the [FAQ's](#faq) for inspiration.
+Troubleshooting??? I thought this was all supposed to be "seamless"? OK you've called me out! Things shouldn't go wrong, but if they do, take a look at the [FAQ's](#troubleshooting-and-faqs) for inspiration.
 
 ## Customizing the Generated Swagger Docs ##
 
@@ -135,7 +135,7 @@ In addition to operation descriptions, Swagger 2.0 includes several properties t
 
 #### RootUrl ####
 
-By default, the service root url is inferred from the request used to access the docs. However, there may be situations (e.g. certain load-balanced environments) where this does not resolve correctly. You can workaround this by providing your own code to determine the root URL.
+By default, the service root url is inferred from the request used to access the docs. However, there may be situations (e.g. proxy and load-balanced environments) where this does not resolve correctly. You can workaround this by providing your own code to determine the root URL.
 
 #### Schemes ####
 
@@ -143,11 +143,11 @@ If schemes are not explicitly provided in a Swagger 2.0 document, then the schem
 
 #### SingleApiVersion ####
 
-Use __SingleApiVersion__ to describe a single version API. Swagger 2.0 includes an "Info" object to hold additional metadata for an API. Version and title are required but you may also provide the additional fields.
+Use this to describe a single version API. Swagger 2.0 includes an "Info" object to hold additional metadata for an API. Version and title are required but you may also provide additional fields as shown above.
 
 ### Describing Multiple API Versions ###
 
-If your API has multiple versions, use __MultipleApiVersions__ instead of __SingleApiVersion__. In this case, you must provide a lambda that tells Swashbuckle which actions should be included in the docs for a given API version. Like "SingleApiVersion", each call to "Version" returns an "Info" builder so you can provide additional metadata per API version.
+If your API has multiple versions, use __MultipleApiVersions__ instead of __SingleApiVersion__. In this case, you provide a lambda that tells Swashbuckle which actions should be included in the docs for a given API version. Like __SingleApiVersion__, __Version__ also returns an "Info" builder so you can provide additional metadata per API version.
 
     httpConfiguration
         .EnableSwagger(c =>
@@ -165,16 +165,17 @@ If your API has multiple versions, use __MultipleApiVersions__ instead of __Sing
                 c.EnableDiscoveryUrlSelector();
             });
 
-If you're API has multiple versions and you've applied the "MultipleApiVersions" setting as described above, you can also enable a select box that displays the corresponding discovery URL's. This provides a convenient way for users to view documentation for different API versions.
+* You can also enable a select box in the swagger-ui (as shown above) that displays a discovery URL for each version. This provides a convenient way for users to browse documentation for different API versions.
 
 ### Describing Security/Authorization Schemes ###
 
-You can use __BasicAuth__, __ApiKey__ or __OAuth2__ options to describe security schemes for the API. See https://github.com/swagger-api/swagger-spec/blob/master/versions/2.0.md for more details.
+You can use BasicAuth, __ApiKey__ or __OAuth2__ options to describe security schemes for the API. See https://github.com/swagger-api/swagger-spec/blob/master/versions/2.0.md for more details.
 
     httpConfiguration
         .EnableSwagger(c =>
             {
-                //c.BasicAuth("basic") .Description("Basic HTTP Authentication");
+                //c.BasicAuth("basic")
+                //    .Description("Basic HTTP Authentication");
 
                 //c.ApiKey("apiKey")
                 //    .Description("API Key Authentication")
@@ -199,13 +200,13 @@ You can use __BasicAuth__, __ApiKey__ or __OAuth2__ options to describe security
                 c.EnableOAuth2Support("test-client-id", "test-realm", "Swagger UI");
             });
 
-__NOTE:__ These only define the schemes and need to be coupled with a corresponding "security" property at the document or operation level to indicate which schemes are required for an operation.  To do this, you'll need to implement a custom IDocumentFilter and/or IOperationFilter to set these properties according to your specific authorization implementation
+__NOTE:__ These only define the schemes and need to be coupled with a corresponding "security" property at the document or operation level to indicate which schemes are required for each operation.  To do this, you'll need to implement a custom IDocumentFilter and/or IOperationFilter to set these properties according to your specific authorization implementation
 
-If you're API supports the OAuth2 Implicit flow, and you've described it correctly, according to the Swagger 2.0 specification, you can enable UI support as shown above.
+* If you're API supports the OAuth2 Implicit flow, and you've described it correctly, according to the Swagger 2.0 specification, you can enable UI support as shown above.
 
 ### Customize the Operation Listing ###
 
-If necessary, you can provide custom strategies to exclude from, group and sort the list of Operations in a Swagger document:
+If necessary, you can provide custom strategies to group and sort the list of Operations in a Swagger document:
 
     httpConfiguration
         .EnableSwagger(c =>
@@ -217,15 +218,15 @@ If necessary, you can provide custom strategies to exclude from, group and sort 
 
 #### GroupActionsBy ####
 
-Each operation can have one or more tags which are used by consumers for various reasons. For example, the swagger-ui groups operations according to the first tag of each operation. By default, this will be controller name but you can use this method to override with any value.
+Each operation can be assigned one or more tags which are then used by consumers for various reasons. For example, the swagger-ui groups operations according to the first tag of each operation. By default, this will be controller name but you can use this method to override with any value.
 
 #### OrderActionGroupsBy ####
 
-You can also specify a custom sort order for groups (as defined by GroupActionsBy) to dictate the order in which operations are listed. For example, if the default grouping is in place (controller name) and you specify a descending alphabetic sort order, then actions from a ProductsController will be listed before those from a CustomersController. This is typically used to customize the order of groupings in the swagger-ui.
+You can also specify a custom sort order for groups (as defined by __GroupActionsBy__) to dictate the order in which operations are listed. For example, if the default grouping is in place (controller name) and you specify a descending alphabetic sort order, then actions from a ProductsController will be listed before those from a CustomersController. This is typically used to customize the order of groupings in the swagger-ui.
 
 ### Modifying Generated Schemas ###
 
-Swashbuckle makes a best attempt at generating Swagger compliant JSON schemas for the various types exposed in your API. However, there may be occassions when more control of the output is needed.  This is supported through the MapType and SchemaFilter options:
+Swashbuckle makes a best attempt at generating Swagger compliant JSON schemas for the various types exposed in your API. However, there may be occassions when more control of the output is needed.  This is supported through the __MapType__ and __SchemaFilter__ options:
 
     httpConfiguration
         .EnableSwagger(c =>
@@ -239,7 +240,7 @@ Swashbuckle makes a best attempt at generating Swagger compliant JSON schemas fo
 
 Use this option to override the Schema generation for a specific type.
 
-It should be noted that the resulting Schema will be placed "inline" for any applicable Operations. While Swagger 2.0 supports inline definitions for "all" Schema types, the swagger-ui tool does not. It expects "complex" Schemas to be defined separately and referenced. For this reason, you should only use the MapType option when the resulting Schema is a primitive or array type.
+It should be noted that the resulting Schema will be placed "inline" for any applicable Operations. While Swagger 2.0 supports inline definitions for "all" Schema types, the swagger-ui tool does not. It expects "complex" Schemas to be defined separately and referenced. For this reason, you should only use the __MapType__ option when the resulting Schema is a primitive or array type.
 
 If you need to alter a complex Schema, use a Schema filter.
 
@@ -273,7 +274,7 @@ IOperationFilter has the following interface:
 
     void Apply(Operation operation, SchemaRegistry schemaRegistry, ApiDescription apiDescription);
 
-A typical implementation will inspect the ApiDescription and modify the Operation accordingly. If necessary, the SchemaRegIistry can be used to obtain or register Schemas for Types that are used in the Operation.
+A typical implementation will inspect the ApiDescription and modify the Operation accordingly. If necessary, the SchemaRegistry can be used to obtain or register Schemas for Types that are used in the Operation.
 
 #### DocumentFilter ####
 
@@ -320,7 +321,7 @@ See the following discusssion for more details:
 
 ## Customizing the swagger-ui ##
 
-The swagger-ui is a JavaScript application hosted in a single HTML page (index.html), which exposes several customization settings. Swashbuckle ships with an embedded version and includes corresponding config. methods for each of the UI settings. If you require further customization, you can also inject your own version of "index.html". Read on to learn more.
+The swagger-ui is a JavaScript application hosted in a single HTML page (index.html), and it exposes several customization settings. Swashbuckle ships with an embedded version and includes corresponding config. methods for each of the UI settings. If you require further customization, you can also inject your own version of "index.html". Read on to learn more.
 
 ### Customizations via Config. Interface ###
 
@@ -341,11 +342,11 @@ If your happy with the basic look and feel but want to make some minor tweaks, t
 
 #### InjectStylesheet ####
 
-Use this to enrich the UI with one or more additional CSS stylesheets. The file must be included in your project as an "Embedded Resource", and then the resource's "Logical Name" is passed to the method as shown above. See [Injecting Custom Content](#) for step by step instructions.
+Use this to enrich the UI with one or more additional CSS stylesheets. The file must be included in your project as an "Embedded Resource", and then the resource's "Logical Name" is passed to the method as shown above. See [Injecting Custom Content](#injecting-custom-content) for step by step instructions.
 
 #### InjectJavaScript ####
 
-Use this to invoke one or more custom JavaScripts after the swagger-ui has loaded. The file must be included in your project as an "Embedded Resource", and then the resource's "Logical Name" is passed to the method as shown above. See [Injecting Custom Content](#) for step by step instructions.
+Use this to invoke one or more custom JavaScripts after the swagger-ui has loaded. The file must be included in your project as an "Embedded Resource", and then the resource's "Logical Name" is passed to the method as shown above. See [Injecting Custom Content](#injecting-custom-content) for step by step instructions.
 
 #### BooleanValues ####
 
@@ -357,7 +358,9 @@ Use this option to control how the Operation listing is displayed. It can be set
 
 ### Provide your own "index.html" ###
 
-As an alternative, you can inject your own version of "index.html" and customize the markup and swagger-ui directly. Use the __CustomAsset__ option to instruct Swashbuckle to return your version instead of the default when a request is made for "index.html". As with all custom content, the file must be included in your project as an "Embedded Resource", and then the resource's "Logical Name" is passed to the method as shown below. See [Injecting Custom Content](#) for step by step instructions.
+As an alternative, you can inject your own version of "index.html" and customize the markup and swagger-ui directly. Use the __CustomAsset__ option to instruct Swashbuckle to return your version instead of the default when a request is made for "index.html". As with all custom content, the file must be included in your project as an "Embedded Resource", and then the resource's "Logical Name" is passed to the method as shown below. See [Injecting Custom Content](#injecting-custom-content) for step by step instructions.
+
+For compatibility, you should base your custom "index.html" off [this version](https://github.com/swagger-api/swagger-ui/blob/8831e289c0e2dc297754e92b6848c386a88ab37a/dist/index.html)
 
     httpConfiguration
         .EnableSwagger(c => c.SingleApiVersion("1.0", "A title for your API"))
@@ -373,9 +376,7 @@ The __InjectStylesheet__, __InjectJavaScript__ and __CustomAsset__ options all s
 1. Add a new file to your WebApi project.
 2. In Solution Explorer, right click the file and open it's properties window. Change the "Build Action" to "Embedded Resource".
 
-This will embed the file in your assembly and register it with a "Logical Name". The Logical Name is based on the Project's default namespace, file location and file extension. For example, given a default namespace of "YourWebApiProject" and a file located at "/SwaggerExtensions/index.html", then the resource will be assigned the name - "YourWebApiProject.SwaggerExtensions.index.html":
-
-3. You then provide a reference to the containing assembly and this "Logical Name" ot the relevant method.
+This will embed the file in your assembly and register it with a "Logical Name". This can then be passed to the relevant config. method. It's based on the Project's default namespace, file location and file extension. For example, given a default namespace of "YourWebApiProject" and a file located at "/SwaggerExtensions/index.html", then the resource will be assigned the name - "YourWebApiProject.SwaggerExtensions.index.html".
 
 ## Transitioning to Swashbuckle 5.0 ##
 
@@ -386,23 +387,23 @@ This version of Swashbuckle makes the transition to Swagger 2.0. The 2.0 specifi
 If you're using the existing config. interface to customize the final Swagger document and/or swagger-ui, you will need to port the code manually. The static __Customize__ methods on SwaggerSpecConfig and SwaggerUiConfig have been replaced with extension methods on HttpConfiguration - __EnableSwagger__ and __EnableSwaggerUi__. All options from version 4.0 are made available through these methods, albeit with slightly different naming and syntax. Refer to the tables below for a summary of changes:
 
 
-| 4.0 Name/Syntax | 5.0 Equivalant | Additional Notes |
+| 4.0 | 5.0 Equivalant | Additional Notes |
 | --------------- | --------------- | ---------------- |
 | ResolveBasePathUsing | RootUrl | |
 | ResolveTargetVersionUsing | N/A | version is now implicit in the docs URL e.g. "swagger/docs/{apiVersion}" |
 | ApiVersion | SingleApiVersion| now supports additional metadata for the version | 
 | SupportMultipleApiVersions | MultipleApiVersions | now supports additional metadata for each version |
+| Authorization | BasicAuth/ApiKey/OAuth2 | | 
 | GroupDeclarationsBy | GroupActionsBy | |
 | SortDeclarationsBy | OrderActionGroupsBy | |
-| Authorization | BasicAuth/ApiKey/Oauth2 | | 
 | MapType | MapType | now accepts Func&lt;Schema&gt; instead of Func&lt;DataType&gt; |
 | ModelFilter | SchemaFilter | IModelFilter is now ISchemaFilter, DataTypeRegistry is now SchemaRegistry |
 | OperationFilter | OperationFilter | DataTypeRegistry is now SchemaRegistry |
-| PolymorphicType | N/A | as of now, not supported |
+| PolymorphicType | N/A | not currently supported |
 | SupportHeaderParams | N/A | header params are implicitly supported |
 | SupportedSubmitMethods | N/A | all HTTP verbs are implicitly supported |
 | CustomRoute | CustomAsset | &nbsp; |
 
-## Troubleshooting Steps ##
+## Troubleshooting and FAQ's ##
 
 Coming real soon ...

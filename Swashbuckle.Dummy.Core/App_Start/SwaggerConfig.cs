@@ -21,7 +21,7 @@ namespace Swashbuckle.Dummy
                 .EnableSwagger(c =>
                     {
                         // By default, the service root url is inferred from the request used to access the docs.
-                        // However, there may be situations (e.g. certain load-balanced environments) where this does not
+                        // However, there may be situations (e.g. proxy and load-balanced environments) where this does not
                         // resolve correctly. You can workaround this by providing your own code to determine the root URL.
                         //
                         //c.RootUrl(req => GetRootUrlFromAppConfig());
@@ -67,7 +67,8 @@ namespace Swashbuckle.Dummy
                         // you'll need to implement a custom IDocumentFilter and/or IOperationFilter to set these properties
                         // according to your specific authorization implementation
                         //
-                        //c.BasicAuth("basic") .Description("Basic HTTP Authentication");
+                        //c.BasicAuth("basic")
+                        //    .Description("Basic HTTP Authentication");
                         //
                         //c.ApiKey("apiKey")
                         //    .Description("API Key Authentication")
@@ -85,14 +86,14 @@ namespace Swashbuckle.Dummy
                                 scopes.Add("write", "Write access to protected resources");
                             });
 
-                        // Each operation can have one or more tags which are used by consumers for various reasons.
+                        // Each operation be assigned one or more tags which are then used by consumers for various reasons.
                         // For example, the swagger-ui groups operations according to the first tag of each operation.
                         // By default, this will be controller name but you can use the "GroupActionsBy" option to
                         // override with any value.
                         //
                         //c.GroupActionsBy(apiDesc => apiDesc.HttpMethod.ToString());
 
-                        // You can also specify a custom sort order for groups (as defined by GroupActionsBy) to dictate
+                        // You can also specify a custom sort order for groups (as defined by "GroupActionsBy") to dictate
                         // the order in which operations are listed. For example, if the default grouping is in place
                         // (controller name) and you specify a descending alphabetic sort order, then actions from a
                         // ProductsController will be listed before those from a CustomersController. This is typically
@@ -189,8 +190,9 @@ namespace Swashbuckle.Dummy
                         //c.CustomAsset("index.html", containingAssembly, "YourWebApiProject.SwaggerExtensions.index.html");
 
                         // If you're API has multiple versions and you've applied the "MultipleApiVersions" setting
-                        // as described above, you can also enable a select box that displays the corresponding discovery
-                        // URL's. This provides a convenient way for users to view documentation for different API versions
+                        // as described above, you can also enable a select box in the swagger-ui, that displays
+                        // a discovery URL for each version. This provides a convenient way for users to browse documentation
+                        // for different API versions.
                         //
                         //c.EnableDiscoveryUrlSelector();
 
