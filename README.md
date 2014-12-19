@@ -165,7 +165,7 @@ If your API has multiple versions, use __MultipleApiVersions__ instead of __Sing
                 c.EnableDiscoveryUrlSelector();
             });
 
-* You can also enable a select box in the swagger-ui (as shown above) that displays a discovery URL for each version. This provides a convenient way for users to browse documentation for different API versions.
+\* You can also enable a select box in the swagger-ui (as shown above) that displays a discovery URL for each version. This provides a convenient way for users to browse documentation for different API versions.
 
 ### Describing Security/Authorization Schemes ###
 
@@ -202,7 +202,7 @@ You can use BasicAuth, __ApiKey__ or __OAuth2__ options to describe security sch
 
 __NOTE:__ These only define the schemes and need to be coupled with a corresponding "security" property at the document or operation level to indicate which schemes are required for each operation.  To do this, you'll need to implement a custom IDocumentFilter and/or IOperationFilter to set these properties according to your specific authorization implementation
 
-* If you're API supports the OAuth2 Implicit flow, and you've described it correctly, according to the Swagger 2.0 specification, you can enable UI support as shown above.
+\* If you're API supports the OAuth2 Implicit flow, and you've described it correctly, according to the Swagger 2.0 specification, you can enable UI support as shown above.
 
 ### Customize the Operation Listing ###
 
