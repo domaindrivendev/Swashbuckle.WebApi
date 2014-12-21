@@ -11,6 +11,27 @@
             <param name="id"></param>
             <returns></returns>
         </member>
+        <member name="M:Swashbuckle.Dummy.Controllers.IExternallyDocumentedController.GetSimpleValue(System.Int32)">
+            <summary>
+            This summary is defined on interface level
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Swashbuckle.Dummy.Controllers.IExternallyDocumentedController.SetSimpleValue(System.Int32,System.Int32)">
+            <summary>
+            This summary is defined on interface level and will be overriden on implementation
+            </summary>
+            <param name="id"></param>
+            <param name="value"></param>
+        </member>
+        <member name="M:Swashbuckle.Dummy.Controllers.ExternallyDocumentedController.SetSimpleValue(System.Int32,System.Int32)">
+            <summary>
+            This summary is defined on instance and overrides interface
+            </summary>
+            <param name="id"></param>
+            <param name="value"></param>
+        </member>
         <member name="M:Swashbuckle.Dummy.Controllers.ProductsController.Create(Swashbuckle.Dummy.Controllers.Product)">
             <summary>
             Create a new product 

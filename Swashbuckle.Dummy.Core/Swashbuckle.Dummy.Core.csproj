@@ -60,6 +60,7 @@
   <ItemGroup>
     <Compile Include="Controllers\CollectionOfPrimitivesController.cs" />
     <Compile Include="Controllers\CustomActionNamesController.cs" />
+    <Compile Include="Controllers\ExternallyDocumentedController.cs" />
     <Compile Include="Controllers\MultipleApiVersionsController.cs" />
     <Compile Include="Controllers\SelfReferencingTypesController.cs" />
     <Compile Include="Controllers\CustomersController.cs" />
