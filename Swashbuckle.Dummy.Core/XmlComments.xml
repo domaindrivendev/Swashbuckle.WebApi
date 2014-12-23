@@ -11,6 +11,11 @@
             <remarks>Create an account to access restricted resources</remarks>
             <param name="account">Details for the account to be created</param>
         </member>
+        <member name="M:Swashbuckle.Dummy.Controllers.XmlAnnotatedController.UpdateSubAccount(Swashbuckle.Dummy.Controllers.SubAccount)">
+            <summary>
+            Updates a SubAccount.
+            </summary>
+        </member>
         <member name="M:Swashbuckle.Dummy.Controllers.XmlAnnotatedController.Search(System.Collections.Generic.IEnumerable{System.String})">
             <summary>
             Search all registered accounts by keywords 
@@ -24,6 +29,11 @@
             Account details
             </summary>
         </member>
+        <member name="P:Swashbuckle.Dummy.Controllers.Account.AccountID">
+            <summary>
+            The ID for Accounts is 5 digits long.
+            </summary>
+        </member>
         <member name="P:Swashbuckle.Dummy.Controllers.Account.Username">
             <summary>
             Uniquely identifies the account
@@ -32,6 +42,16 @@
         <member name="P:Swashbuckle.Dummy.Controllers.Account.Password">
             <summary>
             For authentication
+            </summary>
+        </member>
+        <member name="T:Swashbuckle.Dummy.Controllers.SubAccount">
+            <summary>
+            A Sub-Type of Account
+            </summary>
+        </member>
+        <member name="P:Swashbuckle.Dummy.Controllers.SubAccount.AccountID">
+            <summary>
+            The Account ID for SubAccounts should be 7 digits.
             </summary>
         </member>
     </members>

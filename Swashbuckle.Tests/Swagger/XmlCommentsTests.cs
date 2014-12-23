@@ -76,5 +76,29 @@ namespace Swashbuckle.Tests.Swagger
             Assert.IsNotNull(passwordProperty["description"]);
             Assert.AreEqual("For authentication", passwordProperty["description"].ToString());
         }
+
+        [Test]
+        public void It_documents_schema_properties_from_property_summay_tags_of_base_classes()
+        {
+            var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/1.0");
+
+            var usernameProperty = swagger["definitions"]["SubAccount"]["properties"]["Username"];
+            Assert.IsNotNull(usernameProperty["description"]);
+            Assert.AreEqual("Uniquely identifies the account", usernameProperty["description"].ToString());
+        }
+
+        /// <summary>
+        /// This test checks that Swashbuckle uses the derived class's comments rather than the base
+        /// class's comments when generating descriptions for properties that have been overridden.
+        /// </summary>
+        [Test]
+        public void It_documents_schema_properties_using_derived_class_summary_tags()
+        {
+            var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/1.0");
+
+            var usernameProperty = swagger["definitions"]["SubAccount"]["properties"]["AccountID"];
+            Assert.IsNotNull(usernameProperty["description"]);
+            Assert.AreEqual("The Account ID for SubAccounts should be 7 digits.", usernameProperty["description"].ToString());
+        }
     }
 }

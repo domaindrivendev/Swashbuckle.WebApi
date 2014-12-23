@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Xml.XPath;
 using Swashbuckle.Swagger;
+using System.Collections.Generic;
 
 namespace Swashbuckle.Swagger.Filters
 {
@@ -26,9 +27,22 @@ namespace Swashbuckle.Swagger.Filters
             if (summaryNode != null)
                 schema.description = summaryNode.Value.Trim();
 
+            List<Type> typeList = new List<Type>();
+            typeList.Add(type);
+            while (typeList[typeList.Count - 1].BaseType != null)
+            {
+                typeList.Add(typeList[typeList.Count - 1].BaseType);
+            }
+
             foreach (var property in schema.properties)
             {
-                var propertyNode = _navigator.SelectSingleNode(String.Format(PropertyExpression, type.FullName, property.Key));
+                XPathNavigator propertyNode = null;
+
+                foreach (Type t in typeList)
+                {
+                    propertyNode = _navigator.SelectSingleNode(String.Format(PropertyExpression, t.FullName, property.Key));
+                    if (propertyNode != null) { break; }
+                }
                 if (propertyNode != null)
                     property.Value.description = propertyNode.Value.Trim();
             }
