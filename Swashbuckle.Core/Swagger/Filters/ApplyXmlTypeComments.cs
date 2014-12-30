@@ -44,7 +44,13 @@ namespace Swashbuckle.Swagger.Filters
                     if (propertyNode != null) { break; }
                 }
                 if (propertyNode != null)
-                    property.Value.description = propertyNode.Value.Trim();
+                {
+                    XPathNavigator propSummaryNode = propertyNode.SelectSingleNode(SummaryExpression);
+                    if (propSummaryNode != null)
+                    {
+                        property.Value.description = propSummaryNode.Value.Trim();
+                    }
+                }
             }
         }
     }
