@@ -9,51 +9,51 @@ namespace Swashbuckle.Swagger
 {
     public class SwaggerGenerator : ISwaggerProvider
     {
-        private readonly string _rootUrl;
         private readonly IApiExplorer _apiExplorer;
         private readonly IContractResolver _jsonContractResolver;
-        private readonly SwaggerGeneratorSettings _settings;
+        private readonly IDictionary<string, Info> _apiVersions;
+        private readonly SwaggerGeneratorOptions _options;
 
         public SwaggerGenerator(
-            string rootUrl,
             IApiExplorer apiExplorer,
             IContractResolver jsonContractResolver,
-            SwaggerGeneratorSettings settings)
+            IDictionary<string, Info> apiVersions,
+            SwaggerGeneratorOptions options = null)
         {
-            _rootUrl = rootUrl;
             _apiExplorer = apiExplorer;
             _jsonContractResolver = jsonContractResolver;
-            _settings = settings;
+            _apiVersions = apiVersions;
+            _options = options ?? new SwaggerGeneratorOptions();
         }
 
-        public SwaggerDocument GetSwaggerFor(string apiVersion)
+        public SwaggerDocument GetSwagger(string rootUrl, string apiVersion)
         {
-            var schemaRegistry = new SchemaRegistry(_jsonContractResolver, _settings.CustomSchemaMappings, _settings.SchemaFilters);
+            var schemaRegistry = new SchemaRegistry(_jsonContractResolver, _options.CustomSchemaMappings, _options.SchemaFilters);
 
             Info info;
-            _settings.ApiVersions.TryGetValue(apiVersion, out info);
+            _apiVersions.TryGetValue(apiVersion, out info);
             if (info == null)
                 throw new UnknownApiVersion(apiVersion);
 
             var paths = GetApiDescriptionsFor(apiVersion)
-                .OrderBy(_settings.GroupingKeySelector, _settings.GroupingKeyComparer)
+                .OrderBy(_options.GroupingKeySelector, _options.GroupingKeyComparer)
                 .GroupBy(apiDesc => apiDesc.RelativePathSansQueryString())
                 .ToDictionary(group => "/" + group.Key, group => CreatePathItem(group, schemaRegistry));
 
-            var rootUrl = new Uri(_rootUrl);
+            var rootUri = new Uri(rootUrl);
 
             var swaggerDoc = new SwaggerDocument
             {
                 info = info,
-                host = rootUrl.Host + ":" + rootUrl.Port,
-                basePath = (rootUrl.AbsolutePath != "/") ? rootUrl.AbsolutePath : null,
-                schemes = (_settings.Schemes != null) ? _settings.Schemes.ToList() : new[] { rootUrl.Scheme }.ToList(),
+                host = rootUri.Host + ":" + rootUri.Port,
+                basePath = (rootUri.AbsolutePath != "/") ? rootUri.AbsolutePath : null,
+                schemes = (_options.Schemes != null) ? _options.Schemes.ToList() : new[] { rootUri.Scheme }.ToList(),
                 paths = paths,
                 definitions = schemaRegistry.Definitions,
-                securityDefinitions = _settings.SecurityDefinitions
+                securityDefinitions = _options.SecurityDefinitions
             };
 
-            foreach(var filter in _settings.DocumentFilters)
+            foreach(var filter in _options.DocumentFilters)
             {
                 filter.Apply(swaggerDoc, schemaRegistry, _apiExplorer);
             }
@@ -63,8 +63,9 @@ namespace Swashbuckle.Swagger
 
         private IEnumerable<ApiDescription> GetApiDescriptionsFor(string apiVersion)
         {
-            return _apiExplorer.ApiDescriptions
-                .Where(apiDesc => _settings.VersionSupportResolver(apiDesc, apiVersion));
+            return (_options.VersionSupportResolver == null)
+                ? _apiExplorer.ApiDescriptions
+                : _apiExplorer.ApiDescriptions.Where(apiDesc => _options.VersionSupportResolver(apiDesc, apiVersion));
         }
 
         private PathItem CreatePathItem(IEnumerable<ApiDescription> apiDescriptions, SchemaRegistry schemaRegistry)
@@ -81,7 +82,7 @@ namespace Swashbuckle.Swagger
 
                 var apiDescription = (group.Count() == 1)
                     ? group.First()
-                    : _settings.ConflictingActionsResolver(group);
+                    : _options.ConflictingActionsResolver(group);
 
                 switch (httpMethod)
                 {
@@ -129,7 +130,7 @@ namespace Swashbuckle.Swagger
 
             var operation = new Operation
             { 
-                tags = new [] { _settings.GroupingKeySelector(apiDescription) },
+                tags = new [] { _options.GroupingKeySelector(apiDescription) },
                 operationId = apiDescription.FriendlyId(),
                 produces = apiDescription.Produces().ToList(),
                 consumes = apiDescription.Consumes().ToList(),
@@ -138,7 +139,7 @@ namespace Swashbuckle.Swagger
                 deprecated = apiDescription.IsObsolete()
             };
 
-            foreach (var filter in _settings.OperationFilters)
+            foreach (var filter in _options.OperationFilters)
             {
                 filter.Apply(operation, schemaRegistry, apiDescription);
             }

@@ -3,9 +3,9 @@ using System.IO;
 
 namespace Swashbuckle.SwaggerUi
 {
-    public interface ISwaggerUiProvider
+    public interface IAssetProvider
     {
-        Asset GetAssetFor(string assetPath);
+        Asset GetAsset(string rootUrl, string assetPath);
     }
 
     public class Asset

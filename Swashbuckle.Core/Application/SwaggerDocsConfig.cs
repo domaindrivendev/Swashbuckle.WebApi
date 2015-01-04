@@ -11,10 +11,9 @@ namespace Swashbuckle.Application
 {
     public class SwaggerDocsConfig
     {
-        private Func<HttpRequestMessage, string> _rootUrlResolver;
+        private VersionInfoBuilder _versionInfoBuilder;
         private Func<ApiDescription, string, bool> _versionSupportResolver;
         private IEnumerable<string> _schemes;
-        private VersionInfoBuilder _versionInfoBuilder;
         private IDictionary<string, SecuritySchemeBuilder> _securitySchemeBuilders;
         private Func<ApiDescription, string> _groupingKeySelector;
         private IComparer<string> _groupingKeyComparer;
@@ -23,33 +22,24 @@ namespace Swashbuckle.Application
         private readonly IList<Func<IOperationFilter>> _operationFilters;
         private readonly IList<Func<IDocumentFilter>> _documentFilters;
         private Func<IEnumerable<ApiDescription>, ApiDescription> _conflictingActionsResolver;
+        private Func<HttpRequestMessage, string> _rootUrlResolver;
 
         public SwaggerDocsConfig()
         {
-            _rootUrlResolver = DefaultRootUrlResolver; 
             _versionInfoBuilder = new VersionInfoBuilder();
             _securitySchemeBuilders = new Dictionary<string, SecuritySchemeBuilder>();
             _customSchemaMappings = new Dictionary<Type, Func<Schema>>();
             _schemaFilters = new List<Func<ISchemaFilter>>();
             _operationFilters = new List<Func<IOperationFilter>>();
             _documentFilters = new List<Func<IDocumentFilter>>();
+            _rootUrlResolver = DefaultRootUrlResolver; 
 
             OperationFilter<HandleParamsFromUri>();
         }
 
-        public void RootUrl(Func<HttpRequestMessage, string> rootUrlResolver)
-        {
-            _rootUrlResolver = rootUrlResolver;
-        }
-
-        public void Schemes(IEnumerable<string> schemes)
-        {
-            _schemes = schemes;
-        }
-
         public InfoBuilder SingleApiVersion(string version, string title)
         {
-            _versionSupportResolver = (apiDesc, requestedApiVersion) => requestedApiVersion == version;
+            _versionSupportResolver = null;
             _versionInfoBuilder = new VersionInfoBuilder();
             return _versionInfoBuilder.Version(version, title);
         }
@@ -61,6 +51,11 @@ namespace Swashbuckle.Application
             _versionSupportResolver = versionSupportResolver;
             _versionInfoBuilder = new VersionInfoBuilder();
             configure(_versionInfoBuilder);
+        }
+
+        public void Schemes(IEnumerable<string> schemes)
+        {
+            _schemes = schemes;
         }
 
         public BasicAuthSchemeBuilder BasicAuth(string name)
@@ -93,7 +88,6 @@ namespace Swashbuckle.Application
         {
             _groupingKeyComparer = keyComparer;
         }
-
 
         public void MapType<T>(Func<Schema> factory)
         {
@@ -144,26 +138,22 @@ namespace Swashbuckle.Application
             _conflictingActionsResolver = conflictingActionsResolver;
         }
 
-        internal Func<HttpRequestMessage, string> GetRootUrlResolver()
+        public void RootUrl(Func<HttpRequestMessage, string> rootUrlResolver)
         {
-            return _rootUrlResolver;
+            _rootUrlResolver = rootUrlResolver;
         }
 
-        internal IEnumerable<string> GetApiVersions()
+        internal ISwaggerProvider GetSwaggerProvider(HttpRequestMessage swaggerRequest)
         {
-            return _versionInfoBuilder.Build().Select(entry => entry.Key);
-        }
+            var httpConfig = swaggerRequest.GetConfiguration();
 
-        internal SwaggerGeneratorSettings GetGeneratorSettings()
-        {
             var securityDefintitions = _securitySchemeBuilders.Any()
                 ? _securitySchemeBuilders.ToDictionary(kvp => kvp.Key, kvp => kvp.Value.Build())
                 : null;
 
-            return new SwaggerGeneratorSettings(
-                versionSupportResolver: _versionSupportResolver, // TODO: handle null value
+            var options = new SwaggerGeneratorOptions(
+                versionSupportResolver: _versionSupportResolver,
                 schemes: _schemes, 
-                apiVersions: _versionInfoBuilder.Build(),
                 securityDefinitions: securityDefintitions, 
                 groupingKeySelector: _groupingKeySelector,
                 groupingKeyComparer: _groupingKeyComparer,
@@ -173,6 +163,22 @@ namespace Swashbuckle.Application
                 documentFilters: _documentFilters.Select(factory => factory()),
                 conflictingActionsResolver: _conflictingActionsResolver
             );
+
+            return new SwaggerGenerator(
+                httpConfig.Services.GetApiExplorer(),
+                httpConfig.GetJsonContractResolver(),
+                _versionInfoBuilder.Build(),
+                options);
+        }
+
+        internal string GetRootUrl(HttpRequestMessage swaggerRequest)
+        {
+            return _rootUrlResolver(swaggerRequest);
+        }
+
+        internal IEnumerable<string> GetApiVersions()
+        {
+            return _versionInfoBuilder.Build().Select(entry => entry.Key);
         }
 
         public static string DefaultRootUrlResolver(HttpRequestMessage request)

@@ -5,12 +5,11 @@ using System.Web.Http.Description;
 
 namespace Swashbuckle.Swagger
 {
-    public class SwaggerGeneratorSettings
+    public class SwaggerGeneratorOptions
     {
-        public SwaggerGeneratorSettings(
-            Func<ApiDescription, string, bool> versionSupportResolver,
-            IEnumerable<string> schemes,
-            IDictionary<string, Info> apiVersions,
+        public SwaggerGeneratorOptions(
+            Func<ApiDescription, string, bool> versionSupportResolver = null,
+            IEnumerable<string> schemes = null,
             IDictionary<string, SecurityScheme> securityDefinitions = null,
             Func<ApiDescription, string> groupingKeySelector = null,
             IComparer<string> groupingKeyComparer = null,
@@ -22,7 +21,6 @@ namespace Swashbuckle.Swagger
         {
             VersionSupportResolver = versionSupportResolver;
             Schemes = schemes;
-            ApiVersions = apiVersions;
             SecurityDefinitions = securityDefinitions;
             GroupingKeySelector = groupingKeySelector ?? DefaultGroupingKeySelector;
             GroupingKeyComparer = groupingKeyComparer ?? Comparer<string>.Default;
@@ -36,8 +34,6 @@ namespace Swashbuckle.Swagger
         public Func<ApiDescription, string, bool> VersionSupportResolver { get; private set; }
 
         public IEnumerable<string> Schemes { get; private set; }
-
-        public IDictionary<string, Info> ApiVersions { get; private set; }
 
         public IDictionary<string, SecurityScheme> SecurityDefinitions { get; private set; }
 

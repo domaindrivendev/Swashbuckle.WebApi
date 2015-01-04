@@ -10,22 +10,22 @@ namespace Swashbuckle.Application
 {
     public class SwaggerUiHandler : HttpMessageHandler
     {
-        private readonly SwaggerUiConfig _swaggerUiConfig;
+        private readonly SwaggerUiConfig _config;
 
-        public SwaggerUiHandler(
-            SwaggerUiConfig swaggerUiConfig)
+        public SwaggerUiHandler(SwaggerUiConfig config)
         {
-            _swaggerUiConfig = swaggerUiConfig;
+            _config = config;
         }
 
         protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
         {
-            var swaggerUiProvider = GetSwaggerUiProvider(request);
+            var swaggerUiProvider = _config.GetSwaggerUiProvider();
+            var rootUrl = _config.GetRootUrl(request);
             var assetPath = request.GetRouteData().Values["assetPath"].ToString();
 
             try
             {
-                var webAsset = swaggerUiProvider.GetAssetFor(assetPath);
+                var webAsset = swaggerUiProvider.GetAsset(rootUrl, assetPath);
                 var content = ContentFor(webAsset);
                 return TaskFor(new HttpResponseMessage { Content = content });
             }
@@ -33,13 +33,6 @@ namespace Swashbuckle.Application
             {
                 return TaskFor(request.CreateErrorResponse(HttpStatusCode.NotFound, ex));
             }
-        }
-
-        private ISwaggerUiProvider GetSwaggerUiProvider(HttpRequestMessage request)
-        {
-            return new EmbeddedSwaggerUiProvider(
-                _swaggerUiConfig.GetRootUrlResolver()(request),
-                _swaggerUiConfig.GetUiProviderSettings());
         }
 
         private HttpContent ContentFor(Asset webAsset)
