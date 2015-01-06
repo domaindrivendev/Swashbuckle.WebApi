@@ -28,7 +28,12 @@ namespace Swashbuckle.Swagger
 
         public SwaggerDocument GetSwaggerFor(string apiVersion)
         {
-            var schemaRegistry = new SchemaRegistry(_jsonContractResolver, _settings.CustomSchemaMappings, _settings.SchemaFilters);
+            bool forceStringEnum = false;
+            if (_settings.ForceStringEnumConversion != null)
+            {
+                forceStringEnum = _settings.ForceStringEnumConversion();
+            }
+            var schemaRegistry = new SchemaRegistry(_jsonContractResolver, _settings.CustomSchemaMappings, _settings.SchemaFilters, forceStringEnum);
 
             Info info;
             _settings.ApiVersions.TryGetValue(apiVersion, out info);

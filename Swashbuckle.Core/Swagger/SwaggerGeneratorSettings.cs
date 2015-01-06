@@ -18,12 +18,15 @@ namespace Swashbuckle.Swagger
             IEnumerable<ISchemaFilter> schemaFilters = null,
             IEnumerable<IOperationFilter> operationFilters = null,
             IEnumerable<IDocumentFilter> documentFilters = null,
-            Func<IEnumerable<ApiDescription>, ApiDescription> conflictingActionsResolver = null)
+            Func<IEnumerable<ApiDescription>, ApiDescription> conflictingActionsResolver = null,
+            Func<bool> forceStringEnumConversion = null
+            )
         {
             VersionSupportResolver = versionSupportResolver;
             Schemes = schemes;
             ApiVersions = apiVersions;
             SecurityDefinitions = securityDefinitions;
+            ForceStringEnumConversion = forceStringEnumConversion;
             GroupingKeySelector = groupingKeySelector ?? DefaultGroupingKeySelector;
             GroupingKeyComparer = groupingKeyComparer ?? Comparer<string>.Default;
             CustomSchemaMappings = customSchemaMappings ?? new Dictionary<Type, Func<Schema>>();
@@ -46,6 +49,8 @@ namespace Swashbuckle.Swagger
         public IComparer<string> GroupingKeyComparer { get; private set; }
 
         public IDictionary<Type, Func<Schema>> CustomSchemaMappings { get; private set; }
+
+        public Func<bool> ForceStringEnumConversion { get; private set; }
 
         public IEnumerable<ISchemaFilter> SchemaFilters { get; private set; }
 

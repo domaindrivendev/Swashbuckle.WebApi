@@ -46,15 +46,19 @@ namespace Swashbuckle.Swagger
         private readonly IContractResolver _contractResolver;
         private readonly IDictionary<Type, Func<Schema>> _customSchemaMappings;
         private readonly IEnumerable<ISchemaFilter> _schemaFilters;
+        private readonly bool _forceStringEnumConversion;
 
         public SchemaRegistry(
             IContractResolver contractResolver,
             IDictionary<Type, Func<Schema>> customSchemaMappings,
-            IEnumerable<ISchemaFilter> schemaFilters)
+            IEnumerable<ISchemaFilter> schemaFilters,
+            bool forceStringEnumConversion
+            )
         {
             _contractResolver = contractResolver;
             _customSchemaMappings = customSchemaMappings;
             _schemaFilters = schemaFilters;
+            _forceStringEnumConversion = forceStringEnumConversion;
 
             Definitions = new Dictionary<string, Schema>(StringComparer.OrdinalIgnoreCase);
         }
@@ -105,6 +109,11 @@ namespace Swashbuckle.Swagger
 
             if (type.IsEnum)
             {
+                if (_forceStringEnumConversion)
+                {
+                    return new Schema { type = "string", @enum = type.GetEnumNames()};
+                }
+
                 var converter = contract.Converter;
                 return (converter != null && converter.GetType() == typeof(StringEnumConverter))
                     ? new Schema { type = "string", @enum = type.GetEnumNames() }

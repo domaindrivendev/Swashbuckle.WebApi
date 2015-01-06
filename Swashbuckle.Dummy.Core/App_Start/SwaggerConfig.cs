@@ -154,6 +154,15 @@ namespace Swashbuckle.Dummy
                         // custom strategy to pick a winner or merge the descriptions for the purposes of the Swagger docs 
                         //
                         c.ResolveConflictingActions(apiDescriptions => apiDescriptions.First());
+
+                        c.ForceStringEnumConversion(() =>
+                        {
+                            // could  check SerializerSettings.Converters for the StringEnumConverter here, I'll just hard code it to true
+                            // because we don't have a reference to the formatters here
+                            // var jsonFormatter = GlobalConfiguration.Configuration.Formatters.JsonFormatter;
+                            // jsonFormatter.SerializerSettings.Converters.Add(new Newtonsoft.Json.Converters.StringEnumConverter());
+                            return true;
+                        });
                     })
                 .EnableSwaggerUi(c =>
                     {

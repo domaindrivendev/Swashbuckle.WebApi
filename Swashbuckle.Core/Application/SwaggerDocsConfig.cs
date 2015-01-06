@@ -23,6 +23,7 @@ namespace Swashbuckle.Application
         private readonly IList<Func<IOperationFilter>> _operationFilters;
         private readonly IList<Func<IDocumentFilter>> _documentFilters;
         private Func<IEnumerable<ApiDescription>, ApiDescription> _conflictingActionsResolver;
+        private Func<bool> _forceStringEnumConversion;
 
         public SwaggerDocsConfig()
         {
@@ -144,11 +145,16 @@ namespace Swashbuckle.Application
             _conflictingActionsResolver = conflictingActionsResolver;
         }
 
+        public void ForceStringEnumConversion(Func<bool> factory)
+        {
+            _forceStringEnumConversion = factory;
+        }
+
         internal Func<HttpRequestMessage, string> GetRootUrlResolver()
         {
             return _rootUrlResolver;
         }
-
+        
         internal IEnumerable<string> GetApiVersions()
         {
             return _versionInfoBuilder.Build().Select(entry => entry.Key);
@@ -171,7 +177,8 @@ namespace Swashbuckle.Application
                 schemaFilters: _schemaFilters.Select(factory => factory()),
                 operationFilters: _operationFilters.Select(factory => factory()),
                 documentFilters: _documentFilters.Select(factory => factory()),
-                conflictingActionsResolver: _conflictingActionsResolver
+                conflictingActionsResolver: _conflictingActionsResolver,
+                forceStringEnumConversion: _forceStringEnumConversion
             );
         }
 
