@@ -31,7 +31,7 @@ namespace Swashbuckle.Application
             };
             _rootUrlResolver = rootUrlResolver;
 
-            // Use Swashbuckle specific index.html
+            // Use templatized version of index.html that supports above replacements
             CustomAsset("index.html", GetType().Assembly, "Swashbuckle.SwaggerUi.Assets.index.html");
         }
 

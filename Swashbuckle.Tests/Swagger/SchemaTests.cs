@@ -1,9 +1,10 @@
-﻿using Newtonsoft.Json.Linq;
-using System;
-using NUnit.Framework;
-using Swashbuckle.Dummy.Controllers;
+﻿using System;
 using System.Collections.Generic;
 using System.Net.Http;
+using System.Linq;
+using NUnit.Framework;
+using Newtonsoft.Json.Linq;
+using Swashbuckle.Dummy.Controllers;
 using Swashbuckle.Application;
 using Swashbuckle.Swagger;
 using Swashbuckle.Dummy.SwaggerExtensions;
@@ -264,6 +265,18 @@ namespace Swashbuckle.Tests.Swagger
         }
 
         [Test]
+        public void It_exposes_config_to_workaround_multiple_types_with_the_same_class_name()
+        {
+            SetUpDefaultRouteFor<ConflictingTypesController>();
+            SetUpHandler(c => c.UseFullTypeNameInSchemaIds());
+
+            var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/1.0");
+            var defintitions = swagger["definitions"];
+
+            Assert.AreEqual(2, defintitions.Count());
+        }
+
+        [Test]
         public void It_handles_nested_types()
         {
             SetUpDefaultRouteFor<NestedTypesController>();
@@ -394,6 +407,15 @@ namespace Swashbuckle.Tests.Swagger
                     }
                 });
             Assert.AreEqual(expected.ToString(), definitions.ToString());
+        }
+
+        [Test]
+        [ExpectedException(typeof(InvalidOperationException))]
+        public void It_errors_on_multiple_types_with_the_same_class_name()
+        {
+            SetUpDefaultRouteFor<ConflictingTypesController>();
+
+            var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/1.0");
         }
     }
 }

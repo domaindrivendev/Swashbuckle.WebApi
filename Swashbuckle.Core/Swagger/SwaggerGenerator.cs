@@ -28,7 +28,11 @@ namespace Swashbuckle.Swagger
 
         public SwaggerDocument GetSwagger(string rootUrl, string apiVersion)
         {
-            var schemaRegistry = new SchemaRegistry(_jsonContractResolver, _options.CustomSchemaMappings, _options.SchemaFilters);
+            var schemaRegistry = new SchemaRegistry(
+                _jsonContractResolver,
+                _options.CustomschemaRegistrypings,
+                _options.SchemaFilters,
+                _options.UseFullTypeNameInSchemaIds);
 
             Info info;
             _apiVersions.TryGetValue(apiVersion, out info);
@@ -123,10 +127,12 @@ namespace Swashbuckle.Swagger
                     })
                  .ToList();
 
-            // TODO: Always 200 - is this a little presumptious?
-            var responses = new Dictionary<string, Response>{
-                { "200", CreateResponse(apiDescription.SuccessResponseType(), schemaRegistry) }
-            };
+            var responses = new Dictionary<string, Response>();
+            var responseType = apiDescription.ResponseType();
+            if (responseType == null)
+                responses.Add("204", new Response { description = "No Content" });
+            else
+                responses.Add("200", new Response { description = "OK", schema = schemaRegistry.GetOrRegister(responseType) });
 
             var operation = new Operation
             { 
@@ -168,26 +174,13 @@ namespace Swashbuckle.Swagger
 
             parameter.required = !paramDesc.ParameterDescriptor.IsOptional;
 
-            var schema = schemaRegistry.FindOrRegister(paramDesc.ParameterDescriptor.ParameterType);
+            var schema = schemaRegistry.GetOrRegister(paramDesc.ParameterDescriptor.ParameterType);
             if (parameter.@in == "body")
                 parameter.schema = schema;
             else
                 parameter.PopulateFrom(schema);
 
             return parameter;
-        }
-
-        private Response CreateResponse(Type returnType, SchemaRegistry schemaRegistry)
-        {
-            var schema = (returnType != null)
-                ? schemaRegistry.FindOrRegister(returnType)
-                : null;
-
-            return new Response
-            {
-                description = "OK",
-                schema = schema
-            };
         }
     }
 }

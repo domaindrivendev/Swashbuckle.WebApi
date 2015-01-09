@@ -41,8 +41,8 @@ namespace Swashbuckle.Swagger.Filters
                     .Single(paramDesc => paramDesc.Name == param.name)
                     .ParameterDescriptor.ParameterType;
 
-                var @ref = paramType.FriendlyId();
-                var schema = schemaRegistry.Definitions[@ref];
+                var refSchema = schemaRegistry.GetOrRegister(paramType);
+                var schema = schemaRegistry.Definitions[refSchema.@ref.Replace("#/definitions/", "")];
 
                 operation.parameters.Remove(param);
                 MapSchemaPropertiesToQueryParams(schema, operation.parameters);

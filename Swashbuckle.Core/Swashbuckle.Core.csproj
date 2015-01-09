@@ -80,6 +80,7 @@
     <Compile Include="Swagger\Filters\ApplyXmlTypeComments.cs" />
     <Compile Include="Swagger\Filters\ApplyXmlActionComments.cs" />
     <Compile Include="Swagger\Filters\HandleFromUriParams.cs" />
+    <Compile Include="Swagger\JsonContractExtensions.cs" />
     <Compile Include="Swagger\JsonPropertyExtensions.cs" />
     <Compile Include="SwaggerUi\EmbeddedAssetDescriptor.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -88,13 +89,12 @@
     <Compile Include="Swagger\IOperationFilter.cs" />
     <Compile Include="Swagger\IDocumentFilter.cs" />
     <Compile Include="Swagger\SchemaExtensions.cs" />
+    <Compile Include="Swagger\SchemaRegistry.cs" />
     <Compile Include="Swagger\SwaggerGenerator.cs" />
     <Compile Include="Swagger\SwaggerGeneratorOptions.cs" />
     <Compile Include="Swagger\ISwaggerProvider.cs" />
     <Compile Include="Swagger\SwaggerDocument.cs" />
-    <Compile Include="Swagger\SchemaRegistry.cs" />
     <Compile Include="SwaggerUi\EmbeddedAssetProvider.cs" />
-    <Compile Include="TypeExtensions.cs" />
     <Compile Include="SwaggerUi\IAssetProvider.cs" />
     <Compile Include="SwaggerUi\StreamExtensions.cs" />
   </ItemGroup>

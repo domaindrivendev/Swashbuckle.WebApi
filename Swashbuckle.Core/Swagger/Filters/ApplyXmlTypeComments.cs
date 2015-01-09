@@ -17,7 +17,7 @@ namespace Swashbuckle.Swagger.Filters
             _navigator = new XPathDocument(xmlCommentsPath).CreateNavigator();
         }
 
-        public void Apply(Schema schema, SchemaRegistry schemaRegistry, Type type)
+        public void Apply(Schema schema, SchemaRegistry schemaMap, Type type)
         {
             var typeNode = _navigator.SelectSingleNode(String.Format(TypeExpression, type.FullName));
             if (typeNode == null) return;

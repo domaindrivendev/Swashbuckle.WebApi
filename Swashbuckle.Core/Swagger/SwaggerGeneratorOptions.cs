@@ -13,8 +13,9 @@ namespace Swashbuckle.Swagger
             IDictionary<string, SecurityScheme> securityDefinitions = null,
             Func<ApiDescription, string> groupingKeySelector = null,
             IComparer<string> groupingKeyComparer = null,
-            IDictionary<Type, Func<Schema>> customSchemaMappings = null,
+            IDictionary<Type, Func<Schema>> customschemaRegistrypings = null,
             IEnumerable<ISchemaFilter> schemaFilters = null,
+            bool useFullTypeNameInSchemaIds = false, 
             IEnumerable<IOperationFilter> operationFilters = null,
             IEnumerable<IDocumentFilter> documentFilters = null,
             Func<IEnumerable<ApiDescription>, ApiDescription> conflictingActionsResolver = null)
@@ -24,8 +25,9 @@ namespace Swashbuckle.Swagger
             SecurityDefinitions = securityDefinitions;
             GroupingKeySelector = groupingKeySelector ?? DefaultGroupingKeySelector;
             GroupingKeyComparer = groupingKeyComparer ?? Comparer<string>.Default;
-            CustomSchemaMappings = customSchemaMappings ?? new Dictionary<Type, Func<Schema>>();
+            CustomschemaRegistrypings = customschemaRegistrypings ?? new Dictionary<Type, Func<Schema>>();
             SchemaFilters = schemaFilters ?? new List<ISchemaFilter>();
+            UseFullTypeNameInSchemaIds = useFullTypeNameInSchemaIds;
             OperationFilters = operationFilters ?? new List<IOperationFilter>();
             DocumentFilters = documentFilters ?? new List<IDocumentFilter>();
             ConflictingActionsResolver = conflictingActionsResolver ?? DefaultConflictingActionsResolver;
@@ -41,9 +43,11 @@ namespace Swashbuckle.Swagger
 
         public IComparer<string> GroupingKeyComparer { get; private set; }
 
-        public IDictionary<Type, Func<Schema>> CustomSchemaMappings { get; private set; }
+        public IDictionary<Type, Func<Schema>> CustomschemaRegistrypings { get; private set; }
 
         public IEnumerable<ISchemaFilter> SchemaFilters { get; private set; }
+
+        public bool UseFullTypeNameInSchemaIds { get; private set; }
 
         public IEnumerable<IOperationFilter> OperationFilters { get; private set; }
 
