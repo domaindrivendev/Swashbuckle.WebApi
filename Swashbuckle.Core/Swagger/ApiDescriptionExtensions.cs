@@ -33,7 +33,7 @@ namespace Swashbuckle.Swagger
             return apiDescription.RelativePath.Split('?').First();
         }
 
-        public static Type SuccessResponseType(this ApiDescription apiDesc)
+        public static Type ResponseType(this ApiDescription apiDesc)
         {
             // HACK: The ResponseDescription property was introduced in WebApi 5.0 but Swashbuckle supports >= 4.0.
             // The reflection hack below provides support for the ResponseType attribute if the application is running

@@ -8,7 +8,7 @@ namespace Swashbuckle.Dummy.SwaggerExtensions
     {
         public void Apply(Operation operation, SchemaRegistry schemaRegistry, ApiDescription apiDescription)
         {
-            var errorSchema = schemaRegistry.FindOrRegister(typeof(HttpError));
+            var errorSchema = schemaRegistry.GetOrRegister(typeof(HttpError));
 
             operation.responses.Add("default", new Response
                 {

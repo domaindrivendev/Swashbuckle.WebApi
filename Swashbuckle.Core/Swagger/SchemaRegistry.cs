@@ -16,160 +16,165 @@ namespace Swashbuckle.Swagger
 {
     public class SchemaRegistry
     {
-        public static readonly Dictionary<Type, Func<Schema>> PrimitiveMappings = new Dictionary<Type, Func<Schema>>()
-            {
-                {typeof (Int16), () => new Schema {type = "integer", format = "int32"}},
-                {typeof (UInt16), () => new Schema {type = "integer", format = "int32"}},
-                {typeof (Int32), () => new Schema {type = "integer", format = "int32"}},
-                {typeof (UInt32), () => new Schema {type = "integer", format = "int32"}},
-                {typeof (Int64), () => new Schema {type = "integer", format = "int64"}},
-                {typeof (UInt64), () => new Schema {type = "integer", format = "int64"}},
-                {typeof (Single), () => new Schema {type = "number", format = "float"}},
-                {typeof (Double), () => new Schema {type = "number", format = "double"}},
-                {typeof (Decimal), () => new Schema {type = "number", format = "double"}},
-                {typeof (String), () => new Schema {type = "string"}},
-                {typeof (Char), () => new Schema {type = "string"}},
-                {typeof (Byte), () => new Schema {type = "string", format = "byte"}},
-                {typeof (SByte), () => new Schema {type = "string", format = "byte"}},
-                {typeof (Guid), () => new Schema {type = "string"}},
-                {typeof (Boolean), () => new Schema {type = "boolean"}},
-                {typeof (DateTime), () => new Schema {type = "string", format = "date-time"}},
-                {typeof (DateTimeOffset), () => new Schema {type = "string", format = "date-time"}}
-            };
-
-        private static readonly IEnumerable<Type> HttpTypes = new[]
-            {
-                typeof(HttpRequestMessage),
-                typeof(HttpResponseMessage)
-            };
-
-        private readonly IContractResolver _contractResolver;
-        private readonly IDictionary<Type, Func<Schema>> _customSchemaMappings;
+        private readonly IContractResolver _jsonContractResolver;
+        private readonly IDictionary<Type, Func<Schema>> _customschemaRegistrypings;
         private readonly IEnumerable<ISchemaFilter> _schemaFilters;
+        private readonly bool _useFullTypeNameInSchemaIds;
+
+        private IDictionary<Type, SchemaInfo> _referencedTypes;
+        private class SchemaInfo
+        {
+            public string SchemaId;
+            public Schema Schema;
+        } 
 
         public SchemaRegistry(
-            IContractResolver contractResolver,
+            IContractResolver jsonContractResolver,
             IDictionary<Type, Func<Schema>> customSchemaMappings,
-            IEnumerable<ISchemaFilter> schemaFilters)
+            IEnumerable<ISchemaFilter> schemaFilters,
+            bool useFullTypeNameInSchemaIds)
         {
-            _contractResolver = contractResolver;
-            _customSchemaMappings = customSchemaMappings;
+            _jsonContractResolver = jsonContractResolver;
+            _customschemaRegistrypings = customSchemaMappings;
             _schemaFilters = schemaFilters;
+            _useFullTypeNameInSchemaIds = useFullTypeNameInSchemaIds;
 
-            Definitions = new Dictionary<string, Schema>(StringComparer.OrdinalIgnoreCase);
+            _referencedTypes = new Dictionary<Type, SchemaInfo>();
+            Definitions = new Dictionary<string, Schema>();
+        }
+
+        public Schema GetOrRegister(Type type)
+        {
+            var schema = CreateInlineSchema(type, "#/definitions/");
+
+            // Ensure Schema's have been fully generated for all referenced types
+            while (_referencedTypes.Any(entry => entry.Value.Schema == null))
+            {
+                var typeMapping = _referencedTypes.First(entry => entry.Value.Schema == null);
+                var schemaInfo = typeMapping.Value;
+
+                schemaInfo.Schema = CreateDefinitionSchema(typeMapping.Key, "");
+                Definitions.Add(schemaInfo.SchemaId, schemaInfo.Schema);
+            }
+
+            return schema;
         }
 
         public IDictionary<string, Schema> Definitions { get; private set; }
 
-        public Schema FindOrRegister(Type type)
+        private Schema CreateInlineSchema(Type type, string refPrefix)
         {
-            var referencedTypes = new Queue<KeyValuePair<string, Type>>();
-            var rootSchema = CreateSchema(type, false, true, referencedTypes);
+            if (_customschemaRegistrypings.ContainsKey(type))
+                return _customschemaRegistrypings[type]();
 
-            while (referencedTypes.Any())
-            {
-                var next = referencedTypes.Dequeue();
-                if (Definitions.ContainsKey(next.Key)) continue;
+            var jsonContract = _jsonContractResolver.ResolveContract(type);
 
-                Definitions.Add(next.Key, CreateSchema(next.Value, false, false, referencedTypes));
-            }
+            if (jsonContract is JsonPrimitiveContract)
+                return CreatePrimitiveSchema((JsonPrimitiveContract)jsonContract);
 
-            // Need to fully qualify any ref to a schema that's contained in Definitions
-            // TODO: There has to be a better way - this will do for now though!
-            if (rootSchema.@ref != null)
-                rootSchema.@ref = "#/definitions/" + rootSchema.@ref;
-            if (rootSchema.items != null && rootSchema.items.@ref != null)
-                rootSchema.items.@ref = "#/definitions/" + rootSchema.items.@ref;
+            var dictionaryContract = jsonContract as JsonDictionaryContract;
+            if (dictionaryContract != null)
+                return dictionaryContract.IsSelfReferencing()
+                    ? CreateRefSchema(type, refPrefix)
+                    : CreateDictionarySchema(dictionaryContract, refPrefix);
 
-            return rootSchema;
+            var arrayContract = jsonContract as JsonArrayContract;
+            if (arrayContract != null)
+                return arrayContract.IsSelfReferencing()
+                    ? CreateRefSchema(type, refPrefix)
+                    : CreateArraySchema(arrayContract, refPrefix);
+
+            var objectContract = jsonContract as JsonObjectContract;
+            if (objectContract != null && objectContract.IsInferrable())
+                return CreateRefSchema(type, refPrefix);
+
+            // Fallback to abstract "object"
+            return CreateRefSchema(typeof(object), refPrefix);
         }
 
-        private Schema CreateSchema(
-            Type type,
-            bool refIfArray,
-            bool refIfComplex,
-            Queue<KeyValuePair<string, Type>> referencedTypes)
+        private Schema CreateDefinitionSchema(Type type, string refPrefix)
         {
-            if (_customSchemaMappings.ContainsKey(type))
-                return _customSchemaMappings[type]();
+            var jsonContract = _jsonContractResolver.ResolveContract(type);
 
-            if (PrimitiveMappings.ContainsKey(type))
-                return PrimitiveMappings[type]();
+            if (jsonContract is JsonDictionaryContract)
+                return CreateDictionarySchema((JsonDictionaryContract)jsonContract, refPrefix);
 
-            Type innerType;
-            if (type.IsNullable(out innerType))
-                return CreateSchema(innerType, refIfArray, refIfComplex, referencedTypes);
+            if (jsonContract is JsonArrayContract)
+                return CreateArraySchema((JsonArrayContract)jsonContract, refPrefix);
 
-            // Can't be created from the basic primitive mappings - use json contract resolver
-            var contract = _contractResolver.ResolveContract(type);
+            if (jsonContract is JsonObjectContract)
+                return CreateObjectSchema((JsonObjectContract)jsonContract, refPrefix);
+
+            throw new InvalidOperationException(
+                String.Format("Unsupported type - {0} for Defintitions. Must be Dictionary, Array or Object", type));
+        }
+
+        private Schema CreatePrimitiveSchema(JsonPrimitiveContract primitiveContract)
+        {
+            var type = primitiveContract.UnderlyingType;
 
             if (type.IsEnum)
             {
-                var converter = contract.Converter;
+                var converter = primitiveContract.Converter;
                 return (converter != null && converter.GetType() == typeof(StringEnumConverter))
                     ? new Schema { type = "string", @enum = type.GetEnumNames() }
                     : new Schema { type = "integer", format = "int32", @enum = type.GetEnumValues().Cast<object>().ToArray() };
             }
 
-            if (contract is JsonArrayContract)
+            switch (type.FullName)
             {
-                return refIfArray
-                    ? CreateRefSchema(type, referencedTypes)
-                    : CreateArraySchema((JsonArrayContract)contract, referencedTypes);
+                case "System.Int16":
+                case "System.UInt16":
+                case "System.Int32":
+                case "System.UInt32":
+                    return new Schema { type = "integer", format = "int32" };
+                case "System.Int64":
+                case "System.UInt64":
+                    return new Schema { type = "integer", format = "int64" };
+                case "System.Single":
+                    return new Schema { type = "number", format = "float" };
+                case "System.Double":
+                case "System.Decimal":
+                    return new Schema { type = "number", format = "double" };
+                case "System.Byte":
+                case "System.SByte":
+                    return new Schema { type = "string", format = "byte" };
+                case "System.Boolean":
+                    return new Schema { type = "boolean" };
+                case "System.DateTime":
+                case "System.DateTimeOffset":
+                    return new Schema { type = "string", format = "date-time" };
+                default:
+                    return new Schema { type = "string" };
             }
-
-            if (contract is JsonDictionaryContract)
-            {
-                return refIfComplex
-                    ? CreateRefSchema(type, referencedTypes)
-                    : CreateDictionarySchema((JsonDictionaryContract)contract, referencedTypes);
-            }
- 
-            if (contract is JsonObjectContract && CanDescribe(type))
-            {
-                return refIfComplex
-                    ? CreateRefSchema(type, referencedTypes)
-                    : CreateComplexSchema((JsonObjectContract)contract, referencedTypes);
-            }
-
-            // Falback, describe anything else as plain object
-            return CreateSchema(typeof(object), refIfArray, refIfComplex, referencedTypes);
         }
 
-        private Schema CreateRefSchema(Type type, Queue<KeyValuePair<string, Type>> referencedTypes)
-        {
-            var id = type.FriendlyId();
-            referencedTypes.Enqueue(new KeyValuePair<string, Type>(id, type));
-            return new Schema { @ref = id };
-        }
-
-        private Schema CreateArraySchema(JsonArrayContract contract, Queue<KeyValuePair<string, Type>> referencedTypes)
-        {
-            var refForItems = contract.UnderlyingType == contract.CollectionItemType; //prevents infinite loop
-            return new Schema
-                {
-                    type = "array",
-                    items = CreateSchema(contract.CollectionItemType, refForItems, true, referencedTypes)
-                };
-        }
-
-        private Schema CreateDictionarySchema(JsonDictionaryContract contract, Queue<KeyValuePair<string, Type>> referencedTypes)
+        private Schema CreateDictionarySchema(JsonDictionaryContract dictionaryContract, string refPrefix)
         {
             return new Schema
                 {
                     type = "object",
-                    additionalProperties = CreateSchema(contract.DictionaryValueType, false, true, referencedTypes)
+                    additionalProperties = CreateInlineSchema(dictionaryContract.DictionaryValueType, refPrefix)
                 };
         }
 
-        private Schema CreateComplexSchema(JsonObjectContract contract, Queue<KeyValuePair<string, Type>> referencedTypes)
+        private Schema CreateArraySchema(JsonArrayContract arrayContract, string refPrefix)
         {
-            var properties = contract.Properties.Where(p => !p.Ignored).ToDictionary(
-                prop => prop.PropertyName,
-                prop => CreateSchema(prop.PropertyType, false, true, referencedTypes)
-                    .WithValidationProperties(prop));
+            return new Schema
+                {
+                    type = "array",
+                    items = CreateInlineSchema(arrayContract.CollectionItemType, refPrefix)
+                };
+        }
 
-            var required = contract.Properties.Where(prop => prop.IsRequired())
+        private Schema CreateObjectSchema(JsonObjectContract jsonContract, string refPrefix)
+        {
+            var properties = jsonContract.Properties.Where(p => !p.Ignored).ToDictionary(
+                prop => prop.PropertyName,
+                prop => CreateInlineSchema(prop.PropertyType, refPrefix)
+                    .AndAssignValidationProperties(prop));
+
+            var required = jsonContract.Properties.Where(prop => prop.IsRequired())
                 .Select(propInfo => propInfo.PropertyName)
                 .ToList();
 
@@ -182,15 +187,48 @@ namespace Swashbuckle.Swagger
 
             foreach (var filter in _schemaFilters)
             {
-                filter.Apply(schema, this, contract.UnderlyingType);
+                filter.Apply(schema, this, jsonContract.UnderlyingType);
             }
 
             return schema;
         }
 
-        private bool CanDescribe(Type type)
+        private Schema CreateRefSchema(Type type, string refPrefix)
         {
-            return !HttpTypes.Contains(type) && type.FullName != "System.Web.Http.IHttpActionResult";
+            if (!_referencedTypes.ContainsKey(type))
+            {
+                var schemaId = SchemaIdFor(type);
+                if (_referencedTypes.Any(entry => entry.Value.SchemaId == schemaId))
+                {
+                    var conflictingType = _referencedTypes.First(entry => entry.Value.SchemaId == schemaId).Key;
+                    throw new InvalidOperationException(String.Format(
+                        "Conflicting schemaIds: Duplicate schemaIds detected for types {0} and {1}. " +
+                        "See the config setting - \"UseFullTypeNameInSchemaIds\" for a potential workaround",
+                        type.FullName, conflictingType.FullName));
+                }
+
+                _referencedTypes.Add(type, new SchemaInfo { SchemaId = schemaId });
+            }
+
+            return new Schema { @ref = refPrefix + _referencedTypes[type].SchemaId };
+        }
+
+        public string SchemaIdFor(Type type)
+        {
+            var typeName = _useFullTypeNameInSchemaIds ? type.FullName : type.Name;
+            if (type.IsGenericType)
+            {
+                var genericArgumentIds = type.GetGenericArguments()
+                    .Select(t => SchemaIdFor(t))
+                    .ToArray();
+
+                return new StringBuilder(typeName)
+                    .Replace(String.Format("`{0}", genericArgumentIds.Count()), String.Empty)
+                    .Append(String.Format("[{0}]", String.Join(",", genericArgumentIds).TrimEnd(',')))
+                    .ToString();
+            }
+
+            return typeName;
         }
     }
 }

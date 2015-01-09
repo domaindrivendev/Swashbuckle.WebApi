@@ -145,9 +145,7 @@ namespace Swashbuckle.Tests.SwaggerUi
 
         private void SetUpHandler(Action<SwaggerUiConfig> configure = null)
         {
-            var swaggerUiConfig = new SwaggerUiConfig(
-                SwaggerDocsConfig.DefaultRootUrlResolver,
-                new[] { "swagger/docs/1.0" });
+            var swaggerUiConfig = new SwaggerUiConfig(new[] { "swagger/docs/1.0" }, SwaggerDocsConfig.DefaultRootUrlResolver);
 
             if (configure != null)
                 configure(swaggerUiConfig);

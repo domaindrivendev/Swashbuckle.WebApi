@@ -38,7 +38,7 @@ namespace Swashbuckle.Application
 
             return new SwaggerEnabledConfiguration(
                 httpConfig,
-                config.GetRootUrlResolver(),
+                config.GetRootUrl,
                 config.GetApiVersions().Select(version => routeTemplate.Replace("{apiVersion}", version)));
         }
 
@@ -78,7 +78,7 @@ namespace Swashbuckle.Application
             string routeTemplate,
             Action<SwaggerUiConfig> configure = null)
         {
-            var config = new SwaggerUiConfig(_rootUrlResolver, _discoveryPaths);
+            var config = new SwaggerUiConfig(_discoveryPaths, _rootUrlResolver);
             if (configure != null) configure(config);
 
             _httpConfig.Routes.MapHttpRoute(

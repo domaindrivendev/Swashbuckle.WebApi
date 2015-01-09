@@ -7,7 +7,7 @@ namespace Swashbuckle.Swagger
 {
     public static class SchemaExtensions
     {
-        public static Schema WithValidationProperties(this Schema schema, JsonProperty jsonProperty)
+        public static Schema AndAssignValidationProperties(this Schema schema, JsonProperty jsonProperty)
         {
             var propInfo = jsonProperty.PropertyInfo();
             if (propInfo == null)

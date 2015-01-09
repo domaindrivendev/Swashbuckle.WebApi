@@ -151,9 +151,9 @@ namespace Swashbuckle.Tests.Swagger
                                 responses = new Dictionary<string, object>
                                 {
                                     {
-                                        "200", new
+                                        "204", new
                                         {
-                                            description = "OK",
+                                            description = "No Content",
                                         }
                                     }
                                 },
@@ -179,9 +179,9 @@ namespace Swashbuckle.Tests.Swagger
                                 responses = new Dictionary<string, object>
                                 {
                                     {
-                                        "200", new
+                                        "204", new
                                         {
-                                            description = "OK",
+                                            description = "No Content",
                                         }
                                     }
                                 },

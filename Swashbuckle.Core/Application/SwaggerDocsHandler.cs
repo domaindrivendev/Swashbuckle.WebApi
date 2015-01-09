@@ -14,21 +14,22 @@ namespace Swashbuckle.Application
 {
     public class SwaggerDocsHandler : HttpMessageHandler
     {
-        private readonly SwaggerDocsConfig _swaggerDocsConfig;
+        private readonly SwaggerDocsConfig _config;
 
-        public SwaggerDocsHandler( SwaggerDocsConfig swaggerDocsConfig)
+        public SwaggerDocsHandler(SwaggerDocsConfig config)
         {
-            _swaggerDocsConfig = swaggerDocsConfig;
+            _config = config;
         }
 
         protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
         {
-            var swaggerProvider = GetSwaggerProvider(request);
+            var swaggerProvider = _config.GetSwaggerProvider(request);
+            var rootUrl = _config.GetRootUrl(request);
             var apiVersion = request.GetRouteData().Values["apiVersion"].ToString();
 
             try
             {
-                var swaggerDoc = swaggerProvider.GetSwaggerFor(apiVersion);
+                var swaggerDoc = swaggerProvider.GetSwagger(rootUrl, apiVersion);
                 var content = ContentFor(request, swaggerDoc);
                 return TaskFor(new HttpResponseMessage { Content = content });
             }
@@ -36,17 +37,6 @@ namespace Swashbuckle.Application
             {
                 return TaskFor(request.CreateErrorResponse(HttpStatusCode.NotFound, ex));
             }
-        }
-
-        private ISwaggerProvider GetSwaggerProvider(HttpRequestMessage request)
-        {
-            var httpConfig = request.GetConfiguration();
-
-            return new SwaggerGenerator(
-                _swaggerDocsConfig.GetRootUrlResolver()(request),
-                httpConfig.Services.GetApiExplorer(),
-                httpConfig.GetJsonContractResolver(),
-                _swaggerDocsConfig.GetGeneratorSettings());
         }
 
         private HttpContent ContentFor(HttpRequestMessage request, SwaggerDocument swaggerDoc)

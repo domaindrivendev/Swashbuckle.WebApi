@@ -5,29 +5,29 @@ using System.Web.Http.Description;
 
 namespace Swashbuckle.Swagger
 {
-    public class SwaggerGeneratorSettings
+    public class SwaggerGeneratorOptions
     {
-        public SwaggerGeneratorSettings(
-            Func<ApiDescription, string, bool> versionSupportResolver,
-            IEnumerable<string> schemes,
-            IDictionary<string, Info> apiVersions,
+        public SwaggerGeneratorOptions(
+            Func<ApiDescription, string, bool> versionSupportResolver = null,
+            IEnumerable<string> schemes = null,
             IDictionary<string, SecurityScheme> securityDefinitions = null,
             Func<ApiDescription, string> groupingKeySelector = null,
             IComparer<string> groupingKeyComparer = null,
-            IDictionary<Type, Func<Schema>> customSchemaMappings = null,
+            IDictionary<Type, Func<Schema>> customschemaRegistrypings = null,
             IEnumerable<ISchemaFilter> schemaFilters = null,
+            bool useFullTypeNameInSchemaIds = false, 
             IEnumerable<IOperationFilter> operationFilters = null,
             IEnumerable<IDocumentFilter> documentFilters = null,
             Func<IEnumerable<ApiDescription>, ApiDescription> conflictingActionsResolver = null)
         {
             VersionSupportResolver = versionSupportResolver;
             Schemes = schemes;
-            ApiVersions = apiVersions;
             SecurityDefinitions = securityDefinitions;
             GroupingKeySelector = groupingKeySelector ?? DefaultGroupingKeySelector;
             GroupingKeyComparer = groupingKeyComparer ?? Comparer<string>.Default;
-            CustomSchemaMappings = customSchemaMappings ?? new Dictionary<Type, Func<Schema>>();
+            CustomschemaRegistrypings = customschemaRegistrypings ?? new Dictionary<Type, Func<Schema>>();
             SchemaFilters = schemaFilters ?? new List<ISchemaFilter>();
+            UseFullTypeNameInSchemaIds = useFullTypeNameInSchemaIds;
             OperationFilters = operationFilters ?? new List<IOperationFilter>();
             DocumentFilters = documentFilters ?? new List<IDocumentFilter>();
             ConflictingActionsResolver = conflictingActionsResolver ?? DefaultConflictingActionsResolver;
@@ -37,17 +37,17 @@ namespace Swashbuckle.Swagger
 
         public IEnumerable<string> Schemes { get; private set; }
 
-        public IDictionary<string, Info> ApiVersions { get; private set; }
-
         public IDictionary<string, SecurityScheme> SecurityDefinitions { get; private set; }
 
         public Func<ApiDescription, string> GroupingKeySelector { get; private set; }
 
         public IComparer<string> GroupingKeyComparer { get; private set; }
 
-        public IDictionary<Type, Func<Schema>> CustomSchemaMappings { get; private set; }
+        public IDictionary<Type, Func<Schema>> CustomschemaRegistrypings { get; private set; }
 
         public IEnumerable<ISchemaFilter> SchemaFilters { get; private set; }
+
+        public bool UseFullTypeNameInSchemaIds { get; private set; }
 
         public IEnumerable<IOperationFilter> OperationFilters { get; private set; }
 

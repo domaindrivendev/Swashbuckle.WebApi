@@ -5,32 +5,30 @@ using System.Linq;
 
 namespace Swashbuckle.SwaggerUi
 {
-    public class EmbeddedSwaggerUiProvider : ISwaggerUiProvider
+    public class EmbeddedAssetProvider : IAssetProvider
     {
-        private readonly EmbeddedSwaggerUiProviderSettings _settings;
-        private readonly Dictionary<string, string> _templateValues;
+        private readonly IDictionary<string, EmbeddedAssetDescriptor> _customAssets;
+        private readonly IDictionary<string, string> _replacements;
 
-        public EmbeddedSwaggerUiProvider(
-            string rootUrl,
-            EmbeddedSwaggerUiProviderSettings settings)
+        public EmbeddedAssetProvider(
+            IDictionary<string, EmbeddedAssetDescriptor> customAssets,
+            IDictionary<string, string> replacements)
         {
-            _settings = settings;
-
-            _templateValues = _settings.TemplateValues.ToDictionary(entry => entry.Key, entry => entry.Value);
-            _templateValues["%(RootUrl)"] = rootUrl;
+            _customAssets = customAssets;
+            _replacements = replacements;
         }
 
-        public Asset GetAssetFor(string path)
+        public Asset GetAsset(string rootUrl, string path)
         {
-            var stream = GetEmbeddedResourceStreamFor(path);
+            var stream = GetEmbeddedResourceStreamFor(rootUrl, path);
             var mediaType = InferMediaTypeFrom(path);
             return new Asset(stream, mediaType);
         }
 
-        private Stream GetEmbeddedResourceStreamFor(string assetPath)
+        private Stream GetEmbeddedResourceStreamFor(string rootUrl, string assetPath)
         {
             EmbeddedAssetDescriptor customEmbeddedResource;
-            var isCustom = _settings.CustomAssets.TryGetValue(assetPath, out customEmbeddedResource);
+            var isCustom = _customAssets.TryGetValue(assetPath, out customEmbeddedResource);
 
             var assembly = isCustom ? customEmbeddedResource.ContainingAssembly : GetType().Assembly;
             var name = isCustom ? customEmbeddedResource.Name : assetPath;
@@ -39,7 +37,11 @@ namespace Swashbuckle.SwaggerUi
             if (stream == null)
                 throw new AssetNotFound();
 
-            return isCustom ? stream.FindAndReplace(_templateValues) : stream;
+            var replacements = _replacements
+                .Union(new[] { new KeyValuePair<string, string>("%(RootUrl)", rootUrl) })
+                .ToDictionary(entry => entry.Key, entry => entry.Value);
+
+            return isCustom ? stream.FindAndReplace(replacements) : stream;
         }
 
         private static string InferMediaTypeFrom(string path)
