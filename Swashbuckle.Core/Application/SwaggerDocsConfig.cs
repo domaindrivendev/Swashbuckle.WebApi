@@ -4,6 +4,7 @@ using System.Web.Http;
 using System.Linq;
 using System.Collections.Generic;
 using System.Web.Http.Description;
+using Newtonsoft.Json.Converters;
 using Swashbuckle.Swagger;
 using Swashbuckle.Swagger.Filters;
 
@@ -20,6 +21,7 @@ namespace Swashbuckle.Application
         private readonly IDictionary<Type, Func<Schema>> _customschemaRegistrypings;
         private readonly IList<Func<ISchemaFilter>> _schemaFilters;
         private bool _useFullTypeNameInSchemaIds;
+        private bool _describeAllEnumsAsStrings;
         private readonly IList<Func<IOperationFilter>> _operationFilters;
         private readonly IList<Func<IDocumentFilter>> _documentFilters;
         private Func<IEnumerable<ApiDescription>, ApiDescription> _conflictingActionsResolver;
@@ -32,6 +34,7 @@ namespace Swashbuckle.Application
             _customschemaRegistrypings = new Dictionary<Type, Func<Schema>>();
             _schemaFilters = new List<Func<ISchemaFilter>>();
             _useFullTypeNameInSchemaIds = false;
+            _describeAllEnumsAsStrings = false;
             _operationFilters = new List<Func<IOperationFilter>>();
             _documentFilters = new List<Func<IDocumentFilter>>();
             _rootUrlResolver = DefaultRootUrlResolver; 
@@ -112,6 +115,11 @@ namespace Swashbuckle.Application
             _useFullTypeNameInSchemaIds = true;
         }
 
+        public void DescribeAllEnumsAsStrings()
+        {
+            _describeAllEnumsAsStrings = true;
+        }
+
         public void OperationFilter<TFilter>()
             where TFilter : IOperationFilter, new()
         {
@@ -158,6 +166,9 @@ namespace Swashbuckle.Application
                 ? _securitySchemeBuilders.ToDictionary(kvp => kvp.Key, kvp => kvp.Value.Build())
                 : null;
 
+            var describeAllEnumsAsStrings = _describeAllEnumsAsStrings
+                || httpConfig.HasJsonConverterOfType<StringEnumConverter>();
+
             var options = new SwaggerGeneratorOptions(
                 versionSupportResolver: _versionSupportResolver,
                 schemes: _schemes, 
@@ -167,6 +178,7 @@ namespace Swashbuckle.Application
                 customschemaRegistrypings: _customschemaRegistrypings,
                 schemaFilters: _schemaFilters.Select(factory => factory()),
                 useFullTypeNameInSchemaIds: _useFullTypeNameInSchemaIds,
+                describeAllEnumsAsStrings: describeAllEnumsAsStrings,
                 operationFilters: _operationFilters.Select(factory => factory()),
                 documentFilters: _documentFilters.Select(factory => factory()),
                 conflictingActionsResolver: _conflictingActionsResolver

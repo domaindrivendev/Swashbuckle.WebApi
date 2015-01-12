@@ -4,6 +4,7 @@ using System.Net.Http;
 using System.Linq;
 using NUnit.Framework;
 using Newtonsoft.Json.Linq;
+using Newtonsoft.Json.Converters;
 using Swashbuckle.Dummy.Controllers;
 using Swashbuckle.Application;
 using Swashbuckle.Swagger;
@@ -19,7 +20,7 @@ namespace Swashbuckle.Tests.Swagger
         { }
 
         [SetUp]
-        public void SetUP()
+        public void SetUp()
         {
             // Default set-up
             SetUpHandler();
@@ -224,6 +225,23 @@ namespace Swashbuckle.Tests.Swagger
         }
 
         [Test]
+        public void It_honors_json_string_enum_converter_configured_globally()
+        {
+            Configuration.Formatters.JsonFormatter.SerializerSettings.Converters.Add(new StringEnumConverter());
+            SetUpDefaultRouteFor<ProductsController>();
+
+            var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/1.0");
+            var typeSchema = swagger["definitions"]["Product"]["properties"]["Type"];
+
+            var expected = JObject.FromObject(new
+                {
+                    @enum = new[] { "Book", "Album" },
+                    type = "string"
+                });
+            Assert.AreEqual(expected.ToString(), typeSchema.ToString());
+        }
+
+        [Test]
         public void It_exposes_config_to_map_a_type_to_an_explicit_schema()
         {
             SetUpDefaultRouteFor<ProductsController>();
@@ -251,7 +269,7 @@ namespace Swashbuckle.Tests.Swagger
             Assert.AreEqual(expected.ToString(), parameter.ToString());
         }
 
-
+        [Test]
         public void It_exposes_config_to_post_modify_schemas()
         {
             SetUpDefaultRouteFor<ProductsController>();

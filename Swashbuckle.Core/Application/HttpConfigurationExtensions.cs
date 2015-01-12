@@ -42,12 +42,18 @@ namespace Swashbuckle.Application
                 config.GetApiVersions().Select(version => routeTemplate.Replace("{apiVersion}", version)));
         }
 
-        internal static IContractResolver GetJsonContractResolver(this HttpConfiguration configuration)
+        internal static IContractResolver GetJsonContractResolver(this HttpConfiguration httpConfig)
         {
-            var formatter = configuration.Formatters.JsonFormatter;
+            var formatter = httpConfig.Formatters.JsonFormatter;
             return (formatter != null)
                 ? formatter.SerializerSettings.ContractResolver
                 : new DefaultContractResolver();
+        }
+
+        internal static bool HasJsonConverterOfType<T>(this HttpConfiguration httpConfig)
+        {
+            var formatter = httpConfig.Formatters.JsonFormatter;
+            return (formatter != null && (formatter.SerializerSettings.Converters.OfType<T>().Any()));
         }
     }
 

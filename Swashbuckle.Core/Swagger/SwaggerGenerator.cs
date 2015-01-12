@@ -32,7 +32,8 @@ namespace Swashbuckle.Swagger
                 _jsonContractResolver,
                 _options.CustomschemaRegistrypings,
                 _options.SchemaFilters,
-                _options.UseFullTypeNameInSchemaIds);
+                _options.UseFullTypeNameInSchemaIds,
+                _options.DescribeAllEnumsAsStrings);
 
             Info info;
             _apiVersions.TryGetValue(apiVersion, out info);

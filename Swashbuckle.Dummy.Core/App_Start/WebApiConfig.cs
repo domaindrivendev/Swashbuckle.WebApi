@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json.Serialization;
+﻿using Newtonsoft.Json.Converters;
+using Newtonsoft.Json.Serialization;
 using System.Web.Http;
 
 namespace Swashbuckle.Dummy
@@ -20,6 +21,8 @@ namespace Swashbuckle.Dummy
 
             var formatter = config.Formatters.JsonFormatter;
             formatter.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
+
+            formatter.SerializerSettings.Converters.Add(new StringEnumConverter());
         }
     }
 }
