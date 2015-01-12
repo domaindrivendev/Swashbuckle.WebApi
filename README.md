@@ -236,6 +236,8 @@ Swashbuckle makes a best attempt at generating Swagger compliant JSON schemas fo
                 c.SchemaFilter<ApplySchemaVendorExtensions>();
 
                 c.UseFullTypeNameInSchemaIds();
+
+                c.DescribeAllEnumsAsStrings();
             });
 
 #### MapType ####
@@ -259,6 +261,10 @@ A typical implementation will inspect the system Type and modify the Schema acco
 #### UseFullTypeNamesInSchemaIds ####
 
 In a Swagger 2.0 document, complex types are typically declared globally and referenced by unique Schema Id. By default, Swashbuckle does NOT use the full type name in Schema Ids. In most cases, this works well because it prevents the "implementation detail" of type namespaces from leaking into your Swagger docs and UI. However, if you have multiple types in your API with the same class name, you'll need to opt out of this behavior to avoid Schema Id conflicts.  
+
+#### DescribeAllEnumsAsStrings ####
+
+In accordance with the built in JsonSerializer, Swashbuckle will, by default, describe enums as integers. You can change the serializer behavior by configuring the StringToEnumConverter globally or for a given enum type. Swashbuckle will honor this change out-of-the-box. However, if you use a different approach to serialize enums as strings, you can also force Swashbuckle to describe them as strings.
 
 ### Modifying Generated Operations ###
 

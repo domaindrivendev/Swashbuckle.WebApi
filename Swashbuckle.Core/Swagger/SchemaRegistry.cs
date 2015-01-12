@@ -20,6 +20,7 @@ namespace Swashbuckle.Swagger
         private readonly IDictionary<Type, Func<Schema>> _customschemaRegistrypings;
         private readonly IEnumerable<ISchemaFilter> _schemaFilters;
         private readonly bool _useFullTypeNameInSchemaIds;
+        private readonly bool _describeAllEnumsAsStrings;
 
         private IDictionary<Type, SchemaInfo> _referencedTypes;
         private class SchemaInfo
@@ -32,12 +33,14 @@ namespace Swashbuckle.Swagger
             IContractResolver jsonContractResolver,
             IDictionary<Type, Func<Schema>> customSchemaMappings,
             IEnumerable<ISchemaFilter> schemaFilters,
-            bool useFullTypeNameInSchemaIds)
+            bool useFullTypeNameInSchemaIds,
+            bool describeAllEnumsAsStrings)
         {
             _jsonContractResolver = jsonContractResolver;
             _customschemaRegistrypings = customSchemaMappings;
             _schemaFilters = schemaFilters;
             _useFullTypeNameInSchemaIds = useFullTypeNameInSchemaIds;
+            _describeAllEnumsAsStrings = describeAllEnumsAsStrings;
 
             _referencedTypes = new Dictionary<Type, SchemaInfo>();
             Definitions = new Dictionary<string, Schema>();
@@ -116,7 +119,10 @@ namespace Swashbuckle.Swagger
             if (type.IsEnum)
             {
                 var converter = primitiveContract.Converter;
-                return (converter != null && converter.GetType() == typeof(StringEnumConverter))
+                var describeAsString = _describeAllEnumsAsStrings 
+                    || (converter != null && converter.GetType() == typeof(StringEnumConverter));
+
+                return describeAsString
                     ? new Schema { type = "string", @enum = type.GetEnumNames() }
                     : new Schema { type = "integer", format = "int32", @enum = type.GetEnumValues().Cast<object>().ToArray() };
             }

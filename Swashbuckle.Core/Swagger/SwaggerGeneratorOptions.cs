@@ -16,9 +16,11 @@ namespace Swashbuckle.Swagger
             IDictionary<Type, Func<Schema>> customschemaRegistrypings = null,
             IEnumerable<ISchemaFilter> schemaFilters = null,
             bool useFullTypeNameInSchemaIds = false, 
+            bool describeAllEnumsAsStrings = false,
             IEnumerable<IOperationFilter> operationFilters = null,
             IEnumerable<IDocumentFilter> documentFilters = null,
-            Func<IEnumerable<ApiDescription>, ApiDescription> conflictingActionsResolver = null)
+            Func<IEnumerable<ApiDescription>, ApiDescription> conflictingActionsResolver = null
+            )
         {
             VersionSupportResolver = versionSupportResolver;
             Schemes = schemes;
@@ -28,6 +30,7 @@ namespace Swashbuckle.Swagger
             CustomschemaRegistrypings = customschemaRegistrypings ?? new Dictionary<Type, Func<Schema>>();
             SchemaFilters = schemaFilters ?? new List<ISchemaFilter>();
             UseFullTypeNameInSchemaIds = useFullTypeNameInSchemaIds;
+            DescribeAllEnumsAsStrings = describeAllEnumsAsStrings;
             OperationFilters = operationFilters ?? new List<IOperationFilter>();
             DocumentFilters = documentFilters ?? new List<IDocumentFilter>();
             ConflictingActionsResolver = conflictingActionsResolver ?? DefaultConflictingActionsResolver;
@@ -48,6 +51,8 @@ namespace Swashbuckle.Swagger
         public IEnumerable<ISchemaFilter> SchemaFilters { get; private set; }
 
         public bool UseFullTypeNameInSchemaIds { get; private set; }
+
+        public bool DescribeAllEnumsAsStrings { get; private set; }
 
         public IEnumerable<IOperationFilter> OperationFilters { get; private set; }
 
