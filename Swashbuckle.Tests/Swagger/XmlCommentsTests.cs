@@ -53,6 +53,36 @@ namespace Swashbuckle.Tests.Swagger
         }
 
         [Test]
+        public void It_documents_responses_from_action_response_tags()
+        {
+            var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/1.0");
+
+            var createResponses = swagger["paths"]["/xmlannotated"]["post"]["responses"];
+
+            var expected = JObject.FromObject(new Dictionary<string, object>()
+                {
+                    {
+                        "201", new
+                        {
+                            description = "Account created",
+                            schema = new
+                            {
+                                format = "int32",
+                                type = "integer"
+                            }
+                        }
+                    },
+                    {
+                        "400", new
+                        {
+                            description = "Username already in use"
+                        }
+                    }
+                });
+            Assert.AreEqual(expected.ToString(), createResponses.ToString());
+        }
+
+        [Test]
         public void It_documents_schemas_from_type_summary_tags()
         {
             var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/1.0");

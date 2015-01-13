@@ -11,6 +11,8 @@ namespace Swashbuckle.Dummy.Controllers
         /// </summary>
         /// <remarks>Create an account to access restricted resources</remarks>
         /// <param name="account">Details for the account to be created</param>
+        /// <response code="201">Account created</response>
+        /// <response code="400">Username already in use</response>
         public int Create(Account account)
         {
             throw new NotImplementedException();

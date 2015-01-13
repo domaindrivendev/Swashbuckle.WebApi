@@ -298,7 +298,7 @@ IDocumentFilter has the following interface:
 
 This gives full control to modify the final SwaggerDocument. You can gain additional context from the provided SwaggerDocument (e.g. version) and IApiExplorer. You should have a good understanding of the [Swagger 2.0 spec.](https://github.com/swagger-api/swagger-spec/blob/master/versions/2.0.md) before using this option.
 
-### Including Xml Comments ###
+### Including XML Comments ###
 
 If you annonate Controllers and API Types with [Xml Comments](http://msdn.microsoft.com/en-us/library/b2s063f7(v=vs.110).aspx), you can incorporate those comments into the generated docs and UI. The Xml tags are mapped to Swagger properties as follows:
 
@@ -308,7 +308,7 @@ If you annonate Controllers and API Types with [Xml Comments](http://msdn.micros
 * **Type summary** -> Schema.descripton
 * **Property summary** -> Schema.description (i.e. on a property Schema)
 
-You can enable this by providing the path to one or more Xml comments files:
+You can enable this by providing the path to one or more XML comments files:
 
     httpConfiguration
         .EnableSwagger(c => c.SingleApiVersion("1.0", "A title for your API"))
@@ -316,6 +316,14 @@ You can enable this by providing the path to one or more Xml comments files:
                 c.IncludeXmlComments(GetXmlCommentsPathForControllers());
                 c.IncludeXmlComments(GetXmlCommentsPathForModels());
             });
+
+#### Response Codes ####
+
+Swashbuckle will automatically create a "success" response for each operation based on the action's return type. If it's a void, the status code will be 204 (No content), otherwise 200 (Ok). This mirrors WebApi's default behavior. If you need to change this and/or list additional response codes, you can use the non-standard "response" tag:
+
+    /// <response code="201">Account created</response>
+    /// <response code="400">Username already in use</response>
+    public int Create(Account account)
 
 ### Working Around Swagger 2.0 Constraints ###
 

@@ -39,8 +39,7 @@ namespace Swashbuckle.Swagger.Filters
 
             ApplyParamComments(operation, methodNode);
 
-            // TODO: Not sure about this feature???
-            //ApplyResponseComments(operation, methodNode);
+            ApplyResponseComments(operation, methodNode);
         }
 
         private static string XPathFor(HttpActionDescriptor actionDescriptor)
@@ -96,11 +95,24 @@ namespace Swashbuckle.Swagger.Filters
         private static void ApplyResponseComments(Operation operation, XPathNavigator methodNode)
         {
             var responseNodes = methodNode.Select(ResponseExpression);
-            while (responseNodes.MoveNext())
+
+            if (responseNodes.Count > 0)
             {
-                var responseNode = responseNodes.Current;
-                var response = new Response { description = responseNode.Value.Trim() };
-                operation.responses[responseNode.GetAttribute("code", "")] = response;
+                var successResponse = operation.responses.First().Value;
+                operation.responses.Clear();
+
+                while (responseNodes.MoveNext())
+                {
+                    var statusCode = responseNodes.Current.GetAttribute("code", "");
+                    var description = responseNodes.Current.Value.Trim();
+
+                    var response = new Response
+                    {
+                        description = description,
+                        schema = statusCode.StartsWith("2") ? successResponse.schema : null
+                    };
+                    operation.responses[statusCode] = response;
+                }
             }
         }
     }
