@@ -30,7 +30,7 @@ namespace Swashbuckle.Swagger
         {
             var schemaRegistry = new SchemaRegistry(
                 _jsonContractResolver,
-                _options.CustomschemaRegistrypings,
+                _options.CustomSchemaMappings,
                 _options.SchemaFilters,
                 _options.UseFullTypeNameInSchemaIds,
                 _options.DescribeAllEnumsAsStrings);

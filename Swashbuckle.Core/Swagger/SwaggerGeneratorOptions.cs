@@ -13,7 +13,7 @@ namespace Swashbuckle.Swagger
             IDictionary<string, SecurityScheme> securityDefinitions = null,
             Func<ApiDescription, string> groupingKeySelector = null,
             IComparer<string> groupingKeyComparer = null,
-            IDictionary<Type, Func<Schema>> customschemaRegistrypings = null,
+            IDictionary<Type, Func<Schema>> customSchemaMappings = null,
             IEnumerable<ISchemaFilter> schemaFilters = null,
             bool useFullTypeNameInSchemaIds = false, 
             bool describeAllEnumsAsStrings = false,
@@ -27,7 +27,7 @@ namespace Swashbuckle.Swagger
             SecurityDefinitions = securityDefinitions;
             GroupingKeySelector = groupingKeySelector ?? DefaultGroupingKeySelector;
             GroupingKeyComparer = groupingKeyComparer ?? Comparer<string>.Default;
-            CustomschemaRegistrypings = customschemaRegistrypings ?? new Dictionary<Type, Func<Schema>>();
+            CustomSchemaMappings = customSchemaMappings ?? new Dictionary<Type, Func<Schema>>();
             SchemaFilters = schemaFilters ?? new List<ISchemaFilter>();
             UseFullTypeNameInSchemaIds = useFullTypeNameInSchemaIds;
             DescribeAllEnumsAsStrings = describeAllEnumsAsStrings;
@@ -46,7 +46,7 @@ namespace Swashbuckle.Swagger
 
         public IComparer<string> GroupingKeyComparer { get; private set; }
 
-        public IDictionary<Type, Func<Schema>> CustomschemaRegistrypings { get; private set; }
+        public IDictionary<Type, Func<Schema>> CustomSchemaMappings { get; private set; }
 
         public IEnumerable<ISchemaFilter> SchemaFilters { get; private set; }
 

@@ -426,4 +426,53 @@ If you're using the existing config. interface to customize the final Swagger do
 
 ## Troubleshooting and FAQ's ##
 
-Coming real soon ...
+1. [Page not found when accessing the UI](#page-not-found-when-accessing-ui)
+2. [swagger-ui broken by Visual Studio 2013](#swagger-ui-broken-by-visual-studio-2013)
+3. [How to add vendor extensions](#how-to-add-vendor-extensions)
+4. [How to describe multiple API versions](#how-to-describe-multiple-api-versions)
+5. [How to configure OAuth2 support](#how-to-configure-oauth2-support)
+
+### Page not found when accessing the UI ###
+
+This issue ocurrs in IIS hosted environments when the native "static file" module is setup to intercept requests for URL's that contain extensions, bypassing the WebApi pipeline. In Swashbuckle, all of the swagger-ui assets (.html, .js, .css etc.) are served through the WebApi pipeline and so the static file handler must be disabled for these assets. In your web.config, add the following:
+
+    <system.webServer>
+    <modules>
+      <remove name="UrlRoutingModule-4.0" />
+      <add name="UrlRoutingModule-4.0" type="System.Web.Routing.UrlRoutingModule" preCondition="" />
+    </modules>
+    </system.webServer>
+
+### Swagger-ui broken by Visual Studio 2013 ###
+
+VS 2103 ships with a new feature - Browser Link that improves the web development workflow by setting up a channel between the IDE and pages being previewed in a local browser. It does this by dynamically injecting JavaScript into your files.
+
+Although this JavaScript SHOULD have no affect on your production code, it appears to be breaking the swagger-ui.
+
+I hope to find a permanent fix but in the meantime, you'll need to workaround this isuse by disabling the feature in your web.config:
+
+    <appSettings>
+        <add key="vs:EnableBrowserLink" value="false"/>
+    </appSettings>< appSettings>
+
+### How to add vendor extensions ###
+
+Swagger 2.0 allows additional meta-data (aka vendor extensions) to be added at various points in the Swagger document. Swashbuckle supports this by including a "vendorExtensions" dictionary with each of the extensible Swagger types. Meta-data can be added to these dictionaries from custom Schema, Operation or Document filters. For example:
+
+    public class ApplySchemaVendorExtensions : ISchemaFilter
+    {
+        public void Apply(Schema schema, SchemaRegistry schemaRegistry, Type type)
+        {
+            schema.vendorExtensions.Add("x-foo", "bar");
+        }
+    }
+
+As per the specification, all extension properties should be prefixed by "x-" 
+
+### How to describe multiple API versions ###
+
+TODO
+
+### How to confiugre OAuth2 support
+
+TODO

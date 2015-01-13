@@ -18,7 +18,7 @@ namespace Swashbuckle.Application
         private IDictionary<string, SecuritySchemeBuilder> _securitySchemeBuilders;
         private Func<ApiDescription, string> _groupingKeySelector;
         private IComparer<string> _groupingKeyComparer;
-        private readonly IDictionary<Type, Func<Schema>> _customschemaRegistrypings;
+        private readonly IDictionary<Type, Func<Schema>> _customSchemaMappings;
         private readonly IList<Func<ISchemaFilter>> _schemaFilters;
         private bool _useFullTypeNameInSchemaIds;
         private bool _describeAllEnumsAsStrings;
@@ -31,7 +31,7 @@ namespace Swashbuckle.Application
         {
             _versionInfoBuilder = new VersionInfoBuilder();
             _securitySchemeBuilders = new Dictionary<string, SecuritySchemeBuilder>();
-            _customschemaRegistrypings = new Dictionary<Type, Func<Schema>>();
+            _customSchemaMappings = new Dictionary<Type, Func<Schema>>();
             _schemaFilters = new List<Func<ISchemaFilter>>();
             _useFullTypeNameInSchemaIds = false;
             _describeAllEnumsAsStrings = false;
@@ -96,7 +96,7 @@ namespace Swashbuckle.Application
 
         public void MapType<T>(Func<Schema> factory)
         {
-            _customschemaRegistrypings.Add(typeof(T), factory);
+            _customSchemaMappings.Add(typeof(T), factory);
         }
 
         public void SchemaFilter<TFilter>()
@@ -175,7 +175,7 @@ namespace Swashbuckle.Application
                 securityDefinitions: securityDefintitions, 
                 groupingKeySelector: _groupingKeySelector,
                 groupingKeyComparer: _groupingKeyComparer,
-                customschemaRegistrypings: _customschemaRegistrypings,
+                customSchemaMappings: _customSchemaMappings,
                 schemaFilters: _schemaFilters.Select(factory => factory()),
                 useFullTypeNameInSchemaIds: _useFullTypeNameInSchemaIds,
                 describeAllEnumsAsStrings: describeAllEnumsAsStrings,

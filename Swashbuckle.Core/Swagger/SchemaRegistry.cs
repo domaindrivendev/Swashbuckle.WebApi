@@ -17,7 +17,7 @@ namespace Swashbuckle.Swagger
     public class SchemaRegistry
     {
         private readonly IContractResolver _jsonContractResolver;
-        private readonly IDictionary<Type, Func<Schema>> _customschemaRegistrypings;
+        private readonly IDictionary<Type, Func<Schema>> _customSchemaMappings;
         private readonly IEnumerable<ISchemaFilter> _schemaFilters;
         private readonly bool _useFullTypeNameInSchemaIds;
         private readonly bool _describeAllEnumsAsStrings;
@@ -37,7 +37,7 @@ namespace Swashbuckle.Swagger
             bool describeAllEnumsAsStrings)
         {
             _jsonContractResolver = jsonContractResolver;
-            _customschemaRegistrypings = customSchemaMappings;
+            _customSchemaMappings = customSchemaMappings;
             _schemaFilters = schemaFilters;
             _useFullTypeNameInSchemaIds = useFullTypeNameInSchemaIds;
             _describeAllEnumsAsStrings = describeAllEnumsAsStrings;
@@ -67,8 +67,8 @@ namespace Swashbuckle.Swagger
 
         private Schema CreateInlineSchema(Type type, string refPrefix)
         {
-            if (_customschemaRegistrypings.ContainsKey(type))
-                return _customschemaRegistrypings[type]();
+            if (_customSchemaMappings.ContainsKey(type))
+                return _customSchemaMappings[type]();
 
             var jsonContract = _jsonContractResolver.ResolveContract(type);
 
