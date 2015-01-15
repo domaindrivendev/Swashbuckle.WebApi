@@ -8,6 +8,7 @@ using System.Web.Http.Controllers;
 using System.Web.Http.Description;
 using System.Xml.XPath;
 using Swashbuckle.Swagger;
+using System.Text.RegularExpressions;
 
 namespace Swashbuckle.SwaggerExtensions
 {
@@ -16,14 +17,23 @@ namespace Swashbuckle.SwaggerExtensions
         private const string MethodExpression = "/doc/members/member[@name='M:{0}.{1}{2}']";
         private const string SummaryExpression = "summary";
         private const string RemarksExpression = "remarks";
-        private const string ParameterExpression = "param[@name=\"{0}\"]";
-        private const string ResponseExpression = "response";
+		private const string ParameterExpression = "param[@name=\"{0}\"]";
+		private const string ResponseExpression = "response";
+		private const string TypeNameAttributeExpression = "cref";
+		private const string ReturnsExpression = "returns[@" + TypeNameAttributeExpression + "]";
 
         private readonly XPathNavigator _navigator;
+		private readonly IEnumerable<Type> _types;
 
         public ApplyActionXmlComments(string xmlCommentsPath)
         {
             _navigator = new XPathDocument(xmlCommentsPath).CreateNavigator();
+			_types = AppDomain
+				.CurrentDomain
+				.GetAssemblies()
+				.Where(a => a != null)
+				.SelectMany(a => a.GetTypes())
+				.Where(t => t != null);
         }
 
         public void Apply(Operation operation, DataTypeRegistry dataTypeRegistry, ApiDescription apiDescription)
@@ -51,7 +61,23 @@ namespace Swashbuckle.SwaggerExtensions
             {
                 operation.ResponseMessages.Add(responseMessage);
             }
+
+			var returnType = GetCustomReturnType(methodNode);
+			if (returnType == null) return;
+
+			var dataType = dataTypeRegistry.GetOrRegister(returnType);
+			operation.Type = dataType.Id;
         }
+
+		private Type GetCustomReturnType(XPathNavigator methodNode)
+		{
+			var attributeValue = GetAttributeValueOrDefault(methodNode, ReturnsExpression, TypeNameAttributeExpression);
+			if (attributeValue == null || !attributeValue.StartsWith("T:") || attributeValue.Length < 3) return null;
+
+			var returnTypeName = attributeValue.Substring(2);
+			var type = _types.FirstOrDefault(t => t.FullName.Equals(returnTypeName));
+			return type;
+		}
 
         private static string GetXPathFor(HttpActionDescriptor actionDescriptor)
         {
@@ -97,13 +123,24 @@ namespace Swashbuckle.SwaggerExtensions
             return type.Namespace + "." + type.Name;
         }
 
-        private static string GetChildValueOrDefault(XPathNavigator node, string childExpression)
-        {
-            if (node == null) return String.Empty;
+		private static string GetChildValueOrDefault(XPathNavigator node, string childExpression)
+		{
+			if (node == null) return String.Empty;
 
-            var childNode = node.SelectSingleNode(childExpression);
-            return (childNode == null) ? String.Empty : childNode.Value.Trim();
-        }
+			var childNode = node.SelectSingleNode(childExpression);
+			return (childNode == null) ? String.Empty : childNode.Value.Trim();
+		}        
+
+		private static string GetAttributeValueOrDefault(XPathNavigator node, string childExpression, string attributeName)
+		{
+			if (node == null) return null;
+
+			var childNode = node.SelectSingleNode(childExpression);
+			if (childNode == null) return null;
+
+			var attribute = childNode.GetAttribute(attributeName, string.Empty);
+			return (attribute == null) ? null : attribute.Trim();
+		}
 
         private static IEnumerable<ResponseMessage> GetResponseMessages(XPathNavigator node)
         {
