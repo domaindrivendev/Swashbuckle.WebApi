@@ -246,10 +246,10 @@ If you annotate Controllers and API Types with [Xml Comments](http://msdn.micros
 Although it's not one of the official XML comment tags, Swashbuckle also supports the use of one or more **response** tags on an action. These can be used to describe the error codes for a given operation. For example,
 
     /// <response code="200">It's all good!</response>
-    /// <response code="500" cref="Error">Somethings up!</response>
+    /// <response code="500">Somethings up!</response>
     public int Create(Product product)
     
-These values will get mapped to the Operation.ResponseMessages. Response models specific to a status code can be referenced using a cref attribute.
+These values will get mapped to the Operation.ResponseMessages.
 
 When HttpResponseMessage is returned from a controller action, Swashbuckle automatically sets the return type to **string**. Swashbuckle does support using the cref attribute on the **returns** element of the xml comment to specify the return type wrapped by the HttpResponseMessage.
 
