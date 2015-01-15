@@ -57,27 +57,16 @@ namespace Swashbuckle.SwaggerExtensions
 
             if (methodNode == null) return;
 
-            foreach (var responseMessage in GetResponseMessages(methodNode))
+            foreach (var responseMessage in GetResponseMessages(methodNode, dataTypeRegistry))
             {
                 operation.ResponseMessages.Add(responseMessage);
             }
 
-			var returnType = GetCustomReturnType(methodNode);
-			if (returnType == null) return;
+			var returnsNode = methodNode.SelectSingleNode(ReturnsExpression);
+			var dataTypeId = GetCrefModel(returnsNode, dataTypeRegistry);
 
-			var dataType = dataTypeRegistry.GetOrRegister(returnType);
-			operation.Type = dataType.Id;
+			operation.Type = dataTypeId;
         }
-
-		private Type GetCustomReturnType(XPathNavigator methodNode)
-		{
-			var attributeValue = GetAttributeValueOrDefault(methodNode, ReturnsExpression, TypeNameAttributeExpression);
-			if (attributeValue == null || !attributeValue.StartsWith("T:") || attributeValue.Length < 3) return null;
-
-			var returnTypeName = attributeValue.Substring(2);
-			var type = _types.FirstOrDefault(t => t.FullName.Equals(returnTypeName));
-			return type;
-		}
 
         private static string GetXPathFor(HttpActionDescriptor actionDescriptor)
         {
@@ -129,20 +118,9 @@ namespace Swashbuckle.SwaggerExtensions
 
 			var childNode = node.SelectSingleNode(childExpression);
 			return (childNode == null) ? String.Empty : childNode.Value.Trim();
-		}        
+		}  
 
-		private static string GetAttributeValueOrDefault(XPathNavigator node, string childExpression, string attributeName)
-		{
-			if (node == null) return null;
-
-			var childNode = node.SelectSingleNode(childExpression);
-			if (childNode == null) return null;
-
-			var attribute = childNode.GetAttribute(attributeName, string.Empty);
-			return (attribute == null) ? null : attribute.Trim();
-		}
-
-        private static IEnumerable<ResponseMessage> GetResponseMessages(XPathNavigator node)
+		private IEnumerable<ResponseMessage> GetResponseMessages(XPathNavigator node, DataTypeRegistry dataTypeRegistry)
         {
             var iterator = node.Select(ResponseExpression);
             while (iterator.MoveNext())
@@ -150,9 +128,23 @@ namespace Swashbuckle.SwaggerExtensions
                 yield return new ResponseMessage
                 {
                     Code = Int32.Parse(iterator.Current.GetAttribute("code", String.Empty)),
-                    Message = iterator.Current.Value
+                    Message = iterator.Current.Value,
+					ResponseModel = GetCrefModel(iterator.Current, dataTypeRegistry)
                 };
             }
         }
+
+		private string GetCrefModel(XPathNavigator node, DataTypeRegistry dataTypeRegistry)
+		{
+			var attributeValue = node.GetAttribute("cref", string.Empty);
+			if (attributeValue == null || !attributeValue.StartsWith("T:") || attributeValue.Length < 3) return null;
+
+			var returnTypeName = attributeValue.Substring(2);
+			var type = _types.FirstOrDefault(t => t.FullName.Equals(returnTypeName));
+			if(type == null) return null;
+			var registered = dataTypeRegistry.GetOrRegister(type);
+
+			return registered != null ? registered.Id : null;
+		}
     }
 }

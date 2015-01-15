@@ -282,6 +282,9 @@ namespace Swashbuckle.Swagger
 
         [JsonProperty("message")]
         public string Message { get; set; }
+
+		[JsonProperty("responseModel")]
+		public string ResponseModel { get; set; }
     }
 
     public class DataType
