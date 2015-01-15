@@ -251,6 +251,13 @@ Although it's not one of the official XML comment tags, Swashbuckle also support
     
 These values will get mapped to the Operation.ResponseMessages.
 
+When HttpResponseMessage is returned from a controller action, Swashbuckle automatically sets the return type to **string**. Swashbuckle does support using the cref attribute on the **returns** element of the xml comment to specify the return type wrapped by the HttpResponseMessage.
+
+	///<returns cref="Product">Gets a specific product</returns>
+	public HttpResponseMessage Get(long id)
+	
+The parsed value will get mapped to the Operation.Type property.
+
 ### Customize the swagger-ui ###
 
 The Swagger UI supports a number of options to customize its appearance and behavior. See the [documentation](https://github.com/wordnik/swagger-ui) for a detailed description.

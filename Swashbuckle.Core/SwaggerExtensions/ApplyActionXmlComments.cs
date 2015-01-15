@@ -8,6 +8,7 @@ using System.Web.Http.Controllers;
 using System.Web.Http.Description;
 using System.Xml.XPath;
 using Swashbuckle.Swagger;
+using System.Text.RegularExpressions;
 
 namespace Swashbuckle.SwaggerExtensions
 {
@@ -22,10 +23,17 @@ namespace Swashbuckle.SwaggerExtensions
 		private const string ReturnsExpression = "returns[@" + TypeNameAttributeExpression + "]";
 
         private readonly XPathNavigator _navigator;
+		private readonly IEnumerable<Type> _types;
 
         public ApplyActionXmlComments(string xmlCommentsPath)
         {
             _navigator = new XPathDocument(xmlCommentsPath).CreateNavigator();
+			_types = AppDomain
+				.CurrentDomain
+				.GetAssemblies()
+				.Where(a => a != null)
+				.SelectMany(a => a.GetTypes())
+				.Where(t => t != null);
         }
 
         public void Apply(Operation operation, DataTypeRegistry dataTypeRegistry, ApiDescription apiDescription)
@@ -61,20 +69,13 @@ namespace Swashbuckle.SwaggerExtensions
 			operation.Type = dataType.Id;
         }
 
-		private static Type GetCustomReturnType(XPathNavigator methodNode)
+		private Type GetCustomReturnType(XPathNavigator methodNode)
 		{
 			var attributeValue = GetAttributeValueOrDefault(methodNode, ReturnsExpression, TypeNameAttributeExpression);
 			if (attributeValue == null || !attributeValue.StartsWith("T:") || attributeValue.Length < 3) return null;
+
 			var returnTypeName = attributeValue.Substring(2);
-
-			var type = AppDomain
-				.CurrentDomain
-				.GetAssemblies()
-				.Where(a => a != null)
-				.SelectMany(a => a.GetTypes())
-				.Where(t => t != null)
-				.FirstOrDefault(t => t.FullName.Equals(returnTypeName));
-
+			var type = _types.FirstOrDefault(t => t.FullName.Equals(returnTypeName));
 			return type;
 		}
 
