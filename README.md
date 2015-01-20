@@ -7,7 +7,7 @@ In addition to its Swagger generator, Swashbuckle also contains an embedded vers
 
 And that's not all ...
 
-Once you have a Web API that can describe itself in Swagger, you've opened the treasure chest of Swagger-based tools including a client generator that can be targetted to a wide range of popular platforms. See [swagger-codegen](https://github.com/swagger-api/swagger-codegen) for more details.
+Once you have a Web API that can describe itself in Swagger, you've opened the treasure chest of Swagger-based tools including a client generator that can be targeted to a wide range of popular platforms. See [swagger-codegen](https://github.com/swagger-api/swagger-codegen) for more details.
 
 **Swashbuckle Core Features:**
 
@@ -39,7 +39,7 @@ If your service is hosted in IIS, you can start exposing Swagger docs and a corr
 
     Install-Package Swashbuckle -Pre
 
-This will add a reference to Swashbuckle.Core and also install a bootstrapper (App_Start/SwaggerConfig.cs) that enables the Swagger routes on app start-up using [WeActivatorEx](https://github.com/davidebbo/WebActivator).
+This will add a reference to Swashbuckle.Core and also install a bootstrapper (App_Start/SwaggerConfig.cs) that enables the Swagger routes on app start-up using [WebActivatorEx](https://github.com/davidebbo/WebActivator).
 
 ### Self-hosted ###
 
@@ -65,7 +65,7 @@ Then manually enable the Swagger docs and swagger-ui by invoking the extension m
         .EnableSwagger(c => c.SingleApiVersion("1.0", "A title for your API"));
         .EnableSwaggerUi();
 
-\* If your OWIN middleware is self-hosted then your done! If your using OWIN through the IIS Integrated pipeline then you'll need to apply the following steps to prevent URL's with extensions (i.e. the swagger-ui assets) from being short-circuited by the native static file module.
+\* If your OWIN middleware is self-hosted then you're done! If you're using OWIN through the IIS Integrated pipeline then you'll need to apply the following steps to prevent URLs with extensions (i.e. the swagger-ui assets) from being short-circuited by the native static file module.
 
 1) In your web.config add:
 
@@ -79,7 +79,7 @@ Then manually enable the Swagger docs and swagger-ui by invoking the extension m
 
     app.UseStageMarker(PipelineStage.MapHandler);
     
-This setting causes the WebApi middleware to execute earlier in the pipeline, allowing it to correctly handle URL's with extensions.
+This setting causes the WebApi middleware to execute earlier in the pipeline, allowing it to correctly handle URLs with extensions.
 
 Check out the following articles for more information:
 
@@ -202,7 +202,7 @@ You can use BasicAuth, __ApiKey__ or __OAuth2__ options to describe security sch
 
 __NOTE:__ These only define the schemes and need to be coupled with a corresponding "security" property at the document or operation level to indicate which schemes are required for each operation.  To do this, you'll need to implement a custom IDocumentFilter and/or IOperationFilter to set these properties according to your specific authorization implementation
 
-\* If you're API supports the OAuth2 Implicit flow, and you've described it correctly, according to the Swagger 2.0 specification, you can enable UI support as shown above.
+\* If your API supports the OAuth2 Implicit flow, and you've described it correctly, according to the Swagger 2.0 specification, you can enable UI support as shown above.
 
 ### Customize the Operation Listing ###
 
@@ -226,7 +226,7 @@ You can also specify a custom sort order for groups (as defined by __GroupAction
 
 ### Modifying Generated Schemas ###
 
-Swashbuckle makes a best attempt at generating Swagger compliant JSON schemas for the various types exposed in your API. However, there may be occassions when more control of the output is needed.  This is supported through the following options:
+Swashbuckle makes a best attempt at generating Swagger compliant JSON schemas for the various types exposed in your API. However, there may be occasions when more control of the output is needed.  This is supported through the following options:
 
     httpConfiguration
         .EnableSwagger(c =>
@@ -300,7 +300,7 @@ This gives full control to modify the final SwaggerDocument. You can gain additi
 
 ### Including XML Comments ###
 
-If you annonate Controllers and API Types with [Xml Comments](http://msdn.microsoft.com/en-us/library/b2s063f7(v=vs.110).aspx), you can incorporate those comments into the generated docs and UI. The Xml tags are mapped to Swagger properties as follows:
+If you annotate Controllers and API Types with [Xml Comments](http://msdn.microsoft.com/en-us/library/b2s063f7(v=vs.110).aspx), you can incorporate those comments into the generated docs and UI. The Xml tags are mapped to Swagger properties as follows:
 
 * **Action summary** -> Operation.summary
 * **Action remarks** -> Operation.description
@@ -434,7 +434,7 @@ If you're using the existing config. interface to customize the final Swagger do
 
 ### Page not found when accessing the UI ###
 
-This issue ocurrs in IIS hosted environments when the native "static file" module is setup to intercept requests for URL's that contain extensions, bypassing the WebApi pipeline. In Swashbuckle, all of the swagger-ui assets (.html, .js, .css etc.) are served through the WebApi pipeline and so the static file handler must be disabled for these assets. In your web.config, add the following:
+This issue ocurrs in IIS hosted environments when the native "static file" module is setup to intercept requests for URLs that contain extensions, bypassing the WebApi pipeline. In Swashbuckle, all of the swagger-ui assets (.html, .js, .css etc.) are served through the WebApi pipeline and so the static file handler must be disabled for these assets. In your web.config, add the following:
 
     <system.webServer>
     <modules>
