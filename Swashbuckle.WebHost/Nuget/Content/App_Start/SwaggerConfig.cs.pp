@@ -89,7 +89,7 @@ namespace $rootnamespace$
                         //c.OrderActionGroupsBy(new DescendingAlphabeticComparer());
 
                         // Swashbuckle makes a best attempt at generating Swagger compliant JSON schemas for the various types
-                        // exposed in your API. However, there may be occassions when more control of the output is needed.
+                        // exposed in your API. However, there may be occasions when more control of the output is needed.
                         // This is supported through the "MapType" and "SchemaFilter" options:
                         //
                         // Use the "MapType" option to override the Schema generation for a specific type.
@@ -191,14 +191,14 @@ namespace $rootnamespace$
                         //
                         //c.CustomAsset("index.html", containingAssembly, "YourWebApiProject.SwaggerExtensions.index.html");
 
-                        // If you're API has multiple versions and you've applied the MultipleApiVersions setting
+                        // If your API has multiple versions and you've applied the MultipleApiVersions setting
                         // as described above, you can also enable a select box in the swagger-ui, that displays
                         // a discovery URL for each version. This provides a convenient way for users to browse documentation
                         // for different API versions.
                         //
                         //c.EnableDiscoveryUrlSelector();
 
-                        // If you're API supports the OAuth2 Implicit flow, and you've described it correctly, according to
+                        // If your API supports the OAuth2 Implicit flow, and you've described it correctly, according to
                         // the Swagger 2.0 specification, you can enable UI support as shown below.
                         //
                         c.EnableOAuth2Support("test-client-id", "test-realm", "Swagger UI");
