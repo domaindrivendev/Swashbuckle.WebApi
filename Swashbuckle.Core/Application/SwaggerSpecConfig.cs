@@ -166,6 +166,11 @@ namespace Swashbuckle.Application
             return this;
         }
 
+        public SwaggerSpecConfig IgnoreObsoleteModelFields()
+        {
+            return ModelFilter<HideObsoleteModelFields>();
+        }
+
         public SwaggerSpecConfig OperationFilter<T>()
             where T : IOperationFilter, new()
         {
@@ -182,8 +187,7 @@ namespace Swashbuckle.Application
         public SwaggerSpecConfig IncludeXmlComments(string xmlCommentsPath)
         {
             _operationFilterFactories.Add(() => new ApplyActionXmlComments(xmlCommentsPath));
-            _modelFilterFactories.Add(() => new ApplyTypeXmlComments(xmlCommentsPath));
-            return this;
+            return ModelFilter(new ApplyTypeXmlComments(xmlCommentsPath));
         }
 
         public SwaggerSpecConfig ApiInfo(Info apiInfo)

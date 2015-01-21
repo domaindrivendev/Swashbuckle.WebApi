@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using System.Linq;
+using Newtonsoft.Json.Linq;
 using NUnit.Framework;
 using Swashbuckle.Application;
 using Swashbuckle.Dummy.Controllers;
@@ -358,6 +359,28 @@ namespace Swashbuckle.Tests.SwaggerSpec
                 .SelectToken("models");
 
             Assert.AreEqual("foobar", models.SelectToken("Product.description").ToString());
+        }
+
+        [Test]
+        public void It_should_support_ignoring_model_fields_marked_obsolete()
+        {
+            SetUpDefaultRouteFor<ObsoleteModelFieldsController>();
+
+            var properties = Get<JObject>("http://tempuri.org/swagger/api-docs/ObsoleteModelFields")
+                .SelectToken("models.CreateEntityForm.properties");
+
+            Assert.AreEqual(2, properties.Children().Count());
+            Assert.IsNotNull(properties["Id"]);
+            Assert.IsNotNull(properties["Name"]);
+
+            _swaggerSpecConfig.IgnoreObsoleteModelFields();
+
+            properties = Get<JObject>("http://tempuri.org/swagger/api-docs/ObsoleteModelFields")
+                .SelectToken("models.CreateEntityForm.properties");
+
+            Assert.AreEqual(1, properties.Children().Count());
+            Assert.IsNull(properties["Id"]);
+            Assert.IsNotNull(properties["Name"]);
         }
 
         class OverrideDescription : IModelFilter

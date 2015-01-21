@@ -21,6 +21,7 @@ namespace Swashbuckle.Dummy
             SwaggerSpecConfig.Customize(c =>
                 {
                     c.IgnoreObsoleteActions();
+                    c.IgnoreObsoleteModelFields();
 
                     //c.SupportMultipleApiVersions(
                     //    new[] { "1.0", "2.0" },
