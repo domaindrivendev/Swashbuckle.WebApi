@@ -5,63 +5,83 @@ using System.Collections.Generic;
 
 namespace Swashbuckle.Swagger.Filters
 {
-    public class HandleParamsFromUri : IOperationFilter
+    public class HandleFromUriParams : IOperationFilter
     {
         public void Apply(Operation operation, SchemaRegistry schemaRegistry, ApiDescription apiDescription)
         {
             if(operation.parameters == null)
                 return;
 
-            HandleArrayParamsFromUri(operation);
-
-            HandleObjectParamsFromUri(operation, schemaRegistry, apiDescription);
+            HandleFromUriArrayParams(operation);
+            HandleFromUriObjectParams(operation, schemaRegistry, apiDescription);
         }
 
-        private static void HandleArrayParamsFromUri(Operation operation)
+        private static void HandleFromUriArrayParams(Operation operation)
         {
-            var arrayParamsFromUri = operation.parameters
+            var fromUriArrayParams = operation.parameters
                 .Where(param => param.@in == "query" && param.type == "array")
                 .ToArray();
 
-            foreach (var param in arrayParamsFromUri)
+            foreach (var param in fromUriArrayParams)
             {
                 param.collectionFormat = "multi";
             }
         }
 
-        private void HandleObjectParamsFromUri(Operation operation, SchemaRegistry schemaRegistry, ApiDescription apiDescription)
+        private void HandleFromUriObjectParams(Operation operation, SchemaRegistry schemaRegistry, ApiDescription apiDescription)
         {
-            var objectParamsFromUri = operation.parameters
+            var fromUriObjectParams = operation.parameters
                 .Where(param => param.@in == "query" && param.type == null)
                 .ToArray();
 
-            foreach (var param in objectParamsFromUri)
+            foreach (var objectParam in fromUriObjectParams)
             {
-                var paramType = apiDescription.ParameterDescriptions
-                    .Single(paramDesc => paramDesc.Name == param.name)
+                var type = apiDescription.ParameterDescriptions
+                    .Single(paramDesc => paramDesc.Name == objectParam.name)
                     .ParameterDescriptor.ParameterType;
 
-                var refSchema = schemaRegistry.GetOrRegister(paramType);
+                var refSchema = schemaRegistry.GetOrRegister(type);
                 var schema = schemaRegistry.Definitions[refSchema.@ref.Replace("#/definitions/", "")];
 
-                operation.parameters.Remove(param);
-                MapSchemaPropertiesToQueryParams(schema, operation.parameters);
+                ExtractAndAddQueryParams(schema, "", objectParam.required, schemaRegistry, operation.parameters);
+                operation.parameters.Remove(objectParam);
             }
         }
 
-        private void MapSchemaPropertiesToQueryParams(Schema schema, IList<Parameter> parameters)
+        private void ExtractAndAddQueryParams(
+            Schema sourceSchema,
+            string sourceQualifier,
+            bool sourceRequired,
+            SchemaRegistry schemaRegistry,
+            IList<Parameter> operationParams)
         {
-            // TODO: Support nested properties with dot syntax
-            foreach (var entry in schema.properties)
+            foreach (var entry in sourceSchema.properties)
             {
-                var param = new Parameter
+                var propertySchema = entry.Value;
+                var required = sourceRequired
+                    && sourceSchema.required != null && sourceSchema.required.Contains(entry.Key); 
+
+                if (propertySchema.@ref != null)
                 {
-                    name = entry.Key.ToLowerInvariant(),
-                    @in = "query",
-                    required = schema.required != null && schema.required.Contains(entry.Key)
-                };
-                param.PopulateFrom(entry.Value);
-                parameters.Add(param);
+                    var schema = schemaRegistry.Definitions[propertySchema.@ref.Replace("#/definitions/", "")];
+                    ExtractAndAddQueryParams(
+                        schema,
+                        sourceQualifier + entry.Key.ToLowerInvariant() + ".",
+                        required,
+                        schemaRegistry,
+                        operationParams);
+                }
+                else
+                {
+                    var param = new Parameter
+                    {
+                        name =  sourceQualifier + entry.Key.ToLowerInvariant(),
+                        @in = "query",
+                        required = required
+                    };
+                    param.PopulateFrom(entry.Value);
+                    operationParams.Add(param);
+                }
             }
         }
     }

@@ -39,7 +39,7 @@ namespace Swashbuckle.Application
             _documentFilters = new List<Func<IDocumentFilter>>();
             _rootUrlResolver = DefaultRootUrlResolver; 
 
-            OperationFilter<HandleParamsFromUri>();
+            OperationFilter<HandleFromUriParams>();
         }
 
         public InfoBuilder SingleApiVersion(string version, string title)
