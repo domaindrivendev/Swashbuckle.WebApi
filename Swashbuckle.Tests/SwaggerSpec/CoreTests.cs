@@ -459,7 +459,6 @@ namespace Swashbuckle.Tests.SwaggerSpec
             Assert.AreEqual("/TestActionName/{id}", (string)api["path"]);
         }
 
-
         class AddResponseCodes : IOperationFilter
         {
             public void Apply(Operation operation, DataTypeRegistry dataTypeRegistry, System.Web.Http.Description.ApiDescription apiDescription)
@@ -475,8 +474,5 @@ namespace Swashbuckle.Tests.SwaggerSpec
                 return y.CompareTo(x);
             }
         }
-
- 
-
     }
 }
