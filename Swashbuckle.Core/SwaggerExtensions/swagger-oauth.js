@@ -3,6 +3,8 @@ var popupMask;
 var popupDialog;
 var clientId;
 var realm;
+var nonce;
+var state;
 
 function handleLogin() {
   var scopes = [];
@@ -77,6 +79,13 @@ function handleLogin() {
     var redirectUrl = host.protocol + '//' + host.host + "/swagger/ui/o2c.html";
     var url = null;
 
+    var scopes = [];
+    var o = $('.api-popup-scopes').find('input:checked');
+
+    for (k = 0; k < o.length; k++) {
+        scopes = scopes.concat($(o[k]).attr("scope").split(' '));
+    }
+
     var p = window.swaggerUi.api.authSchemes;
     for (var key in p) {
       if (p.hasOwnProperty(key)) {
@@ -85,24 +94,24 @@ function handleLogin() {
           if(o.hasOwnProperty(t) && t === 'implicit') {
             var dets = o[t];
             url = dets.loginEndpoint.url + "?response_type=token";
+            if (scopes.indexOf("openid") != -1) {
+                url = dets.loginEndpoint.url + "?response_type=id_token token";
+            }
             window.swaggerUi.tokenName = dets.tokenName;
           }
         }
       }
     }
-    var scopes = []
-    var o = $('.api-popup-scopes').find('input:checked');
 
-    for(k =0; k < o.length; k++) {
-      scopes.push($(o[k]).attr("scope"));
-    }
 
     window.enabledScopes=scopes;
 
     url += '&redirect_uri=' + encodeURIComponent(redirectUrl);
     url += '&realm=' + encodeURIComponent(realm);
     url += '&client_id=' + encodeURIComponent(clientId);
-    url += '&scope=' + encodeURIComponent(scopes);
+    url += '&scope=' + encodeURIComponent(scopes.join(' '));
+    url += '&nonce=' + encodeURIComponent(nonce);
+    url += '&state=' + encodeURIComponent(state);
 
     window.open(url);
   });
@@ -134,7 +143,9 @@ function initOAuth(opts) {
   popupMask = (o.popupMask||$('#api-common-mask'));
   popupDialog = (o.popupDialog||$('.api-popup-dialog'));
   clientId = (o.clientId||errors.push("missing client id"));
-  realm = (o.realm||errors.push("missing realm"));
+  realm = (o.realm || errors.push("missing realm"));
+  state = o.state;
+  nonce = o.nonce;
 
   if(errors.length > 0){
     log("auth unable initialize oauth: " + errors);

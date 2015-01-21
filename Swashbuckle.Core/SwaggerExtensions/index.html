@@ -36,7 +36,9 @@
                 oAuth2Enabled: %(OAuth2Enabled),
                 oAuth2ClientId: %(OAuth2ClientId),
                 oAuth2Realm: %(OAuth2Realm),
-                oAuth2AppName: %(OAuth2AppName)
+                oAuth2AppName: %(OAuth2AppName),
+                oAuth2State: %(OAuth2State),
+                oAuth2Nonce: %(OAuth2Nonce)
             }
 
             window.swaggerUi = new SwaggerUi({
@@ -51,7 +53,9 @@
                         initOAuth({
                           clientId: sbConfig.oAuth2ClientId,
                           realm: sbConfig.oAuth2Realm,
-                          appName: sbConfig.oAuth2AppName
+                          appName: sbConfig.oAuth2AppName,
+                          state: sbConfig.oAuth2State,
+                          nonce: sbConfig.oAuth2Nonce
                         });
                     }
                     $('pre code').each(function (i, e) {

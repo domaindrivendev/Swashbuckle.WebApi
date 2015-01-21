@@ -88,7 +88,9 @@ namespace Swashbuckle.Application
                 .Replace("%(OAuth2Enabled)", _swaggerUiConfig.OAuth2Enabled.ToString().ToLower())
                 .Replace("%(OAuth2ClientId)", "\"" + _swaggerUiConfig.OAuth2ClientId + "\"")
                 .Replace("%(OAuth2Realm)", "\"" + _swaggerUiConfig.OAuth2Realm + "\"")
-                .Replace("%(OAuth2AppName)", "\"" + _swaggerUiConfig.OAuth2AppName + "\"");
+                .Replace("%(OAuth2AppName)", "\"" + _swaggerUiConfig.OAuth2AppName + "\"")
+                .Replace("%(OAuth2State)", "\"" + _swaggerUiConfig.OAuth2State + "\"")
+                .Replace("%(OAuth2Nonce)", "\"" + _swaggerUiConfig.OAuth2Nonce + "\"");
 
             // Special case - only applicable to index.html
             var stylesheetIncludes = String.Join("\r\n", _swaggerUiConfig.InjectedStylesheetPaths

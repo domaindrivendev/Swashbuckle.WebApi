@@ -37,6 +37,8 @@ namespace Swashbuckle.Application
         internal string OAuth2AppName { get; private set; }
         internal string OAuth2Realm { get; private set; }
         internal string OAuth2ClientId { get; private set; }
+        internal string OAuth2State { get; set; }
+        internal string OAuth2Nonce { get; set; }
 
         public static void Customize(Action<SwaggerUiConfig> customize)
         {
@@ -77,6 +79,21 @@ namespace Swashbuckle.Application
             OAuth2ClientId = clientId;
             OAuth2Realm = realm;
             OAuth2AppName = appName;
+        }
+
+        /// <summary>
+        /// Enable oauth with optional parameter for opendid connect
+        /// </summary>
+        /// <param name="clientId">OAuth 2.0 Client Identifier valid at the Authorization Server</param>
+        /// <param name="realm">Optional indicate the scope of protection in the manner described in HTTP/1.1 [RFC2617]</param>
+        /// <param name="appName"></param>
+        /// <param name="state">Optional opaque value used to maintain state between the request and the callback. </param>
+        /// <param name="nonce">String value used to associate a Client session with an ID Token, and to mitigate replay attacks</param>
+        public void EnableOAuth2Support(string clientId, string realm, string appName, string state, string nonce)
+        {
+            OAuth2State = state;
+            OAuth2Nonce = nonce;
+            EnableOAuth2Support(clientId, realm, appName);
         }
     }
 
