@@ -78,6 +78,7 @@
     <Compile Include="ApiDescriptionExtensions.cs" />
     <Compile Include="DictionaryExtensions.cs" />
     <Compile Include="SwaggerExtensions\HandleFromUriParams.cs" />
+    <Compile Include="SwaggerExtensions\HideObsoleteModelFields.cs" />
     <Compile Include="Swagger\SwaggerGenerator.cs" />
     <Compile Include="SwaggerExtensions\ApplyActionXmlComments.cs" />
     <Compile Include="SwaggerExtensions\ApplyTypeXmlComments.cs" />

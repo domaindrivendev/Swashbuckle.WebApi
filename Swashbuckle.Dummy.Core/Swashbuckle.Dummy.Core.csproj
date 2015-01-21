@@ -61,6 +61,7 @@
     <Compile Include="Controllers\CollectionOfPrimitivesController.cs" />
     <Compile Include="Controllers\CustomActionNamesController.cs" />
     <Compile Include="Controllers\FromUriParamsController.cs" />
+    <Compile Include="Controllers\ObsoleteModelFieldsController.cs" />
     <Compile Include="Controllers\MultipleApiVersionsController.cs" />
     <Compile Include="Controllers\SelfReferencingTypesController.cs" />
     <Compile Include="Controllers\CustomersController.cs" />
