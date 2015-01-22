@@ -29,6 +29,16 @@ namespace Swashbuckle.Dummy.Controllers
         {
             throw new NotImplementedException();
         }
+
+        /// <summary>
+        /// Prevents the account from being used
+        /// </summary>
+        [HttpPut]
+        [ActionName("put-on-hold")]
+        public void PutOnHold(int id)
+        {
+            throw new NotImplementedException();
+        }
     }
 
     /// <summary>

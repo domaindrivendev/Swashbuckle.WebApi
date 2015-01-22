@@ -106,5 +106,17 @@ namespace Swashbuckle.Tests.Swagger
             Assert.IsNotNull(passwordProperty["description"]);
             Assert.AreEqual("For authentication", passwordProperty["description"].ToString());
         }
+
+        [Test]
+        public void It_handles_actions_decorated_with_action_name()
+        {
+            Configuration.Routes.Clear();
+            SetUpCustomRouteFor<XmlAnnotatedController>("XmlAnnotated/{id}/{action}");
+
+            var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/1.0");
+            var operation = swagger["paths"]["/XmlAnnotated/{id}/put-on-hold"]["put"];
+            Assert.IsNotNull(operation["summary"]);
+            Assert.AreEqual("Prevents the account from being used", operation["summary"].ToString());
+        }
     }
 }

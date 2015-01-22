@@ -21,6 +21,11 @@
             <param name="keywords">List of search keywords</param>
             <returns></returns>
         </member>
+        <member name="M:Swashbuckle.Dummy.Controllers.XmlAnnotatedController.PutOnHold(System.Int32)">
+            <summary>
+            Prevents the account from being used
+            </summary>
+        </member>
         <member name="T:Swashbuckle.Dummy.Controllers.Account">
             <summary>
             Account details
