@@ -227,7 +227,10 @@ namespace Swashbuckle.Swagger
 
         public string SchemaIdFor(Type type)
         {
-            var typeName = _useFullTypeNameInSchemaIds ? type.FullName : type.Name;
+            var typeName = type.Name;
+            if (_useFullTypeNameInSchemaIds)
+                typeName = type.Namespace + "." + typeName;
+
             if (type.IsGenericType)
             {
                 var genericArgumentIds = type.GetGenericArguments()
