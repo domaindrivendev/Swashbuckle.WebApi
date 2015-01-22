@@ -6,6 +6,7 @@
             if (this.$el.prop('tagName') != 'SELECT') {
                 var select = $('<select id="input_baseUrl" name="baseUrl"></select>');
                 select
+                    .css('font-size', '0.9em')
                     .css('margin', '0')
                     .css('border', '1px solid gray')
                     .css('padding', '3px')
