@@ -11,10 +11,12 @@ namespace Swashbuckle.Swagger
             Func<ApiDescription, string, bool> versionSupportResolver = null,
             IEnumerable<string> schemes = null,
             IDictionary<string, SecurityScheme> securityDefinitions = null,
+            bool ignoreObsoleteActions = false,
             Func<ApiDescription, string> groupingKeySelector = null,
             IComparer<string> groupingKeyComparer = null,
             IDictionary<Type, Func<Schema>> customSchemaMappings = null,
             IEnumerable<ISchemaFilter> schemaFilters = null,
+            bool ignoreObsoleteProperties = false, 
             bool useFullTypeNameInSchemaIds = false, 
             bool describeAllEnumsAsStrings = false,
             IEnumerable<IOperationFilter> operationFilters = null,
@@ -25,10 +27,12 @@ namespace Swashbuckle.Swagger
             VersionSupportResolver = versionSupportResolver;
             Schemes = schemes;
             SecurityDefinitions = securityDefinitions;
+            IgnoreObsoleteActions = ignoreObsoleteActions;
             GroupingKeySelector = groupingKeySelector ?? DefaultGroupingKeySelector;
             GroupingKeyComparer = groupingKeyComparer ?? Comparer<string>.Default;
             CustomSchemaMappings = customSchemaMappings ?? new Dictionary<Type, Func<Schema>>();
             SchemaFilters = schemaFilters ?? new List<ISchemaFilter>();
+            IgnoreObsoleteProperties = ignoreObsoleteProperties;
             UseFullTypeNameInSchemaIds = useFullTypeNameInSchemaIds;
             DescribeAllEnumsAsStrings = describeAllEnumsAsStrings;
             OperationFilters = operationFilters ?? new List<IOperationFilter>();
@@ -42,6 +46,8 @@ namespace Swashbuckle.Swagger
 
         public IDictionary<string, SecurityScheme> SecurityDefinitions { get; private set; }
 
+        public bool IgnoreObsoleteActions { get; private set; }
+
         public Func<ApiDescription, string> GroupingKeySelector { get; private set; }
 
         public IComparer<string> GroupingKeyComparer { get; private set; }
@@ -49,6 +55,8 @@ namespace Swashbuckle.Swagger
         public IDictionary<Type, Func<Schema>> CustomSchemaMappings { get; private set; }
 
         public IEnumerable<ISchemaFilter> SchemaFilters { get; private set; }
+
+        public bool IgnoreObsoleteProperties { get; private set; }
 
         public bool UseFullTypeNameInSchemaIds { get; private set; }
 

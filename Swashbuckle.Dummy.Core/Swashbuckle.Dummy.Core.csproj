@@ -62,6 +62,7 @@
     <Compile Include="Controllers\IndexerTypesController.cs" />
     <Compile Include="Controllers\MultipleApiVersionsController.cs" />
     <Compile Include="Controllers\JsonAnnotatedTypesController.cs" />
+    <Compile Include="Controllers\ObsoletePropertiesController.cs" />
     <Compile Include="Controllers\ProtectedResourcesController.cs" />
     <Compile Include="Controllers\SelfReferencingTypesController.cs" />
     <Compile Include="Controllers\CustomersController.cs" />

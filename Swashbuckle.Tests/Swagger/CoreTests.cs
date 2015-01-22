@@ -368,6 +368,20 @@ namespace Swashbuckle.Tests.Swagger
         }
 
         [Test]
+        public void It_exposes_config_to_ignore_all_actions_that_are_obsolete()
+        {
+            SetUpDefaultRouteFor<ObsoleteActionsController>();
+            SetUpHandler(c => c.IgnoreObsoleteActions());
+
+            var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/1.0");
+            var putOp = swagger["paths"]["/obsoleteactions/{id}"]["put"];
+            var deleteOp = swagger["paths"]["/obsoleteactions/{id}"]["delete"];
+
+            Assert.IsNotNull(putOp);
+            Assert.IsNull(deleteOp);
+        }
+
+        [Test]
         public void It_exposes_config_to_customize_the_grouping_of_actions()
         {
             SetUpDefaultRouteFor<ProductsController>();

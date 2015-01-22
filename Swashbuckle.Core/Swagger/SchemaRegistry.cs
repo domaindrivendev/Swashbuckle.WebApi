@@ -19,6 +19,7 @@ namespace Swashbuckle.Swagger
         private readonly IContractResolver _jsonContractResolver;
         private readonly IDictionary<Type, Func<Schema>> _customSchemaMappings;
         private readonly IEnumerable<ISchemaFilter> _schemaFilters;
+        private readonly bool _ignoreObsoleteProperties;
         private readonly bool _useFullTypeNameInSchemaIds;
         private readonly bool _describeAllEnumsAsStrings;
 
@@ -33,12 +34,14 @@ namespace Swashbuckle.Swagger
             IContractResolver jsonContractResolver,
             IDictionary<Type, Func<Schema>> customSchemaMappings,
             IEnumerable<ISchemaFilter> schemaFilters,
+            bool ignoreObsoleteProperties,
             bool useFullTypeNameInSchemaIds,
             bool describeAllEnumsAsStrings)
         {
             _jsonContractResolver = jsonContractResolver;
             _customSchemaMappings = customSchemaMappings;
             _schemaFilters = schemaFilters;
+            _ignoreObsoleteProperties = ignoreObsoleteProperties;
             _useFullTypeNameInSchemaIds = useFullTypeNameInSchemaIds;
             _describeAllEnumsAsStrings = describeAllEnumsAsStrings;
 
@@ -175,10 +178,13 @@ namespace Swashbuckle.Swagger
 
         private Schema CreateObjectSchema(JsonObjectContract jsonContract, string refPrefix)
         {
-            var properties = jsonContract.Properties.Where(p => !p.Ignored).ToDictionary(
-                prop => prop.PropertyName,
-                prop => CreateInlineSchema(prop.PropertyType, refPrefix)
-                    .AndAssignValidationProperties(prop));
+            var properties = jsonContract.Properties
+                .Where(p => !p.Ignored)
+                .Where(p => !(_ignoreObsoleteProperties && p.IsObsolete()))
+                .ToDictionary(
+                    prop => prop.PropertyName,
+                    prop => CreateInlineSchema(prop.PropertyType, refPrefix).WithValidationProperties(prop)
+                );
 
             var required = jsonContract.Properties.Where(prop => prop.IsRequired())
                 .Select(propInfo => propInfo.PropertyName)

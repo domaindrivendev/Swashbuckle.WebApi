@@ -206,15 +206,23 @@ __NOTE:__ These only define the schemes and need to be coupled with a correspond
 
 ### Customize the Operation Listing ###
 
-If necessary, you can provide custom strategies to group and sort the list of Operations in a Swagger document:
+If necessary, you can ignore obsolete actions and provide custom grouping/sorting strategies for the list of Operations in a Swagger document:
 
     httpConfiguration
         .EnableSwagger(c =>
             {
+                c.IgnoreObsoleteActions();
+
                 c.GroupActionsBy(apiDesc => apiDesc.HttpMethod.ToString());
 
                 c.OrderActionGroupsBy(new DescendingAlphabeticComparer());
             });
+
+#### IgnoreObsoleteActions ####
+
+Set this flag to omit operation descriptions for any actions decorated with the Obsolete attribute
+
+__NOTE__: If you want to omit specific operations but without using the Obsolete attribute, you can create an IDocumentFilter or make use of the built in ApiExplorerSettingsAttribute
 
 #### GroupActionsBy ####
 
@@ -234,11 +242,17 @@ Swashbuckle makes a best attempt at generating Swagger compliant JSON schemas fo
                 c.MapType<ProductType>(() => new Schema { type = "integer", format = "int32" });
 
                 c.SchemaFilter<ApplySchemaVendorExtensions>();
+                
+                c.IgnoreObsoleteProperties();
 
                 c.UseFullTypeNameInSchemaIds();
 
                 c.DescribeAllEnumsAsStrings();
             });
+
+#### IgnoreObsoleteProperties ####
+
+Set this flag to omit schema property descriptions for any type properties decorated with the Obsolete attribute 
 
 #### MapType ####
 

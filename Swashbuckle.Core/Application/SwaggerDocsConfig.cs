@@ -16,10 +16,12 @@ namespace Swashbuckle.Application
         private Func<ApiDescription, string, bool> _versionSupportResolver;
         private IEnumerable<string> _schemes;
         private IDictionary<string, SecuritySchemeBuilder> _securitySchemeBuilders;
+        private bool _ignoreObsoleteActions;
         private Func<ApiDescription, string> _groupingKeySelector;
         private IComparer<string> _groupingKeyComparer;
         private readonly IDictionary<Type, Func<Schema>> _customSchemaMappings;
         private readonly IList<Func<ISchemaFilter>> _schemaFilters;
+        private bool _ignoreObsoleteProperties;
         private bool _useFullTypeNameInSchemaIds;
         private bool _describeAllEnumsAsStrings;
         private readonly IList<Func<IOperationFilter>> _operationFilters;
@@ -31,8 +33,10 @@ namespace Swashbuckle.Application
         {
             _versionInfoBuilder = new VersionInfoBuilder();
             _securitySchemeBuilders = new Dictionary<string, SecuritySchemeBuilder>();
+            _ignoreObsoleteActions = false;
             _customSchemaMappings = new Dictionary<Type, Func<Schema>>();
             _schemaFilters = new List<Func<ISchemaFilter>>();
+            _ignoreObsoleteProperties = false;
             _useFullTypeNameInSchemaIds = false;
             _describeAllEnumsAsStrings = false;
             _operationFilters = new List<Func<IOperationFilter>>();
@@ -84,6 +88,11 @@ namespace Swashbuckle.Application
             return schemeBuilder;
         }
 
+        public void IgnoreObsoleteActions()
+        {
+            _ignoreObsoleteActions = true;
+        }
+
         public void GroupActionsBy(Func<ApiDescription, string> keySelector)
         {
             _groupingKeySelector = keySelector;
@@ -120,6 +129,11 @@ namespace Swashbuckle.Application
             _describeAllEnumsAsStrings = true;
         }
 
+        public void IgnoreObsoleteProperties()
+        {
+            _ignoreObsoleteProperties = true;
+        }
+
         public void OperationFilter<TFilter>()
             where TFilter : IOperationFilter, new()
         {
@@ -144,8 +158,8 @@ namespace Swashbuckle.Application
 
         public void IncludeXmlComments(string filePath)
         {
-            _operationFilters.Add(() => new ApplyXmlActionComments(filePath));
-            _schemaFilters.Add(() => new ApplyXmlTypeComments(filePath));
+            OperationFilter(() => new ApplyXmlActionComments(filePath));
+            SchemaFilter(() => new ApplyXmlTypeComments(filePath));
         }
 
         public void ResolveConflictingActions(Func<IEnumerable<ApiDescription>, ApiDescription> conflictingActionsResolver)
@@ -173,10 +187,12 @@ namespace Swashbuckle.Application
                 versionSupportResolver: _versionSupportResolver,
                 schemes: _schemes, 
                 securityDefinitions: securityDefintitions, 
+                ignoreObsoleteActions: _ignoreObsoleteActions,
                 groupingKeySelector: _groupingKeySelector,
                 groupingKeyComparer: _groupingKeyComparer,
                 customSchemaMappings: _customSchemaMappings,
                 schemaFilters: _schemaFilters.Select(factory => factory()),
+                ignoreObsoleteProperties: _ignoreObsoleteProperties,
                 useFullTypeNameInSchemaIds: _useFullTypeNameInSchemaIds,
                 describeAllEnumsAsStrings: describeAllEnumsAsStrings,
                 operationFilters: _operationFilters.Select(factory => factory()),

@@ -32,6 +32,7 @@ namespace Swashbuckle.Swagger
                 _jsonContractResolver,
                 _options.CustomSchemaMappings,
                 _options.SchemaFilters,
+                _options.IgnoreObsoleteProperties,
                 _options.UseFullTypeNameInSchemaIds,
                 _options.DescribeAllEnumsAsStrings);
 
@@ -41,6 +42,7 @@ namespace Swashbuckle.Swagger
                 throw new UnknownApiVersion(apiVersion);
 
             var paths = GetApiDescriptionsFor(apiVersion)
+                .Where(apiDesc => !(_options.IgnoreObsoleteActions && apiDesc.IsObsolete()))
                 .OrderBy(_options.GroupingKeySelector, _options.GroupingKeyComparer)
                 .GroupBy(apiDesc => apiDesc.RelativePathSansQueryString())
                 .ToDictionary(group => "/" + group.Key, group => CreatePathItem(group, schemaRegistry));

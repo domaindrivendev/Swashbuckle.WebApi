@@ -283,6 +283,24 @@ namespace Swashbuckle.Tests.Swagger
         }
 
         [Test]
+        public void It_exposes_config_to_ignore_all_properties_that_are_obsolete()
+        {
+            SetUpDefaultRouteFor<ObsoletePropertiesController>();
+            SetUpHandler(c => c.IgnoreObsoleteProperties());
+
+            var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/1.0");
+            var calendarProps = swagger["definitions"]["Event"]["properties"];
+            var expectedProps = JObject.FromObject(new Dictionary<string, object>
+                {
+                    {
+                        "Name", new { type = "string" }
+                    }
+                });
+
+            Assert.AreEqual(expectedProps.ToString(), calendarProps.ToString());
+        }
+
+        [Test]
         public void It_exposes_config_to_workaround_multiple_types_with_the_same_class_name()
         {
             SetUpDefaultRouteFor<ConflictingTypesController>();

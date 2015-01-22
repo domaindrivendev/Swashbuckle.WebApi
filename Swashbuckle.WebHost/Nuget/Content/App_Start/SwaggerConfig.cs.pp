@@ -73,6 +73,9 @@ namespace $rootnamespace$
                         //        scopes.Add("write", "Write access to protected resources");
                         //    });
 
+                        // Set this flag to omit descriptions for any actions decorated with the Obsolete attribute
+                        //c.IgnoreObsoleteActions();
+
                         // Each operation be assigned one or more tags which are then used by consumers for various reasons.
                         // For example, the swagger-ui groups operations according to the first tag of each operation.
                         // By default, this will be controller name but you can use the "GroupActionsBy" option to
@@ -105,6 +108,10 @@ namespace $rootnamespace$
                         // specific type, you can wire up one or more Schema filters.
                         //
                         //c.SchemaFilter<ApplySchemaVendorExtensions>();
+
+                        // Set this flag to omit schema property descriptions for any type properties decorated with the
+                        // Obsolete attribute 
+                        c.IgnoreObsoleteProperties();
 
                         // In a Swagger 2.0 document, complex types are typically declared globally and referenced by unique
                         // Schema Id. By default, Swashbuckle does NOT use the full type name in Schema Ids. In most cases, this
