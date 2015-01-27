@@ -50,7 +50,7 @@ If your service is self-hosted, just install the Core library:
 And then manually enable the Swagger docs and optionally, the swagger-ui by invoking the following extension methods (in namespace Swashbuckle.Application) on an instance of HttpConfiguration (e.g. in Program.cs)
 
     httpConfiguration
-        .EnableSwagger(c => c.SingleApiVersion("1.0", "A title for your API"));
+        .EnableSwagger(c => c.SingleApiVersion("1.0", "A title for your API"))
         .EnableSwaggerUi();
 
 ### OWIN  ###
