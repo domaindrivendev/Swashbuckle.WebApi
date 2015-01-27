@@ -50,7 +50,7 @@ If your service is self-hosted, just install the Core library:
 And then manually enable the Swagger docs and optionally, the swagger-ui by invoking the following extension methods (in namespace Swashbuckle.Application) on an instance of HttpConfiguration (e.g. in Program.cs)
 
     httpConfiguration
-        .EnableSwagger(c => c.SingleApiVersion("1.0", "A title for your API"));
+        .EnableSwagger(c => c.SingleApiVersion("1.0", "A title for your API"))
         .EnableSwaggerUi();
 
 ### OWIN  ###
@@ -62,7 +62,7 @@ If your service is hosted using OWIN middleware, just install the Core library:
 Then manually enable the Swagger docs and swagger-ui by invoking the extension methods (in namespace Swashbuckle.Application) on an instance of HttpConfiguration (e.g. in Startup.cs)
 
     httpConfiguration
-        .EnableSwagger(c => c.SingleApiVersion("1.0", "A title for your API"));
+        .EnableSwagger(c => c.SingleApiVersion("1.0", "A title for your API"))
         .EnableSwaggerUi();
 
 \* If your OWIN middleware is self-hosted then you're done! If you're using OWIN through the IIS Integrated pipeline then you'll need to apply the following steps to prevent URLs with extensions (i.e. the swagger-ui assets) from being short-circuited by the native static file module.
@@ -71,7 +71,7 @@ Then manually enable the Swagger docs and swagger-ui by invoking the extension m
 
     <configuration>
        <system.webServer>
-          <modules runAllManagedModulesForAllRequests=“true” />
+          <modules runAllManagedModulesForAllRequests="true" />
        </system.webServer>
     </configuration>
 
@@ -487,6 +487,6 @@ As per the specification, all extension properties should be prefixed by "x-"
 
 TODO
 
-### How to confiugre OAuth2 support
+### How to configure OAuth2 support
 
 TODO
