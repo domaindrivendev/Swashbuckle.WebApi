@@ -487,6 +487,6 @@ As per the specification, all extension properties should be prefixed by "x-"
 
 TODO
 
-### How to confiugre OAuth2 support
+### How to configure OAuth2 support
 
 TODO
