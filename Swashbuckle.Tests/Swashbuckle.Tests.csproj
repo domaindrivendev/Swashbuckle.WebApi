@@ -69,6 +69,7 @@
     <Compile Include="SwaggerUi\SwaggerUiTests.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Swagger\DefaultRootUrlResolverTests.cs" />
     <Compile Include="Swagger\FromUriParamsTests.cs" />
     <Compile Include="Swagger\SchemaTests.cs" />
     <Compile Include="Swagger\CoreTests.cs" />

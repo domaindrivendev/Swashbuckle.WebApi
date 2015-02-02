@@ -65,15 +65,20 @@ namespace Swashbuckle.Tests.Swagger
 
             var schemes = swagger["schemes"];
             var expected = JArray.FromObject(new[] { "http" });
-
-            // When there is a virtual directory
-            Configuration = new HttpConfiguration(new HttpRouteCollection("/foobar"));
-            swagger = GetContent<JObject>("http://tempuri.org:1234/swagger/docs/1.0");
-
-            basePath = swagger["basePath"];
-            Assert.AreEqual("/foobar", basePath.ToString());
+            Assert.AreEqual(expected, schemes);
         }
 
+        [Test]
+        public void It_provides_base_path_from_virtual_directory()
+        {
+            // When there is a virtual directory
+            Configuration = new HttpConfiguration(new HttpRouteCollection("/foobar"));
+            var swagger = GetContent<JObject>("http://tempuri.org:1234/swagger/docs/1.0");
+
+            var basePath = swagger["basePath"];
+            Assert.AreEqual("/foobar", basePath.ToString());
+        }
+        
         [Test]
         public void It_provides_a_description_for_each_path_in_the_api()
         {

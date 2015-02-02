@@ -1,8 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
 using System.Net.Http;
 using System.Web.Http;
-using System.Linq;
-using System.Collections.Generic;
 using System.Web.Http.Description;
 using Newtonsoft.Json.Converters;
 using Swashbuckle.Swagger;
@@ -41,7 +42,7 @@ namespace Swashbuckle.Application
             _describeAllEnumsAsStrings = false;
             _operationFilters = new List<Func<IOperationFilter>>();
             _documentFilters = new List<Func<IDocumentFilter>>();
-            _rootUrlResolver = DefaultRootUrlResolver; 
+            _rootUrlResolver = DefaultRootUrlResolver;
 
             OperationFilter<HandleFromUriParams>();
         }
@@ -185,8 +186,8 @@ namespace Swashbuckle.Application
 
             var options = new SwaggerGeneratorOptions(
                 versionSupportResolver: _versionSupportResolver,
-                schemes: _schemes, 
-                securityDefinitions: securityDefintitions, 
+                schemes: _schemes,
+                securityDefinitions: securityDefintitions,
                 ignoreObsoleteActions: _ignoreObsoleteActions,
                 groupingKeySelector: _groupingKeySelector,
                 groupingKeyComparer: _groupingKeyComparer,
@@ -219,9 +220,20 @@ namespace Swashbuckle.Application
 
         public static string DefaultRootUrlResolver(HttpRequestMessage request)
         {
-            var virtualPathRoot = request.GetConfiguration().VirtualPathRoot.TrimEnd('/');
-            var requestUri = request.RequestUri;
-            return String.Format("{0}://{1}:{2}{3}", requestUri.Scheme, requestUri.Host, requestUri.Port, virtualPathRoot);
+            var scheme = GetHeaderValue(request, "X-Forwarded-Proto") ?? request.RequestUri.Scheme;
+            var host = GetHeaderValue(request, "X-Forwarded-Host") ?? request.RequestUri.Host;
+            var port = GetHeaderValue(request, "X-Forwarded-Port") ?? request.RequestUri.Port.ToString(CultureInfo.InvariantCulture);
+
+            var httpConfiguration = request.GetConfiguration();
+            var virtualPathRoot = httpConfiguration != null ? httpConfiguration.VirtualPathRoot.TrimEnd('/') : string.Empty;
+            
+            return string.Format("{0}://{1}:{2}{3}", scheme, host, port, virtualPathRoot);
+        }
+
+        private static string GetHeaderValue(HttpRequestMessage request, string headerName)
+        {
+            IEnumerable<string> list;
+            return request.Headers.TryGetValues(headerName, out list) ? list.FirstOrDefault() : null;
         }
     }
 }
