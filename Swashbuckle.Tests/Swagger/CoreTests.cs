@@ -361,43 +361,11 @@ namespace Swashbuckle.Tests.Swagger
         }
 
         [Test]
-        public void It_exposes_config_to_implicitly_provide_current_scheme()
-        {
-            var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/1.0");
-            var schemes = swagger["schemes"];
-            var expected = JArray.FromObject(new[] { "http" });
-
-            Assert.AreEqual(expected.ToString(), schemes.ToString());
-        }
-
-        [Test]
-        public void It_exposes_config_to_implicitly_provide_current_scheme_on_https()
-        {
-            var swagger = GetContent<JObject>("https://tempuri.org/swagger/docs/1.0");
-            var schemes = swagger["schemes"];
-            var expected = JArray.FromObject(new[] { "https" });
-
-            Assert.AreEqual(expected.ToString(), schemes.ToString());
-        }
-
-        [Test]
         public void It_exposes_config_to_explictly_provide_supported_schemes()
         {
             SetUpHandler(c => c.Schemes(new[] { "http", "https" }));
 
             var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/1.0");
-            var schemes = swagger["schemes"];
-            var expected = JArray.FromObject(new[] { "http", "https" });
-
-            Assert.AreEqual(expected.ToString(), schemes.ToString());
-        }
-
-        [Test]
-        public void It_exposes_config_to_explictly_provide_supported_schemes_on_https()
-        {
-            SetUpHandler(c => c.Schemes(new[] { "http", "https" }));
-
-            var swagger = GetContent<JObject>("https://tempuri.org/swagger/docs/1.0");
             var schemes = swagger["schemes"];
             var expected = JArray.FromObject(new[] { "http", "https" });
 
