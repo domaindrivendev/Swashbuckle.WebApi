@@ -19,6 +19,15 @@ namespace Swashbuckle.Dummy.Controllers
         }
 
         /// <summary>
+        /// Updates a SubAccount.
+        /// </summary>
+        [HttpPut]
+        public int UpdateSubAccount(SubAccount account)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
         /// Search all registered accounts by keywords 
         /// </summary>
         /// <remarks>Restricted to admin users only</remarks>
@@ -47,6 +56,11 @@ namespace Swashbuckle.Dummy.Controllers
     public class Account
     {
         /// <summary>
+        /// The ID for Accounts is 5 digits long.
+        /// </summary>
+        public virtual int AccountID { get; set; }
+        
+        /// <summary>
         /// Uniquely identifies the account
         /// </summary>
         public string Username { get; set; }
@@ -55,5 +69,18 @@ namespace Swashbuckle.Dummy.Controllers
         /// For authentication
         /// </summary>
         public string Password { get; set; }
+    }
+
+    /// <summary>
+    /// A Sub-Type of Account
+    /// </summary>
+    public class SubAccount : Account
+    {
+
+        /// <summary>
+        /// The Account ID for SubAccounts should be 7 digits.
+        /// </summary>
+        public override int AccountID { get; set; }
+
     }
 }
