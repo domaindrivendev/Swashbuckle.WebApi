@@ -108,6 +108,26 @@ namespace Swashbuckle.Tests.Swagger
         }
 
         [Test]
+        public void It_documents_schema_properties_including_property_summay_tags_from_base_classes()
+        {
+            var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/1.0");
+
+            var usernameProperty = swagger["definitions"]["SubAccount"]["properties"]["Username"];
+            Assert.IsNotNull(usernameProperty["description"]);
+            Assert.AreEqual("Uniquely identifies the account", usernameProperty["description"].ToString());
+        }
+
+        [Test]
+        public void It_documents_schema_properties_favoring_property_summary_tags_from_derived_vs_base_classes()
+        {
+            var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/1.0");
+
+            var usernameProperty = swagger["definitions"]["SubAccount"]["properties"]["AccountID"];
+            Assert.IsNotNull(usernameProperty["description"]);
+            Assert.AreEqual("The Account ID for SubAccounts should be 7 digits.", usernameProperty["description"].ToString());
+        }
+
+        [Test]
         public void It_handles_actions_decorated_with_action_name()
         {
             Configuration.Routes.Clear();
