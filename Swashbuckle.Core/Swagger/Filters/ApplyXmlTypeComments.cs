@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Xml.XPath;
-using Swashbuckle.Swagger;
+using System.Linq;
 using System.Collections.Generic;
+using System.Text;
+using Swashbuckle.Swagger;
 
 namespace Swashbuckle.Swagger.Filters
 {
@@ -34,24 +36,32 @@ namespace Swashbuckle.Swagger.Filters
                 typeList.Add(typeList[typeList.Count - 1].BaseType);
             }
 
-            foreach (var property in schema.properties)
+            foreach (var entry in schema.properties)
             {
-                XPathNavigator propertyNode = null;
-
-                foreach (Type t in typeList)
-                {
-                    propertyNode = _navigator.SelectSingleNode(String.Format(PropertyExpression, t.FullName, property.Key));
-                    if (propertyNode != null) { break; }
-                }
-                if (propertyNode != null)
-                {
-                    XPathNavigator propSummaryNode = propertyNode.SelectSingleNode(SummaryExpression);
-                    if (propSummaryNode != null)
-                    {
-                        property.Value.description = propSummaryNode.Value.Trim();
-                    }
-                }
+                ApplyPropertyComments(entry.Key, entry.Value, typeList);
             }
+        }
+
+        private void ApplyPropertyComments(string propertyKey, Schema schema, IEnumerable<Type> typeList)
+        {
+            // TODO: There's a flaw in using an IOperationFilter here because there's no sure way to correlate
+            // a schema property name to it's original member name (e.g. if using JsonProperty). Hence, the
+            // optimistic assumption below.
+            var assumedMemberName = Char.ToUpper(propertyKey[0]) + propertyKey.Substring(1);
+
+            XPathNavigator propertyNode = null;
+            foreach (Type t in typeList)
+            {
+                var propertyXPath = String.Format(PropertyExpression, t.FullName, assumedMemberName);
+                propertyNode = _navigator.SelectSingleNode(propertyXPath);
+                if (propertyNode != null) break;
+            }
+            if (propertyNode == null) return;
+
+            var propSummaryNode = propertyNode.SelectSingleNode(SummaryExpression);
+            if (propSummaryNode == null) return;
+
+            schema.description = propSummaryNode.Value.Trim();
         }
     }
 }
