@@ -51,7 +51,7 @@ namespace Swashbuckle.Swagger.Filters
                 : actionDescriptor.ActionName;
 
             var paramTypeNames = actionDescriptor.GetParameters()
-                .Select(paramDesc => TypeNameFor(paramDesc.ParameterType))
+                .Select(paramDesc => paramDesc.ParameterType.XmlCommentsQualifier())
                 .ToArray();
 
             var parameters = (paramTypeNames.Any())
@@ -59,25 +59,6 @@ namespace Swashbuckle.Swagger.Filters
                 : String.Empty;
 
             return String.Format(MethodExpression, controllerName, actionName, parameters);
-        }
-
-        private static string TypeNameFor(Type type)
-        {
-            if (type.IsGenericType)
-            {
-                var genericArguments = type.GetGenericArguments()
-                    .Select(TypeNameFor)
-                    .ToArray();
-
-                var builder = new StringBuilder(type.Namespace + "." + type.Name);
-
-                return builder
-                    .Replace(String.Format("`{0}", genericArguments.Count()), String.Empty)
-                    .Append(String.Format("{{{0}}}", String.Join(",", genericArguments).TrimEnd(',')))
-                    .ToString();
-            }
-
-            return type.Namespace + "." + type.Name;
         }
 
         private static void ApplyParamComments(Operation operation, XPathNavigator methodNode)

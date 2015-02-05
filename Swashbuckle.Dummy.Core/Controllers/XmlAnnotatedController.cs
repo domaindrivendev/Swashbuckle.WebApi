@@ -69,6 +69,16 @@ namespace Swashbuckle.Dummy.Controllers
         /// For authentication
         /// </summary>
         public string Password { get; set; }
+
+        public AccountPreferences Preferences { get; set; }
+
+        public class AccountPreferences
+        {
+            /// <summary>
+            /// Provide a display name to use instead of Username when signed in
+            /// </summary>
+            public string DisplayName { get; set; }
+        }
     }
 
     /// <summary>
@@ -81,6 +91,5 @@ namespace Swashbuckle.Dummy.Controllers
         /// The Account ID for SubAccounts should be 7 digits.
         /// </summary>
         public override int AccountID { get; set; }
-
     }
 }

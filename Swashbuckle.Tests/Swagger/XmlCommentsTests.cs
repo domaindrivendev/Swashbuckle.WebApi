@@ -138,5 +138,14 @@ namespace Swashbuckle.Tests.Swagger
             Assert.IsNotNull(operation["summary"]);
             Assert.AreEqual("Prevents the account from being used", operation["summary"].ToString());
         }
+
+        [Test]
+        public void It_handles_nested_class_properties()
+        {
+            var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/1.0");
+            var displayNameProperty = swagger["definitions"]["AccountPreferences"]["properties"]["DisplayName"];
+            Assert.IsNotNull(displayNameProperty["description"]);
+            Assert.AreEqual("Provide a display name to use instead of Username when signed in", displayNameProperty["description"].ToString());
+        }
     }
 }

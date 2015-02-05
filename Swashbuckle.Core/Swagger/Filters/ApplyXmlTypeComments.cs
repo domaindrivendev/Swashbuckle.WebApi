@@ -22,12 +22,13 @@ namespace Swashbuckle.Swagger.Filters
 
         public void Apply(Schema schema, SchemaRegistry schemaMap, Type type)
         {
-            var typeNode = _navigator.SelectSingleNode(String.Format(TypeExpression, type.FullName));
-            if (typeNode == null) return;
-
-            var summaryNode = typeNode.SelectSingleNode(SummaryExpression);
-            if (summaryNode != null)
-                schema.description = summaryNode.Value.Trim();
+            var typeNode = _navigator.SelectSingleNode(String.Format(TypeExpression, type.XmlCommentsQualifier()));
+            if (typeNode != null)
+            {
+                var summaryNode = typeNode.SelectSingleNode(SummaryExpression);
+                if (summaryNode != null)
+                    schema.description = summaryNode.Value.Trim();
+            }
 
             List<Type> typeList = new List<Type>();
             typeList.Add(type);
@@ -52,7 +53,7 @@ namespace Swashbuckle.Swagger.Filters
             XPathNavigator propertyNode = null;
             foreach (Type t in typeList)
             {
-                var propertyXPath = String.Format(PropertyExpression, t.FullName, assumedMemberName);
+                var propertyXPath = String.Format(PropertyExpression, t.XmlCommentsQualifier(), assumedMemberName);
                 propertyNode = _navigator.SelectSingleNode(propertyXPath);
                 if (propertyNode != null) break;
             }

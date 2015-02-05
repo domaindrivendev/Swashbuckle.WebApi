@@ -80,6 +80,7 @@
     <Compile Include="Swagger\Filters\ApplyXmlTypeComments.cs" />
     <Compile Include="Swagger\Filters\ApplyXmlActionComments.cs" />
     <Compile Include="Swagger\Filters\HandleFromUriParams.cs" />
+    <Compile Include="Swagger\Filters\XmlCommentsExtensions.cs" />
     <Compile Include="Swagger\JsonContractExtensions.cs" />
     <Compile Include="Swagger\JsonPropertyExtensions.cs" />
     <Compile Include="SwaggerUi\EmbeddedAssetDescriptor.cs" />
