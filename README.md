@@ -339,6 +339,19 @@ In addition, a stage marker must be used in Startup.cs, AFTER configuring the We
     app.UseWebApi(config);
     app.UseStageMarker(PipelineStage.MapHandler);
 
+### OWIN Hosted in IIS - incorrect VirtualPathRoot handling
+
+When you host WebApi 2 on top of OWIN/SystemWeb, Swashbuckle cannot correctly resolve VirtualPathRoot by default.
+
+You must either explicitly set VirtualPathRoot in your HttpConfiguration at startup, or perform customization like this to fix automatic discovery:
+
+    SwaggerSpecConfig.Customize(c =>
+    {
+        c.ResolveBasePathUsing(req =>
+            req.RequestUri.GetLeftPart(UriPartial.Authority) +
+            req.GetRequestContext().VirtualPathRoot.TrimEnd('/'));
+    }
+
 ### Conflicting Model Id's ###
 
 If you see the following error message in the Swagger UI ...
