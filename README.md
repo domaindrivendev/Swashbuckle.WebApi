@@ -419,7 +419,7 @@ If you're using the existing config. interface to customize the final Swagger do
 
 ## Troubleshooting and FAQ's ##
 
-1. [swagger-ui showing Can't read swagger JSON from ...](swagger-ui-showing-cant-read-swagger-JSON-from)
+1. [swagger-ui showing "Can't read swagger JSON from ..."](#swagger-ui-showing-cant-read-swagger-JSON-from)
 2. [Page not found when accessing the UI](#page-not-found-when-accessing-ui)
 3. [swagger-ui broken by Visual Studio 2013](#swagger-ui-broken-by-visual-studio-2013)
 4. [How to add vendor extensions](#how-to-add-vendor-extensions)
