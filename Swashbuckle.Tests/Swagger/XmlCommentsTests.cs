@@ -27,7 +27,7 @@ namespace Swashbuckle.Tests.Swagger
         [Test]
         public void It_documents_operations_from_action_summary_and_remarks_tags()
         {
-            var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/1.0");
+            var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/v1");
 
             var postOp = swagger["paths"]["/xmlannotated"]["post"];
 
@@ -41,7 +41,7 @@ namespace Swashbuckle.Tests.Swagger
         [Test]
         public void It_documents_parameters_from_action_param_tags()
         {
-            var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/1.0");
+            var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/v1");
 
             var accountParam = swagger["paths"]["/xmlannotated"]["post"]["parameters"][0];
             Assert.IsNotNull(accountParam["description"]);
@@ -55,7 +55,7 @@ namespace Swashbuckle.Tests.Swagger
         [Test]
         public void It_documents_responses_from_action_response_tags()
         {
-            var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/1.0");
+            var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/v1");
 
             var createResponses = swagger["paths"]["/xmlannotated"]["post"]["responses"];
 
@@ -85,7 +85,7 @@ namespace Swashbuckle.Tests.Swagger
         [Test]
         public void It_documents_schemas_from_type_summary_tags()
         {
-            var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/1.0");
+            var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/v1");
 
             var accountSchema = swagger["definitions"]["Account"];
 
@@ -96,7 +96,7 @@ namespace Swashbuckle.Tests.Swagger
         [Test]
         public void It_documents_schema_properties_from_property_summary_tags()
         {
-            var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/1.0");
+            var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/v1");
 
             var usernameProperty = swagger["definitions"]["Account"]["properties"]["Username"];
             Assert.IsNotNull(usernameProperty["description"]);
@@ -110,7 +110,7 @@ namespace Swashbuckle.Tests.Swagger
         [Test]
         public void It_documents_schema_properties_including_property_summay_tags_from_base_classes()
         {
-            var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/1.0");
+            var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/v1");
 
             var usernameProperty = swagger["definitions"]["SubAccount"]["properties"]["Username"];
             Assert.IsNotNull(usernameProperty["description"]);
@@ -120,7 +120,7 @@ namespace Swashbuckle.Tests.Swagger
         [Test]
         public void It_documents_schema_properties_favoring_property_summary_tags_from_derived_vs_base_classes()
         {
-            var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/1.0");
+            var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/v1");
 
             var usernameProperty = swagger["definitions"]["SubAccount"]["properties"]["AccountID"];
             Assert.IsNotNull(usernameProperty["description"]);
@@ -133,7 +133,7 @@ namespace Swashbuckle.Tests.Swagger
             Configuration.Routes.Clear();
             SetUpCustomRouteFor<XmlAnnotatedController>("XmlAnnotated/{id}/{action}");
 
-            var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/1.0");
+            var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/v1");
             var operation = swagger["paths"]["/XmlAnnotated/{id}/put-on-hold"]["put"];
             Assert.IsNotNull(operation["summary"]);
             Assert.AreEqual("Prevents the account from being used", operation["summary"].ToString());
@@ -142,7 +142,7 @@ namespace Swashbuckle.Tests.Swagger
         [Test]
         public void It_handles_nested_class_properties()
         {
-            var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/1.0");
+            var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/v1");
             var displayNameProperty = swagger["definitions"]["AccountPreferences"]["properties"]["DisplayName"];
             Assert.IsNotNull(displayNameProperty["description"]);
             Assert.AreEqual("Provide a display name to use instead of Username when signed in", displayNameProperty["description"].ToString());

@@ -25,10 +25,10 @@ namespace Swashbuckle.Tests.SwaggerUi
         [Test]
         public void It_serves_the_embedded_swagger_ui()
         {
-            var content = GetContentAsString("http://tempuri.org/swagger/ui/index.html");
+            var content = GetContentAsString("http://tempuri.org/swagger/ui/index");
 
             StringAssert.Contains("rootUrl: 'http://tempuri.org:80'", content);
-            StringAssert.Contains("discoveryPaths: arrayFrom('swagger/docs/1.0')", content);
+            StringAssert.Contains("discoveryPaths: arrayFrom('swagger/docs/v1')", content);
             StringAssert.Contains("swagger-ui-container", content);
         }
         
@@ -43,17 +43,17 @@ namespace Swashbuckle.Tests.SwaggerUi
                 });
 
 
-            var content = GetContentAsString("http://tempuri.org/swagger/ui/index.html");
+            var content = GetContentAsString("http://tempuri.org/swagger/ui/index");
 
             StringAssert.Contains(
-                "<link href='ext/Swashbuckle.Dummy.SwaggerExtensions.testStyles1.css' media='screen' rel='stylesheet' type='text/css' />\r\n" +
-                "<link href='ext/Swashbuckle.Dummy.SwaggerExtensions.testStyles2.css' media='screen' rel='stylesheet' type='text/css' />",
+                "<link href='ext/Swashbuckle-Dummy-SwaggerExtensions-testStyles1-css' media='screen' rel='stylesheet' type='text/css' />\r\n" +
+                "<link href='ext/Swashbuckle-Dummy-SwaggerExtensions-testStyles2-css' media='screen' rel='stylesheet' type='text/css' />",
                 content);
 
-            content = GetContentAsString("http://tempuri.org/swagger/ui/ext/Swashbuckle.Dummy.SwaggerExtensions.testStyles1.css");
+            content = GetContentAsString("http://tempuri.org/swagger/ui/ext/Swashbuckle-Dummy-SwaggerExtensions-testStyles1-css");
             StringAssert.StartsWith("h1", content);
 
-            content = GetContentAsString("http://tempuri.org/swagger/ui/ext/Swashbuckle.Dummy.SwaggerExtensions.testStyles2.css");
+            content = GetContentAsString("http://tempuri.org/swagger/ui/ext/Swashbuckle-Dummy-SwaggerExtensions-testStyles2-css");
             StringAssert.StartsWith("h2", content);
         }
         
@@ -66,7 +66,7 @@ namespace Swashbuckle.Tests.SwaggerUi
                     c.BooleanValues(new[] { "1", "0" });
                 });
 
-            var content = GetContentAsString("http://tempuri.org/swagger/ui/index.html");
+            var content = GetContentAsString("http://tempuri.org/swagger/ui/index");
 
             StringAssert.Contains("docExpansion: 'full'", content);
             StringAssert.Contains("booleanValues: arrayFrom('1|0')", content);
@@ -77,7 +77,7 @@ namespace Swashbuckle.Tests.SwaggerUi
         {
             SetUpHandler(c => c.EnableOAuth2Support("test-client-id", "test-realm", "Swagger UI"));
 
-            var content = GetContentAsString("http://tempuri.org/swagger/ui/index.html");
+            var content = GetContentAsString("http://tempuri.org/swagger/ui/index");
 
             StringAssert.Contains("oAuth2Enabled: Boolean('true')", content);
             StringAssert.Contains("oAuth2ClientId: 'test-client-id'", content);
@@ -90,9 +90,9 @@ namespace Swashbuckle.Tests.SwaggerUi
         {
             SetUpHandler(c => c.EnableDiscoveryUrlSelector());
 
-            var content = GetContentAsString("http://tempuri.org/swagger/ui/index.html");
+            var content = GetContentAsString("http://tempuri.org/swagger/ui/index");
 
-            StringAssert.Contains("Swashbuckle.SwaggerUi.Assets.discoveryUrlSelector.js", content);
+            StringAssert.Contains("Swashbuckle-SwaggerUi-Assets-discoveryUrlSelector-js", content);
         }
         
 
@@ -106,18 +106,18 @@ namespace Swashbuckle.Tests.SwaggerUi
                     c.InjectJavaScript(assembly, "Swashbuckle.Dummy.SwaggerExtensions.testScript2.js");
                 });
 
-            var content = GetContentAsString("http://tempuri.org/swagger/ui/index.html");
+            var content = GetContentAsString("http://tempuri.org/swagger/ui/index");
 
             StringAssert.Contains(
                 "customScripts: " +
-                "arrayFrom('ext/Swashbuckle.Dummy.SwaggerExtensions.testScript1.js|" +
-                "ext/Swashbuckle.Dummy.SwaggerExtensions.testScript2.js')",
+                "arrayFrom('ext/Swashbuckle-Dummy-SwaggerExtensions-testScript1-js|" +
+                "ext/Swashbuckle-Dummy-SwaggerExtensions-testScript2-js')",
                 content);
 
-            content = GetContentAsString("http://tempuri.org/swagger/ui/ext/Swashbuckle.Dummy.SwaggerExtensions.testScript1.js");
+            content = GetContentAsString("http://tempuri.org/swagger/ui/ext/Swashbuckle-Dummy-SwaggerExtensions-testScript1-js");
             StringAssert.StartsWith("var str1", content);
 
-            content = GetContentAsString("http://tempuri.org/swagger/ui/ext/Swashbuckle.Dummy.SwaggerExtensions.testScript2.js");
+            content = GetContentAsString("http://tempuri.org/swagger/ui/ext/Swashbuckle-Dummy-SwaggerExtensions-testScript2-js");
             StringAssert.StartsWith("var str2", content);
         }
         
@@ -127,10 +127,10 @@ namespace Swashbuckle.Tests.SwaggerUi
             SetUpHandler(c =>
                 {
                     var assembly = typeof(SwaggerConfig).Assembly;
-                    c.CustomAsset("index.html", assembly, "Swashbuckle.Dummy.SwaggerExtensions.myIndex.html");
+                    c.CustomAsset("index", assembly, "Swashbuckle.Dummy.SwaggerExtensions.myIndex.html");
                 });
 
-            var content = GetContentAsString("http://tempuri.org/swagger/ui/index.html");
+            var content = GetContentAsString("http://tempuri.org/swagger/ui/index");
 
             StringAssert.Contains("My Index", content);
         }
@@ -145,7 +145,7 @@ namespace Swashbuckle.Tests.SwaggerUi
 
         private void SetUpHandler(Action<SwaggerUiConfig> configure = null)
         {
-            var swaggerUiConfig = new SwaggerUiConfig(new[] { "swagger/docs/1.0" }, SwaggerDocsConfig.DefaultRootUrlResolver);
+            var swaggerUiConfig = new SwaggerUiConfig(new[] { "swagger/docs/v1" }, SwaggerDocsConfig.DefaultRootUrlResolver);
 
             if (configure != null)
                 configure(swaggerUiConfig);

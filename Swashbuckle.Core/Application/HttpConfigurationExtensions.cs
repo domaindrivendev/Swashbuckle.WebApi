@@ -102,7 +102,7 @@ namespace Swashbuckle.Application
                     "swagger",
                     null,
                     null,
-                    new RedirectHandler(_rootUrlResolver, "swagger/ui/index.html"));
+                    new RedirectHandler(_rootUrlResolver, "swagger/ui/index"));
             }
         }
     }

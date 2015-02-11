@@ -7,41 +7,44 @@ namespace Swashbuckle.SwaggerUi
 {
     public class EmbeddedAssetProvider : IAssetProvider
     {
-        private readonly IDictionary<string, EmbeddedAssetDescriptor> _customAssets;
-        private readonly IDictionary<string, string> _replacements;
+        private readonly IDictionary<string, EmbeddedAssetDescriptor> _pathToAssetMap;
+        private readonly IDictionary<string, string> _templateParams;
 
         public EmbeddedAssetProvider(
-            IDictionary<string, EmbeddedAssetDescriptor> customAssets,
-            IDictionary<string, string> replacements)
+            IDictionary<string, EmbeddedAssetDescriptor> pathToAssetMap,
+            IDictionary<string, string> templateParams)
         {
-            _customAssets = customAssets;
-            _replacements = replacements;
+            _pathToAssetMap = pathToAssetMap;
+            _templateParams = templateParams;
         }
 
         public Asset GetAsset(string rootUrl, string path)
         {
-            var stream = GetEmbeddedResourceStreamFor(rootUrl, path);
-            var mediaType = InferMediaTypeFrom(path);
-            return new Asset(stream, mediaType);
+            if (!_pathToAssetMap.ContainsKey(path)) throw new AssetNotFound();
+
+            var resourceDescriptor = _pathToAssetMap[path];
+            return new Asset(
+                GetEmbeddedResourceStreamFor(resourceDescriptor, rootUrl),
+                InferMediaTypeFrom(resourceDescriptor.Name)
+            );
         }
 
-        private Stream GetEmbeddedResourceStreamFor(string rootUrl, string assetPath)
+        private Stream GetEmbeddedResourceStreamFor(EmbeddedAssetDescriptor resourceDescriptor, string rootUrl)
         {
-            EmbeddedAssetDescriptor customEmbeddedResource;
-            var isCustom = _customAssets.TryGetValue(assetPath, out customEmbeddedResource);
-
-            var assembly = isCustom ? customEmbeddedResource.ContainingAssembly : GetType().Assembly;
-            var name = isCustom ? customEmbeddedResource.Name : assetPath;
-
-            var stream = assembly.GetManifestResourceStream(name);
+            var stream = resourceDescriptor.Assembly.GetManifestResourceStream(resourceDescriptor.Name);
             if (stream == null)
                 throw new AssetNotFound();
 
-            var replacements = _replacements
-                .Union(new[] { new KeyValuePair<string, string>("%(RootUrl)", rootUrl) })
-                .ToDictionary(entry => entry.Key, entry => entry.Value);
+            if (resourceDescriptor.IsTemplate)
+            {
+                var templateParams = _templateParams
+                    .Union(new[] { new KeyValuePair<string, string>("%(RootUrl)", rootUrl) })
+                    .ToDictionary(entry => entry.Key, entry => entry.Value);
 
-            return isCustom ? stream.FindAndReplace(replacements) : stream;
+                return stream.FindAndReplace(templateParams);
+            }
+
+            return stream;
         }
 
         private static string InferMediaTypeFrom(string path)

@@ -56,12 +56,12 @@ namespace Swashbuckle.Dummy
                         //    (apiDesc, targetApiVersion) => ResolveVersionSupportByRouteConstraint(apiDesc, targetApiVersion),
                         //    (vc) =>
                         //    {
-                        //        vc.Version("2.0", "Swashbuckle Dummy API 2.0");
-                        //        vc.Version("1.0", "Swashbuckle Dummy API 1.0");
+                        //        vc.Version("v2", "Swashbuckle Dummy API V2");
+                        //        vc.Version("v1", "Swashbuckle Dummy API V1");
                         //    });
 
                         // You can use "BasicAuth", "ApiKey" or "OAuth2" options to describe security schemes for the API.
-                        // See https://github.com/swagger-api/swagger-spec/blob/master/versions/2.0.md for more details.
+                        // See https://github.com/swagger-api/swagger-spec/blob/master/versions/V2.md for more details.
                         // NOTE: These only define the schemes and need to be coupled with a corresponding "security" property
                         // at the document or operation level to indicate which schemes are required for an operation. To do this,
                         // you'll need to implement a custom IDocumentFilter and/or IOperationFilter to set these properties
@@ -78,7 +78,7 @@ namespace Swashbuckle.Dummy
                         c.OAuth2("oauth2")
                             .Description("OAuth2 Implicit Grant")
                             .Flow("implicit")
-                            .AuthorizationUrl("http://petstore.swagger.wordnik.com/api/oauth/dialog")
+                            .AuthorizationUrl("http://petstore.swagger.io/api/oauth/dialog")
                             //.TokenUrl("https://tempuri.org/token")
                             .Scopes(scopes =>
                             {
@@ -157,7 +157,7 @@ namespace Swashbuckle.Dummy
 
                         // Post-modify the entire Swagger document by wiring up one or more Document filters.
                         // This gives full control to modify the final SwaggerDocument. You should have a good understanding of
-                        // the Swagger 2.0 spec. - https://github.com/swagger-api/swagger-spec/blob/master/versions/2.0.md
+                        // the Swagger 2.0 spec. - https://github.com/swagger-api/swagger-spec/blob/master/versions/V2.md
                         // before using this option.
                         //
                         c.DocumentFilter<ApplyDocumentVendorExtensions>();

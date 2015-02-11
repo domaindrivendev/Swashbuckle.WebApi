@@ -32,7 +32,7 @@ namespace $rootnamespace$
                         // hold additional metadata for an API. Version and title are required but you can also provide
                         // additional fields by chaining methods off SingleApiVersion.
                         //
-                        c.SingleApiVersion("1.0", "$rootnamespace$");
+                        c.SingleApiVersion("v1", "$rootnamespace$");
 
                         // If your API has multiple versions, use "MultipleApiVersions" instead of "SingleApiVersion".
                         // In this case, you must provide a lambda that tells Swashbuckle which actions should be
@@ -43,8 +43,8 @@ namespace $rootnamespace$
                         //    (apiDesc, targetApiVersion) => ResolveVersionSupportByRouteConstraint(apiDesc, targetApiVersion),
                         //    (vc) =>
                         //    {
-                        //        vc.Version("2.0", "Swashbuckle Dummy API 2.0");
-                        //        vc.Version("1.0", "Swashbuckle Dummy API 1.0");
+                        //        vc.Version("v2", "Swashbuckle Dummy API V2");
+                        //        vc.Version("v1", "Swashbuckle Dummy API V1");
                         //    });
 
                         // You can use "BasicAuth", "ApiKey" or "OAuth2" options to describe security schemes for the API.

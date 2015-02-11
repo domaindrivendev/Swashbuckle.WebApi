@@ -103,6 +103,8 @@
   <ItemGroup>
     <EmbeddedResource Include="SwaggerUi\Assets\discoveryUrlSelector.js" />
     <EmbeddedResource Include="SwaggerUi\Assets\index.html" />
+    <EmbeddedResource Include="SwaggerUi\Assets\screen.css" />
+    <EmbeddedResource Include="SwaggerUi\Assets\swagger-oauth.js" />
     <Content Include="Swashbuckle.Core.nuspec">
       <SubType>Designer</SubType>
     </Content>

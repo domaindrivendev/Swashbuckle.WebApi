@@ -29,7 +29,7 @@ There are currently two Nuget packages - the Core library (Swashbuckle.Core) and
 
 Once installed and enabled, you should be able to browse the following Swagger docs and UI endpoints respectively:
 
-***\<your-root-url\>/swagger/docs/1.0***
+***\<your-root-url\>/swagger/docs/v1***
 
 ***\<your-root-url\>/swagger***
 
@@ -50,7 +50,7 @@ If your service is self-hosted, just install the Core library:
 And then manually enable the Swagger docs and optionally, the swagger-ui by invoking the following extension methods (in namespace Swashbuckle.Application) on an instance of HttpConfiguration (e.g. in Program.cs)
 
     httpConfiguration
-        .EnableSwagger(c => c.SingleApiVersion("1.0", "A title for your API"))
+        .EnableSwagger(c => c.SingleApiVersion("v1", "A title for your API"))
         .EnableSwaggerUi();
 
 ### OWIN  ###
@@ -62,30 +62,8 @@ If your service is hosted using OWIN middleware, just install the Core library:
 Then manually enable the Swagger docs and swagger-ui by invoking the extension methods (in namespace Swashbuckle.Application) on an instance of HttpConfiguration (e.g. in Startup.cs)
 
     httpConfiguration
-        .EnableSwagger(c => c.SingleApiVersion("1.0", "A title for your API"))
-        .EnableSwaggerUi();
-
-\* If your OWIN middleware is self-hosted then you're done! If you're using OWIN through the IIS Integrated pipeline then you'll need to apply the following steps to prevent URLs with extensions (i.e. the swagger-ui assets) from being short-circuited by the native static file module.
-
-1) In your web.config add:
-
-    <configuration>
-       <system.webServer>
-          <modules runAllManagedModulesForAllRequests="true" />
-       </system.webServer>
-    </configuration>
-
-2) Add the following stage marker AFTER configuring the WebApi middleware (in namespace Microsoft.Owin.Extensions):
-
-    app.UseStageMarker(PipelineStage.MapHandler);
-    
-This setting causes the WebApi middleware to execute earlier in the pipeline, allowing it to correctly handle URLs with extensions.
-
-Check out the following articles for more information:
-
-<https://katanaproject.codeplex.com/wikipage?title=Static%20Files%20on%20IIS>
-
-<http://www.asp.net/aspnet/overview/owin-and-katana/owin-middleware-in-the-iis-integrated-pipeline>
+        .EnableSwagger(c => c.SingleApiVersion("v1", "A title for your API"))
+        .EnableSwaggerUi();    
 
 ## Troubleshooting ##
 
@@ -96,7 +74,7 @@ Troubleshooting??? I thought this was all supposed to be "seamless"? OK you've c
 The following snippet demonstrates the minimum configuration required to get the Swagger docs and swagger-ui up and running:
 
     httpConfiguration
-        .EnableSwagger(c => c.SingleApiVersion("1.0", "A title for your API"))
+        .EnableSwagger(c => c.SingleApiVersion("v1", "A title for your API"))
         .EnableSwaggerUi();
 
 These methods expose a range of configuration and extensibility options that you can pick and choose from, combining the convenience of sensible defaults with the flexibility to customize where you see fit. Read on to learn more.
@@ -106,7 +84,7 @@ These methods expose a range of configuration and extensibility options that you
 The default route templates for the Swagger docs and swagger-ui are "swagger/docs/{apiVersion}" and "swagger/ui/{\*assetPath}" respectively. You're free to change these so long as the provided templates include the relevant route parameters - {apiVersion} and {\*assetPath}.
 
     httpConfiguration
-        .EnableSwagger("docs/{apiVersion}/swagger.json", c => c.SingleApiVersion("1.0", "A title for your API"))
+        .EnableSwagger("docs/{apiVersion}/swagger", c => c.SingleApiVersion("v1", "A title for your API"))
         .EnableSwaggerUi("sandbox/{*assetPath}");
 
 ### Additional Service Metadata ###
@@ -120,7 +98,7 @@ In addition to operation descriptions, Swagger 2.0 includes several properties t
 
                 c.Schemes(new[] { "http", "https" });
 
-                c.SingleApiVersion("1.0", "Swashbuckle Dummy")
+                c.SingleApiVersion("v1", "Swashbuckle.Dummy")
                     .Description("A sample API for testing and prototyping Swashbuckle features")
                     .TermsOfService("Some terms")
                     .Contact(cc => cc
@@ -130,7 +108,6 @@ In addition to operation descriptions, Swagger 2.0 includes several properties t
                     .License(lc => lc
                         .Name("Some License")
                         .Url("http://tempuri.org/license"));
-
             });
 
 #### RootUrl ####
@@ -145,6 +122,8 @@ If schemes are not explicitly provided in a Swagger 2.0 document, then the schem
 
 Use this to describe a single version API. Swagger 2.0 includes an "Info" object to hold additional metadata for an API. Version and title are required but you may also provide additional fields as shown above.
 
+__NOTE__: If you're WebApi is hosted in IIS, you should avoid using full-stops in the version name (e.g. "1.0"). The full-stop at the tail of the URL will cause IIS to treat it as a static file (i.e. with an extension) and bypass the URL Routing Module and therefore, WebApi. 
+
 ### Describing Multiple API Versions ###
 
 If your API has multiple versions, use __MultipleApiVersions__ instead of __SingleApiVersion__. In this case, you provide a lambda that tells Swashbuckle which actions should be included in the docs for a given API version. Like __SingleApiVersion__, __Version__ also returns an "Info" builder so you can provide additional metadata per API version.
@@ -156,8 +135,8 @@ If your API has multiple versions, use __MultipleApiVersions__ instead of __Sing
                     (apiDesc, targetApiVersion) => ResolveVersionSupportByRouteConstraint(apiDesc, targetApiVersion),
                     (vc) =>
                     {
-                        vc.Version("2.0", "Swashbuckle Dummy API 2.0");
-                        vc.Version("1.0", "Swashbuckle Dummy API 1.0");
+                        vc.Version("v2", "Swashbuckle Dummy API V2");
+                        vc.Version("v1", "Swashbuckle Dummy API V1");
                     });
             });
         .EnableSwaggerUi(c =>
@@ -285,7 +264,7 @@ In accordance with the built in JsonSerializer, Swashbuckle will, by default, de
 Similar to Schema filters, Swashbuckle also supports Operation and Document filters:
 
     httpConfiguration
-        .EnableSwagger(c => c.SingleApiVersion("1.0", "A title for your API"))
+        .EnableSwagger(c => c.SingleApiVersion("v1", "A title for your API"))
             {
                 c.OperationFilter<AddDefaultResponse>();
 
@@ -325,7 +304,7 @@ If you annotate Controllers and API Types with [Xml Comments](http://msdn.micros
 You can enable this by providing the path to one or more XML comments files:
 
     httpConfiguration
-        .EnableSwagger(c => c.SingleApiVersion("1.0", "A title for your API"))
+        .EnableSwagger(c => c.SingleApiVersion("v1", "A title for your API"))
             {
                 c.IncludeXmlComments(GetXmlCommentsPathForControllers());
                 c.IncludeXmlComments(GetXmlCommentsPathForModels());
@@ -344,7 +323,7 @@ Swashbuckle will automatically create a "success" response for each operation ba
 In contrast to WebApi, Swagger 2.0 does not include the query string component when mapping a URL to an action. As a result, Swashbuckle will raise an exception if it encounters multiple actions with the same path (sans query string) and HTTP method. You can workaround this by providing a custom strategy to pick a winner or merge the descriptions for the purposes of the Swagger docs 
 
     httpConfiguration
-        .EnableSwagger(c => c.SingleApiVersion("1.0", "A title for your API"))
+        .EnableSwagger(c => c.SingleApiVersion("v1", "A title for your API"))
             {
                 c.ResolveConflictingActions(apiDescriptions => apiDescriptions.First());
             });
@@ -362,7 +341,7 @@ The swagger-ui is a JavaScript application hosted in a single HTML page (index.h
 If your happy with the basic look and feel but want to make some minor tweaks, the following options may be sufficient:
 
     httpConfiguration
-        .EnableSwagger(c => c.SingleApiVersion("1.0", "A title for your API")) co
+        .EnableSwagger(c => c.SingleApiVersion("v1", "A title for your API")) co
         .EnableSwaggerUi(c =>
             {
                 c.InjectStylesheet(containingAssembly, "Swashbuckle.Dummy.SwaggerExtensions.testStyles1.css");
@@ -390,17 +369,17 @@ The swagger-ui renders boolean data types as a dropdown. By default, it provides
 
 Use this option to control how the Operation listing is displayed. It can be set to "None" (default), "List" (shows operations for each resource), or "Full" (fully expanded: shows operations and their details).
 
-### Provide your own "index.html" ###
+### Provide your own "index" file ###
 
-As an alternative, you can inject your own version of "index.html" and customize the markup and swagger-ui directly. Use the __CustomAsset__ option to instruct Swashbuckle to return your version instead of the default when a request is made for "index.html". As with all custom content, the file must be included in your project as an "Embedded Resource", and then the resource's "Logical Name" is passed to the method as shown below. See [Injecting Custom Content](#injecting-custom-content) for step by step instructions.
+As an alternative, you can inject your own version of "index.html" and customize the markup and swagger-ui directly. Use the __CustomAsset__ option to instruct Swashbuckle to return your version instead of the default when a request is made for "index". As with all custom content, the file must be included in your project as an "Embedded Resource", and then the resource's "Logical Name" is passed to the method as shown below. See [Injecting Custom Content](#injecting-custom-content) for step by step instructions.
 
 For compatibility, you should base your custom "index.html" off [this version](https://github.com/swagger-api/swagger-ui/blob/8831e289c0e2dc297754e92b6848c386a88ab37a/dist/index.html)
 
     httpConfiguration
-        .EnableSwagger(c => c.SingleApiVersion("1.0", "A title for your API"))
+        .EnableSwagger(c => c.SingleApiVersion("v1", "A title for your API"))
         .EnableSwaggerUi(c =>
             {
-                c.CustomAsset("index.html", yourAssembly, "YourWebApiProject.SwaggerExtensions.index.html");
+                c.CustomAsset("index", yourAssembly, "YourWebApiProject.SwaggerExtensions.index.html");
             });
 
 ### Injecting Custom Content ###
@@ -440,11 +419,20 @@ If you're using the existing config. interface to customize the final Swagger do
 
 ## Troubleshooting and FAQ's ##
 
-1. [Page not found when accessing the UI](#page-not-found-when-accessing-ui)
-2. [swagger-ui broken by Visual Studio 2013](#swagger-ui-broken-by-visual-studio-2013)
-3. [How to add vendor extensions](#how-to-add-vendor-extensions)
-4. [How to describe multiple API versions](#how-to-describe-multiple-api-versions)
-5. [How to configure OAuth2 support](#how-to-configure-oauth2-support)
+1. [swagger-ui showing Can't read swagger JSON from ...](swagger-ui-showing-cant-read-swagger-JSON-from)
+2. [Page not found when accessing the UI](#page-not-found-when-accessing-ui)
+3. [swagger-ui broken by Visual Studio 2013](#swagger-ui-broken-by-visual-studio-2013)
+4. [How to add vendor extensions](#how-to-add-vendor-extensions)
+5. [How to describe multiple API versions](#how-to-describe-multiple-api-versions)
+6. [How to configure OAuth2 support](#how-to-configure-oauth2-support)
+
+### Swagger-ui showing Can't read swagger JSON from
+
+If you see this message, it means the swagger-ui received an unexpected response when requesting the Swagger document. You can troubleshoot further by navigating directly to the discovery URL included in the error message. This should provide more details.
+
+If the discovery URL returns a 404 Not Found response, it may be due to a full-stop in the version name (e.g. "1.0"). This will cause IIS to treat it as a static file (i.e. with an extension) and bypass the URL Routing Module and therefore, WebApi. 
+
+To workaround, you can update the version name specified in SwaggerConfig.cs. For example, to "v1", "1-0" etc. Alternatively, you can change the route template being used for the swagger docs (as shown [here](#custom-routes)) so that the version parameter is not at the end of the route.
 
 ### Page not found when accessing the UI ###
 

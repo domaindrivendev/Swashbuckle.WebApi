@@ -21,7 +21,7 @@ namespace Swashbuckle.Tests.Swagger
         [Test]
         public void It_set_collection_format_multi_for_array_params()
         {
-            var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/1.0");
+            var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/v1");
             var headParams = swagger["paths"]["/fromuriparams"]["head"]["parameters"];
 
             var expectedHeadParams = JArray.FromObject(new object[]
@@ -46,7 +46,7 @@ namespace Swashbuckle.Tests.Swagger
         [Test]
         public void It_creates_multiple_query_params_for_from_uri_object_params()
         {
-            var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/1.0");
+            var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/v1");
             var getParams = swagger["paths"]["/fromuriparams"]["get"]["parameters"];
 
             var expectedGetParams = JArray.FromObject(new object[]

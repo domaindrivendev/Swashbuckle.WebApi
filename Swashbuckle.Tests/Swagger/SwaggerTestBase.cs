@@ -16,7 +16,7 @@ namespace Swashbuckle.Tests.Swagger
         protected void SetUpHandler(Action<SwaggerDocsConfig> configure = null)
         {
             var swaggerDocsConfig = new SwaggerDocsConfig();
-            swaggerDocsConfig.SingleApiVersion("1.0", "Test API");
+            swaggerDocsConfig.SingleApiVersion("v1", "Test API");
 
             if (configure != null)
                 configure(swaggerDocsConfig);

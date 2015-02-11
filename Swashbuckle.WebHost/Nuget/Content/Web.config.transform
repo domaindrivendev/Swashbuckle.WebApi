@@ -1,8 +1,0 @@
-﻿<configuration>
-  <system.webServer>
-    <modules>
-      <remove name="UrlRoutingModule-4.0" />
-      <add name="UrlRoutingModule-4.0" type="System.Web.Routing.UrlRoutingModule" preCondition="" />
-    </modules>
-  </system.webServer>
-</configuration>
