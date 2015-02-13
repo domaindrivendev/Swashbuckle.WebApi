@@ -6,13 +6,13 @@ namespace Swashbuckle.Dummy.Controllers
 {
     public class NestedEnumerableTypesController : ApiController
     {
-		public int Create(Matrix matrix)
+        public int Create(Matrix matrix)
         {
             throw new NotImplementedException();
         }
     }
 
-	public class Matrix : List<List<int>>
-	{
-	}
+    public class Matrix : List<List<int>>
+    {
+    }
 }

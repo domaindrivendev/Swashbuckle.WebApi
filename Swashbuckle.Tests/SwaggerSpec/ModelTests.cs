@@ -19,7 +19,7 @@ namespace Swashbuckle.Tests.SwaggerSpec
 
         public ModelTests()
             : base("swagger/api-docs/{resourceName}")
-        {}
+        { }
 
         [SetUp]
         public void SetUp()
@@ -43,7 +43,7 @@ namespace Swashbuckle.Tests.SwaggerSpec
                     {
                         type = "object",
                         id = "Product",
-                        required = new object[] {},
+                        required = new object[] { },
                         properties = new
                         {
                             Id = new
@@ -66,14 +66,14 @@ namespace Swashbuckle.Tests.SwaggerSpec
                                 format = "double"
                             }
                         },
-                        subTypes = new object[] {}
+                        subTypes = new object[] { }
                     }
                 }
             );
 
             Assert.AreEqual(expected.ToString(), models.ToString());
         }
-        
+
         [Test]
         public void It_should_include_inherited_properties_for_complex_types()
         {
@@ -127,7 +127,7 @@ namespace Swashbuckle.Tests.SwaggerSpec
 
             Assert.AreEqual(expected.ToString(), models.ToString());
         }
-        
+
         [Test]
         public void It_should_handle_nested_types()
         {
@@ -143,7 +143,7 @@ namespace Swashbuckle.Tests.SwaggerSpec
                     {
                         type = "object",
                         id = "Order",
-                        required = new object[] {},
+                        required = new object[] { },
                         properties = new
                         {
                             LineItems = new
@@ -152,13 +152,13 @@ namespace Swashbuckle.Tests.SwaggerSpec
                                 items = JObject.Parse("{ $ref: \"LineItem\" }")
                             }
                         },
-                        subTypes = new object[] {}
+                        subTypes = new object[] { }
                     },
                     LineItem = new
                     {
                         type = "object",
                         id = "LineItem",
-                        required = new object[] {},
+                        required = new object[] { },
                         properties = new
                         {
                             ProductId = new
@@ -172,7 +172,7 @@ namespace Swashbuckle.Tests.SwaggerSpec
                                 format = "int32",
                             }
                         },
-                        subTypes = new object[] {}
+                        subTypes = new object[] { }
                     }
                 }
             );
@@ -180,42 +180,42 @@ namespace Swashbuckle.Tests.SwaggerSpec
             Assert.AreEqual(expected.ToString(), models.ToString());
         }
 
-		/// <summary>
-		/// As per https://github.com/swagger-api/swagger-spec/blob/master/versions/2.0.md#items-object-, swagger should support
-		/// nested enumerables from v2.0.
-		/// 
-		/// Expected format based on https://github.com/swagger-api/swagger-spec/issues/273
-		/// </summary>
-		[Test]
-		public void It_should_handle_nested_enumerable_types()
-		{
-			SetUpDefaultRouteFor<NestedEnumerableTypesController>();
+        /// <summary>
+        /// As per https://github.com/swagger-api/swagger-spec/blob/master/versions/2.0.md#items-object-, swagger should support
+        /// nested enumerables from v2.0.
+        /// 
+        /// Expected format based on https://github.com/swagger-api/swagger-spec/issues/273
+        /// </summary>
+        [Test]
+        public void It_should_handle_nested_enumerable_types()
+        {
+            SetUpDefaultRouteFor<NestedEnumerableTypesController>();
 
-			var parameters = Get<JObject>("http://tempuri.org/swagger/api-docs/NestedEnumerableTypes")
-				.SelectToken("apis[0].operations[0].parameters[0]");
+            var parameters = Get<JObject>("http://tempuri.org/swagger/api-docs/NestedEnumerableTypes")
+                .SelectToken("apis[0].operations[0].parameters[0]");
 
-			var expected = JObject.FromObject(
-				new
-				{
-					paramType = "body",
-					name = "matrix",
-					description = "",
-					required = true,
-					type = "array",
-					items = new
-					{
-						type = "array",
-						items = new
-						{
-							type = "integer",
-							format = "int32"
-						}
-					}
-				}
-			);
+            var expected = JObject.FromObject(
+                new
+                {
+                    paramType = "body",
+                    name = "matrix",
+                    description = "",
+                    required = true,
+                    type = "array",
+                    items = new
+                    {
+                        type = "array",
+                        items = new
+                        {
+                            type = "integer",
+                            format = "int32"
+                        }
+                    }
+                }
+            );
 
-			Assert.AreEqual(expected.ToString(), parameters.ToString());
-		}
+            Assert.AreEqual(expected.ToString(), parameters.ToString());
+        }
 
         [Test]
         public void It_should_handle_self_referencing_types()
@@ -232,7 +232,7 @@ namespace Swashbuckle.Tests.SwaggerSpec
                     {
                         type = "object",
                         id = "Component",
-                        required = new object[] {},
+                        required = new object[] { },
                         properties = new
                         {
                             Name = new
@@ -245,7 +245,7 @@ namespace Swashbuckle.Tests.SwaggerSpec
                                 items = JObject.Parse("{ $ref: \"Component\" }")
                             }
                         },
-                        subTypes = new object[] {}
+                        subTypes = new object[] { }
                     }
                 }
             );
@@ -262,7 +262,7 @@ namespace Swashbuckle.Tests.SwaggerSpec
                 .SelectToken("models");
 
             var expected = JObject.FromObject(
-                new {}
+                new { }
             );
 
             Assert.AreEqual(expected.ToString(), models.ToString());
@@ -296,11 +296,11 @@ namespace Swashbuckle.Tests.SwaggerSpec
 
             _swaggerSpecConfig.MapType<Matrix>(() => new DataType { Type = "string" });
 
-			var models = Get<JObject>("http://tempuri.org/swagger/api-docs/NestedEnumerableTypes")
+            var models = Get<JObject>("http://tempuri.org/swagger/api-docs/NestedEnumerableTypes")
                 .SelectToken("models");
 
             var expected = JObject.FromObject(
-                new {}
+                new { }
             );
 
             Assert.AreEqual(expected.ToString(), models.ToString());
@@ -330,7 +330,7 @@ namespace Swashbuckle.Tests.SwaggerSpec
                     {
                         type = "object",
                         id = "Elephant",
-                        required = new object[] {},
+                        required = new object[] { },
                         properties = new
                         {
                             TrunkLength = new
@@ -339,13 +339,13 @@ namespace Swashbuckle.Tests.SwaggerSpec
                                 format = "int32"
                             }
                         },
-                        subTypes = new object[] {}
+                        subTypes = new object[] { }
                     },
                     Animal = new
                     {
                         type = "object",
                         id = "Animal",
-                        required = new object[] {},
+                        required = new object[] { },
                         properties = new
                         {
                             Type = new
@@ -360,7 +360,7 @@ namespace Swashbuckle.Tests.SwaggerSpec
                     {
                         type = "object",
                         id = "Mamal",
-                        required = new object[] {},
+                        required = new object[] { },
                         properties = new
                         {
                             HairColor = new
@@ -380,7 +380,7 @@ namespace Swashbuckle.Tests.SwaggerSpec
         public void It_should_support_configurable_filters_for_modifying_generated_models()
         {
             SetUpDefaultRouteFor<ProductsController>();
-            
+
             _swaggerSpecConfig.ModelFilter<OverrideDescription>();
 
             var models = Get<JObject>("http://tempuri.org/swagger/api-docs/Products")
