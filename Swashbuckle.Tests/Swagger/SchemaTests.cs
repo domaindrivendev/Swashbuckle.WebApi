@@ -385,11 +385,12 @@ namespace Swashbuckle.Tests.Swagger
                             }
                         }
                     },
-                    ListOfSelf = new
-                    {
-                        type = "array",
-                        items = JObject.Parse("{ $ref: \"ListOfSelf\" }") 
-                    },
+                    // Breaks current swagger-ui
+                    //ListOfSelf = new
+                    //{
+                    //    type = "array",
+                    //    items = JObject.Parse("{ $ref: \"ListOfSelf\" }") 
+                    //},
                     DictionaryOfSelf = new
                     {
                         type = "object",

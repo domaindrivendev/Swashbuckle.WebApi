@@ -11,10 +11,11 @@ namespace Swashbuckle.Dummy.Controllers
             throw new NotImplementedException();
         }
 
-        public ListOfSelf Get()
-        {
-            throw new NotImplementedException();
-        }
+        // Breaks current swagger-ui
+        //public ListOfSelf Get()
+        //{
+        //    throw new NotImplementedException();
+        //}
 
         [HttpPut]
         public void Update(DictionaryOfSelf values)

@@ -36,7 +36,7 @@ namespace Swashbuckle.Dummy
                         // hold additional metadata for an API. Version and title are required but you may also provide the
                         // additional fields.
                         //
-                        c.SingleApiVersion("1.0", "Swashbuckle Dummy")
+                        c.SingleApiVersion("v1", "Swashbuckle Dummy")
                             .Description("A sample API for testing and prototyping Swashbuckle features")
                             .TermsOfService("Some terms")
                             .Contact(cc => cc

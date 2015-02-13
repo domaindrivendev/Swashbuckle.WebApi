@@ -101,10 +101,11 @@
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
-    <EmbeddedResource Include="SwaggerUi\Assets\discoveryUrlSelector.js" />
-    <EmbeddedResource Include="SwaggerUi\Assets\index.html" />
-    <EmbeddedResource Include="SwaggerUi\Assets\screen.css" />
-    <EmbeddedResource Include="SwaggerUi\Assets\swagger-oauth.js" />
+    <EmbeddedResource Include="SwaggerUi\CustomAssets\discoveryUrlSelector.js" />
+    <EmbeddedResource Include="SwaggerUi\CustomAssets\swagger-oauth.js" />
+    <EmbeddedResource Include="SwaggerUi\CustomAssets\typography.css" />
+    <EmbeddedResource Include="SwaggerUi\CustomAssets\index.html" />
+    <EmbeddedResource Include="SwaggerUi\CustomAssets\screen.css" />
     <Content Include="Swashbuckle.Core.nuspec">
       <SubType>Designer</SubType>
     </Content>
@@ -114,7 +115,7 @@
   <!-- Automatically embed swagger-ui files. Construct name so resource can be retrieved by swagger-ui relative path -->
   <ItemGroup>
     <EmbeddedResource Include="..\swagger-ui\dist\**\*.*">
-      <LogicalName>$([System.String]::Copy('%(RecursiveDir)%(FileName)%(Extension)').Replace('\', '/'))</LogicalName>
+      <LogicalName>%(RecursiveDir)%(FileName)%(Extension)</LogicalName>
       <InProject>false</InProject>
     </EmbeddedResource>
   </ItemGroup>

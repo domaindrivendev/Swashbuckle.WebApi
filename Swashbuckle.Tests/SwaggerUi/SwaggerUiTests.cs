@@ -92,9 +92,8 @@ namespace Swashbuckle.Tests.SwaggerUi
 
             var content = GetContentAsString("http://tempuri.org/swagger/ui/index");
 
-            StringAssert.Contains("Swashbuckle-SwaggerUi-Assets-discoveryUrlSelector-js", content);
+            StringAssert.Contains("Swashbuckle-SwaggerUi-CustomAssets-discoveryUrlSelector-js", content);
         }
-        
 
         [Test]
         public void It_exposes_config_to_inject_custom_javascripts()

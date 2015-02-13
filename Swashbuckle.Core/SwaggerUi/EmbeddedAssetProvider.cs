@@ -20,7 +20,8 @@ namespace Swashbuckle.SwaggerUi
 
         public Asset GetAsset(string rootUrl, string path)
         {
-            if (!_pathToAssetMap.ContainsKey(path)) throw new AssetNotFound();
+            if (!_pathToAssetMap.ContainsKey(path))
+                throw new AssetNotFound(String.Format("Mapping not found - {0}", path));
 
             var resourceDescriptor = _pathToAssetMap[path];
             return new Asset(
@@ -33,7 +34,7 @@ namespace Swashbuckle.SwaggerUi
         {
             var stream = resourceDescriptor.Assembly.GetManifestResourceStream(resourceDescriptor.Name);
             if (stream == null)
-                throw new AssetNotFound();
+                throw new AssetNotFound(String.Format("Embedded resource not found - {0}", resourceDescriptor.Name));
 
             if (resourceDescriptor.IsTemplate)
             {

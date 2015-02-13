@@ -22,5 +22,9 @@ namespace Swashbuckle.SwaggerUi
     }
 
     public class AssetNotFound : Exception
-    {}
+    {
+        public AssetNotFound(string message)
+            : base(message)
+        {}
+    }
 }

@@ -18,36 +18,6 @@ namespace Swashbuckle.Application
         {
             _pathToAssetMap = new Dictionary<string, EmbeddedAssetDescriptor>();
 
-            // Avoid RAMMFAR by serving swagger-ui through extentionless URL's
-            MapAssets(new Dictionary<string, string>
-                {
-                    { "index", "Swashbuckle.SwaggerUi.Assets.index.html" }, // SB version
-                    { "o2c-html", "o2c.html" }, // SB version
-                    { "swagger-ui-js", "swagger-ui.js" },
-                    { "swagger-ui-min-js", "swagger-ui.min.js" },
-                    { "css/reset-css", "css/reset.css" },
-                    { "css/screen-css", "Swashbuckle.SwaggerUi.Assets.screen.css" }, // SB version
-                    { "lib/shred/content-js", "lib/shred/content.js" },
-                    { "lib/backbone-min-js", "lib/backbone-min.js" },
-                    { "lib/handlebars-1-0-0-js", "lib/handlebars-1.0.0.js" },
-                    { "lib/highlight-7-3-pack-js", "lib/highlight.7.3.pack.js" },
-                    { "lib/jquery-1-8-0-min-js", "lib/jquery-1.8.0.min.js" },
-                    { "lib/jquery-ba-bbq-min-js", "lib/jquery.ba-bbq.min.js" },
-                    { "lib/jquery-slideto-min-js", "lib/jquery.slideto.min.js" },
-                    { "lib/jquery-wiggle-min-js", "lib/jquery.wiggle.min.js" },
-                    { "lib/shred-bundle-js", "lib/shred.bundle.js" },
-                    { "lib/swagger-client-js", "lib/swagger-client.js" },
-                    { "lib/swagger-oauth-js", "Swashbuckle.SwaggerUi.Assets.swagger-oauth.js" }, // SB version
-                    { "lib/swagger-js", "lib/swagger.js" },
-                    { "lib/underscore-min-js", "lib/underscore-min.js" },
-                    { "images/explorer_icons-png", "images/explorer_icons.png" },
-                    { "images/logo_small-png", "images/logo_small.png" },
-                    { "images/pat_store_api-png", "images/pet_store_api.png" },
-                    { "images/throbber-gif", "images/throbber.gif" },
-                    { "images/wordnik_api-png", "images/wordnik_api.png"}
-                }
-            );
-
             _templateParams = new Dictionary<string, string>
             {
                 { "%(StylesheetIncludes)", "" },
@@ -61,17 +31,26 @@ namespace Swashbuckle.Application
                 { "%(OAuth2AppName)", "" },
             };
             _rootUrlResolver = rootUrlResolver;
+
+            MapPathsForSwaggerUiAssets();
+
+            // Use some custom versions to support config and extensionless paths
+            var thisAssembly = GetType().Assembly;
+            CustomAsset("index", thisAssembly, "Swashbuckle.SwaggerUi.CustomAssets.index.html");
+            CustomAsset("css/screen-css", thisAssembly, "Swashbuckle.SwaggerUi.CustomAssets.screen.css");
+            CustomAsset("css/typography-css", thisAssembly, "Swashbuckle.SwaggerUi.CustomAssets.typography.css");
+            CustomAsset("lib/swagger-oauth-js", thisAssembly, "Swashbuckle.SwaggerUi.CustomAssets.swagger-oauth.js");
         }
 
         public void InjectStylesheet(Assembly resourceAssembly, string resourceName)
         {
             var path = "ext/" + resourceName.Replace(".", "-");
-            var stringBuilder = new StringBuilder(_templateParams["%(StylesheetIncludes)"]);
 
+            var stringBuilder = new StringBuilder(_templateParams["%(StylesheetIncludes)"]);
             stringBuilder.AppendLine("<link href='" + path + "' media='screen' rel='stylesheet' type='text/css' />");
             _templateParams["%(StylesheetIncludes)"] = stringBuilder.ToString();
 
-            _pathToAssetMap[path] = new EmbeddedAssetDescriptor(resourceAssembly, resourceName);
+            CustomAsset(path, resourceAssembly, resourceName);
         }
         
         public void BooleanValues(IEnumerable<string> values)
@@ -81,16 +60,16 @@ namespace Swashbuckle.Application
 
         public void InjectJavaScript(Assembly resourceAssembly, string resourceName)
         {
-            var stringBuilder = new StringBuilder(_templateParams["%(CustomScripts)"]);
+            var path = "ext/" + resourceName.Replace(".", "-");
 
+            var stringBuilder = new StringBuilder(_templateParams["%(CustomScripts)"]);
             if (stringBuilder.Length > 0)
                 stringBuilder.Append("|");
 
-            var path = "ext/" + resourceName.Replace(".", "-");
             stringBuilder.Append(path);
-
             _templateParams["%(CustomScripts)"] = stringBuilder.ToString();
-            _pathToAssetMap[path] = new EmbeddedAssetDescriptor(resourceAssembly, resourceName);
+
+            CustomAsset(path, resourceAssembly, resourceName);
         }
 
         public void DocExpansion(DocExpansion docExpansion)
@@ -105,7 +84,7 @@ namespace Swashbuckle.Application
 
         public void EnableDiscoveryUrlSelector()
         {
-            InjectJavaScript(GetType().Assembly, "Swashbuckle.SwaggerUi.Assets.discoveryUrlSelector.js");
+            InjectJavaScript(GetType().Assembly, "Swashbuckle.SwaggerUi.CustomAssets.discoveryUrlSelector.js");
         }
 
         public void EnableOAuth2Support(string clientId, string realm, string appName)
@@ -126,14 +105,18 @@ namespace Swashbuckle.Application
             return _rootUrlResolver(swaggerRequest);
         }
 
-        private void MapAssets(Dictionary<string, string> assetRoutes)
+        private void MapPathsForSwaggerUiAssets()
         {
-            var resourceAssembly = GetType().Assembly;
-            foreach (var entry in assetRoutes)
+            var thisAssembly = GetType().Assembly;
+            foreach (var resourceName in thisAssembly.GetManifestResourceNames())
             {
-                var path = entry.Key;
-                var resourceName = entry.Value;
-                CustomAsset(path, resourceAssembly, resourceName);
+                if (resourceName.Contains("Swashbuckle.SwaggerUi.CustomAssets")) continue; // original assets only
+
+                var path = resourceName
+                    .Replace("\\", "/")
+                    .Replace(".", "-"); // extensionless to avoid RUMMFAR
+
+                _pathToAssetMap[path] = new EmbeddedAssetDescriptor(thisAssembly, resourceName, path == "index");
             }
         }
     }
