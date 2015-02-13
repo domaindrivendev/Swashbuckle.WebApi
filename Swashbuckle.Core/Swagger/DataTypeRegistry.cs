@@ -97,9 +97,8 @@ namespace Swashbuckle.Swagger
             Type itemType;
             if (type.IsEnumerable(out itemType))
             {
-                if (itemType.IsEnumerable() && !PrimitiveMappings.ContainsKey(itemType))
-                    throw new InvalidOperationException(
-                        String.Format("Type {0} is not supported. Swagger does not support containers of containers", type));
+                if (deferIfComplex && !_complexMappings.ContainsKey(type))
+                    deferredTypes.Enqueue(type);
 
                 return new DataType { Type = "array", Items = GetOrRegister(itemType, true, deferredTypes) };
             }
@@ -132,7 +131,7 @@ namespace Swashbuckle.Swagger
             var properties = propInfos
                 .ToDictionary(propInfo => propInfo.Name, propInfo => GetOrRegister(propInfo.PropertyType, true, deferredTypes));
 
-            var required = propInfos.Where(propInfo => Attribute.IsDefined(propInfo, typeof (RequiredAttribute)))
+            var required = propInfos.Where(propInfo => Attribute.IsDefined(propInfo, typeof(RequiredAttribute)))
                 .Select(propInfo => propInfo.Name)
                 .ToList();
 
@@ -182,7 +181,7 @@ namespace Swashbuckle.Swagger
         {
             var polymorphicType = _polymorphicTypes.SingleOrDefault(t => t.Type == type);
             if (polymorphicType != null) return polymorphicType;
-            
+
             // Is it nested?
             foreach (var baseType in _polymorphicTypes)
             {
