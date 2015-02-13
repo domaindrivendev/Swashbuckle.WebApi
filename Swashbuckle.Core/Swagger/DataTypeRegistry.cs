@@ -97,9 +97,8 @@ namespace Swashbuckle.Swagger
             Type itemType;
             if (type.IsEnumerable(out itemType))
             {
-                if (itemType.IsEnumerable() && !PrimitiveMappings.ContainsKey(itemType))
-                    throw new InvalidOperationException(
-                        String.Format("Type {0} is not supported. Swagger does not support containers of containers", type));
+				if (deferIfComplex && !_complexMappings.ContainsKey(type))
+					deferredTypes.Enqueue(type);
 
                 return new DataType { Type = "array", Items = GetOrRegister(itemType, true, deferredTypes) };
             }
