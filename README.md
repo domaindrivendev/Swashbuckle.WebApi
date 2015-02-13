@@ -436,14 +436,23 @@ To workaround, you can update the version name specified in SwaggerConfig.cs. Fo
 
 ### Page not found when accessing the UI ###
 
-This issue ocurrs in IIS hosted environments when the native "static file" module is setup to intercept requests for URLs that contain extensions, bypassing the WebApi pipeline. In Swashbuckle, all of the swagger-ui assets (.html, .js, .css etc.) are served through the WebApi pipeline and so the static file handler must be disabled for these assets. In your web.config, add the following:
+Swashbuckle serves an embedded version of the swagger-ui through the WebApi pipeline. But, most of the URL's contain extensions (.html, .js, .css) and many IIS environments are configured to bypass the managed pipeline for paths containing extensions.
+
+In previous versions of Swashbuckle, this was resolved by adding the following setting to your Web.config:
 
     <system.webServer>
-    <modules>
-      <remove name="UrlRoutingModule-4.0" />
-      <add name="UrlRoutingModule-4.0" type="System.Web.Routing.UrlRoutingModule" preCondition="" />
+      <modules runAllManagedModulesForAllRequests="true">
     </modules>
-    </system.webServer>
+
+This is no longer neccessary in Swashbuckle 5.0 because it serves the swagger-ui through extensionless URL's.
+
+However, if you're using the SingleApiVersion, MultipleApiVersions or CustomAsset config. settings you could still get this error. Check to ensure you're not specifying a value that causes a URL with extension to be referenced in the UI. For example a full-stop in a version number ...
+
+    httpConfiguration
+        .EnableSwagger(c => c.SingleApiVersion("1.0", "A title for your API"))
+        .EnableSwaggerUi();
+
+Will result in a discovery URL like this "/swagger/docs/1.0" where the full-stop is treated as a file extension.
 
 ### Swagger-ui broken by Visual Studio 2013 ###
 
