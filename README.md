@@ -1,4 +1,4 @@
-Swashbuckle 5.0 Alpha
+Swashbuckle 5.0
 =========
 
 Seamlessly adds a [Swagger](http://swagger.io/) to WebApi projects! Combines ApiExplorer and Swagger/swagger-ui to provide a rich discovery, documentation and playground experience to your API consumers.
@@ -37,7 +37,7 @@ Once installed and enabled, you should be able to browse the following Swagger d
 
 If your service is hosted in IIS, you can start exposing Swagger docs and a corresponding swagger-ui by simply installing the following Nuget package:
 
-    Install-Package Swashbuckle -Pre
+    Install-Package Swashbuckle
 
 This will add a reference to Swashbuckle.Core and also install a bootstrapper (App_Start/SwaggerConfig.cs) that enables the Swagger routes on app start-up using [WebActivatorEx](https://github.com/davidebbo/WebActivator).
 
@@ -45,7 +45,7 @@ This will add a reference to Swashbuckle.Core and also install a bootstrapper (A
 
 If your service is self-hosted, just install the Core library:
 
-    Install-Package Swashbuckle.Core -Pre
+    Install-Package Swashbuckle.Core
 
 And then manually enable the Swagger docs and optionally, the swagger-ui by invoking the following extension methods (in namespace Swashbuckle.Application) on an instance of HttpConfiguration (e.g. in Program.cs)
 
@@ -57,7 +57,7 @@ And then manually enable the Swagger docs and optionally, the swagger-ui by invo
 
 If your service is hosted using OWIN middleware, just install the Core library:
 
-    Install-Package Swashbuckle.Core -Pre
+    Install-Package Swashbuckle.Core
 
 Then manually enable the Swagger docs and swagger-ui by invoking the extension methods (in namespace Swashbuckle.Application) on an instance of HttpConfiguration (e.g. in Startup.cs)
 

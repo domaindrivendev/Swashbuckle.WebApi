@@ -111,7 +111,7 @@ namespace $rootnamespace$
 
                         // Set this flag to omit schema property descriptions for any type properties decorated with the
                         // Obsolete attribute 
-                        c.IgnoreObsoleteProperties();
+                        //c.IgnoreObsoleteProperties();
 
                         // In a Swagger 2.0 document, complex types are typically declared globally and referenced by unique
                         // Schema Id. By default, Swashbuckle does NOT use the full type name in Schema Ids. In most cases, this
@@ -147,8 +147,6 @@ namespace $rootnamespace$
                         // before using this option.
                         //
                         //c.DocumentFilter<ApplyDocumentVendorExtensions>();
-                        //
-                        //c.DocumentFilter<AppendVersionToBasePath>();
 
                         // If you annonate Controllers and API Types with
                         // Xml comments (http://msdn.microsoft.com/en-us/library/b2s063f7(v=vs.110).aspx), you can incorporate
@@ -196,7 +194,7 @@ namespace $rootnamespace$
                         // in your project as an "Embedded Resource", and then the resource's "Logical Name" is passed to
                         // the method as shown below.
                         //
-                        //c.CustomAsset("index.html", containingAssembly, "YourWebApiProject.SwaggerExtensions.index.html");
+                        //c.CustomAsset("index", containingAssembly, "YourWebApiProject.SwaggerExtensions.index.html");
 
                         // If your API has multiple versions and you've applied the MultipleApiVersions setting
                         // as described above, you can also enable a select box in the swagger-ui, that displays
@@ -208,7 +206,7 @@ namespace $rootnamespace$
                         // If your API supports the OAuth2 Implicit flow, and you've described it correctly, according to
                         // the Swagger 2.0 specification, you can enable UI support as shown below.
                         //
-                        c.EnableOAuth2Support("test-client-id", "test-realm", "Swagger UI");
+                        //c.EnableOAuth2Support("test-client-id", "test-realm", "Swagger UI");
                     });
         }
     }
