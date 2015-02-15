@@ -29,11 +29,11 @@ namespace Swashbuckle.Application
             if (configure != null) configure(config);
 
             httpConfig.Routes.MapHttpRoute(
-                "swagger_docs",
-                routeTemplate,
-                null,
-                new { apiVersion = @".+" },
-                new SwaggerDocsHandler(config)
+                name: "swagger_docs",
+                routeTemplate: routeTemplate,
+                defaults: null,
+                constraints: new { apiVersion = @".+" },
+                handler: new SwaggerDocsHandler(config)
             );
 
             return new SwaggerEnabledConfiguration(
@@ -88,21 +88,21 @@ namespace Swashbuckle.Application
             if (configure != null) configure(config);
 
             _httpConfig.Routes.MapHttpRoute(
-                "swagger_ui",
-                routeTemplate,
-                null,
-                new { assetPath = @".+" },
-                new SwaggerUiHandler(config)
+                name: "swagger_ui",
+                routeTemplate: routeTemplate,
+                defaults: null,
+                constraints: new { assetPath = @".+" },
+                handler: new SwaggerUiHandler(config)
             );
 
             if (routeTemplate == DefaultRouteTemplate)
             {
                 _httpConfig.Routes.MapHttpRoute(
-                    "swagger_ui_shortcut",
-                    "swagger",
-                    null,
-                    null,
-                    new RedirectHandler(_rootUrlResolver, "swagger/ui/index"));
+                    name: "swagger_ui_shortcut",
+                    routeTemplate: "swagger",
+                    defaults: null,
+                    constraints: null,
+                    handler: new RedirectHandler(_rootUrlResolver, "swagger/ui/index"));
             }
         }
     }
