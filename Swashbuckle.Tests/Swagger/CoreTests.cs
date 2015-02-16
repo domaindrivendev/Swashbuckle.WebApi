@@ -451,17 +451,17 @@ namespace Swashbuckle.Tests.Swagger
                         (apiDesc, targetApiVersion) => SwaggerConfig.ResolveVersionSupportByRouteConstraint(apiDesc, targetApiVersion),
                         (vc) =>
                         {
-                            vc.Version("V2", "Test API V2");
-                            vc.Version("V1", "Test API V1");
+                            vc.Version("v2", "Test API V2");
+                            vc.Version("v1", "Test API V1");
                         });
                 });
             
             // 2.0
-            var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/V2");
+            var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/v2");
             var info = swagger["info"];
             var expected = JObject.FromObject(new
                 {
-                    version = "V2",
+                    version = "v2",
                     title = "Test API V2",
                 });
             Assert.AreEqual(expected.ToString(), info.ToString());
@@ -469,11 +469,11 @@ namespace Swashbuckle.Tests.Swagger
             Assert.IsNotNull(swagger["paths"]["/{apiVersion}/todos/{id}"]);
             
             // 1.0
-            swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/V1");
+            swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/v1");
             info = swagger["info"];
             expected = JObject.FromObject(new
                 {
-                    version = "V1",
+                    version = "v1",
                     title = "Test API V1",
                 });
             Assert.AreEqual(expected.ToString(), info.ToString());
