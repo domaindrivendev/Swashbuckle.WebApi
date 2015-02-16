@@ -420,9 +420,9 @@ If you're using the existing config. interface to customize the final Swagger do
 ## Troubleshooting and FAQ's ##
 
 1. [Swagger-ui showing "Can't read swagger JSON from ..."](#swagger-ui-showing-cant-read-swagger-json-from)
-2. [Page not found when accessing the UI](#page-not-found-when-accessing-ui)
+2. [Page not found when accessing the UI](#page-not-found-when-accessing-the-ui)
 3. [Swagger-ui broken by Visual Studio 2013](#swagger-ui-broken-by-visual-studio-2013)
-4. [OWIN Hosted in IIS - Incorrect VirtualPathRoot Handling](#owin-hosted-in-iis-incorrect-virtualpathroot-handling)
+4. [OWIN Hosted in IIS - Incorrect VirtualPathRoot Handling](#owin-hosted-in-iis---incorrect-virtualpathroot-handling)
 5. [How to add vendor extensions](#how-to-add-vendor-extensions)
 6. [How to describe multiple API versions](#how-to-describe-multiple-api-versions)
 7. [How to configure OAuth2 support](#how-to-configure-oauth2-support)
