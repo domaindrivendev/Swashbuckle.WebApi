@@ -10,13 +10,13 @@
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>Seamlessly adds a Swagger to WebApi projects!</description>
     <releaseNotes>Includes Swagger 2.0 and several enhancements to the config API</releaseNotes>
-    <summary>Combines ApiExplorer and swagger/swagger-ui to provide a rich discovery and documentation experience to your API consumers. If you're WebApi is hosted in IIS use this package. If it's self-hosted, just use Swashbuckle.Core and apply the documented bootstrapping steps.</summary>
+    <summary>Combines ApiExplorer and Swagger/swagger-ui to provide a rich discovery, documentation and playground experience to your API consumers</summary>
     <copyright>Copyright 2013</copyright>
-    <tags>Swagger SwaggerUi Documentation Discovery Help WebApi AspNet tWebApi Docs WebHost IIS</tags>
+    <tags>Swagger SwaggerUi Documentation Discovery Help WebApi AspNet AspNetWebApi Docs WebHost IIS</tags>
     <dependencies>
       <dependency id="Microsoft.AspNet.WebApi.WebHost" version="4.0.20710" />
       <dependency id="WebActivatorEx" />
-      <dependency id="Swashbuckle.Core" version="5.0.0-rc1" />
+      <dependency id="Swashbuckle.Core" version="5.0.0" />
     </dependencies>
   </metadata>
   <files>
