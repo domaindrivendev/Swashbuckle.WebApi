@@ -1,104 +1,189 @@
-﻿using System;
+﻿using System.Linq;
 using System.Collections.Generic;
-using System.Linq;
 using System.Web.Http.Description;
+using System;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 
 namespace Swashbuckle.Swagger
 {
-    public class SwaggerGenerator
+    public class SwaggerGenerator : ISwaggerProvider
     {
-        protected const string SwaggerVersion = "1.2";
-
-        private readonly string _basePath;
-        private readonly string _apiVersion;
-        private readonly IEnumerable<ApiDescription> _apiDescriptions;
+        private readonly IApiExplorer _apiExplorer;
+        private readonly IContractResolver _jsonContractResolver;
+        private readonly IDictionary<string, Info> _apiVersions;
         private readonly SwaggerGeneratorOptions _options;
 
         public SwaggerGenerator(
-            string basePath,
-            string apiVersion,
-            IEnumerable<ApiDescription> apiDescriptions,
-            SwaggerGeneratorOptions options)
+            IApiExplorer apiExplorer,
+            IContractResolver jsonContractResolver,
+            IDictionary<string, Info> apiVersions,
+            SwaggerGeneratorOptions options = null)
         {
-            _basePath = basePath;
-            _apiVersion = apiVersion;
-            _apiDescriptions = apiDescriptions;
-            _options = options;
+            _apiExplorer = apiExplorer;
+            _jsonContractResolver = jsonContractResolver;
+            _apiVersions = apiVersions;
+            _options = options ?? new SwaggerGeneratorOptions();
         }
 
-        public ResourceListing GetListing()
+        public SwaggerDocument GetSwagger(string rootUrl, string apiVersion)
         {
-            var resources = _apiDescriptions
-                .GroupBy(apiDesc => _options.ResourceNameResolver(apiDesc))
-                .OrderBy(group => group.Key, _options.ResourceNameComparer)
-                .Select(apiDescGrp => new Resource { Path = "/" + apiDescGrp.Key })
-                .ToArray();
+            var schemaRegistry = new SchemaRegistry(
+                _jsonContractResolver,
+                _options.CustomSchemaMappings,
+                _options.SchemaFilters,
+                _options.IgnoreObsoleteProperties,
+                _options.UseFullTypeNameInSchemaIds,
+                _options.DescribeAllEnumsAsStrings);
 
-            return new ResourceListing
-            {
-                SwaggerVersion = SwaggerVersion,
-                ApiVersion = _apiVersion,
-                Apis = resources,
-                Info = _options.ApiInfo,
-                Authorizations = _options.Authorizations
-            };
-        }
+            Info info;
+            _apiVersions.TryGetValue(apiVersion, out info);
+            if (info == null)
+                throw new UnknownApiVersion(apiVersion);
 
-        public ApiDeclaration GetDeclaration(string resourceName)
-        {
-            var apiDescriptionGroup = _apiDescriptions
-                .GroupBy(apiDesc => _options.ResourceNameResolver(apiDesc))
-                .SingleOrDefault(apiDescGrp => apiDescGrp.Key == resourceName);
-
-            if (apiDescriptionGroup == null)
-                throw new ApiDeclarationNotFoundException(resourceName);
-
-            var dataTypeRegistry = new DataTypeRegistry(
-                _options.CustomTypeMappings,
-                _options.PolymorphicTypes,
-                _options.ModelFilters);
-
-            var operationGenerator = new OperationGenerator(
-                dataTypeRegistry,
-                _options.OperationFilters);
-
-            // Group further by relative path - each group corresponds to an Api
-            var apis = apiDescriptionGroup
+            var paths = GetApiDescriptionsFor(apiVersion)
+                .Where(apiDesc => !(_options.IgnoreObsoleteActions && apiDesc.IsObsolete()))
+                .OrderBy(_options.GroupingKeySelector, _options.GroupingKeyComparer)
                 .GroupBy(apiDesc => apiDesc.RelativePathSansQueryString())
-                .Select(apiDescGrp => CreateApi(apiDescGrp, operationGenerator))
-                .OrderBy(api => api.Path)
-                .ToList();
+                .ToDictionary(group => "/" + group.Key, group => CreatePathItem(group, schemaRegistry));
 
-            return new ApiDeclaration
+            var rootUri = new Uri(rootUrl);
+
+            var swaggerDoc = new SwaggerDocument
             {
-                SwaggerVersion = SwaggerVersion,
-                ApiVersion = _apiVersion,
-                BasePath = _basePath,
-                ResourcePath = "/" + resourceName,
-                Apis = apis,
-                Models = dataTypeRegistry.GetModels()
+                info = info,
+                host = rootUri.Host + ":" + rootUri.Port,
+                basePath = (rootUri.AbsolutePath != "/") ? rootUri.AbsolutePath : null,
+                schemes = (_options.Schemes != null) ? _options.Schemes.ToList() : new[] { rootUri.Scheme }.ToList(),
+                paths = paths,
+                definitions = schemaRegistry.Definitions,
+                securityDefinitions = _options.SecurityDefinitions
             };
+
+            foreach(var filter in _options.DocumentFilters)
+            {
+                filter.Apply(swaggerDoc, schemaRegistry, _apiExplorer);
+            }
+
+            return swaggerDoc;
         }
 
-        private Api CreateApi(IGrouping<string, ApiDescription> apiDescriptionGroup, OperationGenerator operationGenerator)
+        private IEnumerable<ApiDescription> GetApiDescriptionsFor(string apiVersion)
         {
-            var operations = apiDescriptionGroup
-                .Select(operationGenerator.ApiDescriptionToOperation)
-                .OrderBy(op => op.Method)
-                .ToList();
-
-            return new Api
-            {
-                Path = "/" + apiDescriptionGroup.Key,
-                Operations = operations
-            };
+            return (_options.VersionSupportResolver == null)
+                ? _apiExplorer.ApiDescriptions
+                : _apiExplorer.ApiDescriptions.Where(apiDesc => _options.VersionSupportResolver(apiDesc, apiVersion));
         }
-    }
 
-    public class ApiDeclarationNotFoundException : Exception
-    {
-        public ApiDeclarationNotFoundException(string name)
-            : base(name)
-        {}
+        private PathItem CreatePathItem(IEnumerable<ApiDescription> apiDescriptions, SchemaRegistry schemaRegistry)
+        {
+            var pathItem = new PathItem();
+
+            // Group further by http method
+            var perMethodGrouping = apiDescriptions
+                .GroupBy(apiDesc => apiDesc.HttpMethod.Method.ToLower());
+
+            foreach (var group in perMethodGrouping)
+            {
+                var httpMethod = group.Key;
+
+                var apiDescription = (group.Count() == 1)
+                    ? group.First()
+                    : _options.ConflictingActionsResolver(group);
+
+                switch (httpMethod)
+                {
+                    case "get":
+                        pathItem.get = CreateOperation(apiDescription, schemaRegistry);
+                        break;
+                    case "put":
+                        pathItem.put = CreateOperation(apiDescription, schemaRegistry);
+                        break;
+                    case "post":
+                        pathItem.post = CreateOperation(apiDescription, schemaRegistry);
+                        break;
+                    case "delete":
+                        pathItem.delete = CreateOperation(apiDescription, schemaRegistry);
+                        break;
+                    case "options":
+                        pathItem.options = CreateOperation(apiDescription, schemaRegistry);
+                        break;
+                    case "head":
+                        pathItem.head = CreateOperation(apiDescription, schemaRegistry);
+                        break;
+                    case "patch":
+                        pathItem.patch = CreateOperation(apiDescription, schemaRegistry);
+                        break;
+                }
+            }
+
+            return pathItem;
+        }
+
+        private Operation CreateOperation(ApiDescription apiDescription, SchemaRegistry schemaRegistry)
+        {
+            var parameters = apiDescription.ParameterDescriptions
+                .Select(paramDesc =>
+                    {
+                        var inPath = apiDescription.RelativePathSansQueryString().Contains("{" + paramDesc.Name + "}");
+                        return CreateParameter(paramDesc, inPath, schemaRegistry);
+                    })
+                 .ToList();
+
+            var responses = new Dictionary<string, Response>();
+            var responseType = apiDescription.ResponseType();
+            if (responseType == null)
+                responses.Add("204", new Response { description = "No Content" });
+            else
+                responses.Add("200", new Response { description = "OK", schema = schemaRegistry.GetOrRegister(responseType) });
+
+            var operation = new Operation
+            { 
+                tags = new [] { _options.GroupingKeySelector(apiDescription) },
+                operationId = apiDescription.FriendlyId(),
+                produces = apiDescription.Produces().ToList(),
+                consumes = apiDescription.Consumes().ToList(),
+                parameters = parameters.Any() ? parameters : null, // parameters can be null but not empty
+                responses = responses,
+                deprecated = apiDescription.IsObsolete()
+            };
+
+            foreach (var filter in _options.OperationFilters)
+            {
+                filter.Apply(operation, schemaRegistry, apiDescription);
+            }
+
+            return operation;
+        }
+
+        private Parameter CreateParameter(ApiParameterDescription paramDesc, bool inPath, SchemaRegistry schemaRegistry)
+        {
+            var @in = (inPath)
+                ? "path"
+                : (paramDesc.Source == ApiParameterSource.FromUri) ? "query" : "body";
+
+            var parameter = new Parameter
+            {
+                name = paramDesc.Name,
+                @in = @in
+            };
+
+            if (paramDesc.ParameterDescriptor == null)
+            {
+                parameter.type = "string";
+                parameter.required = true;
+                return parameter; 
+            }
+
+            parameter.required = !paramDesc.ParameterDescriptor.IsOptional;
+
+            var schema = schemaRegistry.GetOrRegister(paramDesc.ParameterDescriptor.ParameterType);
+            if (parameter.@in == "body")
+                parameter.schema = schema;
+            else
+                parameter.PopulateFrom(schema);
+
+            return parameter;
+        }
     }
 }

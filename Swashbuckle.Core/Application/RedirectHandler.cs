@@ -8,23 +8,25 @@ namespace Swashbuckle.Application
 {
     public class RedirectHandler : HttpMessageHandler
     {
+        private readonly Func<HttpRequestMessage, string> _rootUrlResolver;
         private readonly string _redirectPath;
-        private readonly Func<HttpRequestMessage, string> _basePathResolver;
 
-        public RedirectHandler(string redirectPath)
+        public RedirectHandler(Func<HttpRequestMessage, string> rootUrlResolver, string redirectPath)
         {
+            _rootUrlResolver = rootUrlResolver;
             _redirectPath = redirectPath;
-            _basePathResolver = SwaggerSpecConfig.StaticInstance.BasePathResolver;
         }
 
         protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
         {
-            var redirectUri = String.Format("{0}/{1}", _basePathResolver(request).TrimEnd('/'), _redirectPath);
+            var redirectUrl = _rootUrlResolver(request) + "/" + _redirectPath;
 
             var response = request.CreateResponse(HttpStatusCode.Moved);
-            response.Headers.Location = new Uri(redirectUri);
+            response.Headers.Location = new Uri(redirectUrl);
 
-            return Task.Factory.StartNew(() => response);
+            var tsc = new TaskCompletionSource<HttpResponseMessage>();
+            tsc.SetResult(response);
+            return tsc.Task;
         }
     }
 }

@@ -16,7 +16,6 @@ namespace Swashbuckle.Dummy.Controllers
             throw new NotImplementedException();
         }
 
-        [Obsolete]
         public void Delete(int id)
         {
             throw new NotImplementedException();

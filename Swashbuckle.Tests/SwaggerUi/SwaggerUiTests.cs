@@ -1,132 +1,155 @@
-﻿using System.Net;
+﻿using System;
 using System.Net.Http;
-using System.Threading;
-using System.Web.Http.Hosting;
-using System.Web.Http.Routing;
+using System.Net;
 using NUnit.Framework;
 using Swashbuckle.Application;
-using System.Web.Http;
-using Swashbuckle.Dummy.Controllers;
 using Swashbuckle.Dummy;
+using Swashbuckle.SwaggerUi;
 
 namespace Swashbuckle.Tests.SwaggerUi
 {
     [TestFixture]
-    public class SwaggerUiTests : HttpMessageHandlerTestsBase<SwaggerUiHandler>
+    public class SwaggerUiTests : HttpMessageHandlerTestBase<SwaggerUiHandler>
     {
-        private SwaggerUiConfig _swaggerUiConfig;
-        private SwaggerSpecConfig _swaggerSpecConfig; 
-
         public SwaggerUiTests()
-            : base("swagger/ui/{*uiPath}")
-        {}
+            : base("swagger/ui/{*assetPath}")
+        { }
 
         [SetUp]
-        public void Setup()
+        public void SetUp()
         {
-            SetUpDefaultRouteFor<ProductsController>();
-
-            _swaggerSpecConfig = new SwaggerSpecConfig();
-            _swaggerUiConfig = new SwaggerUiConfig();
-            Handler = new SwaggerUiHandler(_swaggerSpecConfig, _swaggerUiConfig);
+            // Default set-up
+            SetUpHandler();
         }
 
         [Test]
-        public void It_should_serve_the_embedded_swagger_ui()
+        public void It_serves_the_embedded_swagger_ui()
         {
-            var content = GetAsString("http://tempuri.org/swagger/ui/index.html");
+            var content = GetContentAsString("http://tempuri.org/swagger/ui/index");
 
+            StringAssert.Contains("rootUrl: 'http://tempuri.org:80'", content);
+            StringAssert.Contains("discoveryPaths: arrayFrom('swagger/docs/v1')", content);
             StringAssert.Contains("swagger-ui-container", content);
         }
-
+        
         [Test]
-        public void It_should_respond_with_a_404_if_resource_not_found()
+        public void It_exposes_config_to_inject_custom_stylesheets()
         {
-            var content = ExecuteGet("http://tempuri.org/swagger/ui/no/such/resource.html");
+            SetUpHandler(c =>
+                {
+                    var assembly = typeof(SwaggerConfig).Assembly;
+                    c.InjectStylesheet(assembly, "Swashbuckle.Dummy.SwaggerExtensions.testStyles1.css");
+                    c.InjectStylesheet(assembly, "Swashbuckle.Dummy.SwaggerExtensions.testStyles2.css");
+                });
 
-            Assert.That(content.StatusCode, Is.EqualTo(HttpStatusCode.NotFound));
-        }
 
-        [Test]
-        public void It_should_support_configurable_swagger_ui_settings()
-        {
-            _swaggerUiConfig.SupportHeaderParams = true;
-            _swaggerUiConfig.SupportedSubmitMethods = new[] { HttpMethod.Get, HttpMethod.Post, HttpMethod.Put, HttpMethod.Head };
-            _swaggerUiConfig.DocExpansion = DocExpansion.Full;
-
-            var content = GetAsString("http://tempuri.org/swagger/ui/index.html");
-
-            StringAssert.Contains("supportHeaderParams: true", content);
-            StringAssert.Contains("supportedSubmitMethods: ['get','post','put','head']", content);
-            StringAssert.Contains("docExpansion: \"full\"", content);
-        }
-
-        [Test]
-        public void It_should_support_custom_stylesheet_injection()
-        {
-            var resourceAssembly = typeof(SwaggerConfig).Assembly;
-            _swaggerUiConfig.InjectStylesheet(resourceAssembly, "Swashbuckle.Dummy.SwaggerExtensions.testStyles1.css");
-            _swaggerUiConfig.InjectStylesheet(resourceAssembly, "Swashbuckle.Dummy.SwaggerExtensions.testStyles2.css");
-
-            var content = GetAsString("http://tempuri.org/swagger/ui/index.html");
+            var content = GetContentAsString("http://tempuri.org/swagger/ui/index");
 
             StringAssert.Contains(
-                "<link href='Swashbuckle.Dummy.SwaggerExtensions.testStyles1.css' rel='stylesheet' type='text/css'/>\r\n" +
-                "<link href='Swashbuckle.Dummy.SwaggerExtensions.testStyles2.css' rel='stylesheet' type='text/css'/>",
+                "<link href='ext/Swashbuckle-Dummy-SwaggerExtensions-testStyles1-css' media='screen' rel='stylesheet' type='text/css' />\r\n" +
+                "<link href='ext/Swashbuckle-Dummy-SwaggerExtensions-testStyles2-css' media='screen' rel='stylesheet' type='text/css' />",
                 content);
 
-            content = GetAsString("http://tempuri.org/swagger/ui/Swashbuckle.Dummy.SwaggerExtensions.testStyles1.css");
+            content = GetContentAsString("http://tempuri.org/swagger/ui/ext/Swashbuckle-Dummy-SwaggerExtensions-testStyles1-css");
             StringAssert.StartsWith("h1", content);
 
-            content = GetAsString("http://tempuri.org/swagger/ui/Swashbuckle.Dummy.SwaggerExtensions.testStyles2.css");
+            content = GetContentAsString("http://tempuri.org/swagger/ui/ext/Swashbuckle-Dummy-SwaggerExtensions-testStyles2-css");
             StringAssert.StartsWith("h2", content);
+        }
+        
+        [Test]
+        public void It_exposes_config_for_swagger_ui_settings()
+        {
+            SetUpHandler(c =>
+                {
+                    c.DocExpansion(DocExpansion.Full);
+                    c.BooleanValues(new[] { "1", "0" });
+                });
+
+            var content = GetContentAsString("http://tempuri.org/swagger/ui/index");
+
+            StringAssert.Contains("docExpansion: 'full'", content);
+            StringAssert.Contains("booleanValues: arrayFrom('1|0')", content);
+        }
+        
+        [Test]
+        public void It_exposes_config_for_swagger_ui_outh2_settings()
+        {
+            SetUpHandler(c => c.EnableOAuth2Support("test-client-id", "test-realm", "Swagger UI"));
+
+            var content = GetContentAsString("http://tempuri.org/swagger/ui/index");
+
+            StringAssert.Contains("oAuth2Enabled: Boolean('true')", content);
+            StringAssert.Contains("oAuth2ClientId: 'test-client-id'", content);
+            StringAssert.Contains("oAuth2Realm: 'test-realm'", content);
+            StringAssert.Contains("oAuth2AppName: 'Swagger UI'", content);
         }
 
         [Test]
-        public void It_should_support_custom_javascript_injection()
+        public void It_exposes_config_to_enable_a_discovery_url_selector()
         {
-            var resourceAssembly = typeof(SwaggerConfig).Assembly;
-            _swaggerUiConfig.InjectJavaScript(resourceAssembly, "Swashbuckle.Dummy.SwaggerExtensions.testScript1.js");
-            _swaggerUiConfig.InjectJavaScript(resourceAssembly, "Swashbuckle.Dummy.SwaggerExtensions.testScript2.js");
+            SetUpHandler(c => c.EnableDiscoveryUrlSelector());
 
-            var content = GetAsString("http://tempuri.org/swagger/ui/index.html");
+            var content = GetContentAsString("http://tempuri.org/swagger/ui/index");
+
+            StringAssert.Contains("Swashbuckle-SwaggerUi-CustomAssets-discoveryUrlSelector-js", content);
+        }
+
+        [Test]
+        public void It_exposes_config_to_inject_custom_javascripts()
+        {
+            SetUpHandler(c =>
+                {
+                    var assembly = typeof(SwaggerConfig).Assembly;
+                    c.InjectJavaScript(assembly, "Swashbuckle.Dummy.SwaggerExtensions.testScript1.js");
+                    c.InjectJavaScript(assembly, "Swashbuckle.Dummy.SwaggerExtensions.testScript2.js");
+                });
+
+            var content = GetContentAsString("http://tempuri.org/swagger/ui/index");
 
             StringAssert.Contains(
-                "customScripts: [" +
-                "'Swashbuckle.Dummy.SwaggerExtensions.testScript1.js'," +
-                "'Swashbuckle.Dummy.SwaggerExtensions.testScript2.js'" +
-                "]",
+                "customScripts: " +
+                "arrayFrom('ext/Swashbuckle-Dummy-SwaggerExtensions-testScript1-js|" +
+                "ext/Swashbuckle-Dummy-SwaggerExtensions-testScript2-js')",
                 content);
 
-            content = GetAsString("http://tempuri.org/swagger/ui/Swashbuckle.Dummy.SwaggerExtensions.testScript1.js");
+            content = GetContentAsString("http://tempuri.org/swagger/ui/ext/Swashbuckle-Dummy-SwaggerExtensions-testScript1-js");
             StringAssert.StartsWith("var str1", content);
 
-            content = GetAsString("http://tempuri.org/swagger/ui/Swashbuckle.Dummy.SwaggerExtensions.testScript2.js");
+            content = GetContentAsString("http://tempuri.org/swagger/ui/ext/Swashbuckle-Dummy-SwaggerExtensions-testScript2-js");
             StringAssert.StartsWith("var str2", content);
         }
         
         [Test]
-        public void It_should_support_customized_route_to_resource_mapping()
+        public void It_exposes_config_to_serve_custom_assets()
         {
-            var resourceAssembly = typeof(SwaggerConfig).Assembly;
-            _swaggerUiConfig.CustomRoute("index.html", resourceAssembly, "Swashbuckle.Dummy.SwaggerExtensions.myIndex.html");
+            SetUpHandler(c =>
+                {
+                    var assembly = typeof(SwaggerConfig).Assembly;
+                    c.CustomAsset("index", assembly, "Swashbuckle.Dummy.SwaggerExtensions.myIndex.html");
+                });
 
-            var content = GetAsString("http://tempuri.org/swagger/ui/index.html");
+            var content = GetContentAsString("http://tempuri.org/swagger/ui/index");
 
             StringAssert.Contains("My Index", content);
         }
-
+        
         [Test]
-        public void It_should_support_an_optional_setting_to_enable_oauth2()
+        public void It_errors_on_asset_not_found_and_returns_status_not_found()
         {
-            _swaggerUiConfig.EnableOAuth2Support("test-client-id", "test-realm", "test-app-name");
+            var response = Get("http://tempuri.org/swagger/ui/ext/foobar");
 
-            var content = GetAsString("http://tempuri.org/swagger/ui/index.html");
+            Assert.AreEqual(HttpStatusCode.NotFound, response.StatusCode);
+        }
 
-            StringAssert.Contains("oAuth2Enabled: true", content);
-            StringAssert.Contains("oAuth2ClientId: \"test-client-id\"", content);
-            StringAssert.Contains("oAuth2Realm: \"test-realm\"", content);
-            StringAssert.Contains("oAuth2AppName: \"test-app-name\"", content);
+        private void SetUpHandler(Action<SwaggerUiConfig> configure = null)
+        {
+            var swaggerUiConfig = new SwaggerUiConfig(new[] { "swagger/docs/v1" }, SwaggerDocsConfig.DefaultRootUrlResolver);
+
+            if (configure != null)
+                configure(swaggerUiConfig);
+
+            Handler = new SwaggerUiHandler(swaggerUiConfig);
         }
     }
 }

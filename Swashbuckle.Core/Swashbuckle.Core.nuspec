@@ -9,7 +9,7 @@
     <projectUrl>https://github.com/domaindrivendev/Swashbuckle</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>Seamlessly adds a Swagger to WebApi projects!</description>
-    <releaseNotes>This version of Swashbuckle includes improved support for documenting versioned API's. It also supports OAuth via the swagger-ui</releaseNotes>
+    <releaseNotes>Includes Swagger 2.0 and several enhancements to the config API</releaseNotes>
     <summary>Combines ApiExplorer and swagger/swagger-ui to provide a rich discovery and documentation experience to your API consumers. If your WebApi is self-hosted, use this package. If it's hosted in IIS, you can use the Swashbuckle package and avail of it's automatic bootstrapping.</summary>
     <copyright>Copyright 2013</copyright>
     <tags>Swagger SwaggerUi Documentation Discovery Help WebApi AspNet AspNetWebApi Docs SelfHost</tags>

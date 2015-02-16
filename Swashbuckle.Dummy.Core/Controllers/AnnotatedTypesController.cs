@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Web.Http;
+using System.Net.Http;
+using System.Net;
 
 namespace Swashbuckle.Dummy.Controllers
 {
@@ -9,6 +11,9 @@ namespace Swashbuckle.Dummy.Controllers
     {
         public int Create(Payment payment)
         {
+            if (!ModelState.IsValid)
+                throw new HttpResponseException(Request.CreateErrorResponse(HttpStatusCode.BadRequest, ModelState));
+
             throw new NotImplementedException();
         }
     }
@@ -18,9 +23,15 @@ namespace Swashbuckle.Dummy.Controllers
         [Required]
         public decimal Amount { get; set; }
 
-        [Required]
+        [Required, RegularExpression("^[3-6]?\\d{12,15}$")]
         public string CardNumber { get; set; }
 
-        public string Cvv { get; set; }
+        [Required, Range(1, 12)]
+        public int ExpMonth { get; set; }
+
+        [Required, Range(14, 99)]
+        public int ExpYear { get; set; }
+
+        public string Note { get; set; }
     }
 }
