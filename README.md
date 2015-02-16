@@ -419,14 +419,15 @@ If you're using the existing config. interface to customize the final Swagger do
 
 ## Troubleshooting and FAQ's ##
 
-1. [swagger-ui showing "Can't read swagger JSON from ..."](#swagger-ui-showing-cant-read-swagger-JSON-from)
+1. [Swagger-ui showing "Can't read swagger JSON from ..."](#swagger-ui-showing-cant-read-swagger-json-from)
 2. [Page not found when accessing the UI](#page-not-found-when-accessing-ui)
-3. [swagger-ui broken by Visual Studio 2013](#swagger-ui-broken-by-visual-studio-2013)
-4. [How to add vendor extensions](#how-to-add-vendor-extensions)
-5. [How to describe multiple API versions](#how-to-describe-multiple-api-versions)
-6. [How to configure OAuth2 support](#how-to-configure-oauth2-support)
+3. [Swagger-ui broken by Visual Studio 2013](#swagger-ui-broken-by-visual-studio-2013)
+4. [OWIN Hosted in IIS - Incorrect VirtualPathRoot Handling](#owin-hosted-in-iis-incorrect-virtualpathroot-handling)
+5. [How to add vendor extensions](#how-to-add-vendor-extensions)
+6. [How to describe multiple API versions](#how-to-describe-multiple-api-versions)
+7. [How to configure OAuth2 support](#how-to-configure-oauth2-support)
 
-### Swagger-ui showing Can't read swagger JSON from
+### Swagger-ui showing "Can't read swagger JSON from ..."
 
 If you see this message, it means the swagger-ui received an unexpected response when requesting the Swagger document. You can troubleshoot further by navigating directly to the discovery URL included in the error message. This should provide more details.
 
@@ -465,6 +466,19 @@ I hope to find a permanent fix but in the meantime, you'll need to workaround th
     <appSettings>
         <add key="vs:EnableBrowserLink" value="false"/>
     </appSettings>< appSettings>
+
+### OWIN Hosted in IIS - Incorrect VirtualPathRoot Handling
+
+When you host WebApi 2 on top of OWIN/SystemWeb, Swashbuckle cannot correctly resolve VirtualPathRoot by default.
+
+You must either explicitly set VirtualPathRoot in your HttpConfiguration at startup, or perform customization like this to fix automatic discovery:
+
+    SwaggerSpecConfig.Customize(c =>
+    {
+        c.ResolveBasePathUsing(req =>
+            req.RequestUri.GetLeftPart(UriPartial.Authority) +
+            req.GetRequestContext().VirtualPathRoot.TrimEnd('/'));
+    }
 
 ### How to add vendor extensions ###
 
