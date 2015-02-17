@@ -27,7 +27,7 @@ namespace Swashbuckle.Swagger.Filters
             {
                 var summaryNode = typeNode.SelectSingleNode(SummaryExpression);
                 if (summaryNode != null)
-                    schema.description = summaryNode.Value.Trim();
+                    schema.description = summaryNode.ExtractContent();
             }
 
             List<Type> typeList = new List<Type>();
@@ -62,7 +62,7 @@ namespace Swashbuckle.Swagger.Filters
             var propSummaryNode = propertyNode.SelectSingleNode(SummaryExpression);
             if (propSummaryNode == null) return;
 
-            schema.description = propSummaryNode.Value.Trim();
+            schema.description = propSummaryNode.ExtractContent();
         }
     }
 }

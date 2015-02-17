@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Web.Http.Controllers;
 using System.Web.Http.Description;
 using System.Xml.XPath;
@@ -16,7 +17,7 @@ namespace Swashbuckle.Swagger.Filters
         private const string RemarksExpression = "remarks";
         private const string ParameterExpression = "param";
         private const string ResponseExpression = "response";
-
+        
         private readonly XPathNavigator _navigator;
 
         public ApplyXmlActionComments(string xmlCommentsPath)
@@ -31,18 +32,18 @@ namespace Swashbuckle.Swagger.Filters
 
             var summaryNode = methodNode.SelectSingleNode(SummaryExpression);
             if (summaryNode != null)
-                operation.summary = summaryNode.Value.Trim();
+                operation.summary = summaryNode.ExtractContent();
 
             var remarksNode = methodNode.SelectSingleNode(RemarksExpression);
             if (remarksNode != null)
-                operation.description = remarksNode.Value.Trim();
+                operation.description = remarksNode.ExtractContent();
 
             ApplyParamComments(operation, methodNode);
 
             ApplyResponseComments(operation, methodNode);
         }
 
-        private static string XPathFor(HttpActionDescriptor actionDescriptor)
+		private static string XPathFor(HttpActionDescriptor actionDescriptor)
         {
             var controllerName = actionDescriptor.ControllerDescriptor.ControllerType.FullName;
             var reflectedActionDescriptor = actionDescriptor as ReflectedHttpActionDescriptor;
@@ -69,7 +70,7 @@ namespace Swashbuckle.Swagger.Filters
                 var paramNode = paramNodes.Current;
                 var parameter = operation.parameters.SingleOrDefault(param => param.name == paramNode.GetAttribute("name", ""));
                 if (parameter != null)
-                    parameter.description = paramNode.Value.Trim();
+                    parameter.description = paramNode.ExtractContent();
             }
         }
 
@@ -85,7 +86,7 @@ namespace Swashbuckle.Swagger.Filters
                 while (responseNodes.MoveNext())
                 {
                     var statusCode = responseNodes.Current.GetAttribute("code", "");
-                    var description = responseNodes.Current.Value.Trim();
+                    var description = responseNodes.Current.ExtractContent();
 
                     var response = new Response
                     {

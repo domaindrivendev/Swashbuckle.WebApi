@@ -25,17 +25,17 @@ namespace Swashbuckle.Tests.Swagger
         }
 
         [Test]
-        public void It_documents_operations_from_action_summary_and_remarks_tags()
+        public void It_documents_operations_from_action_summary_and_remarks_tags_including_paramrefs()
         {
             var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/v1");
 
             var postOp = swagger["paths"]["/xmlannotated"]["post"];
 
             Assert.IsNotNull(postOp["summary"]);
-            Assert.AreEqual("Registers a new Account", postOp["summary"].ToString());
+            Assert.AreEqual("Registers a new Account based on {account}.", postOp["summary"].ToString());
 
             Assert.IsNotNull(postOp["description"]);
-            Assert.AreEqual("Create an account to access restricted resources", postOp["description"].ToString());
+            Assert.AreEqual("Create an {Swashbuckle.Dummy.Controllers.Account} to access restricted resources", postOp["description"].ToString());
         }
 
         [Test]
@@ -64,7 +64,7 @@ namespace Swashbuckle.Tests.Swagger
                     {
                         "201", new
                         {
-                            description = "Account created",
+                            description = "{account} created",
                             schema = new
                             {
                                 format = "int32",
