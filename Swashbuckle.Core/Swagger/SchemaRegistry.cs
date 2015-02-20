@@ -117,7 +117,7 @@ namespace Swashbuckle.Swagger
 
         private Schema CreatePrimitiveSchema(JsonPrimitiveContract primitiveContract)
         {
-            var type = primitiveContract.UnderlyingType;
+            var type = Nullable.GetUnderlyingType(primitiveContract.UnderlyingType) ?? primitiveContract.UnderlyingType;
 
             if (type.IsEnum)
             {

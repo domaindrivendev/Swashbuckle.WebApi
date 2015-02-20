@@ -447,6 +447,38 @@ namespace Swashbuckle.Tests.Swagger
         }
 
         [Test]
+        public void It_handles_nullable_types()
+        {
+            SetUpDefaultRouteFor<NullableTypesController>();
+
+            var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/v1");
+            var definitions = swagger["definitions"];
+
+            var expected = JObject.FromObject(new Dictionary<string, object>
+                {
+                    {
+                        "Contact", new
+                        {
+                            type = "object",
+                            properties = new
+                            {
+                                Name = new
+                                {
+                                    type = "string"
+                                },
+                                Phone = new
+                                {
+                                    format = "int32",
+                                    type = "integer"
+                                }
+                            }
+                        }
+                    }
+                });
+            Assert.AreEqual(expected.ToString(), definitions.ToString());
+        }
+
+        [Test]
         [ExpectedException(typeof(InvalidOperationException))]
         public void It_errors_on_multiple_types_with_the_same_class_name()
         {
