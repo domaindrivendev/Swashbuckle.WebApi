@@ -45,9 +45,10 @@ namespace Swashbuckle.Application
         internal static IContractResolver GetJsonContractResolver(this HttpConfiguration httpConfig)
         {
             var formatter = httpConfig.Formatters.JsonFormatter;
-            return (formatter != null)
-                ? formatter.SerializerSettings.ContractResolver
-                : new DefaultContractResolver();
+            if (formatter != null && formatter.SerializerSettings.ContractResolver != null)
+                return formatter.SerializerSettings.ContractResolver;
+
+            return new DefaultContractResolver();
         }
 
         internal static bool HasJsonConverterOfType<T>(this HttpConfiguration httpConfig)
