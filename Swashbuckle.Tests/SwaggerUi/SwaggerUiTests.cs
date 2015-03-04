@@ -133,6 +133,34 @@ namespace Swashbuckle.Tests.SwaggerUi
 
             StringAssert.Contains("My Index", content);
         }
+
+        [Test]
+        public void It_exposes_config_to_set_validator_url()
+        {
+            SetUpHandler(c =>
+            {
+                var assembly = typeof(SwaggerConfig).Assembly;
+                c.SetValidatorUrl("http://my-validator.url");
+            });
+
+            var content = GetContentAsString("http://tempuri.org/swagger/ui/index");
+
+            StringAssert.Contains("http://my-validator.url", content);
+        }
+
+        [Test]
+        public void It_exposes_config_to_turn_of_validator()
+        {
+            SetUpHandler(c =>
+            {
+                var assembly = typeof(SwaggerConfig).Assembly;
+                c.DisableValidator();
+            });
+
+            var content = GetContentAsString("http://tempuri.org/swagger/ui/index");
+
+            StringAssert.Contains("validatorDisabled", content);
+        }
         
         [Test]
         public void It_errors_on_asset_not_found_and_returns_status_not_found()

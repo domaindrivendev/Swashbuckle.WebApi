@@ -29,6 +29,7 @@ namespace Swashbuckle.Application
                 { "%(OAuth2ClientId)", "" },
                 { "%(OAuth2Realm)", "" },
                 { "%(OAuth2AppName)", "" },
+                { "%(ValidatorUrl)", "" }
             };
             _rootUrlResolver = rootUrlResolver;
 
@@ -70,6 +71,16 @@ namespace Swashbuckle.Application
             _templateParams["%(CustomScripts)"] = stringBuilder.ToString();
 
             CustomAsset(path, resourceAssembly, resourceName);
+        }
+
+        public void SetValidatorUrl(string url)
+        {
+            _templateParams["%(ValidatorUrl)"] = url;
+        }
+
+        public void DisableValidator()
+        {
+            _templateParams["%(ValidatorUrl)"] = "validatorDisabled";
         }
 
         public void DocExpansion(DocExpansion docExpansion)
