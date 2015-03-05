@@ -457,7 +457,7 @@ Will result in a discovery URL like this "/swagger/docs/1.0" where the full-stop
 
 ### Swagger-ui broken by Visual Studio 2013 ###
 
-VS 2103 ships with a new feature - Browser Link that improves the web development workflow by setting up a channel between the IDE and pages being previewed in a local browser. It does this by dynamically injecting JavaScript into your files.
+VS 2013 ships with a new feature - Browser Link that improves the web development workflow by setting up a channel between the IDE and pages being previewed in a local browser. It does this by dynamically injecting JavaScript into your files.
 
 Although this JavaScript SHOULD have no affect on your production code, it appears to be breaking the swagger-ui.
 
