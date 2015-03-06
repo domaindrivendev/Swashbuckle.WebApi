@@ -332,7 +332,7 @@ namespace Swashbuckle.Tests.Swagger
                             LineItems = new
                             {
                                 type = "array",
-                                items = JObject.Parse("{ $ref: \"LineItem\" }")
+                                items = JObject.Parse("{ $ref: \"#/definitions/LineItem\" }")
                             }
                         }
                     },
@@ -381,7 +381,7 @@ namespace Swashbuckle.Tests.Swagger
                             SubComponents = new
                             {
                                 type = "array",
-                                items = JObject.Parse("{ $ref: \"Component\" }")
+                                items = JObject.Parse("{ $ref: \"#/definitions/Component\" }")
                             }
                         }
                     },
@@ -394,7 +394,7 @@ namespace Swashbuckle.Tests.Swagger
                     DictionaryOfSelf = new
                     {
                         type = "object",
-                        additionalProperties = JObject.Parse("{ $ref: \"DictionaryOfSelf\" }") 
+                        additionalProperties = JObject.Parse("{ $ref: \"#/definitions/DictionaryOfSelf\" }") 
                     }
                 });
             Assert.AreEqual(expected.ToString(), definitions.ToString());

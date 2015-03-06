@@ -51,7 +51,7 @@ namespace Swashbuckle.Swagger
 
         public Schema GetOrRegister(Type type)
         {
-            var schema = CreateInlineSchema(type, "#/definitions/");
+            var schema = CreateInlineSchema(type);
 
             // Ensure Schema's have been fully generated for all referenced types
             while (_referencedTypes.Any(entry => entry.Value.Schema == null))
@@ -59,7 +59,7 @@ namespace Swashbuckle.Swagger
                 var typeMapping = _referencedTypes.First(entry => entry.Value.Schema == null);
                 var schemaInfo = typeMapping.Value;
 
-                schemaInfo.Schema = CreateDefinitionSchema(typeMapping.Key, "");
+                schemaInfo.Schema = CreateDefinitionSchema(typeMapping.Key);
                 Definitions.Add(schemaInfo.SchemaId, schemaInfo.Schema);
             }
 
@@ -68,7 +68,7 @@ namespace Swashbuckle.Swagger
 
         public IDictionary<string, Schema> Definitions { get; private set; }
 
-        private Schema CreateInlineSchema(Type type, string refPrefix)
+        private Schema CreateInlineSchema(Type type)
         {
             if (_customSchemaMappings.ContainsKey(type))
                 return _customSchemaMappings[type]();
@@ -81,35 +81,35 @@ namespace Swashbuckle.Swagger
             var dictionaryContract = jsonContract as JsonDictionaryContract;
             if (dictionaryContract != null)
                 return dictionaryContract.IsSelfReferencing()
-                    ? CreateRefSchema(type, refPrefix)
-                    : CreateDictionarySchema(dictionaryContract, refPrefix);
+                    ? CreateRefSchema(type)
+                    : CreateDictionarySchema(dictionaryContract);
 
             var arrayContract = jsonContract as JsonArrayContract;
             if (arrayContract != null)
                 return arrayContract.IsSelfReferencing()
-                    ? CreateRefSchema(type, refPrefix)
-                    : CreateArraySchema(arrayContract, refPrefix);
+                    ? CreateRefSchema(type)
+                    : CreateArraySchema(arrayContract);
 
             var objectContract = jsonContract as JsonObjectContract;
             if (objectContract != null && objectContract.IsInferrable())
-                return CreateRefSchema(type, refPrefix);
+                return CreateRefSchema(type);
 
             // Fallback to abstract "object"
-            return CreateRefSchema(typeof(object), refPrefix);
+            return CreateRefSchema(typeof(object));
         }
 
-        private Schema CreateDefinitionSchema(Type type, string refPrefix)
+        private Schema CreateDefinitionSchema(Type type)
         {
             var jsonContract = _jsonContractResolver.ResolveContract(type);
 
             if (jsonContract is JsonDictionaryContract)
-                return CreateDictionarySchema((JsonDictionaryContract)jsonContract, refPrefix);
+                return CreateDictionarySchema((JsonDictionaryContract)jsonContract);
 
             if (jsonContract is JsonArrayContract)
-                return CreateArraySchema((JsonArrayContract)jsonContract, refPrefix);
+                return CreateArraySchema((JsonArrayContract)jsonContract);
 
             if (jsonContract is JsonObjectContract)
-                return CreateObjectSchema((JsonObjectContract)jsonContract, refPrefix);
+                return CreateObjectSchema((JsonObjectContract)jsonContract);
 
             throw new InvalidOperationException(
                 String.Format("Unsupported type - {0} for Defintitions. Must be Dictionary, Array or Object", type));
@@ -158,34 +158,34 @@ namespace Swashbuckle.Swagger
             }
         }
 
-        private Schema CreateDictionarySchema(JsonDictionaryContract dictionaryContract, string refPrefix)
+        private Schema CreateDictionarySchema(JsonDictionaryContract dictionaryContract)
         {
             var valueType = dictionaryContract.DictionaryValueType ?? typeof(object);
             return new Schema
                 {
                     type = "object",
-                    additionalProperties = CreateInlineSchema(valueType, refPrefix)
+                    additionalProperties = CreateInlineSchema(valueType)
                 };
         }
 
-        private Schema CreateArraySchema(JsonArrayContract arrayContract, string refPrefix)
+        private Schema CreateArraySchema(JsonArrayContract arrayContract)
         {
             var itemType = arrayContract.CollectionItemType ?? typeof(object);
             return new Schema
                 {
                     type = "array",
-                    items = CreateInlineSchema(itemType, refPrefix)
+                    items = CreateInlineSchema(itemType)
                 };
         }
 
-        private Schema CreateObjectSchema(JsonObjectContract jsonContract, string refPrefix)
+        private Schema CreateObjectSchema(JsonObjectContract jsonContract)
         {
             var properties = jsonContract.Properties
                 .Where(p => !p.Ignored)
                 .Where(p => !(_ignoreObsoleteProperties && p.IsObsolete()))
                 .ToDictionary(
                     prop => prop.PropertyName,
-                    prop => CreateInlineSchema(prop.PropertyType, refPrefix).WithValidationProperties(prop)
+                    prop => CreateInlineSchema(prop.PropertyType).WithValidationProperties(prop)
                 );
 
             var required = jsonContract.Properties.Where(prop => prop.IsRequired())
@@ -207,7 +207,7 @@ namespace Swashbuckle.Swagger
             return schema;
         }
 
-        private Schema CreateRefSchema(Type type, string refPrefix)
+        private Schema CreateRefSchema(Type type)
         {
             if (!_referencedTypes.ContainsKey(type))
             {
@@ -224,7 +224,7 @@ namespace Swashbuckle.Swagger
                 _referencedTypes.Add(type, new SchemaInfo { SchemaId = schemaId });
             }
 
-            return new Schema { @ref = refPrefix + _referencedTypes[type].SchemaId };
+            return new Schema { @ref = "#/definitions/" + _referencedTypes[type].SchemaId };
         }
 
         public string SchemaIdFor(Type type)
