@@ -160,19 +160,21 @@ namespace Swashbuckle.Swagger
 
         private Schema CreateDictionarySchema(JsonDictionaryContract dictionaryContract, string refPrefix)
         {
+            var valueType = dictionaryContract.DictionaryValueType ?? typeof(object);
             return new Schema
                 {
                     type = "object",
-                    additionalProperties = CreateInlineSchema(dictionaryContract.DictionaryValueType, refPrefix)
+                    additionalProperties = CreateInlineSchema(valueType, refPrefix)
                 };
         }
 
         private Schema CreateArraySchema(JsonArrayContract arrayContract, string refPrefix)
         {
+            var itemType = arrayContract.CollectionItemType ?? typeof(object);
             return new Schema
                 {
                     type = "array",
-                    items = CreateInlineSchema(arrayContract.CollectionItemType, refPrefix)
+                    items = CreateInlineSchema(itemType, refPrefix)
                 };
         }
 
