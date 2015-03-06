@@ -350,6 +350,9 @@ If your happy with the basic look and feel but want to make some minor tweaks, t
 
                 c.BooleanValues(new[] { "0", "1" });
 
+                c.SetValidatorUrl("http://localhost/validator");
+                c.DisableValidator();
+
                 c.DocExpansion(DocExpansion.List);
             });
 
@@ -364,6 +367,10 @@ Use this to invoke one or more custom JavaScripts after the swagger-ui has loade
 #### BooleanValues ####
 
 The swagger-ui renders boolean data types as a dropdown. By default, it provides "true" and "false" strings as the possible choices. You can use this option to change these to something else, for example 0 and 1.
+
+#### SetValidatorUrl/DisableValidator ####
+
+By default, swagger-ui will validate specs against swagger.io's online validator and display the result in a badge at the bottom of the page. Use these options to set a different validator URL or to disable the feature entirely.
 
 #### DocExpansion ####
 

@@ -23,13 +23,13 @@ namespace Swashbuckle.Application
                 { "%(StylesheetIncludes)", "" },
                 { "%(DiscoveryPaths)", String.Join("|", discoveryPaths) },
                 { "%(BooleanValues)", "true|false" },
+                { "%(ValidatorUrl)", "" },
                 { "%(CustomScripts)", "" },
                 { "%(DocExpansion)", "none" },
                 { "%(OAuth2Enabled)", "false" },
                 { "%(OAuth2ClientId)", "" },
                 { "%(OAuth2Realm)", "" },
-                { "%(OAuth2AppName)", "" },
-                { "%(ValidatorUrl)", "" }
+                { "%(OAuth2AppName)", "" }
             };
             _rootUrlResolver = rootUrlResolver;
 
@@ -59,6 +59,16 @@ namespace Swashbuckle.Application
             _templateParams["%(BooleanValues)"] = String.Join("|", values);
         }
 
+        public void SetValidatorUrl(string url)
+        {
+            _templateParams["%(ValidatorUrl)"] = url;
+        }
+
+        public void DisableValidator()
+        {
+            _templateParams["%(ValidatorUrl)"] = "null";
+        }
+
         public void InjectJavaScript(Assembly resourceAssembly, string resourceName)
         {
             var path = "ext/" + resourceName.Replace(".", "-");
@@ -71,16 +81,6 @@ namespace Swashbuckle.Application
             _templateParams["%(CustomScripts)"] = stringBuilder.ToString();
 
             CustomAsset(path, resourceAssembly, resourceName);
-        }
-
-        public void SetValidatorUrl(string url)
-        {
-            _templateParams["%(ValidatorUrl)"] = url;
-        }
-
-        public void DisableValidator()
-        {
-            _templateParams["%(ValidatorUrl)"] = "validatorDisabled";
         }
 
         public void DocExpansion(DocExpansion docExpansion)

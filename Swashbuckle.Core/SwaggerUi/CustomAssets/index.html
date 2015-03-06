@@ -34,23 +34,19 @@
 
         // Get Swashbuckle config into JavaScript
       function arrayFrom(configString) {
-          return (configString != "") ? configString.split('|') : [];
+          return (configString !== "") ? configString.split('|') : [];
       }
 
-      function validatorDisabledToNullValue(configString) {
-          if (configString === 'validatorDisabled') {
-              return null;
-          }
-
-          return configString;
+      function stringOrNullFrom(configString) {
+          return (configString !== "null") ? configString : null;
       }
 
       window.swashbuckleConfig = {
         rootUrl: '%(RootUrl)',
         discoveryPaths: arrayFrom('%(DiscoveryPaths)'),
         booleanValues: arrayFrom('%(BooleanValues)'),
+        validatorUrl: stringOrNullFrom('%(ValidatorUrl)'),
         customScripts: arrayFrom('%(CustomScripts)'),
-        validatorUrl: validatorDisabledToNullValue('%(ValidatorUrl)'),
         docExpansion: '%(DocExpansion)',
         oAuth2Enabled: Boolean('%(OAuth2Enabled)'),
         oAuth2ClientId: '%(OAuth2ClientId)',
@@ -58,43 +54,36 @@
         oAuth2AppName: '%(OAuth2AppName)'
       };
 
-      function getSwaggerUiConfig() {
-          var config = {
-              url: swashbuckleConfig.rootUrl + "/" + swashbuckleConfig.discoveryPaths[0],
-              dom_id: "swagger-ui-container",
-              booleanValues: swashbuckleConfig.booleanValues,
-              onComplete: function(swaggerApi, swaggerUi) {
-                  if (typeof initOAuth == "function" && swashbuckleConfig.oAuth2Enabled) {
-                      initOAuth({
-                          clientId: swashbuckleConfig.oAuth2ClientId,
-                          realm: swashbuckleConfig.oAuth2Realm,
-                          appName: swashbuckleConfig.oAuth2AppName
-                      });
-                  }
-                  $('pre code').each(function(i, e) {
-                      hljs.highlightBlock(e);
-                  });
-
-                  window.swaggerApi = swaggerApi;
-                  _.each(swashbuckleConfig.customScripts, function(script) {
-                      $.getScript(script);
-                  });
-              },
-              onFailure: function(data) {
-                  log("Unable to Load SwaggerUI");
-              },
-              docExpansion: swashbuckleConfig.docExpansion,
-              sorter: "alpha"
-          };
-
-          if (swashbuckleConfig.validatorUrl === null || swashbuckleConfig.validatorUrl !== '') {
-              config.validatorUrl = swashbuckleConfig.validatorUrl;
+      window.swaggerUi = new SwaggerUi({
+        url: swashbuckleConfig.rootUrl + "/" + swashbuckleConfig.discoveryPaths[0],
+        dom_id: "swagger-ui-container",
+        booleanValues: swashbuckleConfig.booleanValues,
+        onComplete: function(swaggerApi, swaggerUi){
+          if (typeof initOAuth == "function" && swashbuckleConfig.oAuth2Enabled) {
+            initOAuth({
+              clientId: swashbuckleConfig.oAuth2ClientId,
+              realm: swashbuckleConfig.oAuth2Realm,
+              appName: swashbuckleConfig.oAuth2AppName
+            });
           }
+          $('pre code').each(function(i, e) {
+            hljs.highlightBlock(e)
+          });
 
-          return config;
-      }
+          window.swaggerApi = swaggerApi;
+          _.each(swashbuckleConfig.customScripts, function(script){
+            $.getScript(script);
+          });
+        },
+        onFailure: function(data) {
+          log("Unable to Load SwaggerUI");
+        },
+        docExpansion: swashbuckleConfig.docExpansion,
+        sorter : "alpha"
+      });
 
-      window.swaggerUi = new SwaggerUi(getSwaggerUiConfig());
+      if (window.swashbuckleConfig.validatorUrl !== '')
+          window.swaggerUi.options.validatorUrl = window.swashbuckleConfig.validatorUrl;
 
       function addApiKeyAuthorization() {
         var key = $('#input_apiKey')[0].value;
