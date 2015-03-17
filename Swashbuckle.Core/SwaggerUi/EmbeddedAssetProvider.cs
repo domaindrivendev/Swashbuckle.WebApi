@@ -62,6 +62,18 @@ namespace Swashbuckle.SwaggerUi
                     return "image/gif";
                 case "png":
                     return "image/png";
+                case "eot":
+                    return "application/vnd.ms-fontobject";
+                case "woff":
+                    return "application/font-woff";
+                case "woff2":
+                    return "application/font-woff2";
+                case "otf":
+                    return "application/font-sfnt"; // formerly "font/opentype"
+                case "ttf":
+                    return "application/font-sfnt"; // formerly "font/truetype"
+                case "svg":
+                    return "image/svg+xml";
                 default:
                     return "text/html";
             }
