@@ -87,6 +87,8 @@ The default route templates for the Swagger docs and swagger-ui are "swagger/doc
         .EnableSwagger("docs/{apiVersion}/swagger", c => c.SingleApiVersion("v1", "A title for your API"))
         .EnableSwaggerUi("sandbox/{*assetPath}");
 
+In this case the URL to swagger-ui will be `sandbox/ui/index`.
+
 ### Additional Service Metadata ###
 
 In addition to operation descriptions, Swagger 2.0 includes several properties to describe the service itself. These can all be provided through the config. interface:
