@@ -1,0 +1,32 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Configuration xmlns:ctl="http://catel.codeplex.com">
+  <RootProjects xmlns:d1p1="http://schemas.datacontract.org/2004/07/Caitlyn.Models" xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+    <d1p1:RootProject>
+      <Name>Swashbuckle.Core NET40</Name>
+      <Rules xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+        <d1p1:Rule>
+          <Name>packages.config</Name>
+          <Type>DoNotAdd</Type>
+          <ProjectTypes xmlns:d1p1="http://schemas.datacontract.org/2004/07/Caitlyn" xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+            <d1p1:ProjectType>NET45</d1p1:ProjectType>
+          </ProjectTypes>
+        </d1p1:Rule>
+      </Rules>
+    </d1p1:RootProject>
+  </RootProjects>
+  <ProjectMappings xmlns:d1p1="http://schemas.datacontract.org/2004/07/Caitlyn.Models" xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+    <d1p1:ProjectMapping>
+      <SourceProject>Swashbuckle.Core NET40</SourceProject>
+      <TargetProject>Swashbuckle.Core NET45</TargetProject>
+    </d1p1:ProjectMapping>
+    <d1p1:ProjectMapping>
+      <SourceProject>Swashbuckle.Core NET40</SourceProject>
+      <TargetProject>Swashbuckle.Core NET451</TargetProject>
+    </d1p1:ProjectMapping>
+    <d1p1:ProjectMapping>
+      <SourceProject>Swashbuckle.Core NET40</SourceProject>
+      <TargetProject>Swashbuckle.Core NET452</TargetProject>
+    </d1p1:ProjectMapping>
+  </ProjectMappings>
+  <EnableAutoLink>true</EnableAutoLink>
+</Configuration>
