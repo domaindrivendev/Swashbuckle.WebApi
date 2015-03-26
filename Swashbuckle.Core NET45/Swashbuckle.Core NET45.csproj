@@ -158,9 +158,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\Swashbuckle.Core\Swashbuckle.Core.nuspec">
-      <Link>Swashbuckle.Core.nuspec</Link>
-    </None>
     <None Include="..\Swashbuckle.Core\Swashbuckle.Core.snk">
       <Link>Swashbuckle.Core.snk</Link>
     </None>

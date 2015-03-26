@@ -2,7 +2,7 @@
 <package >
   <metadata>
     <id>Swashbuckle</id>
-    <version>5.0.5</version>
+    <version>$version$</version>
     <title>Swashbuckle - Swagger for WebApi</title>
     <authors>Richard Morris</authors>
     <licenseUrl>http://opensource.org/licenses/BSD-3-Clause</licenseUrl>

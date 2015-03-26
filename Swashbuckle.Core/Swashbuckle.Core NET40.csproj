@@ -110,9 +110,6 @@
     <EmbeddedResource Include="SwaggerUi\CustomAssets\typography.css" />
     <EmbeddedResource Include="SwaggerUi\CustomAssets\index.html" />
     <EmbeddedResource Include="SwaggerUi\CustomAssets\screen.css" />
-    <Content Include="Swashbuckle.Core.nuspec">
-      <SubType>Designer</SubType>
-    </Content>
     <None Include="app.config" />
     <None Include="packages.config" />
     <None Include="Swashbuckle.Core.snk" />
