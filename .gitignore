@@ -14,3 +14,13 @@ _ReSharper.*
 *.dotCover
 *.dotsettings
 !*.proj
+/Swashbuckle.Core.Nuget.Packager/*.bak
+/Swashbuckle.Core.Nuget.Packager/*.nupkg
+/Swashbuckle.Core.Nuget.Packager/lib/net40/Swashbuckle.Core.dll
+/Swashbuckle.Core.Nuget.Packager/lib/net40/Swashbuckle.Core.pdb
+/Swashbuckle.Core.Nuget.Packager/lib/net45/Swashbuckle.Core.dll
+/Swashbuckle.Core.Nuget.Packager/lib/net45/Swashbuckle.Core.pdb
+/Swashbuckle.Core.Nuget.Packager/lib/net451/Swashbuckle.Core.dll
+/Swashbuckle.Core.Nuget.Packager/lib/net451/Swashbuckle.Core.pdb
+/Swashbuckle.Core.Nuget.Packager/lib/net452/Swashbuckle.Core.dll
+/Swashbuckle.Core.Nuget.Packager/lib/net452/Swashbuckle.Core.pdb

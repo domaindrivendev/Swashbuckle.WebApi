@@ -54,7 +54,13 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Swashbuckle.Core NET451", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Swashbuckle.Core NET452", "Swashbuckle.Core NET452\Swashbuckle.Core NET452.csproj", "{12A8F0F1-29D8-49AC-9150-FDAAF0A1B8B0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Swashbuckle.Core Nuget Packager", "Swashbuckle.Core Nuget Packager\Swashbuckle.Core Nuget Packager.csproj", "{BEE5419D-7851-4EBF-A9BD-FC10A58DABEE}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Swashbuckle.Core Nuget Packager", "Swashbuckle.Core.Nuget.Packager\Swashbuckle.Core Nuget Packager.csproj", "{BEE5419D-7851-4EBF-A9BD-FC10A58DABEE}"
+	ProjectSection(ProjectDependencies) = postProject
+		{3E507957-036A-46D2-A1A0-25DBD2709C75} = {3E507957-036A-46D2-A1A0-25DBD2709C75}
+		{5F0B077F-D34B-412F-AE19-216DD44F1B6D} = {5F0B077F-D34B-412F-AE19-216DD44F1B6D}
+		{12A8F0F1-29D8-49AC-9150-FDAAF0A1B8B0} = {12A8F0F1-29D8-49AC-9150-FDAAF0A1B8B0}
+		{D50A26FF-02C6-4C16-BA94-4CD7D43EFBB3} = {D50A26FF-02C6-4C16-BA94-4CD7D43EFBB3}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
