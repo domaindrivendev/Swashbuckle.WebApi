@@ -2,7 +2,7 @@
 <package >
   <metadata>
     <id>Swashbuckle</id>
-    <version>$version$</version>
+    <version>5.0.5</version>
     <title>Swashbuckle - Swagger for WebApi</title>
     <authors>Richard Morris</authors>
     <licenseUrl>http://opensource.org/licenses/BSD-3-Clause</licenseUrl>
@@ -14,9 +14,34 @@
     <copyright>Copyright 2013</copyright>
     <tags>Swagger SwaggerUi Documentation Discovery Help WebApi AspNet AspNetWebApi Docs WebHost IIS</tags>
     <dependencies>
-      <dependency id="Microsoft.AspNet.WebApi.WebHost" version="4.0.20710" />
-      <dependency id="WebActivatorEx" />
-      <dependency id="Swashbuckle.Core" version="5.0.4" />
+      <group targetFramework="net40">
+        <!-- Common -->
+        <dependency id="WebActivatorEx" />
+        <dependency id="Swashbuckle.Core" version="5.0.5" />
+        <!-- Net 4.0 -->
+        <dependency id="Microsoft.AspNet.WebApi.WebHost" version="4.0.30506.0" />
+      </group>
+      <group targetFramework="net45">
+        <!-- Common -->
+        <dependency id="WebActivatorEx" />
+        <dependency id="Swashbuckle.Core" version="5.0.5" />
+        <!-- Net 4.5+ -->
+        <dependency id="Microsoft.AspNet.WebApi.WebHost" version="5.2.3" />
+      </group>
+      <group targetFramework="net451">
+        <!-- Common -->
+        <dependency id="WebActivatorEx" />
+        <dependency id="Swashbuckle.Core" version="5.0.5" />
+        <!-- Net 4.5+ -->
+        <dependency id="Microsoft.AspNet.WebApi.WebHost" version="5.2.3" />
+      </group>
+      <group targetFramework="net452">
+        <!-- Common -->
+        <dependency id="WebActivatorEx" />
+        <dependency id="Swashbuckle.Core" version="5.0.5" />
+        <!-- Net 4.5+ -->
+        <dependency id="Microsoft.AspNet.WebApi.WebHost" version="5.2.3" />
+      </group>
     </dependencies>
   </metadata>
   <files>

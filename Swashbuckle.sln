@@ -1,8 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2013
-VisualStudioVersion = 12.0.30501.0
-MinimumVisualStudioVersion = 10.0.40219.1
+# Visual Studio 2012
 Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "swagger-ui", "http://localhost:55139", "{DDE07B02-DD45-4ABF-96D3-A4FBB144BBA1}"
 	ProjectSection(WebsiteProperties) = preProject
 		UseIISExpress = "true"
@@ -31,7 +29,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{67E5A2
 		.nuget\NuGet.targets = .nuget\NuGet.targets
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Swashbuckle.Core", "Swashbuckle.Core\Swashbuckle.Core.csproj", "{D50A26FF-02C6-4C16-BA94-4CD7D43EFBB3}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Swashbuckle.Core NET40", "Swashbuckle.Core\Swashbuckle.Core NET40.csproj", "{D50A26FF-02C6-4C16-BA94-4CD7D43EFBB3}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{6A2C69FA-6824-44F3-A1A5-1313050FA567}"
 EndProject
@@ -48,6 +46,20 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{C63363AF-2303-4489-8287-95D94C414663}"
 	ProjectSection(SolutionItems) = preProject
 		README.md = README.md
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Swashbuckle.Core NET45", "Swashbuckle.Core NET45\Swashbuckle.Core NET45.csproj", "{3E507957-036A-46D2-A1A0-25DBD2709C75}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Swashbuckle.Core NET451", "Swashbuckle.Core NET451\Swashbuckle.Core NET451.csproj", "{5F0B077F-D34B-412F-AE19-216DD44F1B6D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Swashbuckle.Core NET452", "Swashbuckle.Core NET452\Swashbuckle.Core NET452.csproj", "{12A8F0F1-29D8-49AC-9150-FDAAF0A1B8B0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Swashbuckle.Core.Nuget.Packager", "Swashbuckle.Core.Nuget.Packager\Swashbuckle.Core.Nuget.Packager.csproj", "{BEE5419D-7851-4EBF-A9BD-FC10A58DABEE}"
+	ProjectSection(ProjectDependencies) = postProject
+		{3E507957-036A-46D2-A1A0-25DBD2709C75} = {3E507957-036A-46D2-A1A0-25DBD2709C75}
+		{5F0B077F-D34B-412F-AE19-216DD44F1B6D} = {5F0B077F-D34B-412F-AE19-216DD44F1B6D}
+		{12A8F0F1-29D8-49AC-9150-FDAAF0A1B8B0} = {12A8F0F1-29D8-49AC-9150-FDAAF0A1B8B0}
+		{D50A26FF-02C6-4C16-BA94-4CD7D43EFBB3} = {D50A26FF-02C6-4C16-BA94-4CD7D43EFBB3}
 	EndProjectSection
 EndProject
 Global
@@ -84,6 +96,22 @@ Global
 		{2D1F2F73-5828-413C-9FD0-6F81A964C82D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2D1F2F73-5828-413C-9FD0-6F81A964C82D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2D1F2F73-5828-413C-9FD0-6F81A964C82D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3E507957-036A-46D2-A1A0-25DBD2709C75}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3E507957-036A-46D2-A1A0-25DBD2709C75}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3E507957-036A-46D2-A1A0-25DBD2709C75}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3E507957-036A-46D2-A1A0-25DBD2709C75}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5F0B077F-D34B-412F-AE19-216DD44F1B6D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5F0B077F-D34B-412F-AE19-216DD44F1B6D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5F0B077F-D34B-412F-AE19-216DD44F1B6D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5F0B077F-D34B-412F-AE19-216DD44F1B6D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{12A8F0F1-29D8-49AC-9150-FDAAF0A1B8B0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{12A8F0F1-29D8-49AC-9150-FDAAF0A1B8B0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{12A8F0F1-29D8-49AC-9150-FDAAF0A1B8B0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{12A8F0F1-29D8-49AC-9150-FDAAF0A1B8B0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BEE5419D-7851-4EBF-A9BD-FC10A58DABEE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BEE5419D-7851-4EBF-A9BD-FC10A58DABEE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BEE5419D-7851-4EBF-A9BD-FC10A58DABEE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BEE5419D-7851-4EBF-A9BD-FC10A58DABEE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

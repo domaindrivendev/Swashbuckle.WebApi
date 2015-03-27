@@ -1,0 +1,209 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{5F0B077F-D34B-412F-AE19-216DD44F1B6D}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Swashbuckle</RootNamespace>
+    <AssemblyName>Swashbuckle.Core</AssemblyName>
+    <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
+    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
+    <RestorePackages>true</RestorePackages>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Newtonsoft.Json.6.0.8\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Net.Http.Extensions">
+      <HintPath>..\packages\Microsoft.Net.Http.2.2.29\lib\net45\System.Net.Http.Extensions.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Net.Http.Formatting, Version=5.2.3.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Microsoft.AspNet.WebApi.Client.5.2.3\lib\net45\System.Net.Http.Formatting.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Net.Http.Primitives">
+      <HintPath>..\packages\Microsoft.Net.Http.2.2.29\lib\net45\System.Net.Http.Primitives.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Net.Http.WebRequest" />
+    <Reference Include="System.Web.Http, Version=5.2.3.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Microsoft.AspNet.WebApi.Core.5.2.3\lib\net45\System.Web.Http.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\Swashbuckle.Core\Application\ContactBuilder.cs">
+      <Link>Application\ContactBuilder.cs</Link>
+    </Compile>
+    <Compile Include="..\Swashbuckle.Core\Application\HttpConfigurationExtensions.cs">
+      <Link>Application\HttpConfigurationExtensions.cs</Link>
+    </Compile>
+    <Compile Include="..\Swashbuckle.Core\Application\InfoBuilder.cs">
+      <Link>Application\InfoBuilder.cs</Link>
+    </Compile>
+    <Compile Include="..\Swashbuckle.Core\Application\LicenseBuilder.cs">
+      <Link>Application\LicenseBuilder.cs</Link>
+    </Compile>
+    <Compile Include="..\Swashbuckle.Core\Application\RedirectHandler.cs">
+      <Link>Application\RedirectHandler.cs</Link>
+    </Compile>
+    <Compile Include="..\Swashbuckle.Core\Application\SecuritySchemeBuilder.cs">
+      <Link>Application\SecuritySchemeBuilder.cs</Link>
+    </Compile>
+    <Compile Include="..\Swashbuckle.Core\Application\SwaggerDocsConfig.cs">
+      <Link>Application\SwaggerDocsConfig.cs</Link>
+    </Compile>
+    <Compile Include="..\Swashbuckle.Core\Application\SwaggerDocsHandler.cs">
+      <Link>Application\SwaggerDocsHandler.cs</Link>
+    </Compile>
+    <Compile Include="..\Swashbuckle.Core\Application\SwaggerUiConfig.cs">
+      <Link>Application\SwaggerUiConfig.cs</Link>
+    </Compile>
+    <Compile Include="..\Swashbuckle.Core\Application\SwaggerUiHandler.cs">
+      <Link>Application\SwaggerUiHandler.cs</Link>
+    </Compile>
+    <Compile Include="..\Swashbuckle.Core\Application\VendorExtensionsConverter.cs">
+      <Link>Application\VendorExtensionsConverter.cs</Link>
+    </Compile>
+    <Compile Include="..\Swashbuckle.Core\Application\VersionInfoBuilder.cs">
+      <Link>Application\VersionInfoBuilder.cs</Link>
+    </Compile>
+    <Compile Include="..\Swashbuckle.Core\SwaggerUi\EmbeddedAssetDescriptor.cs">
+      <Link>SwaggerUi\EmbeddedAssetDescriptor.cs</Link>
+    </Compile>
+    <Compile Include="..\Swashbuckle.Core\SwaggerUi\EmbeddedAssetProvider.cs">
+      <Link>SwaggerUi\EmbeddedAssetProvider.cs</Link>
+    </Compile>
+    <Compile Include="..\Swashbuckle.Core\SwaggerUi\IAssetProvider.cs">
+      <Link>SwaggerUi\IAssetProvider.cs</Link>
+    </Compile>
+    <Compile Include="..\Swashbuckle.Core\SwaggerUi\StreamExtensions.cs">
+      <Link>SwaggerUi\StreamExtensions.cs</Link>
+    </Compile>
+    <Compile Include="..\Swashbuckle.Core\Swagger\ApiDescriptionExtensions.cs">
+      <Link>Swagger\ApiDescriptionExtensions.cs</Link>
+    </Compile>
+    <Compile Include="..\Swashbuckle.Core\Swagger\Filters\ApplyXmlActionComments.cs">
+      <Link>Swagger\Filters\ApplyXmlActionComments.cs</Link>
+    </Compile>
+    <Compile Include="..\Swashbuckle.Core\Swagger\Filters\ApplyXmlTypeComments.cs">
+      <Link>Swagger\Filters\ApplyXmlTypeComments.cs</Link>
+    </Compile>
+    <Compile Include="..\Swashbuckle.Core\Swagger\Filters\HandleFromUriParams.cs">
+      <Link>Swagger\Filters\HandleFromUriParams.cs</Link>
+    </Compile>
+    <Compile Include="..\Swashbuckle.Core\Swagger\Filters\XmlCommentsExtensions.cs">
+      <Link>Swagger\Filters\XmlCommentsExtensions.cs</Link>
+    </Compile>
+    <Compile Include="..\Swashbuckle.Core\Swagger\IDocumentFilter.cs">
+      <Link>Swagger\IDocumentFilter.cs</Link>
+    </Compile>
+    <Compile Include="..\Swashbuckle.Core\Swagger\IOperationFilter.cs">
+      <Link>Swagger\IOperationFilter.cs</Link>
+    </Compile>
+    <Compile Include="..\Swashbuckle.Core\Swagger\ISchemaFilter.cs">
+      <Link>Swagger\ISchemaFilter.cs</Link>
+    </Compile>
+    <Compile Include="..\Swashbuckle.Core\Swagger\ISwaggerProvider.cs">
+      <Link>Swagger\ISwaggerProvider.cs</Link>
+    </Compile>
+    <Compile Include="..\Swashbuckle.Core\Swagger\JsonContractExtensions.cs">
+      <Link>Swagger\JsonContractExtensions.cs</Link>
+    </Compile>
+    <Compile Include="..\Swashbuckle.Core\Swagger\JsonPropertyExtensions.cs">
+      <Link>Swagger\JsonPropertyExtensions.cs</Link>
+    </Compile>
+    <Compile Include="..\Swashbuckle.Core\Swagger\SchemaExtensions.cs">
+      <Link>Swagger\SchemaExtensions.cs</Link>
+    </Compile>
+    <Compile Include="..\Swashbuckle.Core\Swagger\SchemaRegistry.cs">
+      <Link>Swagger\SchemaRegistry.cs</Link>
+    </Compile>
+    <Compile Include="..\Swashbuckle.Core\Swagger\SwaggerDocument.cs">
+      <Link>Swagger\SwaggerDocument.cs</Link>
+    </Compile>
+    <Compile Include="..\Swashbuckle.Core\Swagger\SwaggerGenerator.cs">
+      <Link>Swagger\SwaggerGenerator.cs</Link>
+    </Compile>
+    <Compile Include="..\Swashbuckle.Core\Swagger\SwaggerGeneratorOptions.cs">
+      <Link>Swagger\SwaggerGeneratorOptions.cs</Link>
+    </Compile>
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="..\Swashbuckle.Core\SwaggerUi\CustomAssets\discoveryUrlSelector.js">
+      <Link>SwaggerUi\CustomAssets\discoveryUrlSelector.js</Link>
+    </Content>
+    <Content Include="..\Swashbuckle.Core\SwaggerUi\CustomAssets\index.html">
+      <Link>SwaggerUi\CustomAssets\index.html</Link>
+    </Content>
+    <Content Include="..\Swashbuckle.Core\SwaggerUi\CustomAssets\screen.css">
+      <Link>SwaggerUi\CustomAssets\screen.css</Link>
+    </Content>
+    <Content Include="..\Swashbuckle.Core\SwaggerUi\CustomAssets\swagger-oauth.js">
+      <Link>SwaggerUi\CustomAssets\swagger-oauth.js</Link>
+    </Content>
+    <Content Include="..\Swashbuckle.Core\SwaggerUi\CustomAssets\typography.css">
+      <Link>SwaggerUi\CustomAssets\typography.css</Link>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\Swashbuckle.Core\Swashbuckle.Core.snk">
+      <Link>Swashbuckle.Core.snk</Link>
+    </None>
+    <None Include="app.config" />
+    <None Include="packages.config" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Enable NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('$(SolutionDir)\.nuget\NuGet.targets')" Text="$([System.String]::Format('$(ErrorText)', '$(SolutionDir)\.nuget\NuGet.targets'))" />
+    <Error Condition="!Exists('..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets'))" />
+  </Target>
+  <Import Project="..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets" Condition="Exists('..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets')" />
+  <PropertyGroup>
+    <PostBuildEvent>xcopy /y "$(TargetDir)Swashbuckle.Core.dll" "$(SolutionDir)Swashbuckle.Core.Nuget.Packager\lib\net451"
+xcopy /y "$(TargetDir)Swashbuckle.Core.pdb" "$(SolutionDir)Swashbuckle.Core.Nuget.Packager\lib\net451"</PostBuildEvent>
+  </PropertyGroup>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
