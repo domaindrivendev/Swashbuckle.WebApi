@@ -98,6 +98,7 @@
     <Compile Include="SwaggerUi\EmbeddedAssetProvider.cs" />
     <Compile Include="SwaggerUi\IAssetProvider.cs" />
     <Compile Include="SwaggerUi\StreamExtensions.cs" />
+    <Compile Include="Swagger\XmlExtensions.cs" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>

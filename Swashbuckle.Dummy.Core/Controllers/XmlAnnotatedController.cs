@@ -7,11 +7,11 @@ namespace Swashbuckle.Dummy.Controllers
     public class XmlAnnotatedController : ApiController
     {
         /// <summary>
-        /// Registers a new Account
+        /// Registers a new Account based on <paramref name="account"/>.
         /// </summary>
-        /// <remarks>Create an account to access restricted resources</remarks>
+        /// <remarks>Create an <see cref="Account"/> to access restricted resources</remarks>
         /// <param name="account">Details for the account to be created</param>
-        /// <response code="201">Account created</response>
+        /// <response code="201"><paramref name="account"/> created</response>
         /// <response code="400">Username already in use</response>
         public int Create(Account account)
         {
