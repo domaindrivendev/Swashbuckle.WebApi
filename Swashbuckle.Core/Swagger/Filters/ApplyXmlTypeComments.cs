@@ -4,6 +4,8 @@ using System.Linq;
 using System.Collections.Generic;
 using System.Text;
 using Swashbuckle.Swagger;
+using System.Collections;
+using System.Xml;
 
 namespace Swashbuckle.Swagger.Filters
 {
@@ -12,6 +14,8 @@ namespace Swashbuckle.Swagger.Filters
         private const string TypeExpression = "/doc/members/member[@name='T:{0}']";
         private const string SummaryExpression = "summary";
         private const string PropertyExpression = "/doc/members/member[@name='P:{0}.{1}']";
+        private List<string> xmlMemberNames = new List<string>();
+        private Hashtable logAcceptedMemberNames = new Hashtable();
 
         private readonly XPathNavigator _navigator;
 
@@ -53,6 +57,48 @@ namespace Swashbuckle.Swagger.Filters
             XPathNavigator propertyNode = null;
             foreach (Type t in typeList)
             {
+                string xmlPath = "/doc/members/member";
+                XPathNavigator memberTag = _navigator.SelectSingleNode(xmlPath);
+                string currentNameAttribute = t.XmlCommentsQualifier();
+                bool jsonDataComment = false;
+
+                do
+                {
+                    if (currentNameAttribute.Equals("System.Object"))
+                    {
+                        break;
+                    }
+                    string nameAttribute = memberTag.GetAttribute("name", "");
+                    if (xmlMemberNames.Contains(nameAttribute))
+                    {
+                        jsonDataComment = true;
+                        break;
+                    }
+                    if (nameAttribute.Contains(currentNameAttribute))
+                    {
+                        if (logAcceptedMemberNames.Contains(nameAttribute))
+                        {
+                            continue;
+                        }
+                        xmlMemberNames.Add(nameAttribute);
+                        logAcceptedMemberNames.Add(nameAttribute, true);
+                        jsonDataComment = true;
+                    }
+                } while (memberTag.MoveToNext());
+
+                if (jsonDataComment)
+                {
+                    string nameAttribute = xmlMemberNames.First();
+                    string newPropertyExpression = "/doc/members/member[@name='" + nameAttribute + "']";
+                    xmlMemberNames.Remove(nameAttribute);
+                    propertyNode = _navigator.SelectSingleNode(newPropertyExpression);
+                    if (propertyNode != null)
+                    {
+                        break;
+                    }
+                }
+                _navigator.MoveToRoot();
+
                 var propertyXPath = String.Format(PropertyExpression, t.XmlCommentsQualifier(), assumedMemberName);
                 propertyNode = _navigator.SelectSingleNode(propertyXPath);
                 if (propertyNode != null) break;
