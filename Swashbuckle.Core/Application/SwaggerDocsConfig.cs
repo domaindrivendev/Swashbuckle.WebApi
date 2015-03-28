@@ -45,6 +45,7 @@ namespace Swashbuckle.Application
             _rootUrlResolver = DefaultRootUrlResolver;
 
             OperationFilter<HandleFromUriParams>();
+            OperationFilter<AddResponseFromAttributes>();
         }
 
         public InfoBuilder SingleApiVersion(string version, string title)

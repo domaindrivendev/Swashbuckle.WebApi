@@ -71,6 +71,7 @@
     </Compile>
     <Compile Include="Swagger\DefaultRootUrlResolverTests.cs" />
     <Compile Include="Swagger\FromUriParamsTests.cs" />
+    <Compile Include="Swagger\ResponseAttributeTests.cs" />
     <Compile Include="Swagger\SchemaTests.cs" />
     <Compile Include="Swagger\CoreTests.cs" />
     <Compile Include="Swagger\SecurityTests.cs" />
