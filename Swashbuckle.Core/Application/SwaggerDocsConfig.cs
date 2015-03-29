@@ -8,6 +8,7 @@ using System.Web.Http.Description;
 using Newtonsoft.Json.Converters;
 using Swashbuckle.Swagger;
 using Swashbuckle.Swagger.Filters;
+using Swashbuckle.Swagger.Annotations;
 
 namespace Swashbuckle.Application
 {
@@ -45,6 +46,7 @@ namespace Swashbuckle.Application
             _rootUrlResolver = DefaultRootUrlResolver;
 
             OperationFilter<HandleFromUriParams>();
+            OperationFilter<AddResponseFromAttributes>();
         }
 
         public InfoBuilder SingleApiVersion(string version, string title)
