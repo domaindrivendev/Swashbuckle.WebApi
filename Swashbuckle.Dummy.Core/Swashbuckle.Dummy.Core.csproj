@@ -86,6 +86,8 @@
     <Compile Include="SwaggerExtensions\ApplyDocumentVendorExtensions.cs" />
     <Compile Include="SwaggerExtensions\AssignOAuth2SecurityRequirements.cs" />
     <Compile Include="SwaggerExtensions\DescendingAlphabeticComparer.cs" />
+    <Compile Include="SwaggerExtensions\ErrorResponseOperationFilter.cs" />
+    <Compile Include="SwaggerExtensions\SwaggerResponseModelAttribute.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="App_Start\SwaggerConfig.cs" />
