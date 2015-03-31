@@ -65,6 +65,7 @@
     <Reference Include="System.XML" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Swagger\Annotations\SwaggerResponseRemoveDefaultsAttribute.cs" />
     <Compile Include="Swagger\Annotations\SwaggerResponseAttribute.cs" />
     <Compile Include="Application\VendorExtensionsConverter.cs" />
     <Compile Include="Application\RedirectHandler.cs" />
@@ -78,7 +79,7 @@
     <Compile Include="Application\InfoBuilder.cs" />
     <Compile Include="Application\SwaggerDocsConfig.cs" />
     <Compile Include="Application\HttpConfigurationExtensions.cs" />
-    <Compile Include="Swagger\Annotations\AddResponseFromAttributes.cs" />
+    <Compile Include="Swagger\Annotations\AddResponsesFromAttributes.cs" />
     <Compile Include="Swagger\Filters\ApplyXmlTypeComments.cs" />
     <Compile Include="Swagger\Filters\ApplyXmlActionComments.cs" />
     <Compile Include="Swagger\Filters\HandleFromUriParams.cs" />

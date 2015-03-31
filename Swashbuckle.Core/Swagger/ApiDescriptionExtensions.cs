@@ -66,5 +66,17 @@ namespace Swashbuckle.Swagger
         {
             return apiDescription.ActionDescriptor.GetCustomAttributes<ObsoleteAttribute>().Any();
         }
+
+        public static IEnumerable<TAttribute> GetControllerAndActionAttributes<TAttribute>(this ApiDescription apiDesc)
+            where TAttribute : class 
+        {
+            var controllerAttributes = apiDesc.ActionDescriptor.ControllerDescriptor
+                .GetCustomAttributes<TAttribute>();
+
+            var actionAttributes = apiDesc.ActionDescriptor
+                .GetCustomAttributes<TAttribute>();
+
+            return controllerAttributes.Concat(actionAttributes);
+        }
     }
 }

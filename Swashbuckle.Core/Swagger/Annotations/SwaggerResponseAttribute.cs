@@ -1,41 +1,39 @@
-﻿namespace Swashbuckle.Swagger.Annotations
-{
-    using System;
-    using System.Net;
+﻿using System;
+using System.Net;
 
+namespace Swashbuckle.Swagger.Annotations
+{
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = true)]
     public class SwaggerResponseAttribute : Attribute
     {
-        public SwaggerResponseAttribute(HttpStatusCode statusCode, Type type, string description = null)
+        public SwaggerResponseAttribute(HttpStatusCode statusCode)
         {
             StatusCode = (int)statusCode;
-            Description = description;
-            ResponseType = type;
         }
 
-        public SwaggerResponseAttribute(int statusCode, Type type, string description = null)
+        public SwaggerResponseAttribute(HttpStatusCode statusCode, string description = null, Type type = null)
+            : this(statusCode)
+        {
+            Description = description;
+            Type = type;
+        }
+
+        public SwaggerResponseAttribute(int statusCode)
         {
             StatusCode = statusCode;
-            Description = description;
-            ResponseType = type;
         }
 
-        public SwaggerResponseAttribute(HttpStatusCode statusCode, string description = null)
+        public SwaggerResponseAttribute(int statusCode, string description = null, Type type = null)
+            : this(statusCode)
         {
-            StatusCode = (int)statusCode;
             Description = description;
-        }
-
-        public SwaggerResponseAttribute(int statusCode, string description = null)
-        {
-            StatusCode = statusCode;
-            Description = description;
+            Type = type;
         }
 
         public int StatusCode { get; private set; }
 
-        public string Description { get; private set; }
+        public string Description { get; set; }
 
-        public Type ResponseType { get; private set; }
+        public Type Type { get; set; }
     }
 }
