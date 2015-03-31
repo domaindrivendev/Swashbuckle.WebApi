@@ -56,6 +56,11 @@
             Provide a display name to use instead of Username when signed in
             </summary>
         </member>
+        <member name="P:Swashbuckle.Dummy.Controllers.Account.AccountPreferences.AllowMarketingEmails">
+            <summary>
+            Flag to indicate if marketing emails may be sent
+            </summary>
+        </member>
         <member name="T:Swashbuckle.Dummy.Controllers.SubAccount">
             <summary>
             A Sub-Type of Account

@@ -80,10 +80,11 @@
     <Compile Include="Application\SwaggerDocsConfig.cs" />
     <Compile Include="Application\HttpConfigurationExtensions.cs" />
     <Compile Include="Swagger\Annotations\AddResponsesFromAttributes.cs" />
-    <Compile Include="Swagger\Filters\ApplyXmlTypeComments.cs" />
-    <Compile Include="Swagger\Filters\ApplyXmlActionComments.cs" />
-    <Compile Include="Swagger\Filters\HandleFromUriParams.cs" />
-    <Compile Include="Swagger\Filters\XmlCommentsExtensions.cs" />
+    <Compile Include="Swagger\IModelFilter.cs" />
+    <Compile Include="Swagger\XmlComments\ApplyXmlTypeComments.cs" />
+    <Compile Include="Swagger\XmlComments\ApplyXmlActionComments.cs" />
+    <Compile Include="Swagger\FromUriParams\HandleFromUriParams.cs" />
+    <Compile Include="Swagger\XmlComments\TypeExtensions.cs" />
     <Compile Include="Swagger\JsonContractExtensions.cs" />
     <Compile Include="Swagger\JsonPropertyExtensions.cs" />
     <Compile Include="SwaggerUi\EmbeddedAssetDescriptor.cs" />
@@ -101,7 +102,7 @@
     <Compile Include="SwaggerUi\EmbeddedAssetProvider.cs" />
     <Compile Include="SwaggerUi\IAssetProvider.cs" />
     <Compile Include="SwaggerUi\StreamExtensions.cs" />
-    <Compile Include="Swagger\XmlExtensions.cs" />
+    <Compile Include="Swagger\XmlComments\XPathNavigatorExtensions.cs" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Web.Http;
+using Newtonsoft.Json;
 
 namespace Swashbuckle.Dummy.Controllers
 {
@@ -78,6 +79,12 @@ namespace Swashbuckle.Dummy.Controllers
             /// Provide a display name to use instead of Username when signed in
             /// </summary>
             public string DisplayName { get; set; }
+
+            /// <summary>
+            /// Flag to indicate if marketing emails may be sent
+            /// </summary>
+            [JsonProperty("allow-marketing-emails")]
+            public string AllowMarketingEmails { get; set; }            
         }
     }
 
@@ -86,7 +93,6 @@ namespace Swashbuckle.Dummy.Controllers
     /// </summary>
     public class SubAccount : Account
     {
-
         /// <summary>
         /// The Account ID for SubAccounts should be 7 digits.
         /// </summary>

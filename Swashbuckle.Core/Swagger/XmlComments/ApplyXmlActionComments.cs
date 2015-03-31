@@ -8,7 +8,7 @@ using System.Web.Http.Description;
 using System.Xml.XPath;
 using Swashbuckle.Swagger;
 
-namespace Swashbuckle.Swagger.Filters
+namespace Swashbuckle.Swagger.XmlComments
 {
     public class ApplyXmlActionComments : IOperationFilter
     {

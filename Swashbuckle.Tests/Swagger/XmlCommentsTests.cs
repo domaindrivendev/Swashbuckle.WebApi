@@ -108,7 +108,7 @@ namespace Swashbuckle.Tests.Swagger
         }
 
         [Test]
-        public void It_documents_schema_properties_including_property_summay_tags_from_base_classes()
+        public void It_documents_schema_properties_including_property_summary_tags_from_base_classes()
         {
             var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/v1");
 
@@ -146,6 +146,15 @@ namespace Swashbuckle.Tests.Swagger
             var displayNameProperty = swagger["definitions"]["AccountPreferences"]["properties"]["DisplayName"];
             Assert.IsNotNull(displayNameProperty["description"]);
             Assert.AreEqual("Provide a display name to use instead of Username when signed in", displayNameProperty["description"].ToString());
+        }
+
+        [Test]
+        public void It_handles_json_annotated_properties()
+        {
+            var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/v1");
+            var marketingEmailsProperty = swagger["definitions"]["AccountPreferences"]["properties"]["allow-marketing-emails"];
+            Assert.IsNotNull(marketingEmailsProperty["description"]);
+            Assert.AreEqual("Flag to indicate if marketing emails may be sent", marketingEmailsProperty["description"].ToString());
         }
     }
 }

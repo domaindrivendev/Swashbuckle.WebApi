@@ -6,22 +6,13 @@ using System.Text.RegularExpressions;
 using System.Xml;
 using System.Xml.XPath;
 
-namespace Swashbuckle.Swagger
+namespace Swashbuckle.Swagger.XmlComments
 {
-    /// <summary>
-    /// Extension methods for XML objects
-    /// </summary>
-    public static class XmlExtensions
+    public static class XPathNavigatorExtensiosn
     {
         private static Regex ParamPattern = new Regex(@"<(see|paramref) (name|cref)=""([TPF]{1}:)?(?<display>.+?)"" />");
         private static Regex ConstPattern = new Regex(@"<c>(?<display>.+?)</c>");
 
-        /// <summary>
-        /// Extracts the display content of the specified <paramref name="node"/>, replacing
-        /// paramref and c tags with a human-readable equivalent.
-        /// </summary>
-        /// <param name="node">The XML node from which to extract content.</param>
-        /// <returns>The extracted content.</returns>
         public static string ExtractContent(this XPathNavigator node)
         {
             if (node == null) return null;

@@ -10,7 +10,6 @@ using Swashbuckle.Application;
 using Swashbuckle.Dummy;
 using Swashbuckle.Dummy.Controllers;
 using Swashbuckle.Dummy.SwaggerExtensions;
-using Swashbuckle.Swagger.Filters;
 
 namespace Swashbuckle.Tests.Swagger
 {

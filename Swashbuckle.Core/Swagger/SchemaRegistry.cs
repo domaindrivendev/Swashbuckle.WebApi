@@ -19,6 +19,7 @@ namespace Swashbuckle.Swagger
         private readonly IContractResolver _jsonContractResolver;
         private readonly IDictionary<Type, Func<Schema>> _customSchemaMappings;
         private readonly IEnumerable<ISchemaFilter> _schemaFilters;
+        private readonly IEnumerable<IModelFilter> _modelFilters;
         private readonly bool _ignoreObsoleteProperties;
         private readonly bool _useFullTypeNameInSchemaIds;
         private readonly bool _describeAllEnumsAsStrings;
@@ -34,6 +35,7 @@ namespace Swashbuckle.Swagger
             IContractResolver jsonContractResolver,
             IDictionary<Type, Func<Schema>> customSchemaMappings,
             IEnumerable<ISchemaFilter> schemaFilters,
+            IEnumerable<IModelFilter> modelFilters,
             bool ignoreObsoleteProperties,
             bool useFullTypeNameInSchemaIds,
             bool describeAllEnumsAsStrings)
@@ -41,6 +43,7 @@ namespace Swashbuckle.Swagger
             _jsonContractResolver = jsonContractResolver;
             _customSchemaMappings = customSchemaMappings;
             _schemaFilters = schemaFilters;
+            _modelFilters = modelFilters;
             _ignoreObsoleteProperties = ignoreObsoleteProperties;
             _useFullTypeNameInSchemaIds = useFullTypeNameInSchemaIds;
             _describeAllEnumsAsStrings = describeAllEnumsAsStrings;
@@ -202,6 +205,13 @@ namespace Swashbuckle.Swagger
             foreach (var filter in _schemaFilters)
             {
                 filter.Apply(schema, this, jsonContract.UnderlyingType);
+            }
+
+            // NOTE: In next major version, _modelFilters will completely replace _schemaFilters
+            var modelFilterContext = new ModelFilterContext(jsonContract.UnderlyingType, jsonContract, this);
+            foreach (var filter in _modelFilters)
+            {
+                filter.Apply(schema, modelFilterContext);
             }
 
             return schema;

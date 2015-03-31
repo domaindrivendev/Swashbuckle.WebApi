@@ -16,6 +16,7 @@ namespace Swashbuckle.Swagger
             IComparer<string> groupingKeyComparer = null,
             IDictionary<Type, Func<Schema>> customSchemaMappings = null,
             IEnumerable<ISchemaFilter> schemaFilters = null,
+            IEnumerable<IModelFilter> modelFilters = null,
             bool ignoreObsoleteProperties = false, 
             bool useFullTypeNameInSchemaIds = false, 
             bool describeAllEnumsAsStrings = false,
@@ -32,6 +33,7 @@ namespace Swashbuckle.Swagger
             GroupingKeyComparer = groupingKeyComparer ?? Comparer<string>.Default;
             CustomSchemaMappings = customSchemaMappings ?? new Dictionary<Type, Func<Schema>>();
             SchemaFilters = schemaFilters ?? new List<ISchemaFilter>();
+            ModelFilters = modelFilters ?? new List<IModelFilter>();
             IgnoreObsoleteProperties = ignoreObsoleteProperties;
             UseFullTypeNameInSchemaIds = useFullTypeNameInSchemaIds;
             DescribeAllEnumsAsStrings = describeAllEnumsAsStrings;
@@ -55,6 +57,8 @@ namespace Swashbuckle.Swagger
         public IDictionary<Type, Func<Schema>> CustomSchemaMappings { get; private set; }
 
         public IEnumerable<ISchemaFilter> SchemaFilters { get; private set; }
+
+        public IEnumerable<IModelFilter> ModelFilters { get; private set; }
 
         public bool IgnoreObsoleteProperties { get; private set; }
 

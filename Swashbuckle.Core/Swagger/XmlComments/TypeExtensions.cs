@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Swashbuckle.Swagger.Filters
+namespace Swashbuckle.Swagger.XmlComments
 {
     public static class XmlCommentsExtensions
     {

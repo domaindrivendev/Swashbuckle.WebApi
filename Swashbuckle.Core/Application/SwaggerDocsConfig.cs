@@ -7,8 +7,9 @@ using System.Web.Http;
 using System.Web.Http.Description;
 using Newtonsoft.Json.Converters;
 using Swashbuckle.Swagger;
-using Swashbuckle.Swagger.Filters;
+using Swashbuckle.Swagger.FromUriParams;
 using Swashbuckle.Swagger.Annotations;
+using Swashbuckle.Swagger.XmlComments;
 
 namespace Swashbuckle.Application
 {
@@ -23,6 +24,7 @@ namespace Swashbuckle.Application
         private IComparer<string> _groupingKeyComparer;
         private readonly IDictionary<Type, Func<Schema>> _customSchemaMappings;
         private readonly IList<Func<ISchemaFilter>> _schemaFilters;
+        private readonly IList<Func<IModelFilter>> _modelFilters;
         private bool _ignoreObsoleteProperties;
         private bool _useFullTypeNameInSchemaIds;
         private bool _describeAllEnumsAsStrings;
@@ -38,6 +40,7 @@ namespace Swashbuckle.Application
             _ignoreObsoleteActions = false;
             _customSchemaMappings = new Dictionary<Type, Func<Schema>>();
             _schemaFilters = new List<Func<ISchemaFilter>>();
+            _modelFilters = new List<Func<IModelFilter>>();
             _ignoreObsoleteProperties = false;
             _useFullTypeNameInSchemaIds = false;
             _describeAllEnumsAsStrings = false;
@@ -122,6 +125,19 @@ namespace Swashbuckle.Application
             _schemaFilters.Add(factory);
         }
 
+        // NOTE: In next major version, ModelFilter will completely replace SchemaFilter
+        internal  void ModelFilter<TFilter>()
+            where TFilter : IModelFilter, new()
+        {
+            ModelFilter(() => new TFilter());
+        }
+
+        // NOTE: In next major version, ModelFilter will completely replace SchemaFilter
+        internal void ModelFilter(Func<IModelFilter> factory)
+        {
+            _modelFilters.Add(factory);
+        }
+
         public void UseFullTypeNameInSchemaIds()
         {
             _useFullTypeNameInSchemaIds = true;
@@ -162,7 +178,7 @@ namespace Swashbuckle.Application
         public void IncludeXmlComments(string filePath)
         {
             OperationFilter(() => new ApplyXmlActionComments(filePath));
-            SchemaFilter(() => new ApplyXmlTypeComments(filePath));
+            ModelFilter(() => new ApplyXmlTypeComments(filePath));
         }
 
         public void ResolveConflictingActions(Func<IEnumerable<ApiDescription>, ApiDescription> conflictingActionsResolver)
@@ -195,6 +211,7 @@ namespace Swashbuckle.Application
                 groupingKeyComparer: _groupingKeyComparer,
                 customSchemaMappings: _customSchemaMappings,
                 schemaFilters: _schemaFilters.Select(factory => factory()),
+                modelFilters: _modelFilters.Select(factory => factory()),
                 ignoreObsoleteProperties: _ignoreObsoleteProperties,
                 useFullTypeNameInSchemaIds: _useFullTypeNameInSchemaIds,
                 describeAllEnumsAsStrings: describeAllEnumsAsStrings,
