@@ -241,7 +241,7 @@ namespace Swashbuckle.Swagger
         {
             var typeName = type.Name;
             if (_useFullTypeNameInSchemaIds)
-                typeName = type.Namespace + "." + typeName;
+                typeName = type.FullName;
 
             if (type.IsGenericType)
             {
