@@ -52,7 +52,7 @@ namespace Swashbuckle.Swagger.XmlComments
                 : actionDescriptor.ActionName;
 
             var paramTypeNames = actionDescriptor.GetParameters()
-                .Select(paramDesc => paramDesc.ParameterType.XmlCommentsQualifier())
+                .Select(paramDesc => paramDesc.ParameterType.XmlCommentsId())
                 .ToArray();
 
             var parameters = (paramTypeNames.Any())

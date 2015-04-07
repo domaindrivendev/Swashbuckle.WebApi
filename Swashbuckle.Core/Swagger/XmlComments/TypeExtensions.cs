@@ -7,7 +7,7 @@ namespace Swashbuckle.Swagger.XmlComments
 {
     public static class XmlCommentsExtensions
     {
-        public static string XmlCommentsQualifier(this Type type)
+        public static string XmlCommentsId(this Type type)
         {
             var builder = new StringBuilder(type.FullNameSansTypeParameters());
             builder.Replace("+", ".");
@@ -15,7 +15,7 @@ namespace Swashbuckle.Swagger.XmlComments
             if (type.IsGenericType)
             {
                 var typeParameterQualifiers = type.GetGenericArguments()
-                    .Select(t => t.XmlCommentsQualifier())
+                    .Select(t => t.XmlCommentsId())
                     .ToArray();
 
                 builder
@@ -25,13 +25,6 @@ namespace Swashbuckle.Swagger.XmlComments
             }
 
             return builder.ToString();
-        }
-
-        public static string FullNameSansTypeParameters(this Type type)
-        {
-            var fullName = type.FullName;
-            var chopIndex = fullName.IndexOf("[[");
-            return (chopIndex == -1) ? fullName : fullName.Substring(0, chopIndex);
         }
     }
 }

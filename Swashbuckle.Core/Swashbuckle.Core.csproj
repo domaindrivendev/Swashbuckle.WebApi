@@ -81,6 +81,7 @@
     <Compile Include="Application\HttpConfigurationExtensions.cs" />
     <Compile Include="Swagger\Annotations\AddResponsesFromAttributes.cs" />
     <Compile Include="Swagger\IModelFilter.cs" />
+    <Compile Include="Swagger\TypeExtensions.cs" />
     <Compile Include="Swagger\XmlComments\ApplyXmlTypeComments.cs" />
     <Compile Include="Swagger\XmlComments\ApplyXmlActionComments.cs" />
     <Compile Include="Swagger\FromUriParams\HandleFromUriParams.cs" />

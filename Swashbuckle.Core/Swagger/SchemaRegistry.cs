@@ -221,7 +221,7 @@ namespace Swashbuckle.Swagger
         {
             if (!_referencedTypes.ContainsKey(type))
             {
-                var schemaId = SchemaIdFor(type);
+                var schemaId = type.FriendlyId(_useFullTypeNameInSchemaIds);
                 if (_referencedTypes.Any(entry => entry.Value.SchemaId == schemaId))
                 {
                     var conflictingType = _referencedTypes.First(entry => entry.Value.SchemaId == schemaId).Key;
@@ -235,27 +235,6 @@ namespace Swashbuckle.Swagger
             }
 
             return new Schema { @ref = "#/definitions/" + _referencedTypes[type].SchemaId };
-        }
-
-        public string SchemaIdFor(Type type)
-        {
-            var typeName = type.Name;
-            if (_useFullTypeNameInSchemaIds)
-                typeName = type.Namespace + "." + typeName;
-
-            if (type.IsGenericType)
-            {
-                var genericArgumentIds = type.GetGenericArguments()
-                    .Select(t => SchemaIdFor(t))
-                    .ToArray();
-
-                return new StringBuilder(typeName)
-                    .Replace(String.Format("`{0}", genericArgumentIds.Count()), String.Empty)
-                    .Append(String.Format("[{0}]", String.Join(",", genericArgumentIds).TrimEnd(',')))
-                    .ToString();
-            }
-
-            return typeName;
         }
     }
 }
