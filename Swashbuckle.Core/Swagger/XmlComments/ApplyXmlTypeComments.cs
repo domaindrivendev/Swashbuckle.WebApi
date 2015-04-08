@@ -45,6 +45,8 @@ namespace Swashbuckle.Swagger.XmlComments
 
         private void ApplyPropertyComments(Schema propertySchema, MemberInfo memberInfo)
         {
+            if (memberInfo == null) return;
+
             var propertyNode = _navigator.SelectSingleNode(
                 String.Format(PropertyExpression, memberInfo.DeclaringType.XmlCommentsId(), memberInfo.Name));
             if (propertyNode == null) return;
