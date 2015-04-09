@@ -56,6 +56,8 @@ namespace Swashbuckle.Dummy.Controllers
     /// </summary>
     public class Account
     {
+        public bool IsPublicField = true;
+
         /// <summary>
         /// The ID for Accounts is 5 digits long.
         /// </summary>

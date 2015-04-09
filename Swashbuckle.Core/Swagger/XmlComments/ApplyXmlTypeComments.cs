@@ -39,7 +39,11 @@ namespace Swashbuckle.Swagger.XmlComments
                 var jsonProperty = context.JsonObjectContract.Properties[entry.Key];
                 if (jsonProperty == null) continue;
 
-                ApplyPropertyComments(entry.Value, jsonProperty.PropertyInfo());
+                var memberInfo = jsonProperty.PropertyInfo();
+                if (memberInfo != null)
+                {
+                    ApplyPropertyComments(entry.Value, memberInfo);
+                }
             }
         }
 

@@ -156,5 +156,12 @@ namespace Swashbuckle.Tests.Swagger
             Assert.IsNotNull(marketingEmailsProperty["description"]);
             Assert.AreEqual("Flag to indicate if marketing emails may be sent", marketingEmailsProperty["description"].ToString());
         }
+
+        [Test]
+        public void It_skips_public_variables()
+        {
+            var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/v1");
+            Assert.IsNull(swagger["definitions"]["Account"]["IsPublicField"]);
+        }
     }
 }
