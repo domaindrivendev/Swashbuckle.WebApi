@@ -20,6 +20,7 @@ namespace Swashbuckle.Tests.Swagger
         [SetUp]
         public void SetUp()
         {
+            SetUpAttributeRoutesFrom(typeof(XmlAnnotatedController).Assembly);
             SetUpDefaultRouteFor<XmlAnnotatedController>();
             SetUpHandler(c => c.IncludeXmlComments(String.Format(@"{0}\XmlComments.xml", AppDomain.CurrentDomain.BaseDirectory)));
         }
@@ -125,6 +126,26 @@ namespace Swashbuckle.Tests.Swagger
             var usernameProperty = swagger["definitions"]["SubAccount"]["properties"]["AccountID"];
             Assert.IsNotNull(usernameProperty["description"]);
             Assert.AreEqual("The Account ID for SubAccounts should be 7 digits.", usernameProperty["description"].ToString());
+        }
+
+        [Test]
+        public void It_documents_schema_properties_from_summary_tags_of_complex_type_when_query_parameter_is_annotated_with_fromuri_attribute()
+        {
+            var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/v1");
+
+            var parameters = swagger["paths"]["/xmlannotated/filter"]["get"]["parameters"];
+
+            var qParam = parameters[0];
+            Assert.IsNotNull(qParam["description"]);
+            Assert.AreEqual("The search query on which to filter accounts", qParam["description"].ToString());
+
+            var limitParam = parameters[1];
+            Assert.IsNotNull(limitParam["description"]);
+            Assert.AreEqual("The maximum number of accounts to return", limitParam["description"].ToString());
+
+            var offsetParam = parameters[2];
+            Assert.IsNotNull(offsetParam["description"]);
+            Assert.AreEqual("Offset into the result", offsetParam["description"].ToString());
         }
 
         [Test]

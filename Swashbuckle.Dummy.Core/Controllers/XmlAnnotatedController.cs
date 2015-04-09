@@ -41,6 +41,19 @@ namespace Swashbuckle.Dummy.Controllers
         }
 
         /// <summary>
+        /// Filters account based on the given parameters.
+        /// </summary>
+        /// <param name="q">The search query on which to filter accounts</param>
+        /// <param name="page">A complex type describing the paging to be used for the request</param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("xmlannotated/filter")]
+        public IEnumerable<Account> Filter(string q, [FromUri]Page page)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
         /// Prevents the account from being used
         /// </summary>
         [HttpPut]
@@ -49,6 +62,19 @@ namespace Swashbuckle.Dummy.Controllers
         {
             throw new NotImplementedException();
         }
+    }
+
+    public class Page
+    {
+        /// <summary>
+        /// The maximum number of accounts to return
+        /// </summary>
+        public int Limit { get; set; }
+
+        /// <summary>
+        /// Offset into the result
+        /// </summary>
+        public int Offset { get; set; }
     }
 
     /// <summary>
