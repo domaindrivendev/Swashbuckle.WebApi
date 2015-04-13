@@ -77,7 +77,8 @@ namespace Swashbuckle.Swagger.FromUriParams
                     {
                         name =  sourceQualifier + entry.Key.ToLowerInvariant(),
                         @in = "query",
-                        required = required
+                        required = required,
+                        description = entry.Value.description
                     };
                     param.PopulateFrom(entry.Value);
                     operationParams.Add(param);

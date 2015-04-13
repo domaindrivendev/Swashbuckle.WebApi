@@ -26,9 +26,27 @@
             <param name="keywords">List of search keywords</param>
             <returns></returns>
         </member>
+        <member name="M:Swashbuckle.Dummy.Controllers.XmlAnnotatedController.Filter(System.String,Swashbuckle.Dummy.Controllers.Page)">
+            <summary>
+            Filters account based on the given parameters.
+            </summary>
+            <param name="q">The search query on which to filter accounts</param>
+            <param name="page">A complex type describing the paging to be used for the request</param>
+            <returns></returns>
+        </member>
         <member name="M:Swashbuckle.Dummy.Controllers.XmlAnnotatedController.PutOnHold(System.Int32)">
             <summary>
             Prevents the account from being used
+            </summary>
+        </member>
+        <member name="P:Swashbuckle.Dummy.Controllers.Page.Limit">
+            <summary>
+            The maximum number of accounts to return
+            </summary>
+        </member>
+        <member name="P:Swashbuckle.Dummy.Controllers.Page.Offset">
+            <summary>
+            Offset into the result
             </summary>
         </member>
         <member name="T:Swashbuckle.Dummy.Controllers.Account">
