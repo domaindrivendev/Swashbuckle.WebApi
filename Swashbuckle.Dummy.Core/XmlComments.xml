@@ -89,5 +89,10 @@
             The Account ID for SubAccounts should be 7 digits.
             </summary>
         </member>
+        <member name="F:Swashbuckle.Dummy.Controllers.Reward.value">
+            <summary>
+            The monetary value of the reward 
+            </summary>
+        </member>
     </members>
 </doc>

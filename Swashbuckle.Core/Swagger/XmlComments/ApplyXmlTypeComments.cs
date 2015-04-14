@@ -43,12 +43,12 @@ namespace Swashbuckle.Swagger.XmlComments
             }
         }
 
-        private void ApplyPropertyComments(Schema propertySchema, MemberInfo memberInfo)
+        private void ApplyPropertyComments(Schema propertySchema, PropertyInfo propertyInfo)
         {
-            if (memberInfo == null) return;
+            if (propertyInfo == null) return;
 
             var propertyNode = _navigator.SelectSingleNode(
-                String.Format(PropertyExpression, memberInfo.DeclaringType.XmlCommentsId(), memberInfo.Name));
+                String.Format(PropertyExpression, propertyInfo.DeclaringType.XmlCommentsId(), propertyInfo.Name));
             if (propertyNode == null) return;
 
             var propSummaryNode = propertyNode.SelectSingleNode(SummaryExpression);
