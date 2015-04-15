@@ -48,7 +48,7 @@
         validatorUrl: stringOrNullFrom('%(ValidatorUrl)'),
         customScripts: arrayFrom('%(CustomScripts)'),
         docExpansion: '%(DocExpansion)',
-        oAuth2Enabled: Boolean('%(OAuth2Enabled)'),
+        oAuth2Enabled: ('%(OAuth2Enabled)' == 'true'),
         oAuth2ClientId: '%(OAuth2ClientId)',
         oAuth2Realm: '%(OAuth2Realm)',
         oAuth2AppName: '%(OAuth2AppName)'

@@ -79,7 +79,7 @@ namespace Swashbuckle.Tests.SwaggerUi
 
             var content = GetContentAsString("http://tempuri.org/swagger/ui/index");
 
-            StringAssert.Contains("oAuth2Enabled: Boolean('true')", content);
+            StringAssert.Contains("oAuth2Enabled: ('true' == 'true')", content);
             StringAssert.Contains("oAuth2ClientId: 'test-client-id'", content);
             StringAssert.Contains("oAuth2Realm: 'test-realm'", content);
             StringAssert.Contains("oAuth2AppName: 'Swagger UI'", content);
