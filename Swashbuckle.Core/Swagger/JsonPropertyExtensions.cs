@@ -25,6 +25,7 @@ namespace Swashbuckle.Swagger
 
         public static PropertyInfo PropertyInfo(this JsonProperty jsonProperty)
         {
+            if(jsonProperty.UnderlyingName == null) return null;
             return jsonProperty.DeclaringType.GetProperty(jsonProperty.UnderlyingName, jsonProperty.PropertyType);
         }
     }
