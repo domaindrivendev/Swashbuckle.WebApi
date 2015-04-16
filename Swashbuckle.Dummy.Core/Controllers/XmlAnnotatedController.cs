@@ -5,6 +5,7 @@ using Newtonsoft.Json;
 
 namespace Swashbuckle.Dummy.Controllers
 {
+    [RoutePrefix("xmlannotated")]
     public class XmlAnnotatedController : ApiController
     {
         /// <summary>
@@ -47,7 +48,7 @@ namespace Swashbuckle.Dummy.Controllers
         /// <param name="page">A complex type describing the paging to be used for the request</param>
         /// <returns></returns>
         [HttpGet]
-        [Route("xmlannotated/filter")]
+        [Route("filter")]
         public IEnumerable<Account> Filter(string q, [FromUri]Page page)
         {
             throw new NotImplementedException();
@@ -63,9 +64,13 @@ namespace Swashbuckle.Dummy.Controllers
             throw new NotImplementedException();
         }
 
-        [HttpPost]
-        [Route("xmlannotated/{id}/rewards")]
-        public void AddReward(int id, Reward reward)
+        /// <summary>
+        /// Adds a reward to an existing account
+        /// </summary>
+        /// <param name="reward"></param>
+        [HttpPut]
+        [Route("{id}/add-reward")]
+        public void AddReward(int id, Reward<string> reward)
         {
             throw new NotImplementedException();
         }
@@ -132,11 +137,20 @@ namespace Swashbuckle.Dummy.Controllers
         public override int AccountID { get; set; }
     }
 
-    public class Reward
+    /// <summary>
+    /// A redeemable reward
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    public class Reward<T>
     {
         /// <summary>
         /// The monetary value of the reward 
         /// </summary>
         public decimal value;
+
+        /// <summary>
+        /// The reward type
+        /// </summary>
+        public T RewardType { get; set; }
     }
 }

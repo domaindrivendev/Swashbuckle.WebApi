@@ -179,10 +179,24 @@ namespace Swashbuckle.Tests.Swagger
         }
 
         [Test]
+        public void It_handles_generic_types()
+        {
+            var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/v1");
+
+            var genericTypeSchema = swagger["definitions"]["Reward[String]"];
+            Assert.NotNull(genericTypeSchema["description"]);
+            Assert.AreEqual("A redeemable reward", genericTypeSchema["description"].ToString());
+
+            var genericProperty = genericTypeSchema["properties"]["RewardType"];
+            Assert.NotNull(genericProperty["description"]);
+            Assert.AreEqual("The reward type", genericProperty["description"].ToString());
+        }
+
+        [Test]
         public void It_does_not_error_on_types_with_public_fields()
         {
             var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/v1");
-            var valueProperty = swagger["definitions"]["Reward"]["properties"]["value"];
+            var valueProperty = swagger["definitions"]["Reward[String]"]["properties"]["value"];
             Assert.IsNull(valueProperty["description"]);
         }
     }

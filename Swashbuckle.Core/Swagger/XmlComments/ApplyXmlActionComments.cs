@@ -45,14 +45,14 @@ namespace Swashbuckle.Swagger.XmlComments
 
 		private static string XPathFor(HttpActionDescriptor actionDescriptor)
         {
-            var controllerName = actionDescriptor.ControllerDescriptor.ControllerType.FullName;
+            var controllerName = actionDescriptor.ControllerDescriptor.ControllerType.XmlLookupName();
             var reflectedActionDescriptor = actionDescriptor as ReflectedHttpActionDescriptor;
             var actionName = (reflectedActionDescriptor != null)
                 ? reflectedActionDescriptor.MethodInfo.Name
                 : actionDescriptor.ActionName;
 
             var paramTypeNames = actionDescriptor.GetParameters()
-                .Select(paramDesc => paramDesc.ParameterType.XmlCommentsId())
+                .Select(paramDesc => paramDesc.ParameterType.XmlLookupNameWithTypeParameters())
                 .ToArray();
 
             var parameters = (paramTypeNames.Any())

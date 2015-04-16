@@ -39,6 +39,12 @@
             Prevents the account from being used
             </summary>
         </member>
+        <member name="M:Swashbuckle.Dummy.Controllers.XmlAnnotatedController.AddReward(System.Int32,Swashbuckle.Dummy.Controllers.Reward{System.String})">
+            <summary>
+            Adds a reward to an existing account
+            </summary>
+            <param name="reward"></param>
+        </member>
         <member name="P:Swashbuckle.Dummy.Controllers.Page.Limit">
             <summary>
             The maximum number of accounts to return
@@ -89,9 +95,20 @@
             The Account ID for SubAccounts should be 7 digits.
             </summary>
         </member>
-        <member name="F:Swashbuckle.Dummy.Controllers.Reward.value">
+        <member name="T:Swashbuckle.Dummy.Controllers.Reward`1">
+            <summary>
+            A redeemable reward
+            </summary>
+            <typeparam name="T"></typeparam>
+        </member>
+        <member name="F:Swashbuckle.Dummy.Controllers.Reward`1.value">
             <summary>
             The monetary value of the reward 
+            </summary>
+        </member>
+        <member name="P:Swashbuckle.Dummy.Controllers.Reward`1.RewardType">
+            <summary>
+            The reward type
             </summary>
         </member>
     </members>

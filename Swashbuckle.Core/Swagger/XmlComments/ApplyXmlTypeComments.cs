@@ -25,7 +25,7 @@ namespace Swashbuckle.Swagger.XmlComments
         public void Apply(Schema model, ModelFilterContext context)
         {
             var typeNode = _navigator.SelectSingleNode(
-                String.Format(TypeExpression, context.SystemType.XmlCommentsId()));
+                String.Format(TypeExpression, context.SystemType.XmlLookupName()));
 
             if (typeNode != null)
             {
@@ -48,7 +48,7 @@ namespace Swashbuckle.Swagger.XmlComments
             if (propertyInfo == null) return;
 
             var propertyNode = _navigator.SelectSingleNode(
-                String.Format(PropertyExpression, propertyInfo.DeclaringType.XmlCommentsId(), propertyInfo.Name));
+                String.Format(PropertyExpression, propertyInfo.DeclaringType.XmlLookupName(), propertyInfo.Name));
             if (propertyNode == null) return;
 
             var propSummaryNode = propertyNode.SelectSingleNode(SummaryExpression);
