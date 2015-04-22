@@ -382,7 +382,7 @@ Use this option to control how the Operation listing is displayed. It can be set
 
 As an alternative, you can inject your own version of "index.html" and customize the markup and swagger-ui directly. Use the __CustomAsset__ option to instruct Swashbuckle to return your version instead of the default when a request is made for "index". As with all custom content, the file must be included in your project as an "Embedded Resource", and then the resource's "Logical Name" is passed to the method as shown below. See [Injecting Custom Content](#injecting-custom-content) for step by step instructions.
 
-For compatibility, you should base your custom "index.html" off [this version](https://github.com/swagger-api/swagger-ui/blob/8831e289c0e2dc297754e92b6848c386a88ab37a/dist/index.html)
+For compatibility, you should base your custom "index.html" off [this version](https://github.com/domaindrivendev/Swashbuckle/blob/master/Swashbuckle.Core/SwaggerUi/CustomAssets/index.html)
 
     httpConfiguration
         .EnableSwagger(c => c.SingleApiVersion("v1", "A title for your API"))
