@@ -70,6 +70,8 @@
             hljs.highlightBlock(e)
           });
 
+          addApiKeyAuthorization();
+
           window.swaggerApi = swaggerApi;
           _.each(swashbuckleConfig.customScripts, function (script) {
               $.getScript(script);
@@ -85,9 +87,8 @@
       if (window.swashbuckleConfig.validatorUrl !== '')
           window.swaggerUi.options.validatorUrl = window.swashbuckleConfig.validatorUrl;
 
-      function addApiKeyAuthorization() {
+      function addApiKeyAuthorization(){
         var key = encodeURIComponent($('#input_apiKey')[0].value);
-        log("key: " + key);
         if(key && key.trim() != "") {
             var apiKeyAuth = new SwaggerClient.ApiKeyAuthorization("api_key", key, "query");
             window.swaggerUi.api.clientAuthorizations.add("api_key", apiKeyAuth);
