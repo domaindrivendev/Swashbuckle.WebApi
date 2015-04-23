@@ -9,8 +9,7 @@ namespace Swashbuckle.Swagger.FromUriParams
     {
         public void Apply(Operation operation, SchemaRegistry schemaRegistry, ApiDescription apiDescription)
         {
-            if(operation.parameters == null)
-                return;
+            if (operation.parameters == null) return;
 
             HandleFromUriArrayParams(operation);
             HandleFromUriObjectParams(operation, schemaRegistry, apiDescription);
