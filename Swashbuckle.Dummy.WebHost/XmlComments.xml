@@ -34,6 +34,12 @@
             <param name="page">A complex type describing the paging to be used for the request</param>
             <returns></returns>
         </member>
+        <member name="M:Swashbuckle.Dummy.Controllers.XmlAnnotatedController.GetAll">
+            <summary>
+            Returns all existing accounts
+            </summary>
+            <param name="q">A non-existant parameter on a method with no parameters</param>
+        </member>
         <member name="M:Swashbuckle.Dummy.Controllers.XmlAnnotatedController.PutOnHold(System.Int32)">
             <summary>
             Prevents the account from being used

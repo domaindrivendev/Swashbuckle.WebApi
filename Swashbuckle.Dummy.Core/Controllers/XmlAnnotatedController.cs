@@ -54,6 +54,19 @@ namespace Swashbuckle.Dummy.Controllers
             throw new NotImplementedException();
         }
 
+#pragma warning disable 1572 // intensionally testing that this warning doesn't cause swashbuckler to crash
+        /// <summary>
+        /// Returns all existing accounts
+        /// </summary>
+        /// <param name="q">A non-existant parameter on a method with no parameters</param>
+        [HttpGet]
+        [Route("all")]
+        public IEnumerable<Account> GetAll()
+        {
+            throw new NotImplementedException();
+        }
+#pragma warning restore 1572
+
         /// <summary>
         /// Prevents the account from being used
         /// </summary>
