@@ -323,8 +323,9 @@ Swashbuckle will automatically create a "success" response for each operation ba
 In contrast to WebApi, Swagger 2.0 does not include the query string component when mapping a URL to an action. As a result, Swashbuckle will raise an exception if it encounters multiple actions with the same path (sans query string) and HTTP method. You can workaround this by providing a custom strategy to pick a winner or merge the descriptions for the purposes of the Swagger docs 
 
     httpConfiguration
-        .EnableSwagger(c => c.SingleApiVersion("v1", "A title for your API"))
+        .EnableSwagger((c) =>
             {
+                c.SingleApiVersion("v1", "A title for your API"));
                 c.ResolveConflictingActions(apiDescriptions => apiDescriptions.First());
             });
 
