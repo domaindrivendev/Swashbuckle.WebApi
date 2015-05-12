@@ -6,7 +6,7 @@ using System.Web.Http.Description;
 
 namespace Swashbuckle.Swagger.Annotations
 {
-    public class AddResponseFromAttributes : IOperationFilter
+    public class ApplySwaggerResponseAttributes : IOperationFilter
     {
         public void Apply(Operation operation, SchemaRegistry schemaRegistry, ApiDescription apiDescription)
         {

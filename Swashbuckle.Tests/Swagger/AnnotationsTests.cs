@@ -24,6 +24,18 @@ namespace Swashbuckle.Tests.Swagger
         }
 
         [Test]
+        public void It_assigns_operation_properties_from_swagger_operation_attribute()
+        {
+            var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/v1");
+
+            var putOperation = swagger["paths"]["/swaggerannotated/{id}"]["put"];
+
+            Assert.AreEqual("UpdateMessage", putOperation["operationId"].ToString());
+            Assert.AreEqual(JArray.FromObject(new[] { "messages" }).ToString(), putOperation["tags"].ToString());
+            Assert.AreEqual(JArray.FromObject(new[] { "foobar" }).ToString(), putOperation["schemes"].ToString());
+        }
+
+        [Test]
         public void It_documents_responses_from_swagger_response_attributes()
         {
             var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/v1");
@@ -78,6 +90,35 @@ namespace Swashbuckle.Tests.Swagger
                     }
                 });
             Assert.AreEqual(expected.ToString(), getResponses.ToString());
+        }
+
+        [Test]
+        public void It_supports_per_type_filters_via_swagger_schema_filter_attribute()
+        {
+            var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/v1");
+
+            var messageExamples = swagger["definitions"]["Message"]["default"];
+            var expected = JObject.FromObject(new
+            {
+                title = "A message",
+                content = "Some content"
+            });
+
+            Assert.AreEqual(expected.ToString(), messageExamples.ToString());
+        }
+
+        [Test]
+        public void It_supports_per_action_filters_via_swagger_operation_filter_attribute()
+        {
+            var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/v1");
+
+            var responseExamples = swagger["paths"]["/swaggerannotated/{id}"]["get"]["responses"]["200"]["examples"];
+            var expected = JObject.FromObject(new Dictionary<string, object>()
+            {
+                { "application/json", new { title = "A message", content = "Some content" } }
+            });
+
+            Assert.AreEqual(expected.ToString(), responseExamples.ToString());
         }
     }
 }

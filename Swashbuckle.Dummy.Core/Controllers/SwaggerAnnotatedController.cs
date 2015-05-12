@@ -4,6 +4,7 @@ using System.Net;
 using System.Web.Http;
 using Newtonsoft.Json.Linq;
 using Swashbuckle.Swagger.Annotations;
+using Swashbuckle.Dummy.SwaggerExtensions;
 
 namespace Swashbuckle.Dummy.Controllers
 {
@@ -12,18 +13,32 @@ namespace Swashbuckle.Dummy.Controllers
     {
         [SwaggerResponseRemoveDefaults]
         [SwaggerResponse(HttpStatusCode.Created, Type = typeof(int))]
-        [SwaggerResponse(HttpStatusCode.BadRequest, "Invalid message", typeof(HttpError))]
-        public int CreateMessage(Message message)
+        [SwaggerResponse(HttpStatusCode.BadRequest, "Invalid message", typeof(HttpError))] 
+        public int Create(Message message)
         {
             throw new NotImplementedException();
         }
 
-        public IEnumerable<Message> GetAllMessages()
+        public IEnumerable<Message> GetAll()
+        {
+            throw new NotImplementedException();
+        }
+
+        [SwaggerOperationFilter(typeof(AddGetMessageExamples))]
+        public Message GetById(int id)
+        {
+            throw new NotImplementedException();
+        }
+
+        [HttpPut]
+        [SwaggerOperation("UpdateMessage", Tags = new[] { "messages" }, Schemes = new[] { "foobar" })]
+        public void Put(int id, Message message)
         {
             throw new NotImplementedException();
         }
     }
 
+    [SwaggerSchemaFilter(typeof(AddMessageDefault))]
     public class Message
     {
         public string Title { get; set; }

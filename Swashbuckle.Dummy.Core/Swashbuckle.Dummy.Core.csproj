@@ -82,11 +82,13 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SwaggerExtensions\AddDefaultResponse.cs" />
     <Compile Include="SwaggerExtensions\AddFileUploadParams.cs" />
+    <Compile Include="SwaggerExtensions\AddMessageDefault.cs" />
     <Compile Include="SwaggerExtensions\AppendVersionToBasePath.cs" />
     <Compile Include="SwaggerExtensions\ApplySchemaVendorExtensions.cs" />
     <Compile Include="SwaggerExtensions\ApplyDocumentVendorExtensions.cs" />
     <Compile Include="SwaggerExtensions\AssignOAuth2SecurityRequirements.cs" />
     <Compile Include="SwaggerExtensions\DescendingAlphabeticComparer.cs" />
+    <Compile Include="SwaggerExtensions\AddGetMessageExamples.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="App_Start\SwaggerConfig.cs" />

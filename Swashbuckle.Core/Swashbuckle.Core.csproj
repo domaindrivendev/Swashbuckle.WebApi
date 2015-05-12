@@ -65,6 +65,12 @@
     <Reference Include="System.XML" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Swagger\Annotations\ApplySwaggerOperationAttributes.cs" />
+    <Compile Include="Swagger\Annotations\ApplySwaggerSchemaFilterAttributes.cs" />
+    <Compile Include="Swagger\Annotations\ApplySwaggerOperationFilterAttributes.cs" />
+    <Compile Include="Swagger\Annotations\SwaggerOperationAttribute.cs" />
+    <Compile Include="Swagger\Annotations\SwaggerSchemaFilterAttribute.cs" />
+    <Compile Include="Swagger\Annotations\SwaggerOperationFilterAttribute.cs" />
     <Compile Include="Swagger\Annotations\SwaggerResponseRemoveDefaultsAttribute.cs" />
     <Compile Include="Swagger\Annotations\SwaggerResponseAttribute.cs" />
     <Compile Include="Application\VendorExtensionsConverter.cs" />
@@ -79,7 +85,7 @@
     <Compile Include="Application\InfoBuilder.cs" />
     <Compile Include="Application\SwaggerDocsConfig.cs" />
     <Compile Include="Application\HttpConfigurationExtensions.cs" />
-    <Compile Include="Swagger\Annotations\AddResponsesFromAttributes.cs" />
+    <Compile Include="Swagger\Annotations\ApplySwaggerResponseAttributes.cs" />
     <Compile Include="Swagger\IModelFilter.cs" />
     <Compile Include="Swagger\TypeExtensions.cs" />
     <Compile Include="Swagger\XmlComments\ApplyXmlTypeComments.cs" />
