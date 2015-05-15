@@ -47,10 +47,18 @@ namespace Swashbuckle.Tests.Swagger
         public void It_creates_multiple_query_params_for_from_uri_object_params()
         {
             var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/v1");
-            var getParams = swagger["paths"]["/fromuriparams"]["get"]["parameters"];
+            var getParams = swagger["paths"]["/fromuriparams/{id}"]["get"]["parameters"];
 
             var expectedGetParams = JArray.FromObject(new object[]
             {
+                new
+                {
+                    name = "id",
+                    @in = "path",
+                    required = true,
+                    type = "integer",
+                    format = "int32"
+                },
                 new
                 {
                     name = "currency",

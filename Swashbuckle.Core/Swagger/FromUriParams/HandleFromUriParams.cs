@@ -57,6 +57,8 @@ namespace Swashbuckle.Swagger.FromUriParams
             foreach (var entry in sourceSchema.properties)
             {
                 var propertySchema = entry.Value;
+                if (propertySchema.readOnly == true) continue;
+
                 var required = sourceRequired
                     && sourceSchema.required != null && sourceSchema.required.Contains(entry.Key); 
 
