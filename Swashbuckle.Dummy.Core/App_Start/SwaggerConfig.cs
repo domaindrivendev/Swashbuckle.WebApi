@@ -154,6 +154,7 @@ namespace Swashbuckle.Dummy
                         //
                         c.OperationFilter<AssignOAuth2SecurityRequirements>();
                         c.OperationFilter<AddFileUploadParams>();
+                        c.OperationFilter<SupportFlaggedEnums>();
 
                         // Post-modify the entire Swagger document by wiring up one or more Document filters.
                         // This gives full control to modify the final SwaggerDocument. You should have a good understanding of

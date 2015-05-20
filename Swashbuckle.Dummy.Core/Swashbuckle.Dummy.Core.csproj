@@ -89,6 +89,7 @@
     <Compile Include="SwaggerExtensions\AssignOAuth2SecurityRequirements.cs" />
     <Compile Include="SwaggerExtensions\DescendingAlphabeticComparer.cs" />
     <Compile Include="SwaggerExtensions\AddGetMessageExamples.cs" />
+    <Compile Include="SwaggerExtensions\SupportFlaggedEnums.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="App_Start\SwaggerConfig.cs" />
