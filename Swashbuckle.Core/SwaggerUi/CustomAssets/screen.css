@@ -274,6 +274,9 @@
   font-weight: bold;
   font-size: 25px;
 }
+.swagger-section .swagger-ui-wrap .footer {
+  margin-top: 20px;
+}
 .swagger-section .swagger-ui-wrap p.big,
 .swagger-section .swagger-ui-wrap div.big p {
   font-size: 1em;
@@ -1065,6 +1068,9 @@
 }
 .swagger-section .swagger-ui-wrap form.form_box p strong {
   color: black;
+}
+.swagger-section .swagger-ui-wrap .operation-status td.markdown > p:last-child {
+  padding-bottom: 0;
 }
 .swagger-section .title {
   font-style: bold;
