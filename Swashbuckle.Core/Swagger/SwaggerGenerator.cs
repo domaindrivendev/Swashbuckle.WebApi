@@ -133,7 +133,7 @@ namespace Swashbuckle.Swagger
 
             var responses = new Dictionary<string, Response>();
             var responseType = apiDescription.ResponseType();
-            if (responseType == null)
+            if (responseType == null || responseType == typeof(void))
                 responses.Add("204", new Response { description = "No Content" });
             else
                 responses.Add("200", new Response { description = "OK", schema = schemaRegistry.GetOrRegister(responseType) });
