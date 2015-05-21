@@ -112,6 +112,8 @@ namespace Swashbuckle.Tests.Swagger
                             },
                             Note = new
                             {
+                                maxLength = 500,
+                                minLength = 10,
                                 type = "string"
                             }
                         }

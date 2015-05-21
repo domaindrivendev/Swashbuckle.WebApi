@@ -30,6 +30,13 @@ namespace Swashbuckle.Swagger
                     if (Int32.TryParse(range.Minimum.ToString(), out minimum))
                         schema.minimum = minimum;
                 }
+
+                var length = attribute as StringLengthAttribute;
+                if (length != null)
+                {
+                    schema.maxLength = length.MaximumLength;
+                    schema.minLength = length.MinimumLength;
+                }
             }
 
             if (!jsonProperty.Writable)

@@ -32,6 +32,7 @@ namespace Swashbuckle.Dummy.Controllers
         [Required, Range(14, 99)]
         public int ExpYear { get; set; }
 
+        [StringLength(500, MinimumLength = 10)]
         public string Note { get; set; }
     }
 }
