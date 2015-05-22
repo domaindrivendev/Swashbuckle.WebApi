@@ -28,6 +28,7 @@ namespace Swashbuckle.Application
         private bool _ignoreObsoleteProperties;
         private bool _useFullTypeNameInSchemaIds;
         private bool _describeAllEnumsAsStrings;
+        private bool _describeStringEnumsInCamelCase;
         private readonly IList<Func<IOperationFilter>> _operationFilters;
         private readonly IList<Func<IDocumentFilter>> _documentFilters;
         private Func<IEnumerable<ApiDescription>, ApiDescription> _conflictingActionsResolver;
@@ -44,6 +45,7 @@ namespace Swashbuckle.Application
             _ignoreObsoleteProperties = false;
             _useFullTypeNameInSchemaIds = false;
             _describeAllEnumsAsStrings = false;
+            _describeStringEnumsInCamelCase = false;
             _operationFilters = new List<Func<IOperationFilter>>();
             _documentFilters = new List<Func<IDocumentFilter>>();
             _rootUrlResolver = DefaultRootUrlResolver;
@@ -147,9 +149,10 @@ namespace Swashbuckle.Application
             _useFullTypeNameInSchemaIds = true;
         }
 
-        public void DescribeAllEnumsAsStrings()
+        public void DescribeAllEnumsAsStrings(bool camelCase = false)
         {
             _describeAllEnumsAsStrings = true;
+            _describeStringEnumsInCamelCase = camelCase;
         }
 
         public void IgnoreObsoleteProperties()
@@ -203,9 +206,6 @@ namespace Swashbuckle.Application
                 ? _securitySchemeBuilders.ToDictionary(kvp => kvp.Key, kvp => kvp.Value.Build())
                 : null;
 
-            var describeAllEnumsAsStrings = _describeAllEnumsAsStrings
-                || httpConfig.HasJsonConverterOfType<StringEnumConverter>();
-
             var options = new SwaggerGeneratorOptions(
                 versionSupportResolver: _versionSupportResolver,
                 schemes: _schemes,
@@ -218,7 +218,8 @@ namespace Swashbuckle.Application
                 modelFilters: _modelFilters.Select(factory => factory()),
                 ignoreObsoleteProperties: _ignoreObsoleteProperties,
                 useFullTypeNameInSchemaIds: _useFullTypeNameInSchemaIds,
-                describeAllEnumsAsStrings: describeAllEnumsAsStrings,
+                describeAllEnumsAsStrings: _describeAllEnumsAsStrings,
+                describeStringEnumsInCamelCase: _describeStringEnumsInCamelCase,
                 operationFilters: _operationFilters.Select(factory => factory()),
                 documentFilters: _documentFilters.Select(factory => factory()),
                 conflictingActionsResolver: _conflictingActionsResolver
@@ -226,7 +227,7 @@ namespace Swashbuckle.Application
 
             return new SwaggerGenerator(
                 httpConfig.Services.GetApiExplorer(),
-                httpConfig.GetJsonContractResolver(),
+                httpConfig.SerializerSettingsOrDefault(),
                 _versionInfoBuilder.Build(),
                 options);
         }

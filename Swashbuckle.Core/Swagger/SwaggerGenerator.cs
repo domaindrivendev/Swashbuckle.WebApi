@@ -4,24 +4,25 @@ using System.Web.Http.Description;
 using System;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
+using System.Net.Http.Formatting;
 
 namespace Swashbuckle.Swagger
 {
     public class SwaggerGenerator : ISwaggerProvider
     {
         private readonly IApiExplorer _apiExplorer;
-        private readonly IContractResolver _jsonContractResolver;
+        private readonly JsonSerializerSettings _jsonSerializerSettings;
         private readonly IDictionary<string, Info> _apiVersions;
         private readonly SwaggerGeneratorOptions _options;
 
         public SwaggerGenerator(
             IApiExplorer apiExplorer,
-            IContractResolver jsonContractResolver,
+            JsonSerializerSettings jsonSerializerSettings,
             IDictionary<string, Info> apiVersions,
             SwaggerGeneratorOptions options = null)
         {
             _apiExplorer = apiExplorer;
-            _jsonContractResolver = jsonContractResolver;
+            _jsonSerializerSettings = jsonSerializerSettings;
             _apiVersions = apiVersions;
             _options = options ?? new SwaggerGeneratorOptions();
         }
@@ -29,13 +30,14 @@ namespace Swashbuckle.Swagger
         public SwaggerDocument GetSwagger(string rootUrl, string apiVersion)
         {
             var schemaRegistry = new SchemaRegistry(
-                _jsonContractResolver,
+                _jsonSerializerSettings,
                 _options.CustomSchemaMappings,
                 _options.SchemaFilters,
                 _options.ModelFilters,
                 _options.IgnoreObsoleteProperties,
                 _options.UseFullTypeNameInSchemaIds,
-                _options.DescribeAllEnumsAsStrings);
+                _options.DescribeAllEnumsAsStrings,
+                _options.DescribeStringEnumsInCamelCase);
 
             Info info;
             _apiVersions.TryGetValue(apiVersion, out info);

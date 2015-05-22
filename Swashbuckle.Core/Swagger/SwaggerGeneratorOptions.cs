@@ -20,6 +20,7 @@ namespace Swashbuckle.Swagger
             bool ignoreObsoleteProperties = false, 
             bool useFullTypeNameInSchemaIds = false, 
             bool describeAllEnumsAsStrings = false,
+            bool describeStringEnumsInCamelCase = false,
             IEnumerable<IOperationFilter> operationFilters = null,
             IEnumerable<IDocumentFilter> documentFilters = null,
             Func<IEnumerable<ApiDescription>, ApiDescription> conflictingActionsResolver = null
@@ -37,6 +38,7 @@ namespace Swashbuckle.Swagger
             IgnoreObsoleteProperties = ignoreObsoleteProperties;
             UseFullTypeNameInSchemaIds = useFullTypeNameInSchemaIds;
             DescribeAllEnumsAsStrings = describeAllEnumsAsStrings;
+            DescribeStringEnumsInCamelCase = describeStringEnumsInCamelCase;
             OperationFilters = operationFilters ?? new List<IOperationFilter>();
             DocumentFilters = documentFilters ?? new List<IDocumentFilter>();
             ConflictingActionsResolver = conflictingActionsResolver ?? DefaultConflictingActionsResolver;
@@ -65,6 +67,8 @@ namespace Swashbuckle.Swagger
         public bool UseFullTypeNameInSchemaIds { get; private set; }
 
         public bool DescribeAllEnumsAsStrings { get; private set; }
+
+        public bool DescribeStringEnumsInCamelCase { get; private set; }
 
         public IEnumerable<IOperationFilter> OperationFilters { get; private set; }
 

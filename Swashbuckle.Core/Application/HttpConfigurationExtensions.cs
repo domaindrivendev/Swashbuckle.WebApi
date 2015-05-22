@@ -6,6 +6,7 @@ using Swashbuckle.Application;
 using System.Net.Http;
 using System.Collections.Generic;
 using System.Web.Http.Routing;
+using Newtonsoft.Json;
 
 namespace Swashbuckle.Application
 {
@@ -42,19 +43,13 @@ namespace Swashbuckle.Application
                 config.GetApiVersions().Select(version => routeTemplate.Replace("{apiVersion}", version)));
         }
 
-        internal static IContractResolver GetJsonContractResolver(this HttpConfiguration httpConfig)
+        internal static JsonSerializerSettings SerializerSettingsOrDefault(this HttpConfiguration httpConfig)
         {
             var formatter = httpConfig.Formatters.JsonFormatter;
-            if (formatter != null && formatter.SerializerSettings.ContractResolver != null)
-                return formatter.SerializerSettings.ContractResolver;
+            if (formatter != null)
+                return formatter.SerializerSettings;
 
-            return new DefaultContractResolver();
-        }
-
-        internal static bool HasJsonConverterOfType<T>(this HttpConfiguration httpConfig)
-        {
-            var formatter = httpConfig.Formatters.JsonFormatter;
-            return (formatter != null && (formatter.SerializerSettings.Converters.OfType<T>().Any()));
+            return new JsonSerializerSettings();
         }
     }
 

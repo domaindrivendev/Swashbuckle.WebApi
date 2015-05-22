@@ -227,7 +227,8 @@ namespace Swashbuckle.Tests.Swagger
         [Test]
         public void It_honors_json_string_enum_converter_configured_globally()
         {
-            Configuration.Formatters.JsonFormatter.SerializerSettings.Converters.Add(new StringEnumConverter());
+            Configuration.Formatters.JsonFormatter.SerializerSettings.Converters.Add(
+                new StringEnumConverter { CamelCaseText = true });
             SetUpDefaultRouteFor<ProductsController>();
 
             var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/v1");
@@ -235,7 +236,7 @@ namespace Swashbuckle.Tests.Swagger
 
             var expected = JObject.FromObject(new
                 {
-                    @enum = new[] { "Book", "Album" },
+                    @enum = new[] { "book", "album" },
                     type = "string"
                 });
             Assert.AreEqual(expected.ToString(), typeSchema.ToString());
