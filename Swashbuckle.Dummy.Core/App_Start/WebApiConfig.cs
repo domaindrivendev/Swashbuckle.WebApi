@@ -1,6 +1,8 @@
 ﻿using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Serialization;
 using System.Web.Http;
+using System.Web.Http.Cors;
+using Swashbuckle.Dummy.App_Start;
 
 namespace Swashbuckle.Dummy
 {
@@ -9,6 +11,7 @@ namespace Swashbuckle.Dummy
         public static void Register(HttpConfiguration config)
         {
             // Web API configuration and services
+            config.EnableCors(new CustomCorsPolicyProvider());
 
             // Web API routes
             config.MapHttpAttributeRoutes();

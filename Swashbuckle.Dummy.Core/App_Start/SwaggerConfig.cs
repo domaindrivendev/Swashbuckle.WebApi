@@ -225,7 +225,7 @@ namespace Swashbuckle.Dummy
                         // a discovery URL for each version. This provides a convenient way for users to browse documentation
                         // for different API versions.
                         //
-                        c.EnableDiscoveryUrlSelector();
+                        //c.EnableDiscoveryUrlSelector();
 
                         // If your API supports the OAuth2 Implicit flow, and you've described it correctly, according to
                         // the Swagger 2.0 specification, you can enable UI support as shown below.
