@@ -267,7 +267,7 @@ namespace Swashbuckle.Swagger
 
         public Schema schema;
 
-        public IList<Header> headers;
+        public IDictionary<string, Header> headers;
 
         public object examples;
     }
