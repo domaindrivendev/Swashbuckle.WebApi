@@ -43,12 +43,12 @@ namespace Swashbuckle.Application
             CustomAsset("lib/swagger-oauth-js", thisAssembly, "Swashbuckle.SwaggerUi.CustomAssets.swagger-oauth.js");
         }
 
-        public void InjectStylesheet(Assembly resourceAssembly, string resourceName)
+        public void InjectStylesheet(Assembly resourceAssembly, string resourceName, string media = "screen")
         {
             var path = "ext/" + resourceName.Replace(".", "-");
 
             var stringBuilder = new StringBuilder(_templateParams["%(StylesheetIncludes)"]);
-            stringBuilder.AppendLine("<link href='" + path + "' media='screen' rel='stylesheet' type='text/css' />");
+            stringBuilder.AppendLine("<link href='" + path + "' media='" + media + "' rel='stylesheet' type='text/css' />");
             _templateParams["%(StylesheetIncludes)"] = stringBuilder.ToString();
 
             CustomAsset(path, resourceAssembly, resourceName);

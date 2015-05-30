@@ -39,7 +39,7 @@ namespace Swashbuckle.Tests.SwaggerUi
                 {
                     var assembly = typeof(SwaggerConfig).Assembly;
                     c.InjectStylesheet(assembly, "Swashbuckle.Dummy.SwaggerExtensions.testStyles1.css");
-                    c.InjectStylesheet(assembly, "Swashbuckle.Dummy.SwaggerExtensions.testStyles2.css");
+                    c.InjectStylesheet(assembly, "Swashbuckle.Dummy.SwaggerExtensions.testStyles2.css", "print");
                 });
 
 
@@ -47,7 +47,7 @@ namespace Swashbuckle.Tests.SwaggerUi
 
             StringAssert.Contains(
                 "<link href='ext/Swashbuckle-Dummy-SwaggerExtensions-testStyles1-css' media='screen' rel='stylesheet' type='text/css' />\r\n" +
-                "<link href='ext/Swashbuckle-Dummy-SwaggerExtensions-testStyles2-css' media='screen' rel='stylesheet' type='text/css' />",
+                "<link href='ext/Swashbuckle-Dummy-SwaggerExtensions-testStyles2-css' media='print' rel='stylesheet' type='text/css' />",
                 content);
 
             content = GetContentAsString("http://tempuri.org/swagger/ui/ext/Swashbuckle-Dummy-SwaggerExtensions-testStyles1-css");
