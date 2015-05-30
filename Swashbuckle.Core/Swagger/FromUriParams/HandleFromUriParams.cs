@@ -68,7 +68,7 @@ namespace Swashbuckle.Swagger.FromUriParams
                     var schema = schemaRegistry.Definitions[propertySchema.@ref.Replace("#/definitions/", "")];
                     ExtractAndAddQueryParams(
                         schema,
-                        sourceQualifier + entry.Key + ".",
+                        sourceQualifier + entry.Key.ToCamelCase() + ".",
                         required,
                         schemaRegistry,
                         operationParams);
@@ -77,7 +77,7 @@ namespace Swashbuckle.Swagger.FromUriParams
                 {
                     var param = new Parameter
                     {
-                        name =  sourceQualifier + entry.Key,
+                        name =  sourceQualifier + entry.Key.ToCamelCase(),
                         @in = "query",
                         required = required,
                         description = entry.Value.description

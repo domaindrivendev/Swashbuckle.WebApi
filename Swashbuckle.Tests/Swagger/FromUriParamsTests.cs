@@ -61,14 +61,14 @@ namespace Swashbuckle.Tests.Swagger
                 },
                 new
                 {
-                    name = "trx.Currency",
+                    name = "trx.currency",
                     @in = "query",
                     required = true,
                     type = "string"
                 },
                 new
                 {
-                    name = "trx.Amount",
+                    name = "trx.amount",
                     @in = "query",
                     required = true,
                     type = "number",
@@ -76,28 +76,28 @@ namespace Swashbuckle.Tests.Swagger
                 },
                 new
                 {
-                    name = "BillTo.Country",
+                    name = "billTo.country",
                     @in = "query",
                     required = true,
                     type = "string"
                 },
                 new
                 {
-                    name = "BillTo.City",
+                    name = "billTo.city",
                     @in = "query",
                     required = false,
                     type = "string"
                 },
                 new
                 {
-                   name = "ShipTo.Country",
+                   name = "shipTo.country",
                    @in = "query",
                    required = false,
                    type = "string"
                 },
                 new
                 {
-                    name = "ShipTo.City",
+                    name = "shipTo.city",
                     @in = "query",
                     required = false,
                     type = "string"
