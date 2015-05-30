@@ -57,6 +57,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Controllers\ConflictingTypesController.cs" />
+    <Compile Include="Controllers\FileDownloadController.cs" />
     <Compile Include="Controllers\FileUploadController.cs" />
     <Compile Include="Controllers\FromUriParamsContoller.cs" />
     <Compile Include="Controllers\ConflictingActionsController.cs" />
@@ -90,6 +91,7 @@
     <Compile Include="SwaggerExtensions\DescendingAlphabeticComparer.cs" />
     <Compile Include="SwaggerExtensions\AddGetMessageExamples.cs" />
     <Compile Include="SwaggerExtensions\SupportFlaggedEnums.cs" />
+    <Compile Include="SwaggerExtensions\UpdateFileDownloadOperations.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="App_Start\SwaggerConfig.cs" />
