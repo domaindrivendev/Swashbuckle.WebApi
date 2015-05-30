@@ -15,7 +15,10 @@ namespace Swashbuckle.Dummy.Controllers
         }
 
         [HttpGet]
-        public decimal CalculateTax(int id, [FromUri]Transaction transaction, [FromUri]BillingInfo billingInfo)
+        public decimal CalculateTax(
+            int id,
+            [FromUri(Name="trx")]Transaction transaction,
+            [FromUri(Name="")]BillingInfo billingInfo)
         {
             throw new NotImplementedException();
         }

@@ -19,7 +19,7 @@ namespace Swashbuckle.Tests.Swagger
         }
 
         [Test]
-        public void It_set_collection_format_multi_for_array_params()
+        public void It_sets_collection_format_multi_for_array_params()
         {
             var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/v1");
             var headParams = swagger["paths"]["/fromuriparams"]["head"]["parameters"];
@@ -61,14 +61,14 @@ namespace Swashbuckle.Tests.Swagger
                 },
                 new
                 {
-                    name = "currency",
+                    name = "trx.Currency",
                     @in = "query",
                     required = true,
                     type = "string"
                 },
                 new
                 {
-                    name = "amount",
+                    name = "trx.Amount",
                     @in = "query",
                     required = true,
                     type = "number",
@@ -76,28 +76,28 @@ namespace Swashbuckle.Tests.Swagger
                 },
                 new
                 {
-                    name = "billto.country",
+                    name = "BillTo.Country",
                     @in = "query",
                     required = true,
                     type = "string"
                 },
                 new
                 {
-                    name = "billto.city",
+                    name = "BillTo.City",
                     @in = "query",
                     required = false,
                     type = "string"
                 },
                 new
                 {
-                   name = "shipto.country",
+                   name = "ShipTo.Country",
                    @in = "query",
                    required = false,
                    type = "string"
                 },
                 new
                 {
-                    name = "shipto.city",
+                    name = "ShipTo.City",
                     @in = "query",
                     required = false,
                     type = "string"
