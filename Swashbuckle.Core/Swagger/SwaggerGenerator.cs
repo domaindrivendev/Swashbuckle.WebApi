@@ -179,6 +179,7 @@ namespace Swashbuckle.Swagger
             }
 
             parameter.required = !paramDesc.ParameterDescriptor.IsOptional;
+            parameter.@default = paramDesc.ParameterDescriptor.DefaultValue;
 
             var schema = schemaRegistry.GetOrRegister(paramDesc.ParameterDescriptor.ParameterType);
             if (parameter.@in == "body")
