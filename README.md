@@ -291,6 +291,20 @@ IDocumentFilter has the following interface:
 
 This gives full control to modify the final SwaggerDocument. You can gain additional context from the provided SwaggerDocument (e.g. version) and IApiExplorer. You should have a good understanding of the [Swagger 2.0 spec.](https://github.com/swagger-api/swagger-spec/blob/master/versions/2.0.md) before using this option.
 
+### Ignoring model properties ###
+
+#### JsonIgnore ####
+You can use the JsonIgnore attribute (from the JSON.NET NuGet package) to ignore a property on your model.
+    
+    public class Request
+    {
+        [JsonIgnore]
+        public string IgnoredProperty { get; set; }
+
+        [JsonProperty("foobar")]
+        public string CustomNamedProperty { get; set; }
+    }
+
 ### Including XML Comments ###
 
 If you annotate Controllers and API Types with [Xml Comments](http://msdn.microsoft.com/en-us/library/b2s063f7(v=vs.110).aspx), you can incorporate those comments into the generated docs and UI. The Xml tags are mapped to Swagger properties as follows:
