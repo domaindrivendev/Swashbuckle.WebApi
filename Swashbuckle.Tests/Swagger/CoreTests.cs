@@ -535,6 +535,15 @@ namespace Swashbuckle.Tests.Swagger
         }
 
         [Test]
+        public void It_handles_json_formatter_not_present()
+        {
+            SetUpDefaultRouteFor<ProductsController>();
+            this.Configuration.Formatters.Clear();
+
+            var response = Get("http://tempuri.org/swagger/docs/v1");
+        }
+
+        [Test]
         public void It_errors_on_unknown_api_version_and_returns_status_not_found()
         {
             var response = Get("http://tempuri.org/swagger/docs/1.1");

@@ -83,7 +83,7 @@ namespace Swashbuckle.Swagger
             if (_customSchemaMappings.ContainsKey(type))
                 return _customSchemaMappings[type]();
 
-            var jsonContract = _jsonSerializerSettings.ContractResolver.ResolveContract(type);
+            var jsonContract = _contractResolver.ResolveContract(type);
 
             if (jsonContract is JsonPrimitiveContract)
                 return CreatePrimitiveSchema((JsonPrimitiveContract)jsonContract);
@@ -110,7 +110,7 @@ namespace Swashbuckle.Swagger
 
         private Schema CreateDefinitionSchema(Type type)
         {
-            var jsonContract = _jsonSerializerSettings.ContractResolver.ResolveContract(type);
+            var jsonContract = _contractResolver.ResolveContract(type);
 
             if (jsonContract is JsonDictionaryContract)
                 return CreateDictionarySchema((JsonDictionaryContract)jsonContract);
