@@ -8,7 +8,7 @@ using System.Xml.XPath;
 
 namespace Swashbuckle.Swagger.XmlComments
 {
-    public static class XPathNavigatorExtensiosn
+    public static class XPathNavigatorExtensions
     {
         private static Regex ParamPattern = new Regex(@"<(see|paramref) (name|cref)=""([TPF]{1}:)?(?<display>.+?)"" />");
         private static Regex ConstPattern = new Regex(@"<c>(?<display>.+?)</c>");
@@ -17,9 +17,11 @@ namespace Swashbuckle.Swagger.XmlComments
         {
             if (node == null) return null;
 
-            return ConstPattern.Replace(
-                ParamPattern.Replace(node.InnerXml, GetParamRefName),
-                GetConstRefName).Trim();
+            return XmlUtility.NormalizeIndentation(
+                ConstPattern.Replace(
+                    ParamPattern.Replace(node.InnerXml, GetParamRefName),
+                GetConstRefName)
+                );
         }
 
         private static string GetConstRefName(Match match)
