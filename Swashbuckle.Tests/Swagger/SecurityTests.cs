@@ -111,5 +111,49 @@ namespace Swashbuckle.Tests.SwaggerFilters
 
             Assert.AreEqual(expected.ToString(), securityDefinitions.ToString());
         }
+
+        [Test]
+        public void It_exposes_config_to_define_custom_responsetypes_for_the_api()
+        {
+            SetUpHandler(c =>
+            {
+                c.OAuth2("oauth2")
+                    .Description("OAuth2 Implicit Id Token Grant")
+                    .Flow("implicit")
+                    .AuthorizationUrl("https://tempuri.org/auth")
+                    .TokenUrl("https://tempuri.org/token")
+                    .Scopes(s =>
+                    {
+                        s.Add("read", "Read access to protected resources");
+                        s.Add("write", "Write access to protected resources");
+                        s.Add("openid", "OpenId access");
+                    })
+                    .ResponseType("id_token token");
+            });
+
+            var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/v1");
+            var securityDefinitions = swagger["securityDefinitions"];
+            var expected = JObject.FromObject(new
+            {
+                oauth2 = new
+                {
+                    type = "oauth2",
+                    description = "OAuth2 Implicit Id Token Grant",
+                    flow = "implicit",
+                    authorizationUrl = "https://tempuri.org/auth",
+                    tokenUrl = "https://tempuri.org/token",
+                    scopes = new
+                    {
+                        read = "Read access to protected resources",
+                        write = "Write access to protected resources",
+                        openid = "OpenId access"
+                    },
+                    responseType = "id_token token"
+                }
+            });
+
+            Assert.AreEqual(expected.ToString(), securityDefinitions.ToString());
+        }
+
     }
 }
