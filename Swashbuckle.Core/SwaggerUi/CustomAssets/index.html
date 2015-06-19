@@ -51,7 +51,9 @@
         oAuth2Enabled: ('%(OAuth2Enabled)' == 'true'),
         oAuth2ClientId: '%(OAuth2ClientId)',
         oAuth2Realm: '%(OAuth2Realm)',
-        oAuth2AppName: '%(OAuth2AppName)'
+        oAuth2AppName: '%(OAuth2AppName)',
+        apiKeyName: '%(ApiKeyName)',
+		apiKeyIn: '%(ApiKeyIn)'
       };
 
       window.swaggerUi = new SwaggerUi({
@@ -90,7 +92,7 @@
       function addApiKeyAuthorization(){
         var key = encodeURIComponent($('#input_apiKey')[0].value);
         if(key && key.trim() != "") {
-            var apiKeyAuth = new SwaggerClient.ApiKeyAuthorization("api_key", key, "query");
+        	var apiKeyAuth = new SwaggerClient.ApiKeyAuthorization(window.swashbuckleConfig.apiKeyName, key, window.swashbuckleConfig.apiKeyIn);
             window.swaggerUi.api.clientAuthorizations.add("api_key", apiKeyAuth);
             log("added key " + key);
         }
