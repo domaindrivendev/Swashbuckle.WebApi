@@ -57,6 +57,7 @@ namespace $rootnamespace$
                         //c.BasicAuth("basic")
                         //    .Description("Basic HTTP Authentication");
                         //
+						// NOTE: You must also configure 'EnableApiKeySupport' below in the SwaggerUI section
                         //c.ApiKey("apiKey")
                         //    .Description("API Key Authentication")
                         //    .Name("apiKey")
@@ -213,6 +214,10 @@ namespace $rootnamespace$
                         // the Swagger 2.0 specification, you can enable UI support as shown below.
                         //
                         //c.EnableOAuth2Support("test-client-id", "test-realm", "Swagger UI");
+
+						// If your API supports ApiKey, you can override the default values.
+						// "apiKeyIn" can either be "query" or "header"                                                
+                        //c.EnableApiKeySupport("apiKey", "header");
                     });
         }
     }

@@ -70,21 +70,21 @@ namespace Swashbuckle.Dummy
                         //c.BasicAuth("basic")
                         //    .Description("Basic HTTP Authentication");
                         //
-                        //c.ApiKey("apiKey")
-                        //    .Description("API Key Authentication")
-                        //    .Name("apiKey")
-                        //    .In("header");
-                        //
-                        c.OAuth2("oauth2")
-                            .Description("OAuth2 Implicit Grant")
-                            .Flow("implicit")
-                            .AuthorizationUrl("http://petstore.swagger.io/api/oauth/dialog")
-                            //.TokenUrl("https://tempuri.org/token")
-                            .Scopes(scopes =>
-                            {
-                                scopes.Add("read", "Read access to protected resources");
-                                scopes.Add("write", "Write access to protected resources");
-                            });
+						// NOTE: You must also configure 'EnableApiKeySupport' below in the SwaggerUI section
+						//c.ApiKey("apiKey")
+						//	.Description("API Key Authentication")
+						//	.Name("apiKey")
+						//	.In("header");
+
+						c.OAuth2("oauth2")
+							.Description("OAuth2 Implicit Grant")
+							.Flow("implicit")
+							.AuthorizationUrl("http://petstore.swagger.io/api/oauth/dialog")
+							//.TokenUrl("https://tempuri.org/token")
+							.Scopes(scopes => {
+								scopes.Add("read", "Read access to protected resources");
+								scopes.Add("write", "Write access to protected resources");
+							});
 
                         // Set this flag to omit descriptions for any actions decorated with the Obsolete attribute
                         //c.IgnoreObsoleteActions();
@@ -230,7 +230,11 @@ namespace Swashbuckle.Dummy
                         // If your API supports the OAuth2 Implicit flow, and you've described it correctly, according to
                         // the Swagger 2.0 specification, you can enable UI support as shown below.
                         //
-                        c.EnableOAuth2Support("test-client-id", "test-realm", "Swagger UI");
+                        //c.EnableOAuth2Support("test-client-id", "test-realm", "Swagger UI");
+
+						// If your API supports ApiKey, you can override the default values.
+						// "apiKeyIn" can either be "query" or "header"                                                
+						//c.EnableApiKeySupport("apiKey", "header");
                     });
         }
 
