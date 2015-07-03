@@ -250,8 +250,15 @@ namespace Swashbuckle.Application
 
             var httpConfiguration = request.GetConfiguration();
             var virtualPathRoot = httpConfiguration.VirtualPathRoot.TrimEnd('/');
-            
-            return string.Format("{0}://{1}:{2}{3}", scheme, host, port, virtualPathRoot);
+
+            var uriBuilder = new UriBuilder(string.Format("{0}://{1}:{2}{3}", scheme, host, port, virtualPathRoot));
+
+            if (uriBuilder.Uri.IsDefaultPort)
+            {
+                uriBuilder.Port = -1;
+            }
+
+            return uriBuilder.ToString();
         }
 
         private static string GetHeaderValue(HttpRequestMessage request, string headerName)
