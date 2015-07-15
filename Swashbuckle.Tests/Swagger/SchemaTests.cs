@@ -489,5 +489,16 @@ namespace Swashbuckle.Tests.Swagger
 
             var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/v1");
         }
+
+        [Test]
+        public void It_always_marks_path_parameters_as_required()
+        {
+            SetUpDefaultRouteFor<PathRequiredController>();
+
+            var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/v1");
+            var required = (bool)swagger["paths"]["/pathrequired/{id}"]["get"]["parameters"][0]["required"];
+
+            Assert.IsTrue(required);
+        }
     }
 }

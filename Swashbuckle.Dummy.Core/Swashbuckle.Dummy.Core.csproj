@@ -73,6 +73,7 @@
     <Compile Include="Controllers\JsonAnnotatedTypesController.cs" />
     <Compile Include="Controllers\NullableTypesController.cs" />
     <Compile Include="Controllers\ObsoletePropertiesController.cs" />
+    <Compile Include="Controllers\PathRequiredController.cs" />
     <Compile Include="Controllers\ProtectedResourcesController.cs" />
     <Compile Include="Controllers\SelfReferencingTypesController.cs" />
     <Compile Include="Controllers\CustomersController.cs" />

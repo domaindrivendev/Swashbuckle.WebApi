@@ -178,7 +178,7 @@ namespace Swashbuckle.Swagger
                 return parameter; 
             }
 
-            parameter.required = !paramDesc.ParameterDescriptor.IsOptional;
+            parameter.required = inPath || !paramDesc.ParameterDescriptor.IsOptional;
             parameter.@default = paramDesc.ParameterDescriptor.DefaultValue;
 
             var schema = schemaRegistry.GetOrRegister(paramDesc.ParameterDescriptor.ParameterType);
