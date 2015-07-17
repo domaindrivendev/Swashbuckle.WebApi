@@ -22,7 +22,7 @@ namespace Swashbuckle.Swagger
         private readonly IEnumerable<ISchemaFilter> _schemaFilters;
         private readonly IEnumerable<IModelFilter> _modelFilters;
         private readonly bool _ignoreObsoleteProperties;
-        private readonly bool _useFullTypeNameInSchemaIds;
+        private readonly Func<Type, string> _schemaIdSelector;
         private readonly bool _describeAllEnumsAsStrings;
         private readonly bool _describeStringEnumsInCamelCase;
 
@@ -41,7 +41,7 @@ namespace Swashbuckle.Swagger
             IEnumerable<ISchemaFilter> schemaFilters,
             IEnumerable<IModelFilter> modelFilters,
             bool ignoreObsoleteProperties,
-            bool useFullTypeNameInSchemaIds,
+            Func<Type, string> schemaIdSelector,
             bool describeAllEnumsAsStrings,
             bool describeStringEnumsInCamelCase)
         {
@@ -50,7 +50,7 @@ namespace Swashbuckle.Swagger
             _schemaFilters = schemaFilters;
             _modelFilters = modelFilters;
             _ignoreObsoleteProperties = ignoreObsoleteProperties;
-            _useFullTypeNameInSchemaIds = useFullTypeNameInSchemaIds;
+            _schemaIdSelector = schemaIdSelector;
             _describeAllEnumsAsStrings = describeAllEnumsAsStrings;
             _describeStringEnumsInCamelCase = describeStringEnumsInCamelCase;
 
@@ -247,7 +247,7 @@ namespace Swashbuckle.Swagger
         {
             if (!_referencedTypes.ContainsKey(type))
             {
-                var schemaId = type.FriendlyId(_useFullTypeNameInSchemaIds);
+                var schemaId = _schemaIdSelector(type); 
                 if (_referencedTypes.Any(entry => entry.Value.SchemaId == schemaId))
                 {
                     var conflictingType = _referencedTypes.First(entry => entry.Value.SchemaId == schemaId).Key;

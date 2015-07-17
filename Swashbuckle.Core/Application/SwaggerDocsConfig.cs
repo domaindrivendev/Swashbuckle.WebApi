@@ -26,7 +26,7 @@ namespace Swashbuckle.Application
         private readonly IList<Func<ISchemaFilter>> _schemaFilters;
         private readonly IList<Func<IModelFilter>> _modelFilters;
         private bool _ignoreObsoleteProperties;
-        private bool _useFullTypeNameInSchemaIds;
+        private Func<Type, string> _schemaIdSelector;
         private bool _describeAllEnumsAsStrings;
         private bool _describeStringEnumsInCamelCase;
         private readonly IList<Func<IOperationFilter>> _operationFilters;
@@ -43,7 +43,6 @@ namespace Swashbuckle.Application
             _schemaFilters = new List<Func<ISchemaFilter>>();
             _modelFilters = new List<Func<IModelFilter>>();
             _ignoreObsoleteProperties = false;
-            _useFullTypeNameInSchemaIds = false;
             _describeAllEnumsAsStrings = false;
             _describeStringEnumsInCamelCase = false;
             _operationFilters = new List<Func<IOperationFilter>>();
@@ -146,7 +145,7 @@ namespace Swashbuckle.Application
 
         public void UseFullTypeNameInSchemaIds()
         {
-            _useFullTypeNameInSchemaIds = true;
+            _schemaIdSelector = t => t.FriendlyId(true);
         }
 
         public void DescribeAllEnumsAsStrings(bool camelCase = false)
@@ -217,7 +216,7 @@ namespace Swashbuckle.Application
                 schemaFilters: _schemaFilters.Select(factory => factory()),
                 modelFilters: _modelFilters.Select(factory => factory()),
                 ignoreObsoleteProperties: _ignoreObsoleteProperties,
-                useFullTypeNameInSchemaIds: _useFullTypeNameInSchemaIds,
+                schemaIdSelector: _schemaIdSelector,
                 describeAllEnumsAsStrings: _describeAllEnumsAsStrings,
                 describeStringEnumsInCamelCase: _describeStringEnumsInCamelCase,
                 operationFilters: _operationFilters.Select(factory => factory()),
@@ -262,7 +261,7 @@ namespace Swashbuckle.Application
 
         public void SchemaId(Func<object, string> schemaIdStategy)
         {
-            
+            _schemaIdSelector = schemaIdStategy;
         }
     }
 }

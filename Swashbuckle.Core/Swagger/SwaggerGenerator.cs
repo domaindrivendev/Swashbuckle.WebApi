@@ -35,7 +35,7 @@ namespace Swashbuckle.Swagger
                 _options.SchemaFilters,
                 _options.ModelFilters,
                 _options.IgnoreObsoleteProperties,
-                _options.UseFullTypeNameInSchemaIds,
+                _options.SchemaIdSelector,
                 _options.DescribeAllEnumsAsStrings,
                 _options.DescribeStringEnumsInCamelCase);
 
