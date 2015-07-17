@@ -316,7 +316,7 @@ namespace Swashbuckle.Tests.Swagger
         }
 
         [Test]
-        public void It_exposes_config_to_chose_schema_id()
+        public void It_exposes_config_to_choose_schema_id()
         {
             SetUpDefaultRouteFor<ProductsController>();
             SetUpHandler(c => c.SchemaId(t => "my custom name"));
