@@ -316,6 +316,18 @@ namespace Swashbuckle.Tests.Swagger
         }
 
         [Test]
+        public void It_exposes_config_to_chose_schema_id()
+        {
+            SetUpDefaultRouteFor<ProductsController>();
+            SetUpHandler(c => c.SchemaId(t => "my custom name"));
+
+            var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/v1");
+            var defintitions = swagger["definitions"];
+
+            Assert.IsNotNull(defintitions["my custom name"]);
+        }
+
+        [Test]
         public void It_handles_nested_types()
         {
             SetUpDefaultRouteFor<NestedTypesController>();
