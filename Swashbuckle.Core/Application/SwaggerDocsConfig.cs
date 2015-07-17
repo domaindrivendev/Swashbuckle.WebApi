@@ -259,7 +259,7 @@ namespace Swashbuckle.Application
             return request.Headers.TryGetValues(headerName, out list) ? list.FirstOrDefault() : null;
         }
 
-        public void SchemaId(Func<object, string> schemaIdStategy)
+        public void SchemaId(Func<Type, string> schemaIdStategy)
         {
             _schemaIdSelector = schemaIdStategy;
         }

@@ -328,6 +328,19 @@ namespace Swashbuckle.Tests.Swagger
         }
 
         [Test]
+        public void It_exposes_config_to_modify_schema_ids()
+        {
+            SetUpDefaultRouteFor<ConflictingTypesController>();
+            // We have to know the default implementation of FriendlyId before we can modify it's output.
+            SetUpHandler(c => { c.SchemaId(t => t.FriendlyId(true).Replace("Swashbuckle.Dummy.Controllers.", String.Empty)); });
+
+            var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/v1");
+            var defintitions = swagger["definitions"];
+
+            Assert.IsNotNull(defintitions["Requests.Blog"]);
+        }
+
+        [Test]
         public void It_handles_nested_types()
         {
             SetUpDefaultRouteFor<NestedTypesController>();
