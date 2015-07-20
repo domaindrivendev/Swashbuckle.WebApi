@@ -434,8 +434,7 @@ If you're using the existing config. interface to customize the final Swagger do
 3. [Swagger-ui broken by Visual Studio 2013](#swagger-ui-broken-by-visual-studio-2013)
 4. [OWIN Hosted in IIS - Incorrect VirtualPathRoot Handling](#owin-hosted-in-iis---incorrect-virtualpathroot-handling)
 5. [How to add vendor extensions](#how-to-add-vendor-extensions)
-6. [How to describe multiple API versions](#how-to-describe-multiple-api-versions)
-7. [How to configure OAuth2 support](#how-to-configure-oauth2-support)
+6. [How to configure OAuth2 support](#how-to-configure-oauth2-support)
 
 ### Swagger-ui showing "Can't read swagger JSON from ..."
 
