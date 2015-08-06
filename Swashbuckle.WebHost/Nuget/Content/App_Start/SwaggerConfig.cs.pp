@@ -148,7 +148,7 @@ namespace $rootnamespace$
                         //
                         //c.DocumentFilter<ApplyDocumentVendorExtensions>();
 
-                        // If you annonate Controllers and API Types with
+                        // If you annotate Controllers and API Types with
                         // Xml comments (http://msdn.microsoft.com/en-us/library/b2s063f7(v=vs.110).aspx), you can incorporate
                         // those comments into the generated docs and UI. You can enable this by providing the path to one or
                         // more Xml comment files.
