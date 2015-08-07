@@ -316,6 +316,18 @@ namespace Swashbuckle.Tests.Swagger
         }
 
         [Test]
+        public void It_exposes_config_to_modify_schema_ids()
+        {
+            SetUpDefaultRouteFor<ConflictingTypesController>();
+            SetUpHandler(c => { c.UseFullTypeNameInSchemaIds(); c.SchemaIdSelector(s => s.Replace("Swashbuckle.Dummy.Controllers.", String.Empty)); });
+
+            var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/v1");
+            var defintitions = swagger["definitions"];
+
+            Assert.IsNotNull(defintitions["Requests.Blog"]);
+        }
+
+        [Test]
         public void It_handles_nested_types()
         {
             SetUpDefaultRouteFor<NestedTypesController>();
