@@ -306,8 +306,9 @@ If you annotate Controllers and API Types with [Xml Comments](http://msdn.micros
 You can enable this by providing the path to one or more XML comments files:
 
     httpConfiguration
-        .EnableSwagger(c => c.SingleApiVersion("v1", "A title for your API"))
+        .EnableSwagger(c =>
             {
+                c.SingleApiVersion("v1", "A title for your API");
                 c.IncludeXmlComments(GetXmlCommentsPathForControllers());
                 c.IncludeXmlComments(GetXmlCommentsPathForModels());
             });
