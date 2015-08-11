@@ -28,6 +28,7 @@ namespace Swashbuckle.Application
                 { "%(DocExpansion)", "none" },
                 { "%(OAuth2Enabled)", "false" },
                 { "%(OAuth2ClientId)", "" },
+                { "%(OAuth2ClientSecret)", "" },
                 { "%(OAuth2Realm)", "" },
                 { "%(OAuth2AppName)", "" }
             };
@@ -100,8 +101,14 @@ namespace Swashbuckle.Application
 
         public void EnableOAuth2Support(string clientId, string realm, string appName)
         {
+            EnableOAuth2Support(clientId, "", realm, appName);
+        }
+
+        public void EnableOAuth2Support(string clientId, string clientSecret, string realm, string appName)
+        {
             _templateParams["%(OAuth2Enabled)"] = "true";
             _templateParams["%(OAuth2ClientId)"] = clientId;
+            _templateParams["%(OAuth2ClientSecret)"] = clientSecret;
             _templateParams["%(OAuth2Realm)"] = realm;
             _templateParams["%(OAuth2AppName)"] = appName;
         }
