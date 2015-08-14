@@ -101,7 +101,7 @@ namespace Swashbuckle.Application
 
         public void EnableOAuth2Support(string clientId, string realm, string appName)
         {
-            EnableOAuth2Support(clientId, "", realm, appName);
+            EnableOAuth2Support(clientId, "N/A", realm, appName);
         }
 
         public void EnableOAuth2Support(string clientId, string clientSecret, string realm, string appName)
