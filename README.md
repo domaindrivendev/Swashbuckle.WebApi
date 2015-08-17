@@ -340,6 +340,12 @@ See the following discusssion for more details:
 
 The swagger-ui is a JavaScript application hosted in a single HTML page (index.html), and it exposes several customization settings. Swashbuckle ships with an embedded version and includes corresponding config. methods for each of the UI settings. If you require further customization, you can also inject your own version of "index.html". Read on to learn more.
 
+### Disable via web/app config ###
+
+If you want to disable swagger-ui via web/app config, add this key under appSettings section
+
+	<add key="SwaggerDisabled" value="true" />
+
 ### Customizations via Config. Interface ###
 
 If your happy with the basic look and feel but want to make some minor tweaks, the following options may be sufficient:
