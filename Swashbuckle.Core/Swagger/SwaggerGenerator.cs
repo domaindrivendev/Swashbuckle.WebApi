@@ -51,11 +51,12 @@ namespace Swashbuckle.Swagger
                 .ToDictionary(group => "/" + group.Key, group => CreatePathItem(group, schemaRegistry));
 
             var rootUri = new Uri(rootUrl);
+            var port = (!rootUri.IsDefaultPort) ? ":" + rootUri.Port : string.Empty;
 
             var swaggerDoc = new SwaggerDocument
             {
                 info = info,
-                host = rootUri.Host + ":" + rootUri.Port,
+                host = rootUri.Host + port,
                 basePath = (rootUri.AbsolutePath != "/") ? rootUri.AbsolutePath : null,
                 schemes = (_options.Schemes != null) ? _options.Schemes.ToList() : new[] { rootUri.Scheme }.ToList(),
                 paths = paths,
