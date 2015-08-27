@@ -313,6 +313,20 @@ You can enable this by providing the path to one or more XML comments files:
                 c.IncludeXmlComments(GetXmlCommentsPathForModels());
             });
 
+NOTE: You will need enable the output of the XML documentation file. This is enabled by going to project properties -> Build -> Output. The "XML documentation file" needs checked and a path assigned such as "bin\Debug\MyProj.XML" you will also want to verify this across each build configuration. Here's an example of reading the file but it may need modified based upon your specific project settings:
+
+    httpConfiguration
+        .EnableSwagger(c =>
+            {
+                var baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
+                var commentsFileName = Assembly.GetExecutingAssembly().GetName().Name + ".XML";
+                var commentsFile = Path.Combine(baseDirectory, commentsFileName);
+
+                c.SingleApiVersion("v1", "A title for your API");
+                c.IncludeXmlComments(commentsFile);
+                c.IncludeXmlComments(GetXmlCommentsPathForModels());
+            });
+
 #### Response Codes ####
 
 Swashbuckle will automatically create a "success" response for each operation based on the action's return type. If it's a void, the status code will be 204 (No content), otherwise 200 (Ok). This mirrors WebApi's default behavior. If you need to change this and/or list additional response codes, you can use the non-standard "response" tag:
@@ -435,8 +449,6 @@ If you're using the existing config. interface to customize the final Swagger do
 3. [Swagger-ui broken by Visual Studio 2013](#swagger-ui-broken-by-visual-studio-2013)
 4. [OWIN Hosted in IIS - Incorrect VirtualPathRoot Handling](#owin-hosted-in-iis---incorrect-virtualpathroot-handling)
 5. [How to add vendor extensions](#how-to-add-vendor-extensions)
-6. [How to describe multiple API versions](#how-to-describe-multiple-api-versions)
-7. [How to configure OAuth2 support](#how-to-configure-oauth2-support)
 
 ### Swagger-ui showing "Can't read swagger JSON from ..."
 
@@ -503,8 +515,4 @@ Swagger 2.0 allows additional meta-data (aka vendor extensions) to be added at v
         }
     }
 
-As per the specification, all extension properties should be prefixed by "x-" 
-
-### How to configure OAuth2 support
-
-TODO
+As per the specification, all extension properties should be prefixed by "x-"
