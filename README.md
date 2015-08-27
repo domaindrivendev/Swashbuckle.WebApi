@@ -313,21 +313,6 @@ You can enable this by providing the path to one or more XML comments files:
                 c.IncludeXmlComments(GetXmlCommentsPathForModels());
             });
 
-Note you will need enable the output of the XML documentation file. This is enabled by going to project properties -> Build -> Output. The "XML documentation file" needs checked and a path assigned such as "bin\Debug\MyProj.XML" you will also want to verify this across each build configuration. Here's an example of reading the file but it may need modified based upon your specific project settings:
-
-    httpConfiguration
-        .EnableSwagger(c =>
-            {
-                var baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
-                var commentsFileName = Assembly.GetExecutingAssembly().GetName().Name + ".XML";
-                var commentsFile = Path.Combine(baseDirectory, commentsFileName);
-            
-                c.SingleApiVersion("v1", "A title for your API");
-                c.IncludeXmlComments(commentsFile);
-                c.IncludeXmlComments(GetXmlCommentsPathForModels());
-            });
-
-
 #### Response Codes ####
 
 Swashbuckle will automatically create a "success" response for each operation based on the action's return type. If it's a void, the status code will be 204 (No content), otherwise 200 (Ok). This mirrors WebApi's default behavior. If you need to change this and/or list additional response codes, you can use the non-standard "response" tag:
@@ -399,7 +384,7 @@ Use this option to control how the Operation listing is displayed. It can be set
 
 As an alternative, you can inject your own version of "index.html" and customize the markup and swagger-ui directly. Use the __CustomAsset__ option to instruct Swashbuckle to return your version instead of the default when a request is made for "index". As with all custom content, the file must be included in your project as an "Embedded Resource", and then the resource's "Logical Name" is passed to the method as shown below. See [Injecting Custom Content](#injecting-custom-content) for step by step instructions.
 
-For compatibility, you should base your custom "index.html" off [this version](https://github.com/domaindrivendev/Swashbuckle/blob/master/Swashbuckle.Core/SwaggerUi/CustomAssets/index.html)
+For compatibility, you should base your custom "index.html" off [this version](https://github.com/domaindrivendev/Swashbuckle/blob/v5.2.1/Swashbuckle.Core/SwaggerUi/CustomAssets/index.html)
 
     httpConfiguration
         .EnableSwagger(c => c.SingleApiVersion("v1", "A title for your API"))
@@ -450,7 +435,8 @@ If you're using the existing config. interface to customize the final Swagger do
 3. [Swagger-ui broken by Visual Studio 2013](#swagger-ui-broken-by-visual-studio-2013)
 4. [OWIN Hosted in IIS - Incorrect VirtualPathRoot Handling](#owin-hosted-in-iis---incorrect-virtualpathroot-handling)
 5. [How to add vendor extensions](#how-to-add-vendor-extensions)
-6. [How to configure OAuth2 support](#how-to-configure-oauth2-support)
+6. [How to describe multiple API versions](#how-to-describe-multiple-api-versions)
+7. [How to configure OAuth2 support](#how-to-configure-oauth2-support)
 
 ### Swagger-ui showing "Can't read swagger JSON from ..."
 
