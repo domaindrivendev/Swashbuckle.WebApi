@@ -106,5 +106,31 @@ namespace Swashbuckle.Tests.Swagger
 
             Assert.AreEqual(expectedGetParams.ToString(), getParams.ToString());
         }
+
+        [Test]
+        public void It_sets_collection_format_multi_for_object_with_array_property()
+        {
+            var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/v1");
+            var getParams = swagger["paths"]["/fromuriparams"]["get"]["parameters"];
+
+            var expectedGetParams = JArray.FromObject(new object[]
+            {
+                new
+                {
+                    name = "search.transactionIds",
+                    @in = "query",
+                    required = false,
+                    type = "array",
+                    items = new
+                    {
+                        type = "integer",
+                        format = "int32"
+                    },
+                    collectionFormat = "multi"
+                }
+            });
+
+            Assert.AreEqual(expectedGetParams.ToString(), getParams.ToString());
+        }
     }
 }
