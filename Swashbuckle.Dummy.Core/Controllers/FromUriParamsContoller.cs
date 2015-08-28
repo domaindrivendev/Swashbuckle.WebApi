@@ -22,17 +22,6 @@ namespace Swashbuckle.Dummy.Controllers
         {
             throw new NotImplementedException();
         }
-
-        [HttpGet]
-        public IEnumerable<Transaction> SearchTransactions([FromUri]TransactionSearch search)
-        {
-            throw new NotImplementedException();
-        }
-    }
-
-    public class TransactionSearch
-    {
-        public ICollection<int> TransactionIds { get; set; }
     }
 
     public class Transaction
