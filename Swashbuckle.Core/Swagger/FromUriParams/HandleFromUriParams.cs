@@ -83,6 +83,8 @@ namespace Swashbuckle.Swagger.FromUriParams
                         description = entry.Value.description
                     };
                     param.PopulateFrom(entry.Value);
+                    if (param.type == "array")
+                        param.collectionFormat = "multi";
                     operationParams.Add(param);
                 }
             }
