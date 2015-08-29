@@ -51,7 +51,7 @@ namespace Swashbuckle.Swagger.FromUriParams
         private void ExtractAndAddQueryParams(
             Schema sourceSchema,
             string sourceQualifier,
-            bool sourceRequired,
+            bool? sourceRequired,
             SchemaRegistry schemaRegistry,
             IList<Parameter> operationParams)
         {
@@ -60,7 +60,7 @@ namespace Swashbuckle.Swagger.FromUriParams
                 var propertySchema = entry.Value;
                 if (propertySchema.readOnly == true) continue;
 
-                var required = sourceRequired
+                var required = (sourceRequired == true)
                     && sourceSchema.required != null && sourceSchema.required.Contains(entry.Key); 
 
                 if (propertySchema.@ref != null)

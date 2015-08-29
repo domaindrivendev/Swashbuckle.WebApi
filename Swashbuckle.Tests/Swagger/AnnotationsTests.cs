@@ -32,7 +32,7 @@ namespace Swashbuckle.Tests.Swagger
 
             Assert.AreEqual("UpdateMessage", putOperation["operationId"].ToString());
             Assert.AreEqual(JArray.FromObject(new[] { "messages" }).ToString(), putOperation["tags"].ToString());
-            Assert.AreEqual(JArray.FromObject(new[] { "foobar" }).ToString(), putOperation["schemes"].ToString());
+            Assert.AreEqual(JArray.FromObject(new[] { "ws" }).ToString(), putOperation["schemes"].ToString());
         }
 
         [Test]
