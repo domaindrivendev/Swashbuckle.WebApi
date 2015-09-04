@@ -293,6 +293,16 @@ IDocumentFilter has the following interface:
 
 This gives full control to modify the final SwaggerDocument. You can gain additional context from the provided SwaggerDocument (e.g. version) and IApiExplorer. You should have a good understanding of the [Swagger 2.0 spec.](https://github.com/swagger-api/swagger-spec/blob/master/versions/2.0.md) before using this option.
 
+### Wrapping the SwaggerGenerator with Additional Behavior ###
+
+The default implementation of ISwaggerProvider, the interface used to obtain Swagger metadata for a given API, is the SwaggerGenerator. If neccessary, you can inject your own implementation or wrap the existing one with additional behavior. For example, you could use this option to inject a "Caching Proxy" that attempts to retrieve the SwaggerDocument from a cache before delegating to the built-in generator:
+
+    httpConfiguration
+        .EnableSwagger(c => c.SingleApiVersion("v1", "A title for your API"))
+            {
+				c.CustomProvider((defaultProvider) => new CachingSwaggerProvider(defaultProvider));
+            });
+
 ### Including XML Comments ###
 
 If you annotate Controllers and API Types with [Xml Comments](http://msdn.microsoft.com/en-us/library/b2s063f7(v=vs.110).aspx), you can incorporate those comments into the generated docs and UI. The Xml tags are mapped to Swagger properties as follows:

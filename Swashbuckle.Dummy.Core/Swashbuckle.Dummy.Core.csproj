@@ -62,6 +62,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="App_Start\CachingSwaggerProvider.cs" />
     <Compile Include="App_Start\CustomCorsPolicyProvider.cs" />
     <Compile Include="Controllers\ConflictingTypesController.cs" />
     <Compile Include="Controllers\FileDownloadController.cs" />

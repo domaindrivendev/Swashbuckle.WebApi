@@ -34,6 +34,8 @@ namespace Swashbuckle.Application
         private Func<IEnumerable<ApiDescription>, ApiDescription> _conflictingActionsResolver;
         private Func<HttpRequestMessage, string> _rootUrlResolver;
 
+        private Func<ISwaggerProvider, ISwaggerProvider> _customProviderFactory;
+
         public SwaggerDocsConfig()
         {
             _versionInfoBuilder = new VersionInfoBuilder();
@@ -143,6 +145,11 @@ namespace Swashbuckle.Application
             _modelFilters.Add(factory);
         }
 
+        public void SchemaId(Func<Type, string> schemaIdStrategy)
+        {
+            _schemaIdSelector = schemaIdStrategy;
+        }
+
         public void UseFullTypeNameInSchemaIds()
         {
             _schemaIdSelector = t => t.FriendlyId(true);
@@ -197,6 +204,11 @@ namespace Swashbuckle.Application
             _rootUrlResolver = rootUrlResolver;
         }
 
+        public void CustomProvider(Func<ISwaggerProvider, ISwaggerProvider> customProviderFactory)
+        {
+            _customProviderFactory = customProviderFactory;
+        }
+
         internal ISwaggerProvider GetSwaggerProvider(HttpRequestMessage swaggerRequest)
         {
             var httpConfig = swaggerRequest.GetConfiguration();
@@ -224,11 +236,15 @@ namespace Swashbuckle.Application
                 conflictingActionsResolver: _conflictingActionsResolver
             );
 
-            return new SwaggerGenerator(
+            var defaultProvider = new SwaggerGenerator(
                 httpConfig.Services.GetApiExplorer(),
                 httpConfig.SerializerSettingsOrDefault(),
                 _versionInfoBuilder.Build(),
                 options);
+
+            return (_customProviderFactory != null)
+                ? _customProviderFactory(defaultProvider)
+                : defaultProvider;
         }
 
         internal string GetRootUrl(HttpRequestMessage swaggerRequest)
@@ -257,11 +273,6 @@ namespace Swashbuckle.Application
         {
             IEnumerable<string> list;
             return request.Headers.TryGetValues(headerName, out list) ? list.FirstOrDefault() : null;
-        }
-
-        public void SchemaId(Func<Type, string> schemaIdStategy)
-        {
-            _schemaIdSelector = schemaIdStategy;
         }
     }
 }
