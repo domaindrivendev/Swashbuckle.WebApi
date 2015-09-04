@@ -197,7 +197,10 @@ function initOAuth(opts) {
     return;
   }
 
-  $('pre code').each(function(i, e) {hljs.highlightBlock(e)});
+  if (!o.disableHighlighting) {
+      $('pre code').each(function (i, e) { hljs.highlightBlock(e) });
+  }
+
   $('.api-ic').unbind();
   $('.api-ic').click(function(s) {
     if($(s.target).hasClass('ic-off'))

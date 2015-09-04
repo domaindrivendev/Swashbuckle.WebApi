@@ -13,7 +13,7 @@ namespace $rootnamespace$
         {
             var thisAssembly = typeof(SwaggerConfig).Assembly;
 
-            GlobalConfiguration.Configuration 
+            GlobalConfiguration.Configuration
                 .EnableSwagger(c =>
                     {
                         // By default, the service root url is inferred from the request used to access the docs.
@@ -117,7 +117,7 @@ namespace $rootnamespace$
                         //c.SchemaFilter<ApplySchemaVendorExtensions>();
 
                         // Set this flag to omit schema property descriptions for any type properties decorated with the
-                        // Obsolete attribute 
+                        // Obsolete attribute
                         //c.IgnoreObsoleteProperties();
 
                         // In a Swagger 2.0 document, complex types are typically declared globally and referenced by unique
@@ -132,7 +132,7 @@ namespace $rootnamespace$
                         // You can change the serializer behavior by configuring the StringToEnumConverter globally or for a given
                         // enum type. Swashbuckle will honor this change out-of-the-box. However, if you use a different
                         // approach to serialize enums as strings, you can also force Swashbuckle to describe them as strings.
-                        // 
+                        //
                         //c.DescribeAllEnumsAsStrings();
 
                         // Similar to Schema filters, Swashbuckle also supports Operation and Document filters:
@@ -158,7 +158,7 @@ namespace $rootnamespace$
                         // In contrast to WebApi, Swagger 2.0 does not include the query string component when mapping a URL
                         // to an action. As a result, Swashbuckle will raise an exception if it encounters multiple actions
                         // with the same path (sans query string) and HTTP method. You can workaround this by providing a
-                        // custom strategy to pick a winner or merge the descriptions for the purposes of the Swagger docs 
+                        // custom strategy to pick a winner or merge the descriptions for the purposes of the Swagger docs
                         //
                         //c.ResolveConflictingActions(apiDescriptions => apiDescriptions.First());
 
@@ -186,6 +186,10 @@ namespace $rootnamespace$
                         // for example 0 and 1.
                         //
                         //c.BooleanValues(new[] { "0", "1" });
+
+						// The swagger-ui applies syntax highlighting by default. This can introduce performance problems
+						// loading large documents. You can use this option to disable the highlighting
+						// c.DisableHighlighting();
 
                         // By default, swagger-ui will validate specs against swagger.io's online validator and display the result
                         // in a badge at the bottom of the page. Use these options to set a different validator URL or to disable the
