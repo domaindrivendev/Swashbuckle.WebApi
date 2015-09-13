@@ -9,6 +9,7 @@ using Newtonsoft.Json.Serialization;
 using System.Collections.Generic;
 using Swashbuckle.Swagger;
 using System.Net;
+using Newtonsoft.Json.Converters;
 
 namespace Swashbuckle.Application
 {
@@ -30,7 +31,7 @@ namespace Swashbuckle.Application
             try
             {
                 var swaggerDoc = swaggerProvider.GetSwagger(rootUrl, apiVersion);
-                var content = ContentFor(request, swaggerDoc);
+                var content = ContentFor(request, swaggerDoc, swaggerProvider.GetOptions());
                 return TaskFor(new HttpResponseMessage { Content = content });
             }
             catch (UnknownApiVersion ex)
@@ -39,24 +40,33 @@ namespace Swashbuckle.Application
             }
         }
 
-        private HttpContent ContentFor(HttpRequestMessage request, SwaggerDocument swaggerDoc)
+        private HttpContent ContentFor(HttpRequestMessage request, SwaggerDocument swaggerDoc, SwaggerGeneratorOptions options)
         {
             var negotiator = request.GetConfiguration().Services.GetContentNegotiator();
-            var result = negotiator.Negotiate(typeof(SwaggerDocument), request, GetSupportedSwaggerFormatters());
+            var result = negotiator.Negotiate(typeof(SwaggerDocument), request, GetSupportedSwaggerFormatters(options));
 
             return new ObjectContent(typeof(SwaggerDocument), swaggerDoc, result.Formatter, result.MediaType);
         }
 
-        private IEnumerable<MediaTypeFormatter> GetSupportedSwaggerFormatters()
+        private IEnumerable<MediaTypeFormatter> GetSupportedSwaggerFormatters(SwaggerGeneratorOptions options)
         {
             var jsonFormatter = new JsonMediaTypeFormatter
             {
                 SerializerSettings = new JsonSerializerSettings
                 {
                     NullValueHandling = NullValueHandling.Ignore,
-                    Converters = new[] { new VendorExtensionsConverter() }
+                    Converters = new List<JsonConverter>() { new VendorExtensionsConverter() }
                 }
             };
+
+	          if (options.DescribeAllEnumsAsStrings)
+	          {
+		            jsonFormatter.SerializerSettings.Converters.Add(new StringEnumConverter()
+		            {
+			              CamelCaseText = options.DescribeStringEnumsInCamelCase
+		            });
+	          }
+
             // NOTE: The custom converter would not be neccessary in Newtonsoft.Json >= 5.0.5 as JsonExtensionData
             // provides similar functionality. But, need to stick with older version for WebApi 5.0.0 compatibility 
             return new[] { jsonFormatter };
