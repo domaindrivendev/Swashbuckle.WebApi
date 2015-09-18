@@ -6,7 +6,7 @@ var realm;
 var oauth2KeyName;
 var redirect_uri;
 var clientSecret;
-var scopeSeperator;
+var scopeSeparator;
 
 function handleLogin() {
   var scopes = [];
@@ -42,7 +42,7 @@ function handleLogin() {
     appName = window.swaggerUi.api.info.title;
   }
 
-  $('.api-popup-dialog').remove();
+  $('.api-popup-dialog').remove(); 
   popupDialog = $(
     [
       '<div class="api-popup-dialog">',
@@ -154,7 +154,7 @@ function handleLogin() {
     url += '&redirect_uri=' + encodeURIComponent(redirectUrl);
     url += '&realm=' + encodeURIComponent(realm);
     url += '&client_id=' + encodeURIComponent(clientId);
-    url += '&scope=' + encodeURIComponent(scopes.join(scopeSeperator));
+    url += '&scope=' + encodeURIComponent(scopes.join(scopeSeparator));
     url += '&state=' + encodeURIComponent(state);
 
     window.open(url);
@@ -167,18 +167,17 @@ function handleLogin() {
 
 
 function handleLogout() {
-  for(key in window.swaggerUi.api.clientAuthorizations.authz) {
-      window.swaggerUi.api.clientAuthorizations.remove(key);
+  for(key in window.swaggerUi.api.clientAuthorizations.authz){
+    window.swaggerUi.api.clientAuthorizations.remove(key)
   }
   window.enabledScopes = null;
   $('.api-ic.ic-on').addClass('ic-off');
   $('.api-ic.ic-on').removeClass('ic-on');
 
   // set the info box
-  $('.api-ic').addClass('ic-error');
-  $('.api-ic').removeClass('ic-warning');
-  $('.api-ic').removeClass('ic-info');
-  }
+  $('.api-ic.ic-warning').addClass('ic-error');
+  $('.api-ic.ic-warning').removeClass('ic-warning');
+}
 
 function initOAuth(opts) {
   var o = (opts||{});
@@ -212,7 +211,7 @@ function initOAuth(opts) {
 window.processOAuthCode = function processOAuthCode(data) {
   var params = {
     'client_id': clientId,
-	'client_secret': clientSecret,
+    'client_secret': clientSecret,
     'code': data.code,
     'grant_type': 'authorization_code',
     'redirect_uri': redirect_uri
