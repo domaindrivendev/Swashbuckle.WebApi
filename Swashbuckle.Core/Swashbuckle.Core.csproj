@@ -65,6 +65,7 @@
     <Reference Include="System.XML" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Application\HttpRouteDirectionConstraint.cs" />
     <Compile Include="Swagger\Annotations\ApplySwaggerOperationAttributes.cs" />
     <Compile Include="Swagger\Annotations\ApplySwaggerSchemaFilterAttributes.cs" />
     <Compile Include="Swagger\Annotations\ApplySwaggerOperationFilterAttributes.cs" />
