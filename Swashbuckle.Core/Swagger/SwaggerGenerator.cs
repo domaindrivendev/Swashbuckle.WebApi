@@ -27,6 +27,11 @@ namespace Swashbuckle.Swagger
             _options = options ?? new SwaggerGeneratorOptions();
         }
 
+			  public SwaggerGeneratorOptions GetOptions()
+	      {
+		        return _options;
+	      }
+
         public SwaggerDocument GetSwagger(string rootUrl, string apiVersion)
         {
             var schemaRegistry = new SchemaRegistry(
