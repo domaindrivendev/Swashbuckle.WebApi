@@ -23,7 +23,8 @@ namespace Swashbuckle.Swagger
             bool describeStringEnumsInCamelCase = false,
             IEnumerable<IOperationFilter> operationFilters = null,
             IEnumerable<IDocumentFilter> documentFilters = null,
-            Func<IEnumerable<ApiDescription>, ApiDescription> conflictingActionsResolver = null
+            Func<IEnumerable<ApiDescription>, ApiDescription> conflictingActionsResolver = null,
+            IApiDescriptionFilter apiDescriptionFilter = null
             )
         {
             VersionSupportResolver = versionSupportResolver;
@@ -42,6 +43,7 @@ namespace Swashbuckle.Swagger
             OperationFilters = operationFilters ?? new List<IOperationFilter>();
             DocumentFilters = documentFilters ?? new List<IDocumentFilter>();
             ConflictingActionsResolver = conflictingActionsResolver ?? DefaultConflictingActionsResolver;
+            ApiDescriptionFilter = apiDescriptionFilter;
         }
 
         public Func<ApiDescription, string, bool> VersionSupportResolver { get; private set; }
@@ -75,6 +77,8 @@ namespace Swashbuckle.Swagger
         public IEnumerable<IDocumentFilter> DocumentFilters { get; private set; }
 
         public Func<IEnumerable<ApiDescription>, ApiDescription> ConflictingActionsResolver { get; private set; }
+
+        public IApiDescriptionFilter ApiDescriptionFilter { get; private set; }
 
         private string DefaultGroupingKeySelector(ApiDescription apiDescription)
         {

@@ -74,9 +74,14 @@ namespace Swashbuckle.Swagger
 
         private IEnumerable<ApiDescription> GetApiDescriptionsFor(string apiVersion)
         {
+            var apiDescriptions = _apiExplorer.ApiDescriptions;
+            if (_options.ApiDescriptionFilter != null)
+            {
+                apiDescriptions = _options.ApiDescriptionFilter.Appy(_apiExplorer);
+            }
             return (_options.VersionSupportResolver == null)
-                ? _apiExplorer.ApiDescriptions
-                : _apiExplorer.ApiDescriptions.Where(apiDesc => _options.VersionSupportResolver(apiDesc, apiVersion));
+                ? apiDescriptions
+                : apiDescriptions.Where(apiDesc => _options.VersionSupportResolver(apiDesc, apiVersion));
         }
 
         private PathItem CreatePathItem(IEnumerable<ApiDescription> apiDescriptions, SchemaRegistry schemaRegistry)
