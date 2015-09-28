@@ -245,7 +245,8 @@ namespace Swashbuckle.Application
                 describeStringEnumsInCamelCase: _describeStringEnumsInCamelCase,
                 operationFilters: _operationFilters.Select(factory => factory()),
                 documentFilters: _documentFilters.Select(factory => factory()),
-                conflictingActionsResolver: _conflictingActionsResolver
+                conflictingActionsResolver: _conflictingActionsResolver,
+                apiDescriptionFilter: _apiDescriptionFilter()
             );
 
             var defaultProvider = new SwaggerGenerator(
