@@ -4,6 +4,7 @@ using System.Linq;
 using System.Collections.Generic;
 using System.Text;
 using System.Reflection;
+using System.Xml;
 using Newtonsoft.Json.Serialization;
 using Swashbuckle.Swagger;
 
@@ -18,8 +19,13 @@ namespace Swashbuckle.Swagger.XmlComments
         private readonly XPathNavigator _navigator;
 
         public ApplyXmlTypeComments(string xmlCommentsPath)
+            : this(new XPathDocument(xmlCommentsPath))
         {
-            _navigator = new XPathDocument(xmlCommentsPath).CreateNavigator();
+        }
+
+        public ApplyXmlTypeComments(XmlDocument document)
+        {
+            _navigator = document.CreateNavigator();
         }
 
         public void Apply(Schema model, ModelFilterContext context)
