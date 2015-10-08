@@ -5,6 +5,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Web.Http.Controllers;
 using System.Web.Http.Description;
+using System.Xml;
 using System.Xml.XPath;
 using Swashbuckle.Swagger;
 
@@ -21,8 +22,13 @@ namespace Swashbuckle.Swagger.XmlComments
         private readonly XPathNavigator _navigator;
 
         public ApplyXmlActionComments(string xmlCommentsPath)
+            : this(new XPathDocument(xmlCommentsPath))
         {
-            _navigator = new XPathDocument(xmlCommentsPath).CreateNavigator();
+        }
+
+        public ApplyXmlActionComments(XmlDocument document)
+        {
+            _navigator = document.CreateNavigator();
         }
 
         public void Apply(Operation operation, SchemaRegistry schemaRegistry, ApiDescription apiDescription)

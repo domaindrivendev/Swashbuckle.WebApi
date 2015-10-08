@@ -5,6 +5,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Web.Http;
 using System.Web.Http.Description;
+using System.Xml;
 using Newtonsoft.Json.Converters;
 using Swashbuckle.Swagger;
 using Swashbuckle.Swagger.FromUriParams;
@@ -190,8 +191,15 @@ namespace Swashbuckle.Application
 
         public void IncludeXmlComments(string filePath)
         {
-            OperationFilter(() => new ApplyXmlActionComments(filePath));
-            ModelFilter(() => new ApplyXmlTypeComments(filePath));
+            XmlDocument document = new XmlDocument();
+            document.Load(filePath);
+            IncludeXmlComments(document);
+        }
+
+        public void IncludeXmlComments(XmlDocument document)
+        {
+            OperationFilter(() => new ApplyXmlActionComments(document));
+            ModelFilter(() => new ApplyXmlTypeComments(document));
         }
 
         public void ResolveConflictingActions(Func<IEnumerable<ApiDescription>, ApiDescription> conflictingActionsResolver)
