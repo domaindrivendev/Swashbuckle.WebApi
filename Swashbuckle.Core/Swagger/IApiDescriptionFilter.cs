@@ -5,6 +5,6 @@ namespace Swashbuckle.Swagger
 {
     public interface IApiDescriptionFilter
     {
-        Collection<ApiDescription> Appy(IApiExplorer apiExplorer);
+        Collection<ApiDescription> Apply(IApiExplorer apiExplorer);
     }
 }

@@ -77,7 +77,7 @@ namespace Swashbuckle.Swagger
             var apiDescriptions = _apiExplorer.ApiDescriptions;
             if (_options.ApiDescriptionFilter != null)
             {
-                apiDescriptions = _options.ApiDescriptionFilter.Appy(_apiExplorer);
+                apiDescriptions = _options.ApiDescriptionFilter.Apply(_apiExplorer);
             }
             return (_options.VersionSupportResolver == null)
                 ? apiDescriptions
