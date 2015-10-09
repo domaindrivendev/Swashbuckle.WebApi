@@ -30,7 +30,9 @@ namespace Swashbuckle.Application
                 { "%(OAuth2ClientId)", "" },
                 { "%(OAuth2ClientSecret)", "" },
                 { "%(OAuth2Realm)", "" },
-                { "%(OAuth2AppName)", "" }
+                { "%(OAuth2AppName)", "" },
+                { "%(disableHighlighting)", "false" }
+
             };
             _rootUrlResolver = rootUrlResolver;
 
@@ -54,7 +56,7 @@ namespace Swashbuckle.Application
 
             CustomAsset(path, resourceAssembly, resourceName);
         }
-        
+
         public void BooleanValues(IEnumerable<string> values)
         {
             _templateParams["%(BooleanValues)"] = String.Join("|", values);
@@ -68,6 +70,11 @@ namespace Swashbuckle.Application
         public void DisableValidator()
         {
             _templateParams["%(ValidatorUrl)"] = "null";
+        }
+
+        public void DisableHighlighting()
+        {
+            _templateParams["%(disableHighlighting)"] = "true";
         }
 
         public void InjectJavaScript(Assembly resourceAssembly, string resourceName)
