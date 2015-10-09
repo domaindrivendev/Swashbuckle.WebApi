@@ -97,7 +97,7 @@ namespace Swashbuckle.Application
                     name: "swagger_ui_shortcut",
                     routeTemplate: "swagger",
                     defaults: null,
-                    constraints: null,
+                    constraints: new { uriResolution = new HttpRouteDirectionConstraint(HttpRouteDirection.UriResolution) },
                     handler: new RedirectHandler(_rootUrlResolver, "swagger/ui/index"));
             }
         }

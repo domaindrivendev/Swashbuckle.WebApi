@@ -29,6 +29,8 @@ namespace Swashbuckle.Swagger
         public static string FullNameSansTypeParameters(this Type type)
         {
             var fullName = type.FullName;
+            if (string.IsNullOrEmpty(fullName))
+                fullName = type.Name;
             var chopIndex = fullName.IndexOf("[[");
             return (chopIndex == -1) ? fullName : fullName.Substring(0, chopIndex);
         }
