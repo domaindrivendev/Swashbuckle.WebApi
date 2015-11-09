@@ -5,6 +5,7 @@ using System.Dynamic;
 using System.Linq;
 using System.Net.Http;
 using System.Reflection;
+using System.Runtime.Serialization;
 using System.Text;
 using System.Web.Http;
 using Newtonsoft.Json;
@@ -174,17 +175,25 @@ namespace Swashbuckle.Swagger
                 {
                     type = "string",
                     @enum = camelCase
-                        ? type.GetEnumNames().Select(name => name.ToCamelCase()).ToArray()
-                        : type.GetEnumNames()
+                        ? GetEnumNames(type).Select(name => name.ToCamelCase()).ToArray()
+                        : GetEnumNames(type)
                 };
             }
-
+            
             return new Schema
             {
                 type = "integer",
                 format = "int32",
                 @enum = type.GetEnumValues().Cast<object>().ToArray()
             };
+        }
+
+        private string[] GetEnumNames(Type type)
+        {
+            return (from f in type.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static)
+                    let attribute = (EnumMemberAttribute)f.GetCustomAttributes(typeof(EnumMemberAttribute), false).FirstOrDefault()
+                    select attribute == null || string.IsNullOrWhiteSpace(attribute.Value) ? f.Name : attribute.Value)
+                .ToArray();
         }
 
         private Schema CreateDictionarySchema(JsonDictionaryContract dictionaryContract)
