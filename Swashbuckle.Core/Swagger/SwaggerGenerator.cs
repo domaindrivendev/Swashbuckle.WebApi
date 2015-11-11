@@ -126,13 +126,7 @@ namespace Swashbuckle.Swagger
 
         protected virtual Operation CreateOperation(ApiDescription apiDescription, SchemaRegistry schemaRegistry)
         {
-            var parameters = apiDescription.ParameterDescriptions
-                .Select(paramDesc =>
-                    {
-                        var inPath = apiDescription.RelativePathSansQueryString().Contains("{" + paramDesc.Name + "}");
-                        return CreateParameter(paramDesc, inPath, schemaRegistry);
-                    })
-                 .ToList();
+            var parameters = CreateParameters(apiDescription, schemaRegistry);
 
             var responses = new Dictionary<string, Response>();
             var responseType = apiDescription.ResponseType();
@@ -158,6 +152,17 @@ namespace Swashbuckle.Swagger
             }
 
             return operation;
+        }
+
+        protected virtual List<Parameter> CreateParameters(ApiDescription apiDescription, SchemaRegistry schemaRegistry)
+        {
+            return apiDescription.ParameterDescriptions
+                .Select(paramDesc =>
+                {
+                    var inPath = apiDescription.RelativePathSansQueryString().Contains("{" + paramDesc.Name + "}");
+                    return CreateParameter(paramDesc, inPath, schemaRegistry);
+                })
+                .ToList();
         }
 
         protected virtual Parameter CreateParameter(ApiParameterDescription paramDesc, bool inPath, SchemaRegistry schemaRegistry)
