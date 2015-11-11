@@ -79,7 +79,7 @@ namespace Swashbuckle.Swagger
                 : _apiExplorer.ApiDescriptions.Where(apiDesc => _options.VersionSupportResolver(apiDesc, apiVersion));
         }
 
-        private PathItem CreatePathItem(IEnumerable<ApiDescription> apiDescriptions, SchemaRegistry schemaRegistry)
+        protected virtual PathItem CreatePathItem(IEnumerable<ApiDescription> apiDescriptions, SchemaRegistry schemaRegistry)
         {
             var pathItem = new PathItem();
 
@@ -124,7 +124,7 @@ namespace Swashbuckle.Swagger
             return pathItem;
         }
 
-        private Operation CreateOperation(ApiDescription apiDescription, SchemaRegistry schemaRegistry)
+        protected virtual Operation CreateOperation(ApiDescription apiDescription, SchemaRegistry schemaRegistry)
         {
             var parameters = apiDescription.ParameterDescriptions
                 .Select(paramDesc =>
@@ -160,7 +160,7 @@ namespace Swashbuckle.Swagger
             return operation;
         }
 
-        private Parameter CreateParameter(ApiParameterDescription paramDesc, bool inPath, SchemaRegistry schemaRegistry)
+        protected virtual Parameter CreateParameter(ApiParameterDescription paramDesc, bool inPath, SchemaRegistry schemaRegistry)
         {
             var @in = (inPath)
                 ? "path"
