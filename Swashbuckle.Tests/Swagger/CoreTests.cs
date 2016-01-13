@@ -372,6 +372,20 @@ namespace Swashbuckle.Tests.Swagger
         }
 
         [Test]
+        public void It_exposes_config_to_pretty_print_docs_output()
+        {
+            SetUpDefaultRouteFor<ObsoleteActionsController>();
+
+            var swagger = GetContentAsString("http://tempuri.org/swagger/docs/v1");
+            Assert.IsTrue(swagger.StartsWith("{\"swagger\":"));
+
+            SetUpHandler(c => c.PrettyPrint());
+
+            swagger = GetContentAsString("http://tempuri.org/swagger/docs/v1");
+            Assert.IsTrue(swagger.StartsWith("{\r\n  \"swagger\":"));
+        }
+
+        [Test]
         public void It_exposes_config_to_ignore_all_actions_that_are_obsolete()
         {
             SetUpDefaultRouteFor<ObsoleteActionsController>();

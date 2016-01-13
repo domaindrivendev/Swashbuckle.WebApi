@@ -54,6 +54,7 @@ namespace Swashbuckle.Application
                 SerializerSettings = new JsonSerializerSettings
                 {
                     NullValueHandling = NullValueHandling.Ignore,
+                    Formatting = _config.GetFormatting(),
                     Converters = new[] { new VendorExtensionsConverter() }
                 }
             };

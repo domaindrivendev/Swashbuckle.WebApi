@@ -5,10 +5,10 @@ using System.Linq;
 using System.Net.Http;
 using System.Web.Http;
 using System.Web.Http.Description;
-using Newtonsoft.Json.Converters;
+using Newtonsoft.Json;
 using Swashbuckle.Swagger;
-using Swashbuckle.Swagger.FromUriParams;
 using Swashbuckle.Swagger.Annotations;
+using Swashbuckle.Swagger.FromUriParams;
 using Swashbuckle.Swagger.XmlComments;
 
 namespace Swashbuckle.Application
@@ -19,6 +19,7 @@ namespace Swashbuckle.Application
         private Func<ApiDescription, string, bool> _versionSupportResolver;
         private IEnumerable<string> _schemes;
         private IDictionary<string, SecuritySchemeBuilder> _securitySchemeBuilders;
+        private bool _prettyPrint;
         private bool _ignoreObsoleteActions;
         private Func<ApiDescription, string> _groupingKeySelector;
         private IComparer<string> _groupingKeyComparer;
@@ -40,6 +41,7 @@ namespace Swashbuckle.Application
         {
             _versionInfoBuilder = new VersionInfoBuilder();
             _securitySchemeBuilders = new Dictionary<string, SecuritySchemeBuilder>();
+            _prettyPrint = false;
             _ignoreObsoleteActions = false;
             _customSchemaMappings = new Dictionary<Type, Func<Schema>>();
             _schemaFilters = new List<Func<ISchemaFilter>>();
@@ -99,6 +101,11 @@ namespace Swashbuckle.Application
             var schemeBuilder = new OAuth2SchemeBuilder();
             _securitySchemeBuilders[name] = schemeBuilder;
             return schemeBuilder;
+        }
+
+        public void PrettyPrint()
+        {
+            _prettyPrint = true;
         }
 
         public void IgnoreObsoleteActions()
@@ -255,6 +262,11 @@ namespace Swashbuckle.Application
         internal IEnumerable<string> GetApiVersions()
         {
             return _versionInfoBuilder.Build().Select(entry => entry.Key);
+        }
+
+        internal Formatting GetFormatting()
+        {
+            return _prettyPrint ? Formatting.Indented : Formatting.None;
         }
 
         public static string DefaultRootUrlResolver(HttpRequestMessage request)
