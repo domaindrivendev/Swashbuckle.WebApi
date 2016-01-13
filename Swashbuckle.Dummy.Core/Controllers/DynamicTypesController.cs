@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -13,6 +14,11 @@ namespace Swashbuckle.Dummy.Controllers
         public int Create(dynamic thing)
         {
             throw new NotImplementedException();
+        }
+
+        [HttpPut]
+        public void Update(DynamicObjectSubType resource)
+        {
         }
 
         public ExpandoObject GeByProperties(JObject thing)
@@ -34,5 +40,11 @@ namespace Swashbuckle.Dummy.Controllers
         {
             throw new NotImplementedException();
         }
+    }
+
+    [JsonObject]
+    public class DynamicObjectSubType : DynamicObject
+    {
+        public string Name { get; set; } 
     }
 }
