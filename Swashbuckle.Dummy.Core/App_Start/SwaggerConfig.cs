@@ -236,7 +236,7 @@ namespace Swashbuckle.Dummy
                         // If your API supports the OAuth2 Implicit flow, and you've described it correctly, according to
                         // the Swagger 2.0 specification, you can enable UI support as shown below.
                         //
-                        c.EnableOAuth2Support("test-client-id", "test-realm", "Swagger UI");
+                        c.EnableOAuth2Support("test-client-id", null, "test-realm", "Swagger UI", ",");
                     });
         }
 

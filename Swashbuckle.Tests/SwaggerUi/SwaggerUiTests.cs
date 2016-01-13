@@ -83,6 +83,7 @@ namespace Swashbuckle.Tests.SwaggerUi
             StringAssert.Contains("oAuth2ClientId: 'test-client-id'", content);
             StringAssert.Contains("oAuth2Realm: 'test-realm'", content);
             StringAssert.Contains("oAuth2AppName: 'Swagger UI'", content);
+            StringAssert.Contains("oAuth2ScopeSeperator: ' '", content);
         }
 
         [Test]
