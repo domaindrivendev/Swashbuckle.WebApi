@@ -1,3 +1,7 @@
+* **[Getting Started](#getting-started)**
+  * [IIS Hosted](#iis-hosted)
+* **[Troubleshooting](#troubleshooting)**
+
 Swashbuckle 5.0
 =========
 
