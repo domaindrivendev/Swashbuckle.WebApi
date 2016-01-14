@@ -22,7 +22,7 @@ Once you have a Web API that can describe itself in Swagger, you've opened the t
 
 Swashbuckle 5.0 makes the transition to Swagger 2.0. The 2.0 schema is significantly different to its predecessor (1.2) and, as a result, the Swashbuckle config interface has undergone yet another overhaul. Checkout the [transition guide](#transitioning-to-swashbuckle-50) if you're upgrading from a prior version.
 
-# Table of Contents
+## Table of Contents
 
 1. [Getting Started](#getting-started)
   * [IIS Hosted](#iis-hosted)
