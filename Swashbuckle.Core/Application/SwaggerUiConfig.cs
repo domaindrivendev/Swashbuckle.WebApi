@@ -31,7 +31,8 @@ namespace Swashbuckle.Application
                 { "%(OAuth2ClientId)", "" },
                 { "%(OAuth2ClientSecret)", "" },
                 { "%(OAuth2Realm)", "" },
-                { "%(OAuth2AppName)", "" }
+                { "%(OAuth2AppName)", "" },
+                { "%(OAuth2ScopeSeperator)", " " }
             };
             _rootUrlResolver = rootUrlResolver;
 
@@ -102,16 +103,23 @@ namespace Swashbuckle.Application
 
         public void EnableOAuth2Support(string clientId, string realm, string appName, Dictionary<string, string> additionalQueryStringParams = null)
         {
-            EnableOAuth2Support(clientId, "N/A", realm, appName, additionalQueryStringParams);
+            EnableOAuth2Support(clientId, "N/A", realm, appName, additionalQueryStringParams: additionalQueryStringParams);
         }
 
-        public void EnableOAuth2Support(string clientId, string clientSecret, string realm, string appName, Dictionary<string, string> additionalQueryStringParams = null)
+        public void EnableOAuth2Support(
+            string clientId,
+            string clientSecret,
+            string realm,
+            string appName,
+            string scopeSeperator = " ",
+            Dictionary<string, string> additionalQueryStringParams = null)
         {
             _templateParams["%(OAuth2Enabled)"] = "true";
             _templateParams["%(OAuth2ClientId)"] = clientId;
             _templateParams["%(OAuth2ClientSecret)"] = clientSecret;
             _templateParams["%(OAuth2Realm)"] = realm;
             _templateParams["%(OAuth2AppName)"] = appName;
+            _templateParams["%(OAuth2ScopeSeperator)"] = scopeSeperator;
             _templateParams["%(oAuth2AdditionalQueryStringParams)"] = JsonConvert.SerializeObject(additionalQueryStringParams ?? new Dictionary<string, string>());
         }
 

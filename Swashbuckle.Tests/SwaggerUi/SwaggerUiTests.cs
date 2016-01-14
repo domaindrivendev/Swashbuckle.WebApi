@@ -81,7 +81,7 @@ namespace Swashbuckle.Tests.SwaggerUi
                 "test-client-secret",
                 "test-realm",
                 "Swagger UI",
-                new Dictionary<string, string> {{"TestHeader", "TestValue"}}));
+                additionalQueryStringParams: new Dictionary<string, string> {{"TestHeader", "TestValue"}}));
 
             var content = GetContentAsString("http://tempuri.org/swagger/ui/index");
 
@@ -90,6 +90,7 @@ namespace Swashbuckle.Tests.SwaggerUi
             StringAssert.Contains("oAuth2ClientSecret: 'test-client-secret'", content);
             StringAssert.Contains("oAuth2Realm: 'test-realm'", content);
             StringAssert.Contains("oAuth2AppName: 'Swagger UI'", content);
+            StringAssert.Contains("oAuth2ScopeSeperator: ' '", content);
             StringAssert.Contains("oAuth2AdditionalQueryStringParams: JSON.parse('{\"TestHeader\":\"TestValue\"}')", content);
         }
 

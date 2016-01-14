@@ -464,6 +464,19 @@ namespace Swashbuckle.Tests.Swagger
             var expected = JObject.FromObject(new Dictionary<string, object>
                 {
                     {
+                        "DynamicObjectSubType", new
+                        {
+                            type = "object",
+                            properties = new
+                            {
+                                Name = new
+                                {
+                                    type = "string" 
+                                } 
+                            }
+                        }
+                    },
+                    {
                         "Object", new
                         {
                             type = "object",
