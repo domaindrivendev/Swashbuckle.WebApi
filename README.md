@@ -1,9 +1,9 @@
-* [# Getting Started](#getting-started)
+* [## Getting Started](#getting-started)
   * [#### IIS Hosted](#iis-hosted)
   * [#### Self-hosted](#self-hosted)
   * [#### OWIN](#owin)
-* [# Troubleshooting](#troubleshooting)
-* [# Customizing the Generated Swagger Docs](#customizing-the-generated-swagger-docs)
+* [## Troubleshooting](#troubleshooting)
+* [## Customizing the Generated Swagger Docs](#customizing-the-generated-swagger-docs)
   * [#### Custom Routes](#custom-routes)
   * [#### Additional Service Metadata](#additional-service-metadata)
     * [###### RootUrl](#rooturl)
@@ -28,7 +28,7 @@
   * [#### Including XML Comments](#including-xml-comments)
     * [###### Response Codes](#response-codes)
   * [#### Working Around Swagger 2.0 Constraints](#working-around-swagger-20-constraints)
-* [# Customizing the swagger-ui](#customizing-the-swagger-ui)
+* [## Customizing the swagger-ui](#customizing-the-swagger-ui)
   * [#### Customizations via the configuration API](#customizations-via-the-configuration-api)
     * [###### InjectStylesheet](#injectstylesheet)
     * [###### InjectJavaScript](#injectjavascript)
@@ -37,8 +37,8 @@
     * [###### DocExpansion](#docexpansion)
   * [#### Provide your own "index" file](#provide-your-own-index-file)
   * [#### Injecting Custom Content](#injecting-custom-content)
-* [# Transitioning to Swashbuckle 5.0](#transitioning-to-swashbuckle-50)
-* [# Troubleshooting and FAQ's](#troubleshooting-and-faqs)
+* [## Transitioning to Swashbuckle 5.0](#transitioning-to-swashbuckle-50)
+* [## Troubleshooting and FAQ's](#troubleshooting-and-faqs)
   * [#### Swagger-ui showing "Can't read swagger JSON from ..."](#swagger-ui-showing-cant-read-swagger-json-from-)
   * [#### Page not found when accessing the UI](#page-not-found-when-accessing-the-ui)
   * [#### Swagger-ui broken by Visual Studio 2013](#swagger-ui-broken-by-visual-studio-2013)
@@ -69,7 +69,7 @@ Once you have a Web API that can describe itself in Swagger, you've opened the t
 
 Swashbuckle 5.0 makes the transition to Swagger 2.0. The 2.0 schema is significantly different to its predecessor (1.2) and, as a result, the Swashbuckle config interface has undergone yet another overhaul. Checkout the [transition guide](#transitioning-to-swashbuckle-50) if you're upgrading from a prior version.
 
-# Getting Started
+## Getting Started
 
 There are currently two Nuget packages - the Core library (Swashbuckle.Core) and a convenience package (Swashbuckle)  - that provides automatic bootstrapping. The latter is only applicable to regular IIS hosted Web APIs. For all other hosting environments, you should only install the Core library and then follow the instructions below to manually enable the Swagger routes.
 
@@ -111,11 +111,11 @@ Then manually enable the Swagger docs and swagger-ui by invoking the extension m
         .EnableSwagger(c => c.SingleApiVersion("v1", "A title for your API"))
         .EnableSwaggerUi();    
 
-# Troubleshooting
+## Troubleshooting
 
 Troubleshooting??? I thought this was all supposed to be "seamless"? OK you've called me out! Things shouldn't go wrong, but if they do, take a look at the [FAQs](#troubleshooting-and-faqs) for inspiration.
 
-# Customizing the Generated Swagger Docs
+## Customizing the Generated Swagger Docs
 
 The following snippet demonstrates the minimum configuration required to get the Swagger docs and swagger-ui up and running:
 
@@ -406,7 +406,7 @@ See the following discussion for more details:
 
 <https://github.com/domaindrivendev/Swashbuckle/issues/142>
 
-# Customizing the swagger-ui
+## Customizing the swagger-ui
 
 The swagger-ui is a JavaScript application hosted in a single HTML page (index.html), and it exposes several customization settings. Swashbuckle ships with an embedded version and includes corresponding configuration methods for each of the UI settings. If you require further customization, you can also inject your own version of "index.html". Read on to learn more.
 
@@ -472,7 +472,7 @@ The __InjectStylesheet__, __InjectJavaScript__ and __CustomAsset__ options all s
 
 This will embed the file in your assembly and register it with a "Logical Name". This can then be passed to the relevant configuration method. It's based on the Project's default namespace, file location and file extension. For example, given a default namespace of "YourWebApiProject" and a file located at "/SwaggerExtensions/index.html", then the resource will be assigned the name - "YourWebApiProject.SwaggerExtensions.index.html".
 
-# Transitioning to Swashbuckle 5.0
+## Transitioning to Swashbuckle 5.0
 
 This version of Swashbuckle makes the transition to Swagger 2.0. The 2.0 specification is significantly different to its predecessor (1.2) and forces several breaking changes to Swashbuckle's configuration API. If you're using Swashbuckle without any customizations, i.e. App_Start/SwaggerConfig.cs has never been modified, then you can overwrite it with the new version. The defaults are the same and so the swagger-ui should behave as before.
 
@@ -498,7 +498,7 @@ If you're using the existing configuration API to customize the final Swagger do
 | SupportedSubmitMethods | N/A | all HTTP verbs are implicitly supported |
 | CustomRoute | CustomAsset | &nbsp; |
 
-# Troubleshooting and FAQ's
+## Troubleshooting and FAQ's
 
 1. [Swagger-ui showing "Can't read swagger JSON from ..."](#swagger-ui-showing-cant-read-swagger-json-from)
 2. [Page not found when accessing the UI](#page-not-found-when-accessing-the-ui)
