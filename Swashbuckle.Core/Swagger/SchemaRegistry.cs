@@ -21,8 +21,8 @@ namespace Swashbuckle.Swagger
         private readonly IDictionary<Type, Func<Schema>> _customSchemaMappings;
         private readonly IEnumerable<ISchemaFilter> _schemaFilters;
         private readonly IEnumerable<IModelFilter> _modelFilters;
-        private readonly bool _ignoreObsoleteProperties;
         private readonly Func<Type, string> _schemaIdSelector;
+        private readonly bool _ignoreObsoleteProperties;
         private readonly bool _describeAllEnumsAsStrings;
         private readonly bool _describeStringEnumsInCamelCase;
 
@@ -40,8 +40,8 @@ namespace Swashbuckle.Swagger
             IDictionary<Type, Func<Schema>> customSchemaMappings,
             IEnumerable<ISchemaFilter> schemaFilters,
             IEnumerable<IModelFilter> modelFilters,
-            bool ignoreObsoleteProperties,
             Func<Type, string> schemaIdSelector,
+            bool ignoreObsoleteProperties,
             bool describeAllEnumsAsStrings,
             bool describeStringEnumsInCamelCase)
         {
@@ -49,8 +49,8 @@ namespace Swashbuckle.Swagger
             _customSchemaMappings = customSchemaMappings;
             _schemaFilters = schemaFilters;
             _modelFilters = modelFilters;
-            _ignoreObsoleteProperties = ignoreObsoleteProperties;
             _schemaIdSelector = schemaIdSelector;
+            _ignoreObsoleteProperties = ignoreObsoleteProperties;
             _describeAllEnumsAsStrings = describeAllEnumsAsStrings;
             _describeStringEnumsInCamelCase = describeStringEnumsInCamelCase;
 

@@ -223,17 +223,15 @@ Swashbuckle makes a best attempt at generating Swagger compliant JSON schemas fo
                 c.MapType<ProductType>(() => new Schema { type = "integer", format = "int32" });
 
                 c.SchemaFilter<ApplySchemaVendorExtensions>();
+
+                //c.UseFullTypeNameInSchemaIds();
+
+                c.SchemaId(t => t.FullName.Contains('`') ? t.FullName.Substring(0, t.FullName.IndexOf('`')) : t.FullName);
                 
                 c.IgnoreObsoleteProperties();
 
-                c.UseFullTypeNameInSchemaIds();
-
                 c.DescribeAllEnumsAsStrings();
             });
-
-#### IgnoreObsoleteProperties ####
-
-Set this flag to omit schema property descriptions for any type properties decorated with the Obsolete attribute 
 
 #### MapType ####
 
@@ -256,6 +254,14 @@ A typical implementation will inspect the system Type and modify the Schema acco
 #### UseFullTypeNamesInSchemaIds ####
 
 In a Swagger 2.0 document, complex types are typically declared globally and referenced by unique Schema Id. By default, Swashbuckle does NOT use the full type name in Schema Ids. In most cases, this works well because it prevents the "implementation detail" of type namespaces from leaking into your Swagger docs and UI. However, if you have multiple types in your API with the same class name, you'll need to opt out of this behavior to avoid Schema Id conflicts.  
+
+#### SchemaId ####
+
+Use this option to provide your own custom strategy for inferring SchemaId's for describing "complex" types in your API.
+
+#### IgnoreObsoleteProperties ####
+
+Set this flag to omit schema property descriptions for any type properties decorated with the Obsolete attribute 
 
 #### DescribeAllEnumsAsStrings ####
 

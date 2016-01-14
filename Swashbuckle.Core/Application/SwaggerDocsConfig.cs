@@ -26,8 +26,8 @@ namespace Swashbuckle.Application
         private readonly IDictionary<Type, Func<Schema>> _customSchemaMappings;
         private readonly IList<Func<ISchemaFilter>> _schemaFilters;
         private readonly IList<Func<IModelFilter>> _modelFilters;
-        private bool _ignoreObsoleteProperties;
         private Func<Type, string> _schemaIdSelector;
+        private bool _ignoreObsoleteProperties;
         private bool _describeAllEnumsAsStrings;
         private bool _describeStringEnumsInCamelCase;
         private readonly IList<Func<IOperationFilter>> _operationFilters;
