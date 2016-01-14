@@ -45,8 +45,7 @@
   * [### OWIN Hosted in IIS - Incorrect VirtualPathRoot Handling](#owin-hosted-in-iis---incorrect-virtualpathroot-handling)
   * [### How to add vendor extensions](#how-to-add-vendor-extensions)
 
-Swashbuckle 5.0
-=========
+# Swashbuckle 5.0 #
 
 Seamlessly adds a [Swagger](http://swagger.io/) to WebApi projects! Combines ApiExplorer and Swagger/swagger-ui to provide a rich discovery, documentation and playground experience to your API consumers.
 
@@ -100,7 +99,7 @@ Then manually enable the Swagger docs and, optionally, the swagger-ui by invokin
         .EnableSwagger(c => c.SingleApiVersion("v1", "A title for your API"))
         .EnableSwaggerUi();
 
-### OWIN  ###
+### OWIN ###
 
 If your service is hosted using OWIN middleware, just install the Core library:
 
@@ -513,7 +512,7 @@ If you're using the existing configuration API to customize the final Swagger do
 4. [OWIN Hosted in IIS - Incorrect VirtualPathRoot Handling](#owin-hosted-in-iis---incorrect-virtualpathroot-handling)
 5. [How to add vendor extensions](#how-to-add-vendor-extensions)
 
-### Swagger-ui showing "Can't read swagger JSON from ..."
+### Swagger-ui showing "Can't read swagger JSON from ..." ###
 
 If you see this message, it means the swagger-ui received an unexpected response when requesting the Swagger document. You can troubleshoot further by navigating directly to the discovery URL included in the error message. This should provide more details.
 
@@ -553,7 +552,7 @@ I hope to find a permanent fix, but in the meantime, you'll need to workaround t
         <add key="vs:EnableBrowserLink" value="false"/>
     </appSettings>< appSettings>
 
-### OWIN Hosted in IIS - Incorrect VirtualPathRoot Handling
+### OWIN Hosted in IIS - Incorrect VirtualPathRoot Handling ###
 
 When you host Web API 2 on top of OWIN/SystemWeb, Swashbuckle cannot correctly resolve VirtualPathRoot by default.
 
