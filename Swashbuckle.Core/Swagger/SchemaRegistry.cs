@@ -175,8 +175,8 @@ namespace Swashbuckle.Swagger
                 {
                     type = "string",
                     @enum = camelCase
-                        ? GetEnumNames(type).Select(name => name.ToCamelCase()).ToArray()
-                        : GetEnumNames(type)
+                        ? type.GetEnumNamesForSerialization().Select(name => name.ToCamelCase()).ToArray()
+                        : type.GetEnumNamesForSerialization()
                 };
             }
             
@@ -186,14 +186,6 @@ namespace Swashbuckle.Swagger
                 format = "int32",
                 @enum = type.GetEnumValues().Cast<object>().ToArray()
             };
-        }
-
-        private string[] GetEnumNames(Type type)
-        {
-            return (from f in type.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static)
-                    let attribute = (EnumMemberAttribute)f.GetCustomAttributes(typeof(EnumMemberAttribute), false).FirstOrDefault()
-                    select attribute == null || string.IsNullOrWhiteSpace(attribute.Value) ? f.Name : attribute.Value)
-                .ToArray();
         }
 
         private Schema CreateDictionarySchema(JsonDictionaryContract dictionaryContract)

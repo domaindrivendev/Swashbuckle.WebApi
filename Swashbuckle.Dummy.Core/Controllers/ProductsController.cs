@@ -1,6 +1,7 @@
 ﻿using Swashbuckle.Dummy.SwaggerExtensions;
 using System;
 using System.Collections.Generic;
+using System.Runtime.Serialization;
 using System.Web.Http;
 
 namespace Swashbuckle.Dummy.Controllers
@@ -34,7 +35,9 @@ namespace Swashbuckle.Dummy.Controllers
 
     public enum ProductType
     {
+        [EnumMember(Value = "Publication")]
         Book = 2,
+
         Album = 4
     }
 }

@@ -238,7 +238,7 @@ namespace Swashbuckle.Tests.Swagger
 
             var expected = JObject.FromObject(new
                 {
-                    @enum = new[] { "book", "album" },
+                    @enum = new[] { "publication", "album" },
                     type = "string"
                 });
             Assert.AreEqual(expected.ToString(), typeSchema.ToString());
