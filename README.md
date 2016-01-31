@@ -309,6 +309,16 @@ The default implementation of ISwaggerProvider, the interface used to obtain Swa
 				c.CustomProvider((defaultProvider) => new CachingSwaggerProvider(defaultProvider));
             });
 
+#### ApiDescriptionFilter ####
+
+Post-modify the entire Swagger document by wiring up one or more ApiDescription filters.
+
+IApiDescriptionFilter has the following interface:
+
+    Collection<ApiDescription> Apply(IApiExplorer apiExplorer);
+
+This gives full control to modify the ApiDescriptions. You can gain additional context from the provided SwaggerDocument (e.g. version) and IApiExplorer. You should have a good understanding of the [CustomApiExplorer.](https://github.com/partychen/CustomApiExplorer) before using this option.
+
 ### Including XML Comments ###
 
 If you annotate Controllers and API Types with [Xml Comments](http://msdn.microsoft.com/en-us/library/b2s063f7(v=vs.110).aspx), you can incorporate those comments into the generated docs and UI. The Xml tags are mapped to Swagger properties as follows:

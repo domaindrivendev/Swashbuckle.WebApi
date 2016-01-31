@@ -160,6 +160,13 @@ namespace $rootnamespace$
                         //
                         //c.DocumentFilter<ApplyDocumentVendorExtensions>();
 
+						// Post-modify the entire Swagger document by wiring up one or more ApiDescription filters.
+                        // This gives full control to modify the ApiDescription. You should have a good understanding of
+                        // the Swagger 2.0 spec. - https://github.com/partychen/CustomApiExplorer
+                        // before using this option.
+                        //
+                        //c.ApiDescriptionFilter<CustomApiDescriptionFilter>();
+
                         // In contrast to WebApi, Swagger 2.0 does not include the query string component when mapping a URL
                         // to an action. As a result, Swashbuckle will raise an exception if it encounters multiple actions
                         // with the same path (sans query string) and HTTP method. You can workaround this by providing a

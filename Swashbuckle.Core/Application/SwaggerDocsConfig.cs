@@ -34,6 +34,7 @@ namespace Swashbuckle.Application
         private readonly IList<Func<IDocumentFilter>> _documentFilters;
         private Func<IEnumerable<ApiDescription>, ApiDescription> _conflictingActionsResolver;
         private Func<HttpRequestMessage, string> _rootUrlResolver;
+        private Func<IApiDescriptionFilter> _apiDescriptionFilter;
 
         private Func<ISwaggerProvider, ISwaggerProvider> _customProviderFactory;
 
@@ -216,6 +217,17 @@ namespace Swashbuckle.Application
             _customProviderFactory = customProviderFactory;
         }
 
+        public void ApiDescriptionFilter<TFilter>()
+            where TFilter : IApiDescriptionFilter, new()
+        {
+            ApiDescriptionFilter(() => new TFilter());
+        }
+
+        public void ApiDescriptionFilter(Func<IApiDescriptionFilter> factory)
+        {
+            _apiDescriptionFilter = factory;
+        }
+
         internal ISwaggerProvider GetSwaggerProvider(HttpRequestMessage swaggerRequest)
         {
             var httpConfig = swaggerRequest.GetConfiguration();
@@ -240,7 +252,8 @@ namespace Swashbuckle.Application
                 describeStringEnumsInCamelCase: _describeStringEnumsInCamelCase,
                 operationFilters: _operationFilters.Select(factory => factory()),
                 documentFilters: _documentFilters.Select(factory => factory()),
-                conflictingActionsResolver: _conflictingActionsResolver
+                conflictingActionsResolver: _conflictingActionsResolver,
+                apiDescriptionFilter: _apiDescriptionFilter()
             );
 
             var defaultProvider = new SwaggerGenerator(
