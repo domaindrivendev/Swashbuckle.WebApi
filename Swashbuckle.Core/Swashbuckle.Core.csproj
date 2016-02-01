@@ -88,13 +88,13 @@
     <Compile Include="Application\SwaggerDocsConfig.cs" />
     <Compile Include="Application\HttpConfigurationExtensions.cs" />
     <Compile Include="Swagger\Annotations\ApplySwaggerResponseAttributes.cs" />
+    <Compile Include="Swagger\XmlComments\XmlCommentsIdHelper.cs" />
     <Compile Include="Swagger\IModelFilter.cs" />
     <Compile Include="Swagger\StringExtensions.cs" />
     <Compile Include="Swagger\TypeExtensions.cs" />
     <Compile Include="Swagger\XmlComments\ApplyXmlTypeComments.cs" />
     <Compile Include="Swagger\XmlComments\ApplyXmlActionComments.cs" />
     <Compile Include="Swagger\FromUriParams\HandleFromUriParams.cs" />
-    <Compile Include="Swagger\XmlComments\TypeExtensions.cs" />
     <Compile Include="Swagger\JsonContractExtensions.cs" />
     <Compile Include="Swagger\JsonPropertyExtensions.cs" />
     <Compile Include="SwaggerUi\EmbeddedAssetDescriptor.cs" />
