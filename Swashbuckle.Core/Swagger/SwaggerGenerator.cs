@@ -79,7 +79,7 @@ namespace Swashbuckle.Swagger
                 : _apiExplorer.ApiDescriptions.Where(apiDesc => _options.VersionSupportResolver(apiDesc, apiVersion));
         }
 
-        private PathItem CreatePathItem(IEnumerable<ApiDescription> apiDescriptions, SchemaRegistry schemaRegistry)
+        protected virtual PathItem CreatePathItem(IEnumerable<ApiDescription> apiDescriptions, SchemaRegistry schemaRegistry)
         {
             var pathItem = new PathItem();
 
@@ -124,22 +124,11 @@ namespace Swashbuckle.Swagger
             return pathItem;
         }
 
-        private Operation CreateOperation(ApiDescription apiDescription, SchemaRegistry schemaRegistry)
+        protected virtual Operation CreateOperation(ApiDescription apiDescription, SchemaRegistry schemaRegistry)
         {
-            var parameters = apiDescription.ParameterDescriptions
-                .Select(paramDesc =>
-                    {
-                        var inPath = apiDescription.RelativePathSansQueryString().Contains("{" + paramDesc.Name + "}");
-                        return CreateParameter(paramDesc, inPath, schemaRegistry);
-                    })
-                 .ToList();
+            var parameters = CreateParameters(apiDescription, schemaRegistry);
 
-            var responses = new Dictionary<string, Response>();
-            var responseType = apiDescription.ResponseType();
-            if (responseType == null || responseType == typeof(void))
-                responses.Add("204", new Response { description = "No Content" });
-            else
-                responses.Add("200", new Response { description = "OK", schema = schemaRegistry.GetOrRegister(responseType) });
+            var responses = CreateResponses(apiDescription, schemaRegistry);
 
             var operation = new Operation
             { 
@@ -160,7 +149,18 @@ namespace Swashbuckle.Swagger
             return operation;
         }
 
-        private Parameter CreateParameter(ApiParameterDescription paramDesc, bool inPath, SchemaRegistry schemaRegistry)
+        protected virtual List<Parameter> CreateParameters(ApiDescription apiDescription, SchemaRegistry schemaRegistry)
+        {
+            return apiDescription.ParameterDescriptions
+                .Select(paramDesc =>
+                {
+                    var inPath = apiDescription.RelativePathSansQueryString().Contains("{" + paramDesc.Name + "}");
+                    return CreateParameter(paramDesc, inPath, schemaRegistry);
+                })
+                .ToList();
+        }
+
+        protected virtual Parameter CreateParameter(ApiParameterDescription paramDesc, bool inPath, SchemaRegistry schemaRegistry)
         {
             var @in = (inPath)
                 ? "path"
@@ -189,6 +189,17 @@ namespace Swashbuckle.Swagger
                 parameter.PopulateFrom(schema);
 
             return parameter;
+        }
+
+        protected virtual Dictionary<string, Response> CreateResponses(ApiDescription apiDescription, SchemaRegistry schemaRegistry)
+        {
+            var responses = new Dictionary<string, Response>();
+            var responseType = apiDescription.ResponseType();
+            if (responseType == null || responseType == typeof(void))
+                responses.Add("204", new Response { description = "No Content" });
+            else
+                responses.Add("200", new Response { description = "OK", schema = schemaRegistry.GetOrRegister(responseType) });
+            return responses;
         }
     }
 }
