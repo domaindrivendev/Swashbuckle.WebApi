@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web.Http.Description;
+using Swashbuckle.Application.Swashbuckle.Application;
 
 namespace Swashbuckle.Swagger
 {
@@ -23,7 +24,8 @@ namespace Swashbuckle.Swagger
             bool describeStringEnumsInCamelCase = false,
             IEnumerable<IOperationFilter> operationFilters = null,
             IEnumerable<IDocumentFilter> documentFilters = null,
-            Func<IEnumerable<ApiDescription>, ApiDescription> conflictingActionsResolver = null
+            Func<IEnumerable<ApiDescription>, ApiDescription> conflictingActionsResolver = null,
+            AutoRestEnumSupportType? autoRestEnumSupport = null
             )
         {
             VersionSupportResolver = versionSupportResolver;
@@ -39,6 +41,7 @@ namespace Swashbuckle.Swagger
             SchemaIdSelector = schemaIdSelector ?? DefaultSchemaIdSelector;
             DescribeAllEnumsAsStrings = describeAllEnumsAsStrings;
             DescribeStringEnumsInCamelCase = describeStringEnumsInCamelCase;
+            AutoRestEnumSupport = autoRestEnumSupport;
             OperationFilters = operationFilters ?? new List<IOperationFilter>();
             DocumentFilters = documentFilters ?? new List<IDocumentFilter>();
             ConflictingActionsResolver = conflictingActionsResolver ?? DefaultConflictingActionsResolver;
@@ -72,6 +75,7 @@ namespace Swashbuckle.Swagger
 
         public IEnumerable<IOperationFilter> OperationFilters { get; private set; }
 
+        public AutoRestEnumSupportType? AutoRestEnumSupport { get; private set; }
         public IEnumerable<IDocumentFilter> DocumentFilters { get; private set; }
 
         public Func<IEnumerable<ApiDescription>, ApiDescription> ConflictingActionsResolver { get; private set; }

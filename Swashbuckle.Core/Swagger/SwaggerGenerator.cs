@@ -37,7 +37,8 @@ namespace Swashbuckle.Swagger
                 _options.SchemaIdSelector,
                 _options.IgnoreObsoleteProperties,
                 _options.DescribeAllEnumsAsStrings,
-                _options.DescribeStringEnumsInCamelCase);
+                _options.DescribeStringEnumsInCamelCase,
+                _options.AutoRestEnumSupport);
 
             Info info;
             _apiVersions.TryGetValue(apiVersion, out info);
