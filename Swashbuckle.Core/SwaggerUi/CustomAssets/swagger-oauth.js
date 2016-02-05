@@ -103,6 +103,7 @@ function handleLogin() {
     var defaultRedirectUrl = host.protocol + '//' + host.host + pathname + '/o2c-html';
     var redirectUrl = window.oAuthRedirectUrl || defaultRedirectUrl;
     var url = null;
+    var validResponseTypes = ['code', 'token', 'id_token', 'id_token token', 'code id_token', 'code token', 'code id_token token'];
 
     for (var key in authSchemes) {
       if (authSchemes.hasOwnProperty(key)) {
@@ -110,7 +111,11 @@ function handleLogin() {
 
         if(authSchemes[key].type === 'oauth2' && flow && (flow === 'implicit' || flow === 'accessCode')) {
           var dets = authSchemes[key];
-          url = dets.authorizationUrl + '?response_type=' + (flow === 'implicit' ? 'token' : 'code');
+          var responseType = (flow === 'implicit' ? 'token' : 'code');
+          if(validResponseTypes.indexOf(authSchemes[key].responseType) >= 0) {
+            responseType = encodeURIComponent(authSchemes[key].responseType);
+          }
+          url = dets.authorizationUrl + '?response_type=' + responseType;
           window.swaggerUi.tokenName = dets.tokenName || 'access_token';
           window.swaggerUi.tokenUrl = (flow === 'accessCode' ? dets.tokenUrl : null);
         }
@@ -157,6 +162,11 @@ function handleLogin() {
     url += '&scope=' + encodeURIComponent(scopes.join(scopeSeparator));
     url += '&state=' + encodeURIComponent(state);
 
+    if (flow === 'implicit' && authSchemes[key].responseType.indexOf("id_token") >= 0) {
+      // implicit auth with id_token in the response type needs a nonce
+      var nonce = Math.random();
+      url += '&nonce=' + encodeURIComponent(nonce);
+    }
     window.open(url);
   });
 

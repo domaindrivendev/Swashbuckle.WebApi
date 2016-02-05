@@ -312,5 +312,7 @@ namespace Swashbuckle.Swagger
         public IDictionary<string, string> scopes;
 
         public Dictionary<string, object> vendorExtensions = new Dictionary<string, object>();
+
+        public string responseType;
     }
 }

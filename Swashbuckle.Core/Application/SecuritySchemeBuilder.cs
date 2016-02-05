@@ -73,6 +73,7 @@ namespace Swashbuckle.Application
         private string _authorizationUrl;
         private string _tokenUrl;
         private IDictionary<string, string> _scopes = new Dictionary<string, string>();
+        private string _responseType;
 
         public OAuth2SchemeBuilder Description(string description)
         {
@@ -103,6 +104,12 @@ namespace Swashbuckle.Application
             configure(_scopes);
             return this;
         }
+        
+        public OAuth2SchemeBuilder ResponseType(string responseType)
+        {
+            _responseType = responseType;
+            return this;
+        }
 
         internal override SecurityScheme Build()
         {
@@ -116,6 +123,7 @@ namespace Swashbuckle.Application
                 tokenUrl = _tokenUrl,
                 scopes = _scopes,
                 description = _description,
+                responseType = _responseType
             };
         }
     }
