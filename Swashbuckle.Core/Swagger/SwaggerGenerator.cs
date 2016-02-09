@@ -162,9 +162,13 @@ namespace Swashbuckle.Swagger
 
         private Parameter CreateParameter(ApiParameterDescription paramDesc, bool inPath, SchemaRegistry schemaRegistry)
         {
+            var supportsOnlyGetMethod = 
+                paramDesc.ParameterDescriptor.ActionDescriptor.SupportedHttpMethods.Contains(System.Net.Http.HttpMethod.Get) &&
+                paramDesc.ParameterDescriptor.ActionDescriptor.SupportedHttpMethods.Count == 1;
+            
             var @in = (inPath)
                 ? "path"
-                : (paramDesc.Source == ApiParameterSource.FromUri) ? "query" : "body";
+                : (paramDesc.Source == ApiParameterSource.FromUri || supportsOnlyGetMethod) ? "query" : "body";
 
             var parameter = new Parameter
             {
