@@ -4,6 +4,7 @@ using System.Net.Http;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Text;
+using Newtonsoft.Json;
 using Swashbuckle.SwaggerUi;
 
 namespace Swashbuckle.Application
@@ -100,9 +101,9 @@ namespace Swashbuckle.Application
             InjectJavaScript(GetType().Assembly, "Swashbuckle.SwaggerUi.CustomAssets.discoveryUrlSelector.js");
         }
 
-        public void EnableOAuth2Support(string clientId, string realm, string appName)
+        public void EnableOAuth2Support(string clientId, string realm, string appName, Dictionary<string, string> additionalQueryStringParams = null)
         {
-            EnableOAuth2Support(clientId, "N/A", realm, appName);
+            EnableOAuth2Support(clientId, "N/A", realm, appName, additionalQueryStringParams: additionalQueryStringParams);
         }
 
         public void EnableOAuth2Support(
@@ -110,7 +111,8 @@ namespace Swashbuckle.Application
             string clientSecret,
             string realm,
             string appName,
-            string scopeSeperator = " ")
+            string scopeSeperator = " ",
+            Dictionary<string, string> additionalQueryStringParams = null)
         {
             _templateParams["%(OAuth2Enabled)"] = "true";
             _templateParams["%(OAuth2ClientId)"] = clientId;
@@ -118,6 +120,7 @@ namespace Swashbuckle.Application
             _templateParams["%(OAuth2Realm)"] = realm;
             _templateParams["%(OAuth2AppName)"] = appName;
             _templateParams["%(OAuth2ScopeSeperator)"] = scopeSeperator;
+            _templateParams["%(oAuth2AdditionalQueryStringParams)"] = JsonConvert.SerializeObject(additionalQueryStringParams ?? new Dictionary<string, string>());
         }
 
         internal IAssetProvider GetSwaggerUiProvider()
