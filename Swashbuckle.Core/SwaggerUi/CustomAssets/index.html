@@ -99,7 +99,9 @@
           log("Unable to Load SwaggerUI");
         },
         docExpansion: swashbuckleConfig.docExpansion,
-        apisSorter: "alpha",
+        jsonEditor: false,
+        apisSorter: null, // default to server
+        defaultModelRendering: 'schema',
         showRequestHeaders: false
       });
 
