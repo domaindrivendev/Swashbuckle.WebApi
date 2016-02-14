@@ -32,7 +32,8 @@ namespace Swashbuckle.Application
                 { "%(OAuth2ClientSecret)", "" },
                 { "%(OAuth2Realm)", "" },
                 { "%(OAuth2AppName)", "" },
-                { "%(OAuth2ScopeSeperator)", " " }
+                { "%(OAuth2ScopeSeperator)", " " },
+                { "%(oAuth2AdditionalQueryStringParams)", "{}" }
             };
             _rootUrlResolver = rootUrlResolver;
 
