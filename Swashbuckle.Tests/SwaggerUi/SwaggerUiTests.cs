@@ -165,11 +165,6 @@ namespace Swashbuckle.Tests.SwaggerUi
 
         [TestCase("http://tempuri.org/swagger/ui/images/logo_small-png",                   Result = "image/png")]
         [TestCase("http://tempuri.org/swagger/ui/css/typography-css",                      Result = "text/css")]
-        [TestCase("http://tempuri.org/swagger/ui/fonts/droid-sans-v6-latin-regular-eot",   Result = "application/vnd.ms-fontobject")]
-        [TestCase("http://tempuri.org/swagger/ui/fonts/droid-sans-v6-latin-regular-woff",  Result = "application/font-woff")]
-        [TestCase("http://tempuri.org/swagger/ui/fonts/droid-sans-v6-latin-regular-woff2", Result = "application/font-woff2")]
-        [TestCase("http://tempuri.org/swagger/ui/fonts/droid-sans-v6-latin-regular-ttf",   Result = "application/font-sfnt")]
-        [TestCase("http://tempuri.org/swagger/ui/fonts/droid-sans-v6-latin-regular-svg",   Result = "image/svg+xml")]
         public string It_returns_correct_asset_mime_type(string resourceUri)
         {
             var response = Get(resourceUri);
