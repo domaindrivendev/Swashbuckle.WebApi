@@ -60,7 +60,8 @@
         oAuth2ClientSecret: '%(OAuth2ClientSecret)',
         oAuth2Realm: '%(OAuth2Realm)',
         oAuth2AppName: '%(OAuth2AppName)',
-        oAuth2ScopeSeperator: '%(OAuth2ScopeSeperator)'
+        oAuth2ScopeSeperator: '%(OAuth2ScopeSeperator)',
+        oAuth2AdditionalQueryStringParams: JSON.parse('%(OAuth2AdditionalQueryStringParams)')
       };
 
       // Pre load translate...
@@ -79,7 +80,7 @@
               realm: swashbuckleConfig.oAuth2Realm,
               appName: swashbuckleConfig.oAuth2AppName,
               scopeSeparator: swashbuckleConfig.oAuth2ScopeSeperator,
-              additionalQueryStringParams: {}
+              additionalQueryStringParams: swashbuckleConfig.oAuth2AdditionalQueryStringParams
             });
           }
 

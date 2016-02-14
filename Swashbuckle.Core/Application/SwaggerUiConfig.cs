@@ -4,6 +4,7 @@ using System.Net.Http;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Text;
+using Newtonsoft.Json;
 using Swashbuckle.SwaggerUi;
 
 namespace Swashbuckle.Application
@@ -31,7 +32,8 @@ namespace Swashbuckle.Application
                 { "%(OAuth2ClientSecret)", "" },
                 { "%(OAuth2Realm)", "" },
                 { "%(OAuth2AppName)", "" },
-                { "%(OAuth2ScopeSeperator)", " " }
+                { "%(OAuth2ScopeSeperator)", " " },
+                { "%(OAuth2AdditionalQueryStringParams)", "{}" }
             };
             _rootUrlResolver = rootUrlResolver;
 
@@ -110,7 +112,8 @@ namespace Swashbuckle.Application
             string clientSecret,
             string realm,
             string appName,
-            string scopeSeperator = " ")
+            string scopeSeperator = " ",
+            Dictionary<string, string> additionalQueryStringParams = null)
         {
             _templateParams["%(OAuth2Enabled)"] = "true";
             _templateParams["%(OAuth2ClientId)"] = clientId;
@@ -118,6 +121,9 @@ namespace Swashbuckle.Application
             _templateParams["%(OAuth2Realm)"] = realm;
             _templateParams["%(OAuth2AppName)"] = appName;
             _templateParams["%(OAuth2ScopeSeperator)"] = scopeSeperator;
+
+            if (additionalQueryStringParams != null)
+                _templateParams["%(OAuth2AdditionalQueryStringParams)"] = JsonConvert.SerializeObject(additionalQueryStringParams);
         }
 
         internal IAssetProvider GetSwaggerUiProvider()
