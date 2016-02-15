@@ -34,15 +34,15 @@ namespace Swashbuckle.Swagger
         {
             public string SchemaId;
             public Schema Schema;
-        } 
+        }
 
         public SchemaRegistry(
             JsonSerializerSettings jsonSerializerSettings,
             IDictionary<Type, Func<Schema>> customSchemaMappings,
             IEnumerable<ISchemaFilter> schemaFilters,
             IEnumerable<IModelFilter> modelFilters,
-            Func<Type, string> schemaIdSelector,
             bool ignoreObsoleteProperties,
+            Func<Type, string> schemaIdSelector,
             bool describeAllEnumsAsStrings,
             bool describeStringEnumsInCamelCase)
         {
