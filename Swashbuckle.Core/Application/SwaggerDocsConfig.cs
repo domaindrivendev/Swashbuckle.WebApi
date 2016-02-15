@@ -125,7 +125,12 @@ namespace Swashbuckle.Application
 
         public void MapType<T>(Func<Schema> factory)
         {
-            _customSchemaMappings.Add(typeof(T), factory);
+            MapType(typeof(T), factory);
+        }
+
+        public void MapType(Type type, Func<Schema> factory)
+        {
+            _customSchemaMappings.Add(type, factory);
         }
 
         public void SchemaFilter<TFilter>()
