@@ -208,5 +208,18 @@ namespace Swashbuckle.Tests.Swagger
             var valueProperty = swagger["definitions"]["Reward[String]"]["properties"]["value"];
             Assert.IsNull(valueProperty["description"]);
         }
+
+        [Test]
+        public void It_trims_leading_spaces_on_comments()
+        {
+            var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/v1");
+            var description = swagger["paths"]["/xmlannotated/markdown"]["get"]["description"].ToString();
+            Assert.AreEqual(@"First Line after remarks tag
+Second no additional space
+Third with extra leading spaces (that should be ignored)
+
+     Fourth with intentional leading spaces", description);
+            
+        }
     }
 }
