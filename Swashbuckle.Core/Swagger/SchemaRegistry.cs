@@ -135,6 +135,8 @@ namespace Swashbuckle.Swagger
 
             switch (type.FullName)
             {
+                case "System.Byte":
+                case "System.SByte":
                 case "System.Int16":
                 case "System.UInt16":
                 case "System.Int32":
@@ -148,8 +150,8 @@ namespace Swashbuckle.Swagger
                 case "System.Double":
                 case "System.Decimal":
                     return new Schema { type = "number", format = "double" };
-                case "System.Byte":
-                case "System.SByte":
+                case "System.Byte[]":
+                case "System.SByte[]":
                     return new Schema { type = "string", format = "byte" };
                 case "System.Boolean":
                     return new Schema { type = "boolean" };
