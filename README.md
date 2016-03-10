@@ -375,18 +375,14 @@ The swagger-ui is a JavaScript application hosted in a single HTML page (index.h
 If you're happy with the basic look and feel but want to make some minor tweaks, the following options may be sufficient:
 
     httpConfiguration
-        .EnableSwagger(c => c.SingleApiVersion("v1", "A title for your API")) co
+        .EnableSwagger(c => c.SingleApiVersion("v1", "A title for your API"))
         .EnableSwaggerUi(c =>
             {
                 c.InjectStylesheet(containingAssembly, "Swashbuckle.Dummy.SwaggerExtensions.testStyles1.css");
-
                 c.InjectJavaScript(containingAssembly, "Swashbuckle.Dummy.SwaggerExtensions.testScript1.js");
-
                 c.BooleanValues(new[] { "0", "1" });
-
                 c.SetValidatorUrl("http://localhost/validator");
                 c.DisableValidator();
-
                 c.DocExpansion(DocExpansion.List);
             });
 
