@@ -273,6 +273,8 @@ namespace Swashbuckle.Swagger
         public IDictionary<string, Header> headers;
 
         public object examples;
+
+        public Dictionary<string, object> vendorExtensions = new Dictionary<string, object>();
     }
 
     public class Header : PartialSchema

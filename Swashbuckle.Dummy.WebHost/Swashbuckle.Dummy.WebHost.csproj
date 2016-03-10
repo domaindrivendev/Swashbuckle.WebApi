@@ -21,6 +21,7 @@
     <IISExpressUseClassicPipelineMode>false</IISExpressUseClassicPipelineMode>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
     <RestorePackages>true</RestorePackages>
+    <UseGlobalApplicationHostFile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -86,6 +87,10 @@
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
+    <ProjectReference Include="..\Swashbuckle.Core\Swashbuckle.Core.csproj">
+      <Project>{d50a26ff-02c6-4c16-ba94-4cd7d43efbb3}</Project>
+      <Name>Swashbuckle.Core</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Swashbuckle.Dummy.Core\Swashbuckle.Dummy.Core.csproj">
       <Project>{2DFE3931-747F-48C6-8530-B74710988095}</Project>
       <Name>Swashbuckle.Dummy.Core</Name>
