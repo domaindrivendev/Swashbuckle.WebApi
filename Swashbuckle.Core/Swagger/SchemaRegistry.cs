@@ -167,23 +167,14 @@ namespace Swashbuckle.Swagger
 
         private Schema CreateEnumSchema(JsonPrimitiveContract primitiveContract, Type type)
         {
-            var stringEnumConverter = primitiveContract.Converter as StringEnumConverter
-                ?? _jsonSerializerSettings.Converters.OfType<StringEnumConverter>().FirstOrDefault();
-
-            if (_describeAllEnumsAsStrings || stringEnumConverter != null)
-            {
-                var camelCase = _describeStringEnumsInCamelCase
-                    || (stringEnumConverter != null && stringEnumConverter.CamelCaseText);
-
+            string[] enumValues;
+            if (TryGetEnumStringValues(primitiveContract, type, out enumValues))
                 return new Schema
                 {
                     type = "string",
-                    @enum = camelCase
-                        ? type.GetEnumNamesForSerialization().Select(name => name.ToCamelCase()).ToArray()
-                        : type.GetEnumNamesForSerialization()
+                    @enum = enumValues
                 };
-            }
-            
+
             return new Schema
             {
                 type = "integer",
@@ -192,14 +183,50 @@ namespace Swashbuckle.Swagger
             };
         }
 
+        private bool TryGetEnumStringValues(JsonContract contract, Type type, out string[] enumValues)
+        {
+            enumValues = null;
+            var stringEnumConverter = contract.Converter as StringEnumConverter
+                                      ?? _jsonSerializerSettings.Converters.OfType<StringEnumConverter>().FirstOrDefault();
+
+            if (_describeAllEnumsAsStrings || stringEnumConverter != null)
+            {
+                var camelCase = _describeStringEnumsInCamelCase
+                                || (stringEnumConverter != null && stringEnumConverter.CamelCaseText);
+
+                enumValues = camelCase
+                    ? type.GetEnumNamesForSerialization().Select(name => name.ToCamelCase()).ToArray()
+                    : type.GetEnumNamesForSerialization();
+
+                return true;
+            }
+            return false;
+        }
+
         private Schema CreateDictionarySchema(JsonDictionaryContract dictionaryContract)
         {
             var valueType = dictionaryContract.DictionaryValueType ?? typeof(object);
-            return new Schema
+
+            string[] enumValues;
+            if (dictionaryContract.DictionaryKeyType.IsEnum 
+                && TryGetEnumStringValues(dictionaryContract, dictionaryContract.DictionaryKeyType, out enumValues))
+            {
+                var properties = enumValues.ToDictionary(
+                    prop => prop,
+                    prop => CreateInlineSchema(dictionaryContract.DictionaryValueType)
+                    );
+                return new Schema
                 {
                     type = "object",
-                    additionalProperties = CreateInlineSchema(valueType)
+                    properties = properties
                 };
+            }
+
+            return new Schema
+            {
+                type = "object",
+                additionalProperties = CreateInlineSchema(valueType)
+            };
         }
 
         private Schema CreateArraySchema(JsonArrayContract arrayContract)

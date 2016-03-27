@@ -538,5 +538,50 @@ namespace Swashbuckle.Tests.Swagger
 
             Assert.IsTrue(required);
         }
+
+        [Test]
+        public void It_handle_dictionary_when_json_string_enum_converter_configured()
+        {
+            Configuration.Formatters.JsonFormatter.SerializerSettings.Converters.Add(
+                new StringEnumConverter { CamelCaseText = true });
+            SetUpDefaultRouteFor<DictionaryController>();
+
+            var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/v1");
+            var typeSchema = swagger["definitions"];
+
+            var valueDefinition = JObject.Parse("{ $ref: \"#/definitions/SimpleValue\" }");
+            var expected = JObject.FromObject(new
+            {
+                ItemWithDictionary = new
+                {
+                    type = "object",
+                    properties = new
+                    {
+                        Values = new
+                        {
+                            type = "object",
+                            properties = new
+                            {
+                                keyOne = valueDefinition,
+                                keyTwo = valueDefinition
+                            }
+                        }
+                    }
+                },
+                SimpleValue = new
+                {
+                    type = "object",
+                    properties = new
+                    {
+                        Name = new
+                        {
+                            type = "string"
+                        }
+                    }
+                }
+            });
+
+            Assert.AreEqual(expected.ToString(), typeSchema.ToString());
+        }
     }
 }
