@@ -96,6 +96,7 @@
     <Compile Include="SwaggerExtensions\AddFileUploadParams.cs" />
     <Compile Include="SwaggerExtensions\AddMessageDefault.cs" />
     <Compile Include="SwaggerExtensions\AppendVersionToBasePath.cs" />
+    <Compile Include="SwaggerExtensions\ApplyResponseVendorExtensions.cs" />
     <Compile Include="SwaggerExtensions\ApplySchemaVendorExtensions.cs" />
     <Compile Include="SwaggerExtensions\ApplyDocumentVendorExtensions.cs" />
     <Compile Include="SwaggerExtensions\AssignOAuth2SecurityRequirements.cs" />

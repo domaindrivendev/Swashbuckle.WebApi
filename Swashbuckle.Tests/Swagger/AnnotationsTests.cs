@@ -3,6 +3,7 @@ using System.Diagnostics;
 using Newtonsoft.Json.Linq;
 using NUnit.Framework;
 using Swashbuckle.Dummy.Controllers;
+using Swashbuckle.Dummy.SwaggerExtensions;
 
 namespace Swashbuckle.Tests.Swagger
 {
@@ -33,6 +34,20 @@ namespace Swashbuckle.Tests.Swagger
             Assert.AreEqual("UpdateMessage", putOperation["operationId"].ToString());
             Assert.AreEqual(JArray.FromObject(new[] { "messages" }).ToString(), putOperation["tags"].ToString());
             Assert.AreEqual(JArray.FromObject(new[] { "ws" }).ToString(), putOperation["schemes"].ToString());
+        }
+
+        [Test]
+        public void It_exposes_config_to_post_modify_responses()
+        {
+
+            SetUpDefaultRouteFor<ProductsController>();
+            SetUpHandler(c => c.OperationFilter<ApplyResponseVendorExtensions>());
+
+            var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/v1");
+            var xProp = swagger["paths"]["/products"]["get"]["responses"]["200"]["x-foo"];
+
+            Assert.IsNotNull(xProp);
+            Assert.AreEqual("bar", xProp.ToString());            
         }
 
         [Test]
