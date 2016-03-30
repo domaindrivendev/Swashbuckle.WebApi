@@ -102,11 +102,11 @@ namespace Swashbuckle.Swagger
                     : CreateArraySchema(arrayContract);
 
             var objectContract = jsonContract as JsonObjectContract;
-            if (objectContract != null && objectContract.IsInferrable())
+            if (objectContract != null && !objectContract.IsAmbiguous())
                 return CreateRefSchema(type);
 
             // Fallback to abstract "object"
-            return CreateRefSchema(typeof(object));
+            return new Schema { type = "object" };
         }
 
         private Schema CreateDefinitionSchema(Type type)

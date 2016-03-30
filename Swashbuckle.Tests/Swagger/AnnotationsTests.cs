@@ -76,7 +76,10 @@ namespace Swashbuckle.Tests.Swagger
                             schema = new
                             {
                                 type = "object",
-                                additionalProperties = JObject.Parse("{ $ref: \"#/definitions/Object\" }") 
+                                additionalProperties = new
+                                {
+                                    type = "object"
+                                }
                             }
                         }
                     }

@@ -475,13 +475,6 @@ namespace Swashbuckle.Tests.Swagger
                                 } 
                             }
                         }
-                    },
-                    {
-                        "Object", new
-                        {
-                            type = "object",
-                            properties = new Dictionary<string, Schema>()
-                        }
                     }
                 });
             Assert.AreEqual(expected.ToString(), definitions.ToString());
