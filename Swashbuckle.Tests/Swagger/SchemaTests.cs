@@ -70,6 +70,34 @@ namespace Swashbuckle.Tests.Swagger
         }
 
         [Test]
+        public void It_provides_object_schemas_for_dictionary_types_with_enum_keys()
+        {
+            SetUpCustomRouteFor<DictionaryTypesController>("term-definitions");
+
+            var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/v1");
+            var schema = swagger["paths"]["/term-definitions"]["get"]["responses"]["200"]["schema"];
+
+            var expected = JObject.FromObject(new
+                {
+                    type = "object",
+                    properties = new
+                    {
+                        TermA = new
+                        {
+                            type = "string"
+                        },
+                        TermB = new
+                        {
+                            type = "string"
+                        }
+                    }
+                });
+
+            Assert.IsNotNull(schema);
+            Assert.AreEqual(expected.ToString(), schema.ToString());
+        }
+
+        [Test]
         public void It_provides_validation_properties_for_annotated_types()
         {
             SetUpDefaultRouteFor<AnnotatedTypesController>();
