@@ -384,6 +384,7 @@ If you're happy with the basic look and feel but want to make some minor tweaks,
                 c.SetValidatorUrl("http://localhost/validator");
                 c.DisableValidator();
                 c.DocExpansion(DocExpansion.List);
+				c.SupportedSubmitMethods("GET", "HEAD")
             });
 
 #### InjectStylesheet ####
@@ -405,6 +406,10 @@ By default, swagger-ui will validate specs against swagger.io's online validator
 #### DocExpansion ####
 
 Use this option to control how the Operation listing is displayed. It can be set to "None" (default), "List" (shows operations for each resource), or "Full" (fully expanded: shows operations and their details).
+
+#### SupportedSubmitMethods ####
+
+Specify which HTTP operations will have the 'Try it out!' option. An empty paramter list disables it for all operations.
 
 ### Provide your own "index" file ###
 

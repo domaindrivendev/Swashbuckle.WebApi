@@ -65,12 +65,14 @@ namespace Swashbuckle.Tests.SwaggerUi
                 {
                     c.DocExpansion(DocExpansion.Full);
                     c.BooleanValues(new[] { "1", "0" });
+                    c.SupportedSubmitMethods("GET", "HEAD");
                 });
 
             var content = GetContentAsString("http://tempuri.org/swagger/ui/index");
 
             StringAssert.Contains("docExpansion: 'full'", content);
             StringAssert.Contains("booleanValues: arrayFrom('1|0')", content);
+            StringAssert.Contains("supportedSubmitMethods: arrayFrom('get|head')", content);
         }
         
         [Test]

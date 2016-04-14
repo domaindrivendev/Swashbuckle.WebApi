@@ -224,6 +224,11 @@ namespace Swashbuckle.Dummy
                         //
                         c.DocExpansion(DocExpansion.List);
 
+                        // Specify which HTTP operations will have the 'Try it out!' option. An empty paramter list disables
+                        // it for all operations.
+                        //
+                        //c.SupportedSubmitMethods("GET", "HEAD");
+
                         // Use the CustomAsset option to provide your own version of assets used in the swagger-ui.
                         // It's typically used to instruct Swashbuckle to return your version instead of the default
                         // when a request is made for "index.html". As with all custom content, the file must be included

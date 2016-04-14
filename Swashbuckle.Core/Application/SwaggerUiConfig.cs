@@ -27,6 +27,7 @@ namespace Swashbuckle.Application
                 { "%(ValidatorUrl)", "" },
                 { "%(CustomScripts)", "" },
                 { "%(DocExpansion)", "none" },
+                { "%(SupportedSubmitMethods)", "get|put|post|delete|options|head|patch" },
                 { "%(OAuth2Enabled)", "false" },
                 { "%(OAuth2ClientId)", "" },
                 { "%(OAuth2ClientSecret)", "" },
@@ -90,6 +91,11 @@ namespace Swashbuckle.Application
         public void DocExpansion(DocExpansion docExpansion)
         {
             _templateParams["%(DocExpansion)"] = docExpansion.ToString().ToLower();
+        }
+
+        public void SupportedSubmitMethods(params string[] methods)
+        {
+            _templateParams["%(SupportedSubmitMethods)"] = String.Join("|", methods).ToLower();
         }
 
         public void CustomAsset(string path, Assembly resourceAssembly, string resourceName)

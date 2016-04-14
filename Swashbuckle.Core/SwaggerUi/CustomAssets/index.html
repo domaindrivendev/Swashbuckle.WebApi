@@ -55,6 +55,7 @@
         validatorUrl: stringOrNullFrom('%(ValidatorUrl)'),
         customScripts: arrayFrom('%(CustomScripts)'),
         docExpansion: '%(DocExpansion)',
+        supportedSubmitMethods: arrayFrom('%(SupportedSubmitMethods)'),
         oAuth2Enabled: ('%(OAuth2Enabled)' == 'true'),
         oAuth2ClientId: '%(OAuth2ClientId)',
         oAuth2ClientSecret: '%(OAuth2ClientSecret)',
@@ -72,6 +73,7 @@
         url: swashbuckleConfig.rootUrl + "/" + swashbuckleConfig.discoveryPaths[0],
         dom_id: "swagger-ui-container",
         booleanValues: swashbuckleConfig.booleanValues,
+        supportedSubmitMethods: swashbuckleConfig.supportedSubmitMethods,
         onComplete: function(swaggerApi, swaggerUi){
           if (typeof initOAuth == "function" && swashbuckleConfig.oAuth2Enabled) {
             initOAuth({
