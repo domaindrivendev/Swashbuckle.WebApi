@@ -46,11 +46,12 @@ namespace Swashbuckle.Swagger
             if (info == null)
                 throw new UnknownApiVersion(apiVersion);
 
+            HashSet<string> operationNames = new HashSet<string>();
             var paths = GetApiDescriptionsFor(apiVersion)
                 .Where(apiDesc => !(_options.IgnoreObsoleteActions && apiDesc.IsObsolete()))
                 .OrderBy(_options.GroupingKeySelector, _options.GroupingKeyComparer)
                 .GroupBy(apiDesc => apiDesc.RelativePathSansQueryString())
-                .ToDictionary(group => "/" + group.Key, group => CreatePathItem(group, schemaRegistry));
+                .ToDictionary(group => "/" + group.Key, group => CreatePathItem(group, schemaRegistry, operationNames));
 
             var rootUri = new Uri(rootUrl);
             var port = (!rootUri.IsDefaultPort) ? ":" + rootUri.Port : string.Empty;
@@ -81,7 +82,7 @@ namespace Swashbuckle.Swagger
                 : _apiExplorer.ApiDescriptions.Where(apiDesc => _options.VersionSupportResolver(apiDesc, apiVersion));
         }
 
-        private PathItem CreatePathItem(IEnumerable<ApiDescription> apiDescriptions, SchemaRegistry schemaRegistry)
+        private PathItem CreatePathItem(IEnumerable<ApiDescription> apiDescriptions, SchemaRegistry schemaRegistry, HashSet<string> operationNames)
         {
             var pathItem = new PathItem();
 
@@ -100,25 +101,25 @@ namespace Swashbuckle.Swagger
                 switch (httpMethod)
                 {
                     case "get":
-                        pathItem.get = CreateOperation(apiDescription, schemaRegistry);
+                        pathItem.get = CreateOperation(apiDescription, schemaRegistry, operationNames);
                         break;
                     case "put":
-                        pathItem.put = CreateOperation(apiDescription, schemaRegistry);
+                        pathItem.put = CreateOperation(apiDescription, schemaRegistry, operationNames);
                         break;
                     case "post":
-                        pathItem.post = CreateOperation(apiDescription, schemaRegistry);
+                        pathItem.post = CreateOperation(apiDescription, schemaRegistry, operationNames);
                         break;
                     case "delete":
-                        pathItem.delete = CreateOperation(apiDescription, schemaRegistry);
+                        pathItem.delete = CreateOperation(apiDescription, schemaRegistry, operationNames);
                         break;
                     case "options":
-                        pathItem.options = CreateOperation(apiDescription, schemaRegistry);
+                        pathItem.options = CreateOperation(apiDescription, schemaRegistry, operationNames);
                         break;
                     case "head":
-                        pathItem.head = CreateOperation(apiDescription, schemaRegistry);
+                        pathItem.head = CreateOperation(apiDescription, schemaRegistry, operationNames);
                         break;
                     case "patch":
-                        pathItem.patch = CreateOperation(apiDescription, schemaRegistry);
+                        pathItem.patch = CreateOperation(apiDescription, schemaRegistry, operationNames);
                         break;
                 }
             }
@@ -126,7 +127,7 @@ namespace Swashbuckle.Swagger
             return pathItem;
         }
 
-        private Operation CreateOperation(ApiDescription apiDesc, SchemaRegistry schemaRegistry)
+        private Operation CreateOperation(ApiDescription apiDesc, SchemaRegistry schemaRegistry, HashSet<string> operationNames)
         {
             var parameters = apiDesc.ParameterDescriptions
                 .Select(paramDesc =>
@@ -146,7 +147,7 @@ namespace Swashbuckle.Swagger
             var operation = new Operation
             {
                 tags = new[] { _options.GroupingKeySelector(apiDesc) },
-                operationId = apiDesc.FriendlyId(),
+                operationId = this.GetUniqueFriendlyId(apiDesc, operationNames),
                 produces = apiDesc.Produces().ToList(),
                 consumes = apiDesc.Consumes().ToList(),
                 parameters = parameters.Any() ? parameters : null, // parameters can be null but not empty
@@ -160,6 +161,19 @@ namespace Swashbuckle.Swagger
             }
 
             return operation;
+        }
+
+        private string GetUniqueFriendlyId(ApiDescription apiDesc, HashSet<string> operationNames)
+        {
+            string friendlyId = apiDesc.FriendlyId();
+            int nextFriendlyIdPostfix = 1;
+            while (operationNames.Contains(friendlyId))
+            {
+                friendlyId = string.Format("{0}_{1}", apiDesc.FriendlyId(), nextFriendlyIdPostfix);
+                nextFriendlyIdPostfix++;
+            }
+            operationNames.Add(friendlyId);
+            return friendlyId;
         }
 
         private string GetParameterLocation(ApiDescription apiDesc, ApiParameterDescription paramDesc)
