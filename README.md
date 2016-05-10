@@ -431,7 +431,7 @@ The __InjectStylesheet__, __InjectJavaScript__ and __CustomAsset__ options all s
 1. Add a new file to your Web API project.
 2. In Solution Explorer, right click the file and open its properties window. Change the "Build Action" to "Embedded Resource".
 
-This will embed the file in your assembly and register it with a "Logical Name". This can then be passed to the relevant configuration method. It's based on the Project's default namespace, file location and file extension. For example, given a default namespace of "YourWebApiProject" and a file located at "/SwaggerExtensions/index.html", then the resource will be assigned the name - "YourWebApiProject.SwaggerExtensions.index.html". If you use "Swagger" as the root folder name for your custom assets, this will collide with the default route templates and the page willnot be loaded correctly.
+This will embed the file in your assembly and register it with a "Logical Name". This can then be passed to the relevant configuration method. It's based on the Project's default namespace, file location and file extension. For example, given a default namespace of "YourWebApiProject" and a file located at "/SwaggerExtensions/index.html", then the resource will be assigned the name - "YourWebApiProject.SwaggerExtensions.index.html". If you use "Swagger" as the root folder name for your custom assets, this will collide with the default route templates and the page will not be loaded correctly.
 
 ## Transitioning to Swashbuckle 5.0 ##
 
