@@ -6,8 +6,10 @@ using System.Collections.Generic;
 using System.Web.Http.Description;
 using System.Web.Http.Routing.Constraints;
 using Swashbuckle.Application;
+using Swashbuckle.Swagger;
 using Swashbuckle.Dummy.Controllers;
 using Swashbuckle.Dummy.SwaggerExtensions;
+using Swashbuckle.Dummy.App_Start;
 
 namespace Swashbuckle.Dummy
 {
@@ -104,6 +106,13 @@ namespace Swashbuckle.Dummy
                         //
                         //c.OrderActionGroupsBy(new DescendingAlphabeticComparer());
 
+                        // If you annonate Controllers and API Types with
+                        // Xml comments (http://msdn.microsoft.com/en-us/library/b2s063f7(v=vs.110).aspx), you can incorporate
+                        // those comments into the generated docs and UI. You can enable this by providing the path to one or
+                        // more Xml comment files.
+                        //
+                        c.IncludeXmlComments(GetXmlCommentsPath());
+
                         // Swashbuckle makes a best attempt at generating Swagger compliant JSON schemas for the various types
                         // exposed in your API. However, there may be occasions when more control of the output is needed.
                         // This is supported through the MapType and SchemaFilter options:
@@ -116,15 +125,11 @@ namespace Swashbuckle.Dummy
                         // complex Schema, use a Schema filter.
                         //
                         //c.MapType<ProductType>(() => new Schema { type = "integer", format = "int32" });
-                        //
+
                         // If you want to post-modify "complex" Schemas once they've been generated, across the board or for a
                         // specific type, you can wire up one or more Schema filters.
                         //
                         c.SchemaFilter<ApplySchemaVendorExtensions>();
-
-                        // Set this flag to omit schema property descriptions for any type properties decorated with the
-                        // Obsolete attribute 
-                        c.IgnoreObsoleteProperties();
 
                         // In a Swagger 2.0 document, complex types are typically declared globally and referenced by unique
                         // Schema Id. By default, Swashbuckle does NOT use the full type name in Schema Ids. In most cases, this
@@ -132,10 +137,19 @@ namespace Swashbuckle.Dummy
                         // Swagger docs and UI. However, if you have multiple types in your API with the same class name, you'll
                         // need to opt out of this behavior to avoid Schema Id conflicts.
                         //
-                        c.UseFullTypeNameInSchemaIds();
+                        //c.UseFullTypeNameInSchemaIds();
+
+                        // Alternatively, you can provide your own custom strategy for inferring SchemaId's for
+                        // describing "complex" types in your API.
+                        //  
+                        c.SchemaId(t => t.FullName.Contains('`') ? t.FullName.Substring(0, t.FullName.IndexOf('`')) : t.FullName);
+
+                        // Set this flag to omit schema property descriptions for any type properties decorated with the
+                        // Obsolete attribute 
+                        c.IgnoreObsoleteProperties();
 
                         // In accordance with the built in JsonSerializer, Swashbuckle will, by default, describe enums as integers.
-                        // You can change the serializer behavior by configuring the StringToEnumConverter globally or for a given
+                        // You can change the serializer behavior by configuring the StringToEnumConverter globally or for a given 
                         // enum type. Swashbuckle will honor this change out-of-the-box. However, if you use a different
                         // approach to serialize enums as strings, you can also force Swashbuckle to describe them as strings.
                         // 
@@ -166,19 +180,17 @@ namespace Swashbuckle.Dummy
                         //
                         //c.DocumentFilter<AppendVersionToBasePath>();
 
-                        // If you annonate Controllers and API Types with
-                        // Xml comments (http://msdn.microsoft.com/en-us/library/b2s063f7(v=vs.110).aspx), you can incorporate
-                        // those comments into the generated docs and UI. You can enable this by providing the path to one or
-                        // more Xml comment files.
-                        //
-                        c.IncludeXmlComments(GetXmlCommentsPath());
-
                         // In contrast to WebApi, Swagger 2.0 does not include the query string component when mapping a URL
                         // to an action. As a result, Swashbuckle will raise an exception if it encounters multiple actions
                         // with the same path (sans query string) and HTTP method. You can workaround this by providing a
                         // custom strategy to pick a winner or merge the descriptions for the purposes of the Swagger docs 
                         //
                         c.ResolveConflictingActions(apiDescriptions => apiDescriptions.First());
+
+                        // Wrap the default SwaggerGenerator with additional behavior (e.g. caching) or provide an
+                        // alternative implementation for ISwaggerProvider with the CustomProvider option.
+                        //
+                        c.CustomProvider((defaultProvider) => new CachingSwaggerProvider(defaultProvider));
                     })
                 .EnableSwaggerUi(c =>
                     {
@@ -212,6 +224,11 @@ namespace Swashbuckle.Dummy
                         //
                         c.DocExpansion(DocExpansion.List);
 
+                        // Specify which HTTP operations will have the 'Try it out!' option. An empty paramter list disables
+                        // it for all operations.
+                        //
+                        //c.SupportedSubmitMethods("GET", "HEAD");
+
                         // Use the CustomAsset option to provide your own version of assets used in the swagger-ui.
                         // It's typically used to instruct Swashbuckle to return your version instead of the default
                         // when a request is made for "index.html". As with all custom content, the file must be included
@@ -230,7 +247,13 @@ namespace Swashbuckle.Dummy
                         // If your API supports the OAuth2 Implicit flow, and you've described it correctly, according to
                         // the Swagger 2.0 specification, you can enable UI support as shown below.
                         //
-                        c.EnableOAuth2Support("test-client-id", "test-realm", "Swagger UI");
+                        c.EnableOAuth2Support(
+                            clientId: "test-client-id",
+                            clientSecret: null,
+                            realm: "test-realm",
+                            appName: "Swagger UI"
+                            //additionalQueryStringParams: new Dictionary<string, string>() { { "foo", "bar" } }
+                        );
                     });
         }
 

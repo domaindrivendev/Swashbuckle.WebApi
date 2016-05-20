@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
 using System.Web.Http.Controllers;
 using System.Web.Http.Description;
 using System.Xml.XPath;
@@ -12,11 +9,11 @@ namespace Swashbuckle.Swagger.XmlComments
 {
     public class ApplyXmlActionComments : IOperationFilter
     {
-        private const string MethodExpression = "/doc/members/member[@name='M:{0}.{1}{2}']";
-        private const string SummaryExpression = "summary";
-        private const string RemarksExpression = "remarks";
-        private const string ParameterExpression = "param";
-        private const string ResponseExpression = "response";
+        private const string MemberXPath = "/doc/members/member[@name='{0}']";
+        private const string SummaryTag = "summary";
+        private const string RemarksTag = "remarks";
+        private const string ParameterTag = "param";
+        private const string ResponseTag = "response";
         
         private readonly XPathNavigator _navigator;
 
@@ -27,14 +24,18 @@ namespace Swashbuckle.Swagger.XmlComments
 
         public void Apply(Operation operation, SchemaRegistry schemaRegistry, ApiDescription apiDescription)
         {
-            var methodNode = _navigator.SelectSingleNode(XPathFor(apiDescription.ActionDescriptor));
+            var reflectedActionDescriptor = apiDescription.ActionDescriptor as ReflectedHttpActionDescriptor;
+            if (reflectedActionDescriptor == null) return;
+
+            var commentId = XmlCommentsIdHelper.GetCommentIdForMethod(reflectedActionDescriptor.MethodInfo);
+            var methodNode = _navigator.SelectSingleNode(string.Format(MemberXPath, commentId));
             if (methodNode == null) return;
 
-            var summaryNode = methodNode.SelectSingleNode(SummaryExpression);
+            var summaryNode = methodNode.SelectSingleNode(SummaryTag);
             if (summaryNode != null)
                 operation.summary = summaryNode.ExtractContent();
 
-            var remarksNode = methodNode.SelectSingleNode(RemarksExpression);
+            var remarksNode = methodNode.SelectSingleNode(RemarksTag);
             if (remarksNode != null)
                 operation.description = remarksNode.ExtractContent();
 
@@ -43,30 +44,11 @@ namespace Swashbuckle.Swagger.XmlComments
             ApplyResponseComments(operation, methodNode);
         }
 
-		private static string XPathFor(HttpActionDescriptor actionDescriptor)
-        {
-            var controllerName = actionDescriptor.ControllerDescriptor.ControllerType.XmlLookupName();
-            var reflectedActionDescriptor = actionDescriptor as ReflectedHttpActionDescriptor;
-            var actionName = (reflectedActionDescriptor != null)
-                ? reflectedActionDescriptor.MethodInfo.Name
-                : actionDescriptor.ActionName;
-
-            var paramTypeNames = actionDescriptor.GetParameters()
-                .Select(paramDesc => paramDesc.ParameterType.XmlLookupNameWithTypeParameters())
-                .ToArray();
-
-            var parameters = (paramTypeNames.Any())
-                ? String.Format("({0})", String.Join(",", paramTypeNames))
-                : String.Empty;
-
-            return String.Format(MethodExpression, controllerName, actionName, parameters);
-        }
-
         private static void ApplyParamComments(Operation operation, XPathNavigator methodNode)
         {
             if (operation.parameters == null) return;
 
-            var paramNodes = methodNode.Select(ParameterExpression);
+            var paramNodes = methodNode.Select(ParameterTag);
             while (paramNodes.MoveNext())
             {
                 var paramNode = paramNodes.Current;
@@ -78,7 +60,7 @@ namespace Swashbuckle.Swagger.XmlComments
 
         private static void ApplyResponseComments(Operation operation, XPathNavigator methodNode)
         {
-            var responseNodes = methodNode.Select(ResponseExpression);
+            var responseNodes = methodNode.Select(ResponseTag);
 
             if (responseNodes.Count > 0)
             {

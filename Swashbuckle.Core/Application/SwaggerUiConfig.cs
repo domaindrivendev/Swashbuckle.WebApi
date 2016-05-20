@@ -4,6 +4,7 @@ using System.Net.Http;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Text;
+using Newtonsoft.Json;
 using Swashbuckle.SwaggerUi;
 
 namespace Swashbuckle.Application
@@ -26,10 +27,14 @@ namespace Swashbuckle.Application
                 { "%(ValidatorUrl)", "" },
                 { "%(CustomScripts)", "" },
                 { "%(DocExpansion)", "none" },
+                { "%(SupportedSubmitMethods)", "get|put|post|delete|options|head|patch" },
                 { "%(OAuth2Enabled)", "false" },
                 { "%(OAuth2ClientId)", "" },
+                { "%(OAuth2ClientSecret)", "" },
                 { "%(OAuth2Realm)", "" },
-                { "%(OAuth2AppName)", "" }
+                { "%(OAuth2AppName)", "" },
+                { "%(OAuth2ScopeSeperator)", " " },
+                { "%(OAuth2AdditionalQueryStringParams)", "{}" }
             };
             _rootUrlResolver = rootUrlResolver;
 
@@ -88,6 +93,11 @@ namespace Swashbuckle.Application
             _templateParams["%(DocExpansion)"] = docExpansion.ToString().ToLower();
         }
 
+        public void SupportedSubmitMethods(params string[] methods)
+        {
+            _templateParams["%(SupportedSubmitMethods)"] = String.Join("|", methods).ToLower();
+        }
+
         public void CustomAsset(string path, Assembly resourceAssembly, string resourceName)
         {
             _pathToAssetMap[path] = new EmbeddedAssetDescriptor(resourceAssembly, resourceName, path == "index");
@@ -100,10 +110,26 @@ namespace Swashbuckle.Application
 
         public void EnableOAuth2Support(string clientId, string realm, string appName)
         {
+            EnableOAuth2Support(clientId, "N/A", realm, appName);
+        }
+
+        public void EnableOAuth2Support(
+            string clientId,
+            string clientSecret,
+            string realm,
+            string appName,
+            string scopeSeperator = " ",
+            Dictionary<string, string> additionalQueryStringParams = null)
+        {
             _templateParams["%(OAuth2Enabled)"] = "true";
             _templateParams["%(OAuth2ClientId)"] = clientId;
+            _templateParams["%(OAuth2ClientSecret)"] = clientSecret;
             _templateParams["%(OAuth2Realm)"] = realm;
             _templateParams["%(OAuth2AppName)"] = appName;
+            _templateParams["%(OAuth2ScopeSeperator)"] = scopeSeperator;
+
+            if (additionalQueryStringParams != null)
+                _templateParams["%(OAuth2AdditionalQueryStringParams)"] = JsonConvert.SerializeObject(additionalQueryStringParams);
         }
 
         internal IAssetProvider GetSwaggerUiProvider()

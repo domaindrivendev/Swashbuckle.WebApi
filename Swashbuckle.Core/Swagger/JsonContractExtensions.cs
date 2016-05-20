@@ -7,8 +7,9 @@ namespace Swashbuckle.Swagger
 {
     public static class JsonContractExtensions
     {
-        private static IEnumerable<string> HttpTypeNames = new[]
+        private static IEnumerable<string> AmbiguousTypeNames = new[]
             {
+                "System.Object",
                 "System.Net.Http.HttpRequestMessage",
                 "System.Net.Http.HttpResponseMessage",
                 "System.Web.Http.IHttpActionResult"
@@ -24,9 +25,9 @@ namespace Swashbuckle.Swagger
             return arrayContract.UnderlyingType == arrayContract.CollectionItemType;
         }
 
-        public static bool IsInferrable(this JsonObjectContract objectContract)
+        public static bool IsAmbiguous(this JsonObjectContract objectContract)
         {
-            return !HttpTypeNames.Contains(objectContract.UnderlyingType.FullName);
+            return AmbiguousTypeNames.Contains(objectContract.UnderlyingType.FullName);
         }
     }
 }

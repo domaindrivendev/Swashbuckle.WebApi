@@ -5,6 +5,7 @@ using System.Dynamic;
 using System.Linq;
 using System.Net.Http;
 using System.Reflection;
+using System.Runtime.Serialization;
 using System.Text;
 using System.Web.Http;
 using Newtonsoft.Json;
@@ -21,8 +22,8 @@ namespace Swashbuckle.Swagger
         private readonly IDictionary<Type, Func<Schema>> _customSchemaMappings;
         private readonly IEnumerable<ISchemaFilter> _schemaFilters;
         private readonly IEnumerable<IModelFilter> _modelFilters;
+        private readonly Func<Type, string> _schemaIdSelector;
         private readonly bool _ignoreObsoleteProperties;
-        private readonly bool _useFullTypeNameInSchemaIds;
         private readonly bool _describeAllEnumsAsStrings;
         private readonly bool _describeStringEnumsInCamelCase;
 
@@ -33,7 +34,7 @@ namespace Swashbuckle.Swagger
         {
             public string SchemaId;
             public Schema Schema;
-        } 
+        }
 
         public SchemaRegistry(
             JsonSerializerSettings jsonSerializerSettings,
@@ -41,7 +42,7 @@ namespace Swashbuckle.Swagger
             IEnumerable<ISchemaFilter> schemaFilters,
             IEnumerable<IModelFilter> modelFilters,
             bool ignoreObsoleteProperties,
-            bool useFullTypeNameInSchemaIds,
+            Func<Type, string> schemaIdSelector,
             bool describeAllEnumsAsStrings,
             bool describeStringEnumsInCamelCase)
         {
@@ -49,8 +50,8 @@ namespace Swashbuckle.Swagger
             _customSchemaMappings = customSchemaMappings;
             _schemaFilters = schemaFilters;
             _modelFilters = modelFilters;
+            _schemaIdSelector = schemaIdSelector;
             _ignoreObsoleteProperties = ignoreObsoleteProperties;
-            _useFullTypeNameInSchemaIds = useFullTypeNameInSchemaIds;
             _describeAllEnumsAsStrings = describeAllEnumsAsStrings;
             _describeStringEnumsInCamelCase = describeStringEnumsInCamelCase;
 
@@ -101,11 +102,11 @@ namespace Swashbuckle.Swagger
                     : CreateArraySchema(arrayContract);
 
             var objectContract = jsonContract as JsonObjectContract;
-            if (objectContract != null && objectContract.IsInferrable())
+            if (objectContract != null && !objectContract.IsAmbiguous())
                 return CreateRefSchema(type);
 
             // Fallback to abstract "object"
-            return CreateRefSchema(typeof(object));
+            return new Schema { type = "object" };
         }
 
         private Schema CreateDefinitionSchema(Type type)
@@ -134,6 +135,8 @@ namespace Swashbuckle.Swagger
 
             switch (type.FullName)
             {
+                case "System.Byte":
+                case "System.SByte":
                 case "System.Int16":
                 case "System.UInt16":
                 case "System.Int32":
@@ -147,14 +150,16 @@ namespace Swashbuckle.Swagger
                 case "System.Double":
                 case "System.Decimal":
                     return new Schema { type = "number", format = "double" };
-                case "System.Byte":
-                case "System.SByte":
+                case "System.Byte[]":
+                case "System.SByte[]":
                     return new Schema { type = "string", format = "byte" };
                 case "System.Boolean":
                     return new Schema { type = "boolean" };
                 case "System.DateTime":
                 case "System.DateTimeOffset":
                     return new Schema { type = "string", format = "date-time" };
+                case "System.Guid":
+                    return new Schema { type = "string", format = "uuid" };
                 default:
                     return new Schema { type = "string" };
             }
@@ -174,11 +179,11 @@ namespace Swashbuckle.Swagger
                 {
                     type = "string",
                     @enum = camelCase
-                        ? type.GetEnumNames().Select(name => name.ToCamelCase()).ToArray()
-                        : type.GetEnumNames()
+                        ? type.GetEnumNamesForSerialization().Select(name => name.ToCamelCase()).ToArray()
+                        : type.GetEnumNamesForSerialization()
                 };
             }
-
+            
             return new Schema
             {
                 type = "integer",
@@ -189,12 +194,28 @@ namespace Swashbuckle.Swagger
 
         private Schema CreateDictionarySchema(JsonDictionaryContract dictionaryContract)
         {
+            var keyType = dictionaryContract.DictionaryKeyType ?? typeof(object);
             var valueType = dictionaryContract.DictionaryValueType ?? typeof(object);
-            return new Schema
+
+            if (keyType.IsEnum)
+            {
+                return new Schema
+                {
+                    type = "object",
+                    properties = Enum.GetNames(keyType).ToDictionary(
+                        (name) => dictionaryContract.PropertyNameResolver(name),
+                        (name) => CreateInlineSchema(valueType)
+                    )
+                };
+            }
+            else
+            {
+                return new Schema
                 {
                     type = "object",
                     additionalProperties = CreateInlineSchema(valueType)
                 };
+            }
         }
 
         private Schema CreateArraySchema(JsonArrayContract arrayContract)
@@ -247,7 +268,7 @@ namespace Swashbuckle.Swagger
         {
             if (!_referencedTypes.ContainsKey(type))
             {
-                var schemaId = type.FriendlyId(_useFullTypeNameInSchemaIds);
+                var schemaId = _schemaIdSelector(type); 
                 if (_referencedTypes.Any(entry => entry.Value.SchemaId == schemaId))
                 {
                     var conflictingType = _referencedTypes.First(entry => entry.Value.SchemaId == schemaId).Key;

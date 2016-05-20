@@ -67,10 +67,23 @@ namespace Swashbuckle.Dummy.Controllers
         /// <summary>
         /// Adds a reward to an existing account
         /// </summary>
+        /// <param name="id"></param>
         /// <param name="reward"></param>
         [HttpPut]
         [Route("{id}/add-reward")]
         public void AddReward(int id, Reward<string> reward)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// Updates metadata associated with an account 
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="metadata"></param>
+        [HttpPut]
+        [Route("{id}/metadata")]
+        public void UpdateMetadata(int id, KeyValuePair<string, string>[] metadata)
         {
             throw new NotImplementedException();
         }

@@ -31,7 +31,7 @@ namespace Swashbuckle.Dummy.Controllers
         }
 
         [HttpPut]
-        [SwaggerOperation("UpdateMessage", Tags = new[] { "messages" }, Schemes = new[] { "foobar" })]
+        [SwaggerOperation("UpdateMessage", Tags = new[] { "messages" }, Schemes = new[] { "ws" })]
         public void Put(int id, Message message)
         {
             throw new NotImplementedException();

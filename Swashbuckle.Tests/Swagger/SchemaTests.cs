@@ -70,6 +70,34 @@ namespace Swashbuckle.Tests.Swagger
         }
 
         [Test]
+        public void It_provides_object_schemas_for_dictionary_types_with_enum_keys()
+        {
+            SetUpCustomRouteFor<DictionaryTypesController>("term-definitions");
+
+            var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/v1");
+            var schema = swagger["paths"]["/term-definitions"]["get"]["responses"]["200"]["schema"];
+
+            var expected = JObject.FromObject(new
+                {
+                    type = "object",
+                    properties = new
+                    {
+                        TermA = new
+                        {
+                            type = "string"
+                        },
+                        TermB = new
+                        {
+                            type = "string"
+                        }
+                    }
+                });
+
+            Assert.IsNotNull(schema);
+            Assert.AreEqual(expected.ToString(), schema.ToString());
+        }
+
+        [Test]
         public void It_provides_validation_properties_for_annotated_types()
         {
             SetUpDefaultRouteFor<AnnotatedTypesController>();
@@ -238,7 +266,7 @@ namespace Swashbuckle.Tests.Swagger
 
             var expected = JObject.FromObject(new
                 {
-                    @enum = new[] { "book", "album" },
+                    @enum = new[] { "publication", "album" },
                     type = "string"
                 });
             Assert.AreEqual(expected.ToString(), typeSchema.ToString());
@@ -313,6 +341,31 @@ namespace Swashbuckle.Tests.Swagger
             var defintitions = swagger["definitions"];
 
             Assert.AreEqual(2, defintitions.Count());
+        }
+
+        [Test]
+        public void It_exposes_config_to_choose_schema_id()
+        {
+            SetUpDefaultRouteFor<ProductsController>();
+            SetUpHandler(c => c.SchemaId(t => "my custom name"));
+
+            var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/v1");
+            var defintitions = swagger["definitions"];
+
+            Assert.IsNotNull(defintitions["my custom name"]);
+        }
+
+        [Test]
+        public void It_exposes_config_to_modify_schema_ids()
+        {
+            SetUpDefaultRouteFor<ConflictingTypesController>();
+            // We have to know the default implementation of FriendlyId before we can modify it's output.
+            SetUpHandler(c => { c.SchemaId(t => t.FriendlyId(true).Replace("Swashbuckle.Dummy.Controllers.", String.Empty)); });
+
+            var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/v1");
+            var defintitions = swagger["definitions"];
+
+            Assert.IsNotNull(defintitions["Requests.Blog"]);
         }
 
         [Test]
@@ -439,10 +492,16 @@ namespace Swashbuckle.Tests.Swagger
             var expected = JObject.FromObject(new Dictionary<string, object>
                 {
                     {
-                        "Object", new
+                        "DynamicObjectSubType", new
                         {
                             type = "object",
-                            properties = new Dictionary<string, Schema>()
+                            properties = new
+                            {
+                                Name = new
+                                {
+                                    type = "string" 
+                                } 
+                            }
                         }
                     }
                 });
@@ -488,6 +547,17 @@ namespace Swashbuckle.Tests.Swagger
             SetUpDefaultRouteFor<ConflictingTypesController>();
 
             var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/v1");
+        }
+
+        [Test]
+        public void It_always_marks_path_parameters_as_required()
+        {
+            SetUpDefaultRouteFor<PathRequiredController>();
+
+            var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/v1");
+            var required = (bool)swagger["paths"]["/pathrequired/{id}"]["get"]["parameters"][0]["required"];
+
+            Assert.IsTrue(required);
         }
     }
 }

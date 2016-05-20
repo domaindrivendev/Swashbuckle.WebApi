@@ -49,6 +49,7 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\Microsoft.AspNet.WebApi.Client.5.2.2\lib\net45\System.Net.Http.Formatting.dll</HintPath>
     </Reference>
+    <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Web.Cors">
       <HintPath>..\packages\Microsoft.AspNet.Cors.5.0.0\lib\net45\System.Web.Cors.dll</HintPath>
     </Reference>
@@ -62,8 +63,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="App_Start\CachingSwaggerProvider.cs" />
     <Compile Include="App_Start\CustomCorsPolicyProvider.cs" />
     <Compile Include="Controllers\ConflictingTypesController.cs" />
+    <Compile Include="Controllers\DataContractAnnotatedTypesController.cs" />
     <Compile Include="Controllers\FileDownloadController.cs" />
     <Compile Include="Controllers\FileUploadController.cs" />
     <Compile Include="Controllers\FromUriParamsContoller.cs" />
@@ -73,6 +76,7 @@
     <Compile Include="Controllers\JsonAnnotatedTypesController.cs" />
     <Compile Include="Controllers\NullableTypesController.cs" />
     <Compile Include="Controllers\ObsoletePropertiesController.cs" />
+    <Compile Include="Controllers\PathRequiredController.cs" />
     <Compile Include="Controllers\ProtectedResourcesController.cs" />
     <Compile Include="Controllers\SelfReferencingTypesController.cs" />
     <Compile Include="Controllers\CustomersController.cs" />
@@ -87,11 +91,13 @@
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="Controllers\SwaggerAnnotatedController.cs" />
     <Compile Include="Controllers\XmlAnnotatedController.cs" />
+    <Compile Include="Controllers\DictionaryTypesController.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SwaggerExtensions\AddDefaultResponse.cs" />
     <Compile Include="SwaggerExtensions\AddFileUploadParams.cs" />
     <Compile Include="SwaggerExtensions\AddMessageDefault.cs" />
     <Compile Include="SwaggerExtensions\AppendVersionToBasePath.cs" />
+    <Compile Include="SwaggerExtensions\ApplyResponseVendorExtensions.cs" />
     <Compile Include="SwaggerExtensions\ApplySchemaVendorExtensions.cs" />
     <Compile Include="SwaggerExtensions\ApplyDocumentVendorExtensions.cs" />
     <Compile Include="SwaggerExtensions\AssignOAuth2SecurityRequirements.cs" />

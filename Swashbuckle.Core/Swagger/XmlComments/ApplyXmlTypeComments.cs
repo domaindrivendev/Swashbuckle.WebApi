@@ -11,9 +11,8 @@ namespace Swashbuckle.Swagger.XmlComments
 {
     public class ApplyXmlTypeComments : IModelFilter
     {
-        private const string TypeExpression = "/doc/members/member[@name='T:{0}']";
-        private const string SummaryExpression = "summary";
-        private const string PropertyExpression = "/doc/members/member[@name='P:{0}.{1}']";
+        private const string MemberXPath = "/doc/members/member[@name='{0}']";
+        private const string SummaryTag = "summary";
 
         private readonly XPathNavigator _navigator;
 
@@ -24,12 +23,12 @@ namespace Swashbuckle.Swagger.XmlComments
 
         public void Apply(Schema model, ModelFilterContext context)
         {
-            var typeNode = _navigator.SelectSingleNode(
-                String.Format(TypeExpression, context.SystemType.XmlLookupName()));
+            var commentId = XmlCommentsIdHelper.GetCommentIdForType(context.SystemType);
+            var typeNode = _navigator.SelectSingleNode(string.Format(MemberXPath, commentId));
 
             if (typeNode != null)
             {
-                var summaryNode = typeNode.SelectSingleNode(SummaryExpression);
+                var summaryNode = typeNode.SelectSingleNode(SummaryTag);
                 if (summaryNode != null)
                     model.description = summaryNode.ExtractContent();
             }
@@ -47,11 +46,11 @@ namespace Swashbuckle.Swagger.XmlComments
         {
             if (propertyInfo == null) return;
 
-            var propertyNode = _navigator.SelectSingleNode(
-                String.Format(PropertyExpression, propertyInfo.DeclaringType.XmlLookupName(), propertyInfo.Name));
+            var commentId = XmlCommentsIdHelper.GetCommentIdForProperty(propertyInfo);
+            var propertyNode = _navigator.SelectSingleNode(string.Format(MemberXPath, commentId));
             if (propertyNode == null) return;
 
-            var propSummaryNode = propertyNode.SelectSingleNode(SummaryExpression);
+            var propSummaryNode = propertyNode.SelectSingleNode(SummaryTag);
             if (propSummaryNode != null)
             {
                 propertySchema.description = propSummaryNode.ExtractContent();

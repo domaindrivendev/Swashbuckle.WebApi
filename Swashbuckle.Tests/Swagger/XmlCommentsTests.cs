@@ -161,6 +161,15 @@ namespace Swashbuckle.Tests.Swagger
         }
 
         [Test]
+        public void It_handles_actions_with_array_of_generic_parameters()
+        {
+            var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/v1");
+            var operation = swagger["paths"]["/xmlannotated/{id}/metadata"]["put"];
+            Assert.IsNotNull(operation["summary"]);
+            Assert.AreEqual("Updates metadata associated with an account", operation["summary"].ToString());
+        }
+
+        [Test]
         public void It_handles_nested_class_properties()
         {
             var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/v1");

@@ -5,6 +5,7 @@ using System;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using System.Net.Http.Formatting;
+using System.Net.Http;
 
 namespace Swashbuckle.Swagger
 {
@@ -35,7 +36,7 @@ namespace Swashbuckle.Swagger
                 _options.SchemaFilters,
                 _options.ModelFilters,
                 _options.IgnoreObsoleteProperties,
-                _options.UseFullTypeNameInSchemaIds,
+                _options.SchemaIdSelector,
                 _options.DescribeAllEnumsAsStrings,
                 _options.DescribeStringEnumsInCamelCase);
 
@@ -51,11 +52,12 @@ namespace Swashbuckle.Swagger
                 .ToDictionary(group => "/" + group.Key, group => CreatePathItem(group, schemaRegistry));
 
             var rootUri = new Uri(rootUrl);
+            var port = (!rootUri.IsDefaultPort) ? ":" + rootUri.Port : string.Empty;
 
             var swaggerDoc = new SwaggerDocument
             {
                 info = info,
-                host = rootUri.Host + ":" + rootUri.Port,
+                host = rootUri.Host + port,
                 basePath = (rootUri.AbsolutePath != "/") ? rootUri.AbsolutePath : null,
                 schemes = (_options.Schemes != null) ? _options.Schemes.ToList() : new[] { rootUri.Scheme }.ToList(),
                 paths = paths,
@@ -123,18 +125,18 @@ namespace Swashbuckle.Swagger
             return pathItem;
         }
 
-        private Operation CreateOperation(ApiDescription apiDescription, SchemaRegistry schemaRegistry)
+        private Operation CreateOperation(ApiDescription apiDesc, SchemaRegistry schemaRegistry)
         {
-            var parameters = apiDescription.ParameterDescriptions
+            var parameters = apiDesc.ParameterDescriptions
                 .Select(paramDesc =>
                     {
-                        var inPath = apiDescription.RelativePathSansQueryString().Contains("{" + paramDesc.Name + "}");
-                        return CreateParameter(paramDesc, inPath, schemaRegistry);
+                        string location = GetParameterLocation(apiDesc, paramDesc);
+                        return CreateParameter(location, paramDesc, schemaRegistry);
                     })
                  .ToList();
 
             var responses = new Dictionary<string, Response>();
-            var responseType = apiDescription.ResponseType();
+            var responseType = apiDesc.ResponseType();
             if (responseType == null || responseType == typeof(void))
                 responses.Add("204", new Response { description = "No Content" });
             else
@@ -142,33 +144,39 @@ namespace Swashbuckle.Swagger
 
             var operation = new Operation
             { 
-                tags = new [] { _options.GroupingKeySelector(apiDescription) },
-                operationId = apiDescription.FriendlyId(),
-                produces = apiDescription.Produces().ToList(),
-                consumes = apiDescription.Consumes().ToList(),
+                tags = new [] { _options.GroupingKeySelector(apiDesc) },
+                operationId = apiDesc.FriendlyId(),
+                produces = apiDesc.Produces().ToList(),
+                consumes = apiDesc.Consumes().ToList(),
                 parameters = parameters.Any() ? parameters : null, // parameters can be null but not empty
                 responses = responses,
-                deprecated = apiDescription.IsObsolete()
+                deprecated = apiDesc.IsObsolete()
             };
 
             foreach (var filter in _options.OperationFilters)
             {
-                filter.Apply(operation, schemaRegistry, apiDescription);
+                filter.Apply(operation, schemaRegistry, apiDesc);
             }
 
             return operation;
         }
 
-        private Parameter CreateParameter(ApiParameterDescription paramDesc, bool inPath, SchemaRegistry schemaRegistry)
+        private string GetParameterLocation(ApiDescription apiDesc, ApiParameterDescription paramDesc)
         {
-            var @in = (inPath)
-                ? "path"
-                : (paramDesc.Source == ApiParameterSource.FromUri) ? "query" : "body";
+            if (apiDesc.RelativePathSansQueryString().Contains("{" + paramDesc.Name + "}"))
+                return "path";
+            else if (paramDesc.Source == ApiParameterSource.FromBody && apiDesc.HttpMethod != HttpMethod.Get)
+                return "body";
+            else
+                return "query";
+        }
 
+        private Parameter CreateParameter(string location, ApiParameterDescription paramDesc, SchemaRegistry schemaRegistry)
+        {
             var parameter = new Parameter
             {
-                name = paramDesc.Name,
-                @in = @in
+                @in = location,
+                name = paramDesc.Name
             };
 
             if (paramDesc.ParameterDescriptor == null)
@@ -178,7 +186,7 @@ namespace Swashbuckle.Swagger
                 return parameter; 
             }
 
-            parameter.required = !paramDesc.ParameterDescriptor.IsOptional;
+            parameter.required = location == "path" || !paramDesc.ParameterDescriptor.IsOptional;
             parameter.@default = paramDesc.ParameterDescriptor.DefaultValue;
 
             var schema = schemaRegistry.GetOrRegister(paramDesc.ParameterDescriptor.ParameterType);

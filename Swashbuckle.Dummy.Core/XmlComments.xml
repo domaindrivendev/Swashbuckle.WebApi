@@ -43,7 +43,15 @@
             <summary>
             Adds a reward to an existing account
             </summary>
+            <param name="id"></param>
             <param name="reward"></param>
+        </member>
+        <member name="M:Swashbuckle.Dummy.Controllers.XmlAnnotatedController.UpdateMetadata(System.Int32,System.Collections.Generic.KeyValuePair{System.String,System.String}[])">
+            <summary>
+            Updates metadata associated with an account 
+            </summary>
+            <param name="id"></param>
+            <param name="metadata"></param>
         </member>
         <member name="P:Swashbuckle.Dummy.Controllers.Page.Limit">
             <summary>

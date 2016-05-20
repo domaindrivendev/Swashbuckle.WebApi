@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Net.Http;
 using System.Net;
+using System.Collections.Generic;
 using NUnit.Framework;
 using Swashbuckle.Application;
 using Swashbuckle.Dummy;
@@ -64,25 +65,39 @@ namespace Swashbuckle.Tests.SwaggerUi
                 {
                     c.DocExpansion(DocExpansion.Full);
                     c.BooleanValues(new[] { "1", "0" });
+                    c.SupportedSubmitMethods("GET", "HEAD");
                 });
 
             var content = GetContentAsString("http://tempuri.org/swagger/ui/index");
 
             StringAssert.Contains("docExpansion: 'full'", content);
             StringAssert.Contains("booleanValues: arrayFrom('1|0')", content);
+            StringAssert.Contains("supportedSubmitMethods: arrayFrom('get|head')", content);
         }
         
         [Test]
         public void It_exposes_config_for_swagger_ui_outh2_settings()
         {
-            SetUpHandler(c => c.EnableOAuth2Support("test-client-id", "test-realm", "Swagger UI"));
+            SetUpHandler(c =>
+                {
+                    c.EnableOAuth2Support(
+                        "test-client-id",
+                        "test-client-secret",
+                        "test-realm",
+                        "Swagger UI",
+                        " ",
+                        new Dictionary<string, string> { { "TestHeader", "TestValue" } });
+                });
 
             var content = GetContentAsString("http://tempuri.org/swagger/ui/index");
 
             StringAssert.Contains("oAuth2Enabled: ('true' == 'true')", content);
             StringAssert.Contains("oAuth2ClientId: 'test-client-id'", content);
+            StringAssert.Contains("oAuth2ClientSecret: 'test-client-secret'", content);
             StringAssert.Contains("oAuth2Realm: 'test-realm'", content);
             StringAssert.Contains("oAuth2AppName: 'Swagger UI'", content);
+            StringAssert.Contains("oAuth2ScopeSeperator: ' '", content);
+            StringAssert.Contains("oAuth2AdditionalQueryStringParams: JSON.parse('{\"TestHeader\":\"TestValue\"}')", content);
         }
 
         [Test]
@@ -164,11 +179,6 @@ namespace Swashbuckle.Tests.SwaggerUi
 
         [TestCase("http://tempuri.org/swagger/ui/images/logo_small-png",                   Result = "image/png")]
         [TestCase("http://tempuri.org/swagger/ui/css/typography-css",                      Result = "text/css")]
-        [TestCase("http://tempuri.org/swagger/ui/fonts/droid-sans-v6-latin-regular-eot",   Result = "application/vnd.ms-fontobject")]
-        [TestCase("http://tempuri.org/swagger/ui/fonts/droid-sans-v6-latin-regular-woff",  Result = "application/font-woff")]
-        [TestCase("http://tempuri.org/swagger/ui/fonts/droid-sans-v6-latin-regular-woff2", Result = "application/font-woff2")]
-        [TestCase("http://tempuri.org/swagger/ui/fonts/droid-sans-v6-latin-regular-ttf",   Result = "application/font-sfnt")]
-        [TestCase("http://tempuri.org/swagger/ui/fonts/droid-sans-v6-latin-regular-svg",   Result = "image/svg+xml")]
         public string It_returns_correct_asset_mime_type(string resourceUri)
         {
             var response = Get(resourceUri);

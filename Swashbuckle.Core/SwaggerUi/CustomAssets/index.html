@@ -1,6 +1,8 @@
+﻿
 <!DOCTYPE html>
 <html>
 <head>
+  <meta charset="UTF-8">
   <title>Swagger UI</title>
   <link rel="icon" type="image/png" href="images/favicon-32x32-png" sizes="32x32" />
   <link rel="icon" type="image/png" href="images/favicon-16x16-png" sizes="16x16" />
@@ -17,11 +19,16 @@
   <script src='lib/handlebars-2-0-0-js' type='text/javascript'></script>
   <script src='lib/underscore-min-js' type='text/javascript'></script>
   <script src='lib/backbone-min-js' type='text/javascript'></script>
-  <script src='swagger-ui-js' type='text/javascript'></script>
+  <script src='swagger-ui-min-js' type='text/javascript'></script>
   <script src='lib/highlight-7-3-pack-js' type='text/javascript'></script>
+  <script src='lib/jsoneditor-min-js' type='text/javascript'></script>
   <script src='lib/marked-js' type='text/javascript'></script>
-
   <script src='lib/swagger-oauth-js' type='text/javascript'></script>
+
+  <!-- Some basic translations -->
+  <!-- <script src='lang/translator.js' type='text/javascript'></script> -->
+  <!-- <script src='lang/ru.js' type='text/javascript'></script> -->
+  <!-- <script src='lang/en.js' type='text/javascript'></script> -->
 
   <script type="text/javascript">
     $(function () {
@@ -32,13 +39,13 @@
         url = "http://petstore.swagger.io/v2/swagger.json";
       }
 
-        // Get Swashbuckle config into JavaScript
+      // Get Swashbuckle config into JavaScript
       function arrayFrom(configString) {
-          return (configString !== "") ? configString.split('|') : [];
+        return (configString !== "") ? configString.split('|') : [];
       }
 
       function stringOrNullFrom(configString) {
-          return (configString !== "null") ? configString : null;
+        return (configString !== "null") ? configString : null;
       }
 
       window.swashbuckleConfig = {
@@ -48,24 +55,41 @@
         validatorUrl: stringOrNullFrom('%(ValidatorUrl)'),
         customScripts: arrayFrom('%(CustomScripts)'),
         docExpansion: '%(DocExpansion)',
+        supportedSubmitMethods: arrayFrom('%(SupportedSubmitMethods)'),
         oAuth2Enabled: ('%(OAuth2Enabled)' == 'true'),
         oAuth2ClientId: '%(OAuth2ClientId)',
+        oAuth2ClientSecret: '%(OAuth2ClientSecret)',
         oAuth2Realm: '%(OAuth2Realm)',
-        oAuth2AppName: '%(OAuth2AppName)'
+        oAuth2AppName: '%(OAuth2AppName)',
+        oAuth2ScopeSeperator: '%(OAuth2ScopeSeperator)',
+        oAuth2AdditionalQueryStringParams: JSON.parse('%(OAuth2AdditionalQueryStringParams)')
       };
 
+      // Pre load translate...
+      if(window.SwaggerTranslator) {
+        window.SwaggerTranslator.translate();
+      }
       window.swaggerUi = new SwaggerUi({
         url: swashbuckleConfig.rootUrl + "/" + swashbuckleConfig.discoveryPaths[0],
         dom_id: "swagger-ui-container",
         booleanValues: swashbuckleConfig.booleanValues,
+        supportedSubmitMethods: swashbuckleConfig.supportedSubmitMethods,
         onComplete: function(swaggerApi, swaggerUi){
           if (typeof initOAuth == "function" && swashbuckleConfig.oAuth2Enabled) {
             initOAuth({
               clientId: swashbuckleConfig.oAuth2ClientId,
+              clientSecret: swashbuckleConfig.oAuth2ClientSecret,
               realm: swashbuckleConfig.oAuth2Realm,
-              appName: swashbuckleConfig.oAuth2AppName
+              appName: swashbuckleConfig.oAuth2AppName,
+              scopeSeparator: swashbuckleConfig.oAuth2ScopeSeperator,
+              additionalQueryStringParams: swashbuckleConfig.oAuth2AdditionalQueryStringParams
             });
           }
+
+          if(window.SwaggerTranslator) {
+            window.SwaggerTranslator.translate();
+          }
+
           $('pre code').each(function(i, e) {
             hljs.highlightBlock(e)
           });
@@ -74,23 +98,26 @@
 
           window.swaggerApi = swaggerApi;
           _.each(swashbuckleConfig.customScripts, function (script) {
-              $.getScript(script);
+            $.getScript(script);
           });
         },
         onFailure: function(data) {
           log("Unable to Load SwaggerUI");
         },
         docExpansion: swashbuckleConfig.docExpansion,
-        sorter : "alpha"
+        jsonEditor: false,
+        apisSorter: null, // default to server
+        defaultModelRendering: 'schema',
+        showRequestHeaders: false
       });
 
       if (window.swashbuckleConfig.validatorUrl !== '')
-          window.swaggerUi.options.validatorUrl = window.swashbuckleConfig.validatorUrl;
+        window.swaggerUi.options.validatorUrl = window.swashbuckleConfig.validatorUrl;
 
       function addApiKeyAuthorization(){
         var key = encodeURIComponent($('#input_apiKey')[0].value);
-        if(key && key.trim() != "") {
-            var apiKeyAuth = new SwaggerClient.ApiKeyAuthorization("api_key", key, "query");
+        if (key && key.trim() != "") {
+          var apiKeyAuth = new SwaggerClient.ApiKeyAuthorization("api_key", key, "query");
             window.swaggerUi.api.clientAuthorizations.add("api_key", apiKeyAuth);
             log("added key " + key);
         }
@@ -102,7 +129,6 @@
       /*
         var apiKey = "myApiKeyXXXX123456789";
         $('#input_apiKey').val(apiKey);
-        addApiKeyAuthorization();
       */
 
       window.swaggerUi.load();
@@ -123,12 +149,12 @@
     <form id='api_selector'>
       <div class='input'><input placeholder="http://example.com/api" id="input_baseUrl" name="baseUrl" type="text"/></div>
       <div class='input'><input placeholder="api_key" id="input_apiKey" name="apiKey" type="text"/></div>
-      <div class='input'><a id="explore" href="#">Explore</a></div>
+      <div class='input'><a id="explore" href="#" data-sw-translate>Explore</a></div>
     </form>
   </div>
 </div>
 
-<div id="message-bar" class="swagger-ui-wrap">&nbsp;</div>
+<div id="message-bar" class="swagger-ui-wrap" data-sw-translate>&nbsp;</div>
 <div id="swagger-ui-container" class="swagger-ui-wrap"></div>
 </body>
 </html>

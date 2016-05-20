@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime.Serialization;
 using NUnit.Framework;
 
 namespace Swashbuckle.Swagger
@@ -27,9 +28,25 @@ namespace Swashbuckle.Swagger
             Assert.AreEqual(expectedReturnValue, systemType.FriendlyId(true));
         }
 
+        [Test]
+        public void GetEnumNamesForSerialization_HonorsEnumMemberAttributes()
+        {
+            var enumNames = typeof(EnumWithMemberAttributes).GetEnumNamesForSerialization();
+            CollectionAssert.AreEqual(new[] { "value-1", "value-2" }, enumNames);
+        }
+
         private class InnerType
         {
             public string Property1 { get; set; }
+        }
+
+        public enum EnumWithMemberAttributes
+        {
+            [EnumMember(Value = "value-1")]
+            Value1 = 0,
+
+            [EnumMember(Value = "value-2")]
+            Value2 = 1
         }
     }
 }

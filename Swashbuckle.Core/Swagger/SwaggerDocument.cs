@@ -145,13 +145,16 @@ namespace Swashbuckle.Swagger
 
     public class Parameter : PartialSchema
     {
+        [JsonProperty("$ref")]
+        public string @ref;
+
         public string name;
 
         public string @in;
 
         public string description;
 
-        public bool required;
+        public bool? required;
 
         public Schema schema;
 
@@ -270,6 +273,8 @@ namespace Swashbuckle.Swagger
         public IDictionary<string, Header> headers;
 
         public object examples;
+
+        public Dictionary<string, object> vendorExtensions = new Dictionary<string, object>();
     }
 
     public class Header : PartialSchema
