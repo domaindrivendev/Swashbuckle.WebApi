@@ -26,6 +26,7 @@ namespace Swashbuckle.Swagger
         private readonly bool _ignoreObsoleteProperties;
         private readonly bool _describeAllEnumsAsStrings;
         private readonly bool _describeStringEnumsInCamelCase;
+        private readonly bool _includeExtensionsForPrimitives;
 
         private readonly IContractResolver _contractResolver;
 
@@ -44,7 +45,8 @@ namespace Swashbuckle.Swagger
             bool ignoreObsoleteProperties,
             Func<Type, string> schemaIdSelector,
             bool describeAllEnumsAsStrings,
-            bool describeStringEnumsInCamelCase)
+            bool describeStringEnumsInCamelCase,
+            bool includeExtensionsForPrimitives)
         {
             _jsonSerializerSettings = jsonSerializerSettings;
             _customSchemaMappings = customSchemaMappings;
@@ -54,6 +56,7 @@ namespace Swashbuckle.Swagger
             _ignoreObsoleteProperties = ignoreObsoleteProperties;
             _describeAllEnumsAsStrings = describeAllEnumsAsStrings;
             _describeStringEnumsInCamelCase = describeStringEnumsInCamelCase;
+            _includeExtensionsForPrimitives = includeExtensionsForPrimitives;
 
             _contractResolver = jsonSerializerSettings.ContractResolver ?? new DefaultContractResolver();
             _referencedTypes = new Dictionary<Type, SchemaInfo>();
@@ -128,44 +131,58 @@ namespace Swashbuckle.Swagger
 
         private Schema CreatePrimitiveSchema(JsonPrimitiveContract primitiveContract)
         {
-            var type = Nullable.GetUnderlyingType(primitiveContract.UnderlyingType) ?? primitiveContract.UnderlyingType;
+            var nullableUnderlyingType = Nullable.GetUnderlyingType(primitiveContract.UnderlyingType);
+            var type = nullableUnderlyingType ?? primitiveContract.UnderlyingType;
+
+            // Optionally include extensions to capture original .NET primitive type names and whether or not they are nullable.
+            var xtypeDotNetValue = _includeExtensionsForPrimitives
+                ? new Dictionary<string, object> { { "x-type-dotnet", type.FullName }, { "x-nullable", nullableUnderlyingType != null } }
+                : new Dictionary<string, object>();
+            var xtypeDotNetReference = _includeExtensionsForPrimitives
+                ? new Dictionary <string, object> { { "x-type-dotnet", type.FullName }, { "x-nullable", true } }
+                : new Dictionary<string, object>();
 
             if (type.IsEnum)
-                return CreateEnumSchema(primitiveContract, type);
+                return CreateEnumSchema(primitiveContract, type, xtypeDotNetValue);
 
             switch (type.FullName)
             {
+                // .NET value types: only nullable if wrapped in Nullable<T>
+                case "System.Boolean":
+                    return new Schema { type = "boolean", vendorExtensions = xtypeDotNetValue };
                 case "System.Byte":
                 case "System.SByte":
                 case "System.Int16":
                 case "System.UInt16":
                 case "System.Int32":
                 case "System.UInt32":
-                    return new Schema { type = "integer", format = "int32" };
+                    return new Schema { type = "integer", format = "int32", vendorExtensions = xtypeDotNetValue };
                 case "System.Int64":
                 case "System.UInt64":
-                    return new Schema { type = "integer", format = "int64" };
+                    return new Schema { type = "integer", format = "int64", vendorExtensions = xtypeDotNetValue };
                 case "System.Single":
-                    return new Schema { type = "number", format = "float" };
+                    return new Schema { type = "number", format = "float", vendorExtensions = xtypeDotNetValue };
                 case "System.Double":
                 case "System.Decimal":
-                    return new Schema { type = "number", format = "double" };
-                case "System.Byte[]":
-                case "System.SByte[]":
-                    return new Schema { type = "string", format = "byte" };
-                case "System.Boolean":
-                    return new Schema { type = "boolean" };
+                    return new Schema { type = "number", format = "double", vendorExtensions = xtypeDotNetValue };
                 case "System.DateTime":
                 case "System.DateTimeOffset":
-                    return new Schema { type = "string", format = "date-time" };
+                    return new Schema { type = "string", format = "date-time", vendorExtensions = xtypeDotNetValue };
+                case "System.TimeSpan":
+                    return new Schema { type = "string", vendorExtensions = xtypeDotNetValue };
                 case "System.Guid":
-                    return new Schema { type = "string", format = "uuid" };
+                    return new Schema { type = "string", format = "uuid", vendorExtensions = xtypeDotNetValue };
+                case "System.Char":
+                    return new Schema { type = "string", vendorExtensions = xtypeDotNetValue };
+                // .NET reference types: always nullable
+                case "System.Byte[]":
+                    return new Schema { type = "string", format = "byte", vendorExtensions = xtypeDotNetReference }; // Special case
                 default:
-                    return new Schema { type = "string" };
+                    return new Schema { type = "string", vendorExtensions = xtypeDotNetReference };
             }
         }
 
-        private Schema CreateEnumSchema(JsonPrimitiveContract primitiveContract, Type type)
+        private Schema CreateEnumSchema(JsonPrimitiveContract primitiveContract, Type type, Dictionary<string, object> xtypeDotNetValue)
         {
             var stringEnumConverter = primitiveContract.Converter as StringEnumConverter
                 ?? _jsonSerializerSettings.Converters.OfType<StringEnumConverter>().FirstOrDefault();
@@ -180,7 +197,8 @@ namespace Swashbuckle.Swagger
                     type = "string",
                     @enum = camelCase
                         ? type.GetEnumNamesForSerialization().Select(name => name.ToCamelCase()).ToArray()
-                        : type.GetEnumNamesForSerialization()
+                        : type.GetEnumNamesForSerialization(),
+                    vendorExtensions = xtypeDotNetValue
                 };
             }
             
@@ -188,7 +206,8 @@ namespace Swashbuckle.Swagger
             {
                 type = "integer",
                 format = "int32",
-                @enum = type.GetEnumValues().Cast<object>().ToArray()
+                @enum = type.GetEnumValues().Cast<object>().ToArray(),
+                vendorExtensions = xtypeDotNetValue
             };
         }
 
