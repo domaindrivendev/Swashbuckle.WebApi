@@ -1,6 +1,10 @@
 Swashbuckle 5.0
 =========
 
+:heavy_exclamation_mark: The source code for Swashbuckle 6.0.0 currently resides at https://github.com/domaindrivendev/Ahoy|
+--------------
+This new version targets ASP.NET Core (RC2 and beyond) and, like the new .NET framework, was built from the ground up - hence the separate repository. It's currently in beta and once it reaches a stable release milestone, I plan on merging it back with a single commit that essentially replaces the entire codebase. In the meantime, if you have issues related to 6.0.0, please create them at the other repo.| 
+
 Seamlessly adds a [Swagger](http://swagger.io/) to WebApi projects! Combines ApiExplorer and Swagger/swagger-ui to provide a rich discovery, documentation and playground experience to your API consumers.
 
 In addition to its Swagger generator, Swashbuckle also contains an embedded version of [swagger-ui](https://github.com/swagger-api/swagger-ui) which it will automatically serve up once Swashbuckle is installed. This means you can complement your API with a slick discovery UI to assist consumers with their integration efforts. Best of all, it requires minimal coding and maintenance, allowing you to focus on building an awesome API!
