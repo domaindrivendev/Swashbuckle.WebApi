@@ -53,6 +53,16 @@
             <param name="id"></param>
             <param name="metadata"></param>
         </member>
+        <member name="M:Swashbuckle.Dummy.Controllers.XmlAnnotatedController.MarkDownTest">
+            <summary>
+            Markdown Indention Tests
+            </summary>
+            <remarks>First Line after remarks tag
+            Second no additional space
+                 Third with extra leading spaces (that should be ignored)
+                 
+            .    Fourth with intentional leading spaces</remarks>
+        </member>
         <member name="P:Swashbuckle.Dummy.Controllers.Page.Limit">
             <summary>
             The maximum number of accounts to return

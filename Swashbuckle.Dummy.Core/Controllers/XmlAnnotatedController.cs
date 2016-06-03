@@ -87,6 +87,21 @@ namespace Swashbuckle.Dummy.Controllers
         {
             throw new NotImplementedException();
         }
+
+        /// <summary>
+        /// Markdown Indention Tests
+        /// </summary>
+        /// <remarks>First Line after remarks tag
+        /// Second no additional space
+        ///      Third with extra leading spaces (that should be ignored)
+        ///      
+        /// .    Fourth with intentional leading spaces</remarks>
+        [HttpGet]
+        [Route("markdown")]
+        public void MarkDownTest()
+        {
+
+        }
     }
 
     public class Page
