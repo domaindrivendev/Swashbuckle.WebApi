@@ -30,6 +30,7 @@ namespace Swashbuckle.Application
         private bool _ignoreObsoleteProperties;
         private bool _describeAllEnumsAsStrings;
         private bool _describeStringEnumsInCamelCase;
+        private bool _includeExtensionsForPrimitives;
         private readonly IList<Func<IOperationFilter>> _operationFilters;
         private readonly IList<Func<IDocumentFilter>> _documentFilters;
         private Func<IEnumerable<ApiDescription>, ApiDescription> _conflictingActionsResolver;
@@ -49,6 +50,7 @@ namespace Swashbuckle.Application
             _ignoreObsoleteProperties = false;
             _describeAllEnumsAsStrings = false;
             _describeStringEnumsInCamelCase = false;
+            _includeExtensionsForPrimitives = false;
             _operationFilters = new List<Func<IOperationFilter>>();
             _documentFilters = new List<Func<IDocumentFilter>>();
             _rootUrlResolver = DefaultRootUrlResolver;
@@ -178,6 +180,11 @@ namespace Swashbuckle.Application
             _ignoreObsoleteProperties = true;
         }
 
+        public void IncludeExtensionsForPrimitives()
+        {
+            _includeExtensionsForPrimitives = true;
+        }
+
         public void OperationFilter<TFilter>()
             where TFilter : IOperationFilter, new()
         {
@@ -243,6 +250,7 @@ namespace Swashbuckle.Application
                 schemaIdSelector: _schemaIdSelector,
                 describeAllEnumsAsStrings: _describeAllEnumsAsStrings,
                 describeStringEnumsInCamelCase: _describeStringEnumsInCamelCase,
+                includeExtensionsForPrimitives: _includeExtensionsForPrimitives,
                 operationFilters: _operationFilters.Select(factory => factory()),
                 documentFilters: _documentFilters.Select(factory => factory()),
                 conflictingActionsResolver: _conflictingActionsResolver

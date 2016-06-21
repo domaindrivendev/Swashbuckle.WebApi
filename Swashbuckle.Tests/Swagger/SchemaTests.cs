@@ -9,6 +9,7 @@ using Swashbuckle.Dummy.Controllers;
 using Swashbuckle.Application;
 using Swashbuckle.Swagger;
 using Swashbuckle.Dummy.SwaggerExtensions;
+using Swashbuckle.Dummy.Types;
 
 namespace Swashbuckle.Tests.Swagger
 {
@@ -366,6 +367,949 @@ namespace Swashbuckle.Tests.Swagger
             var defintitions = swagger["definitions"];
 
             Assert.IsNotNull(defintitions["Requests.Blog"]);
+        }
+
+        [TestCase("EchoBoolean", typeof(bool), "boolean", null, "System.Boolean", false)]
+        [TestCase("EchoByte", typeof(byte), "integer", "int32", "System.Byte", false)]
+        [TestCase("EchoSByte", typeof(sbyte), "integer", "int32", "System.SByte", false)]
+        [TestCase("EchoInt16", typeof(short), "integer", "int32", "System.Int16", false)]
+        [TestCase("EchoUInt16", typeof(ushort), "integer", "int32", "System.UInt16", false)]
+        [TestCase("EchoInt32", typeof(int), "integer", "int32", "System.Int32", false)]
+        [TestCase("EchoUInt32", typeof(uint), "integer", "int32", "System.UInt32", false)]
+        [TestCase("EchoInt64", typeof(long), "integer", "int64", "System.Int64", false)]
+        [TestCase("EchoUInt64", typeof(ulong), "integer", "int64", "System.UInt64", false)]
+        [TestCase("EchoSingle", typeof(float), "number", "float", "System.Single", false)]
+        [TestCase("EchoDouble", typeof(double), "number", "double", "System.Double", false)]
+        [TestCase("EchoDecimal", typeof(decimal), "number", "double", "System.Decimal", false)]
+        [TestCase("EchoDateTime", typeof(DateTime), "string", "date-time", "System.DateTime", false)]
+        [TestCase("EchoDateTimeOffset", typeof(DateTimeOffset), "string", "date-time", "System.DateTimeOffset", false)]
+        [TestCase("EchoTimeSpan", typeof(TimeSpan), "string", null, "System.TimeSpan", false)]
+        [TestCase("EchoGuid", typeof(Guid), "string", "uuid", "System.Guid", false)]
+        [TestCase("EchoEnum", typeof(PrimitiveEnum), "integer", "int32", "Swashbuckle.Dummy.Types.PrimitiveEnum", false)]
+        [TestCase("EchoEnum", typeof(PrimitiveEnum), "string", null, "Swashbuckle.Dummy.Types.PrimitiveEnum", false)]
+        [TestCase("EchoChar", typeof(char), "string", null, "System.Char", false)]
+        [TestCase("EchoNullableBoolean", typeof(bool?), "boolean", null, "System.Boolean", true)]
+        [TestCase("EchoNullableByte", typeof(byte?), "integer", "int32", "System.Byte", true)]
+        [TestCase("EchoNullableSByte", typeof(sbyte?), "integer", "int32", "System.SByte", true)]
+        [TestCase("EchoNullableInt16", typeof(short?), "integer", "int32", "System.Int16", true)]
+        [TestCase("EchoNullableUInt16", typeof(ushort?), "integer", "int32", "System.UInt16", true)]
+        [TestCase("EchoNullableInt32", typeof(int?), "integer", "int32", "System.Int32", true)]
+        [TestCase("EchoNullableUInt32", typeof(uint?), "integer", "int32", "System.UInt32", true)]
+        [TestCase("EchoNullableInt64", typeof(long?), "integer", "int64", "System.Int64", true)]
+        [TestCase("EchoNullableUInt64", typeof(ulong?), "integer", "int64", "System.UInt64", true)]
+        [TestCase("EchoNullableSingle", typeof(float?), "number", "float", "System.Single", true)]
+        [TestCase("EchoNullableDouble", typeof(double?), "number", "double", "System.Double", true)]
+        [TestCase("EchoNullableDecimal", typeof(decimal?), "number", "double", "System.Decimal", true)]
+        [TestCase("EchoNullableDateTime", typeof(DateTime?), "string", "date-time", "System.DateTime", true)]
+        [TestCase("EchoNullableDateTimeOffset", typeof(DateTimeOffset?), "string", "date-time", "System.DateTimeOffset", true)]
+        [TestCase("EchoNullableTimeSpan", typeof(TimeSpan?), "string", null, "System.TimeSpan", true)]
+        [TestCase("EchoNullableGuid", typeof(Guid?), "string", "uuid", "System.Guid", true)]
+        [TestCase("EchoNullableEnum", typeof(PrimitiveEnum?), "integer", "int32", "Swashbuckle.Dummy.Types.PrimitiveEnum", true)]
+        [TestCase("EchoNullableEnum", typeof(PrimitiveEnum?), "string", null, "Swashbuckle.Dummy.Types.PrimitiveEnum", true)]
+        [TestCase("EchoNullableChar", typeof(char?), "string", null, "System.Char", true)]
+        [TestCase("EchoString", typeof(string), "string", null, "System.String", true)]
+        public void It_exposes_config_to_include_extensions_for_primitives(string action, Type dotNetType, string type, string format, string xtypeDotNet, bool xnullable)
+        {
+            var underlyingDotNetType = Nullable.GetUnderlyingType(dotNetType) ?? dotNetType;
+            SetUpCustomRouteFor<PrimitiveTypesController>("PrimitiveTypes/{action}");
+            SetUpHandler(c =>
+            {
+                if (underlyingDotNetType.IsEnum && type == "string")
+                {
+                    c.DescribeAllEnumsAsStrings();
+                }
+                c.IncludeExtensionsForPrimitives();
+            });
+
+            var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/v1");
+            var operation = swagger["paths"]["/PrimitiveTypes/" + action]["post"];
+            var parameter = operation["parameters"][0];
+            var response = operation["responses"]["200"]["schema"];
+
+            var method = typeof(PrimitiveTypesController).GetMethod(action);
+            Assert.AreEqual(dotNetType, method.GetParameters()[0].ParameterType);
+            Assert.AreEqual(dotNetType, method.ReturnType);
+
+            var expectedParameter = new Dictionary<string, object>
+            {
+                { "name", "value" },
+                { "in", "query" },
+                { "required", true },
+                { "type", type }
+            };
+            if (format != null)
+            {
+                expectedParameter.Add("format", format);
+            }
+            if (underlyingDotNetType.IsEnum)
+            {
+                expectedParameter.Add("enum", type == "string" ? underlyingDotNetType.GetEnumNames() : underlyingDotNetType.GetEnumValues());
+            }
+            expectedParameter.Add("x-type-dotnet", xtypeDotNet);
+            expectedParameter.Add("x-nullable", xnullable);
+            Assert.AreEqual(JObject.FromObject(expectedParameter).ToString(), parameter.ToString());
+
+            var expectedResponse = new Dictionary<string, object>();
+            if (format != null)
+            {
+                expectedResponse.Add("format", format);
+            }
+            if (underlyingDotNetType.IsEnum)
+            {
+                expectedResponse.Add("enum", type == "string" ? underlyingDotNetType.GetEnumNames() : underlyingDotNetType.GetEnumValues());
+            }
+            expectedResponse.Add("type", type);
+            expectedResponse.Add("x-type-dotnet", xtypeDotNet);
+            expectedResponse.Add("x-nullable", xnullable);
+            Assert.AreEqual(JObject.FromObject(expectedResponse).ToString(), response.ToString());
+        }
+
+        [Test]
+        public void It_exposes_config_to_include_extensions_for_primitive_composite()
+        {
+            SetUpCustomRouteFor<PrimitiveTypesController>("PrimitiveTypes/{action}");
+            SetUpHandler(c => c.IncludeExtensionsForPrimitives());
+
+            var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/v1");
+            var operation = swagger["paths"]["/PrimitiveTypes/EchoComposite"]["post"];
+            var parameter = operation["parameters"][0];
+            var response = operation["responses"]["200"]["schema"];
+            var compositeProps = swagger["definitions"]["PrimitiveComposite"]["properties"];
+
+            var method = typeof(PrimitiveTypesController).GetMethod("EchoComposite");
+            Assert.AreEqual(typeof(PrimitiveComposite), method.GetParameters()[0].ParameterType);
+            Assert.AreEqual(typeof(PrimitiveComposite), method.ReturnType);
+
+            var expectedParameter = JObject.FromObject(new
+            {
+                name = "value",
+                @in = "body",
+                required = true,
+                schema = new Dictionary<string, object>
+                {
+                    { "$ref", "#/definitions/PrimitiveComposite" }
+                }
+            });
+            Assert.AreEqual(JObject.FromObject(expectedParameter).ToString(), parameter.ToString());
+
+            var expectedResponse = new Dictionary<string, object>
+            {
+                { "$ref", "#/definitions/PrimitiveComposite" }
+            };
+            Assert.AreEqual(JObject.FromObject(expectedResponse).ToString(), response.ToString());
+
+            var expectedProps = JObject.FromObject(new
+            {
+                Boolean = new Dictionary<string, object>
+                {
+                    { "type", "boolean" },
+                    { "x-type-dotnet", "System.Boolean" },
+                    { "x-nullable", false }
+                },
+                Byte = new Dictionary<string, object>
+                {
+                    { "format", "int32" },
+                    { "type", "integer" },
+                    { "x-type-dotnet", "System.Byte" },
+                    { "x-nullable", false }
+                },
+                SByte = new Dictionary<string, object>
+                {
+                    { "format", "int32" },
+                    { "type", "integer" },
+                    { "x-type-dotnet", "System.SByte" },
+                    { "x-nullable", false }
+                },
+                Int16 = new Dictionary<string, object>
+                {
+                    { "format", "int32" },
+                    { "type", "integer" },
+                    { "x-type-dotnet", "System.Int16" },
+                    { "x-nullable", false }
+                },
+                UInt16 = new Dictionary<string, object>
+                {
+                    { "format", "int32" },
+                    { "type", "integer" },
+                    { "x-type-dotnet", "System.UInt16" },
+                    { "x-nullable", false }
+                },
+                Int32 = new Dictionary<string, object>
+                {
+                    { "format", "int32" },
+                    { "type", "integer" },
+                    { "x-type-dotnet", "System.Int32" },
+                    { "x-nullable", false }
+                },
+                UInt32 = new Dictionary<string, object>
+                {
+                    { "format", "int32" },
+                    { "type", "integer" },
+                    { "x-type-dotnet", "System.UInt32" },
+                    { "x-nullable", false }
+                },
+                Int64 = new Dictionary<string, object>
+                {
+                    { "format", "int64" },
+                    { "type", "integer" },
+                    { "x-type-dotnet", "System.Int64" },
+                    { "x-nullable", false }
+                },
+                UInt64 = new Dictionary<string, object>
+                {
+                    { "format", "int64" },
+                    { "type", "integer" },
+                    { "x-type-dotnet", "System.UInt64" },
+                    { "x-nullable", false }
+                },
+                Single = new Dictionary<string, object>
+                {
+                    { "format", "float" },
+                    { "type", "number" },
+                    { "x-type-dotnet", "System.Single" },
+                    { "x-nullable", false }
+                },
+                Double = new Dictionary<string, object>
+                {
+                    { "format", "double" },
+                    { "type", "number" },
+                    { "x-type-dotnet", "System.Double" },
+                    { "x-nullable", false }
+                },
+                Decimal = new Dictionary<string, object>
+                {
+                    { "format", "double" },
+                    { "type", "number" },
+                    { "x-type-dotnet", "System.Decimal" },
+                    { "x-nullable", false }
+                },
+                DateTime = new Dictionary<string, object>
+                {
+                    { "format", "date-time" },
+                    { "type", "string" },
+                    { "x-type-dotnet", "System.DateTime" },
+                    { "x-nullable", false }
+                },
+                DateTimeOffset = new Dictionary<string, object>
+                {
+                    { "format", "date-time" },
+                    { "type", "string" },
+                    { "x-type-dotnet", "System.DateTimeOffset" },
+                    { "x-nullable", false }
+                },
+                TimeSpan = new Dictionary<string, object>
+                {
+                    { "type", "string" },
+                    { "x-type-dotnet", "System.TimeSpan" },
+                    { "x-nullable", false }
+                },
+                Guid = new Dictionary<string, object>
+                {
+                    { "format", "uuid" },
+                    { "type", "string" },
+                    { "x-type-dotnet", "System.Guid" },
+                    { "x-nullable", false }
+                },
+                Enum = new Dictionary<string, object>
+                {
+                    { "format", "int32" },
+                    { "enum", typeof(PrimitiveEnum).GetEnumValues() },
+                    { "type", "integer" },
+                    { "x-type-dotnet", typeof(PrimitiveEnum).FullName },
+                    { "x-nullable", false }
+                },
+                Char = new Dictionary<string, object>
+                {
+                    { "type", "string" },
+                    { "x-type-dotnet", "System.Char" },
+                    { "x-nullable", false }
+                },
+                NullableBoolean = new Dictionary<string, object>
+                {
+                    { "type", "boolean" },
+                    { "x-type-dotnet", "System.Boolean" },
+                    { "x-nullable", true }
+                },
+                NullableByte = new Dictionary<string, object>
+                {
+                    { "format", "int32" },
+                    { "type", "integer" },
+                    { "x-type-dotnet", "System.Byte" },
+                    { "x-nullable", true }
+                },
+                NullableSByte = new Dictionary<string, object>
+                {
+                    { "format", "int32" },
+                    { "type", "integer" },
+                    { "x-type-dotnet", "System.SByte" },
+                    { "x-nullable", true }
+                },
+                NullableInt16 = new Dictionary<string, object>
+                {
+                    { "format", "int32" },
+                    { "type", "integer" },
+                    { "x-type-dotnet", "System.Int16" },
+                    { "x-nullable", true }
+                },
+                NullableUInt16 = new Dictionary<string, object>
+                {
+                    { "format", "int32" },
+                    { "type", "integer" },
+                    { "x-type-dotnet", "System.UInt16" },
+                    { "x-nullable", true }
+                },
+                NullableInt32 = new Dictionary<string, object>
+                {
+                    { "format", "int32" },
+                    { "type", "integer" },
+                    { "x-type-dotnet", "System.Int32" },
+                    { "x-nullable", true }
+                },
+                NullableUInt32 = new Dictionary<string, object>
+                {
+                    { "format", "int32" },
+                    { "type", "integer" },
+                    { "x-type-dotnet", "System.UInt32" },
+                    { "x-nullable", true }
+                },
+                NullableInt64 = new Dictionary<string, object>
+                {
+                    { "format", "int64" },
+                    { "type", "integer" },
+                    { "x-type-dotnet", "System.Int64" },
+                    { "x-nullable", true }
+                },
+                NullableUInt64 = new Dictionary<string, object>
+                {
+                    { "format", "int64" },
+                    { "type", "integer" },
+                    { "x-type-dotnet", "System.UInt64" },
+                    { "x-nullable", true }
+                },
+                NullableSingle = new Dictionary<string, object>
+                {
+                    { "format", "float" },
+                    { "type", "number" },
+                    { "x-type-dotnet", "System.Single" },
+                    { "x-nullable", true }
+                },
+                NullableDouble = new Dictionary<string, object>
+                {
+                    { "format", "double" },
+                    { "type", "number" },
+                    { "x-type-dotnet", "System.Double" },
+                    { "x-nullable", true }
+                },
+                NullableDecimal = new Dictionary<string, object>
+                {
+                    { "format", "double" },
+                    { "type", "number" },
+                    { "x-type-dotnet", "System.Decimal" },
+                    { "x-nullable", true }
+                },
+                NullableDateTime = new Dictionary<string, object>
+                {
+                    { "format", "date-time" },
+                    { "type", "string" },
+                    { "x-type-dotnet", "System.DateTime" },
+                    { "x-nullable", true }
+                },
+                NullableDateTimeOffset = new Dictionary<string, object>
+                {
+                    { "format", "date-time" },
+                    { "type", "string" },
+                    { "x-type-dotnet", "System.DateTimeOffset" },
+                    { "x-nullable", true }
+                },
+                NullableTimeSpan = new Dictionary<string, object>
+                {
+                    { "type", "string" },
+                    { "x-type-dotnet", "System.TimeSpan" },
+                    { "x-nullable", true }
+                },
+                NullableGuid = new Dictionary<string, object>
+                {
+                    { "format", "uuid" },
+                    { "type", "string" },
+                    { "x-type-dotnet", "System.Guid" },
+                    { "x-nullable", true }
+                },
+                NullableEnum = new Dictionary<string, object>
+                {
+                    { "format", "int32" },
+                    { "enum", typeof(PrimitiveEnum).GetEnumValues() },
+                    { "type", "integer" },
+                    { "x-type-dotnet", typeof(PrimitiveEnum).FullName },
+                    { "x-nullable", true }
+                },
+                NullableChar = new Dictionary<string, object>
+                {
+                    { "type", "string" },
+                    { "x-type-dotnet", "System.Char" },
+                    { "x-nullable", true }
+                },
+                String = new Dictionary<string, object>
+                {
+                    { "type", "string" },
+                    { "x-type-dotnet", "System.String" },
+                    { "x-nullable", true }
+                }
+            });
+            Assert.AreEqual(expectedProps.ToString(), compositeProps.ToString());
+        }
+
+        [TestCase("EchoBoolean", typeof(bool), "boolean", null, "System.Boolean", false)]
+        [TestCase("EchoByte", typeof(byte), "string", "byte", "System.Byte[]", true)] // Special case
+        [TestCase("EchoSByte", typeof(sbyte), "integer", "int32", "System.SByte", false)]
+        [TestCase("EchoInt16", typeof(short), "integer", "int32", "System.Int16", false)]
+        [TestCase("EchoUInt16", typeof(ushort), "integer", "int32", "System.UInt16", false)]
+        [TestCase("EchoInt32", typeof(int), "integer", "int32", "System.Int32", false)]
+        [TestCase("EchoUInt32", typeof(uint), "integer", "int32", "System.UInt32", false)]
+        [TestCase("EchoInt64", typeof(long), "integer", "int64", "System.Int64", false)]
+        [TestCase("EchoUInt64", typeof(ulong), "integer", "int64", "System.UInt64", false)]
+        [TestCase("EchoSingle", typeof(float), "number", "float", "System.Single", false)]
+        [TestCase("EchoDouble", typeof(double), "number", "double", "System.Double", false)]
+        [TestCase("EchoDecimal", typeof(decimal), "number", "double", "System.Decimal", false)]
+        [TestCase("EchoDateTime", typeof(DateTime), "string", "date-time", "System.DateTime", false)]
+        [TestCase("EchoDateTimeOffset", typeof(DateTimeOffset), "string", "date-time", "System.DateTimeOffset", false)]
+        [TestCase("EchoTimeSpan", typeof(TimeSpan), "string", null, "System.TimeSpan", false)]
+        [TestCase("EchoGuid", typeof(Guid), "string", "uuid", "System.Guid", false)]
+        [TestCase("EchoEnum", typeof(PrimitiveEnum), "integer", "int32", "Swashbuckle.Dummy.Types.PrimitiveEnum", false)]
+        [TestCase("EchoEnum", typeof(PrimitiveEnum), "string", null, "Swashbuckle.Dummy.Types.PrimitiveEnum", false)]
+        [TestCase("EchoChar", typeof(char), "string", null, "System.Char", false)]
+        [TestCase("EchoNullableBoolean", typeof(bool?), "boolean", null, "System.Boolean", true)]
+        [TestCase("EchoNullableByte", typeof(byte?), "integer", "int32", "System.Byte", true)]
+        [TestCase("EchoNullableSByte", typeof(sbyte?), "integer", "int32", "System.SByte", true)]
+        [TestCase("EchoNullableInt16", typeof(short?), "integer", "int32", "System.Int16", true)]
+        [TestCase("EchoNullableUInt16", typeof(ushort?), "integer", "int32", "System.UInt16", true)]
+        [TestCase("EchoNullableInt32", typeof(int?), "integer", "int32", "System.Int32", true)]
+        [TestCase("EchoNullableUInt32", typeof(uint?), "integer", "int32", "System.UInt32", true)]
+        [TestCase("EchoNullableInt64", typeof(long?), "integer", "int64", "System.Int64", true)]
+        [TestCase("EchoNullableUInt64", typeof(ulong?), "integer", "int64", "System.UInt64", true)]
+        [TestCase("EchoNullableSingle", typeof(float?), "number", "float", "System.Single", true)]
+        [TestCase("EchoNullableDouble", typeof(double?), "number", "double", "System.Double", true)]
+        [TestCase("EchoNullableDecimal", typeof(decimal?), "number", "double", "System.Decimal", true)]
+        [TestCase("EchoNullableDateTime", typeof(DateTime?), "string", "date-time", "System.DateTime", true)]
+        [TestCase("EchoNullableDateTimeOffset", typeof(DateTimeOffset?), "string", "date-time", "System.DateTimeOffset", true)]
+        [TestCase("EchoNullableTimeSpan", typeof(TimeSpan?), "string", null, "System.TimeSpan", true)]
+        [TestCase("EchoNullableGuid", typeof(Guid?), "string", "uuid", "System.Guid", true)]
+        [TestCase("EchoNullableEnum", typeof(PrimitiveEnum?), "integer", "int32", "Swashbuckle.Dummy.Types.PrimitiveEnum", true)]
+        [TestCase("EchoNullableEnum", typeof(PrimitiveEnum?), "string", null, "Swashbuckle.Dummy.Types.PrimitiveEnum", true)]
+        [TestCase("EchoNullableChar", typeof(char?), "string", null, "System.Char", true)]
+        [TestCase("EchoString", typeof(string), "string", null, "System.String", true)]
+        public void It_exposes_config_to_include_extensions_for_primitive_arrays(string action, Type dotNetType, string type, string format, string xtypeDotNet, bool xnullable)
+        {
+            var underlyingDotNetType = Nullable.GetUnderlyingType(dotNetType) ?? dotNetType;
+            SetUpCustomRouteFor<PrimitiveArrayTypesController>("PrimitiveArrayTypes/{action}");
+            SetUpHandler(c =>
+            {
+                if (underlyingDotNetType.IsEnum && type == "string")
+                {
+                    c.DescribeAllEnumsAsStrings();
+                }
+                c.IncludeExtensionsForPrimitives();
+            });
+
+            var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/v1");
+            var operation = swagger["paths"]["/PrimitiveArrayTypes/" + action]["post"];
+            var parameter = operation["parameters"][0];
+            var response = operation["responses"]["200"]["schema"];
+
+            var method = typeof(PrimitiveArrayTypesController).GetMethod(action);
+            Assert.AreEqual(dotNetType.MakeArrayType(), method.GetParameters()[0].ParameterType);
+            Assert.AreEqual(dotNetType.MakeArrayType(), method.ReturnType);
+
+            var expectedParameterItems = new Dictionary<string, object>();
+            if (format != null)
+            {
+                expectedParameterItems.Add("format", format);
+            }
+            if (underlyingDotNetType.IsEnum)
+            {
+                expectedParameterItems.Add("enum", type == "string" ? underlyingDotNetType.GetEnumNames() : underlyingDotNetType.GetEnumValues());
+            }
+            expectedParameterItems.Add("type", type);
+            expectedParameterItems.Add("x-type-dotnet", xtypeDotNet);
+            expectedParameterItems.Add("x-nullable", xnullable);
+            var expectedParameter = (format == "byte") // Special case
+                ? JObject.FromObject(new
+                {
+                    name = "value",
+                    @in = "body",
+                    required = true,
+                    schema = expectedParameterItems
+                })
+                : JObject.FromObject(new
+                {
+                    name = "value",
+                    @in = "body",
+                    required = true,
+                    schema = new
+                    {
+                        type = "array",
+                        items = expectedParameterItems
+                    }
+                });
+            Assert.AreEqual(expectedParameter.ToString(), parameter.ToString());
+
+            var expectedResponseItems = new Dictionary<string, object>();
+            if (format != null)
+            {
+                expectedResponseItems.Add("format", format);
+            }
+            if (underlyingDotNetType.IsEnum)
+            {
+                expectedResponseItems.Add("enum", type == "string" ? underlyingDotNetType.GetEnumNames() : underlyingDotNetType.GetEnumValues());
+            }
+            expectedResponseItems.Add("type", type);
+            expectedResponseItems.Add("x-type-dotnet", xtypeDotNet);
+            expectedResponseItems.Add("x-nullable", xnullable);
+            var expectedResponse = (format == "byte") // Special case
+                ? JObject.FromObject(expectedResponseItems)
+                : JObject.FromObject(new
+                {
+                    type = "array",
+                    items = expectedResponseItems
+                });
+            Assert.AreEqual(expectedResponse.ToString(), response.ToString());
+        }
+
+        [Test]
+        public void It_exposes_config_to_include_extensions_for_primitive_array_composite()
+        {
+            SetUpCustomRouteFor<PrimitiveArrayTypesController>("PrimitiveArrayTypes/{action}");
+            SetUpHandler(c => c.IncludeExtensionsForPrimitives());
+
+            var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/v1");
+            var operation = swagger["paths"]["/PrimitiveArrayTypes/EchoComposite"]["post"];
+            var parameter = operation["parameters"][0];
+            var response = operation["responses"]["200"]["schema"];
+            var compositeProps = swagger["definitions"]["PrimitiveArrayComposite"]["properties"];
+
+            var method = typeof(PrimitiveArrayTypesController).GetMethod("EchoComposite");
+            Assert.AreEqual(typeof(PrimitiveArrayComposite), method.GetParameters()[0].ParameterType);
+            Assert.AreEqual(typeof(PrimitiveArrayComposite), method.ReturnType);
+
+            var expectedParameter = JObject.FromObject(new
+            {
+                name = "value",
+                @in = "body",
+                required = true,
+                schema = new Dictionary<string, object>
+                {
+                    { "$ref", "#/definitions/PrimitiveArrayComposite" }
+                }
+            });
+            Assert.AreEqual(JObject.FromObject(expectedParameter).ToString(), parameter.ToString());
+
+            var expectedResponse = new Dictionary<string, object>
+            {
+                { "$ref", "#/definitions/PrimitiveArrayComposite" }
+            };
+            Assert.AreEqual(JObject.FromObject(expectedResponse).ToString(), response.ToString());
+
+            var expectedProps = JObject.FromObject(new
+            {
+                Boolean = JObject.FromObject(new
+                {
+                    type = "array",
+                    items = new Dictionary<string, object>
+                    {
+                        { "type", "boolean" },
+                        { "x-type-dotnet", "System.Boolean" },
+                        { "x-nullable", false }
+                    }
+                }),
+                Byte = new Dictionary<string, object> // Special case
+                {
+                    { "format", "byte" },
+                    { "type", "string" },
+                    { "x-type-dotnet", "System.Byte[]" },
+                    { "x-nullable", true }
+                },
+                SByte = JObject.FromObject(new
+                {
+                    type = "array",
+                    items = new Dictionary<string, object>
+                    {
+                        { "format", "int32" },
+                        { "type", "integer" },
+                        { "x-type-dotnet", "System.SByte" },
+                        { "x-nullable", false }
+                    }
+                }),
+                Int16 = JObject.FromObject(new
+                {
+                    type = "array",
+                    items = new Dictionary<string, object>
+                    {
+                        { "format", "int32" },
+                        { "type", "integer" },
+                        { "x-type-dotnet", "System.Int16" },
+                        { "x-nullable", false }
+                    }
+                }),
+                UInt16 = JObject.FromObject(new
+                {
+                    type = "array",
+                    items = new Dictionary<string, object>
+                    {
+                        { "format", "int32" },
+                        { "type", "integer" },
+                        { "x-type-dotnet", "System.UInt16" },
+                        { "x-nullable", false }
+                    }
+                }),
+                Int32 = JObject.FromObject(new
+                {
+                    type = "array",
+                    items = new Dictionary<string, object>
+                    {
+                        { "format", "int32" },
+                        { "type", "integer" },
+                        { "x-type-dotnet", "System.Int32" },
+                        { "x-nullable", false }
+                    }
+                }),
+                UInt32 = JObject.FromObject(new
+                {
+                    type = "array",
+                    items = new Dictionary<string, object>
+                    {
+                        { "format", "int32" },
+                        { "type", "integer" },
+                        { "x-type-dotnet", "System.UInt32" },
+                        { "x-nullable", false }
+                    }
+                }),
+                Int64 = JObject.FromObject(new
+                {
+                    type = "array",
+                    items = new Dictionary<string, object>
+                    {
+                        { "format", "int64" },
+                        { "type", "integer" },
+                        { "x-type-dotnet", "System.Int64" },
+                        { "x-nullable", false }
+                    }
+                }),
+                UInt64 = JObject.FromObject(new
+                {
+                    type = "array",
+                    items = new Dictionary<string, object>
+                    {
+                        { "format", "int64" },
+                        { "type", "integer" },
+                        { "x-type-dotnet", "System.UInt64" },
+                        { "x-nullable", false }
+                    }
+                }),
+                Single = JObject.FromObject(new
+                {
+                    type = "array",
+                    items = new Dictionary<string, object>
+                    {
+                        { "format", "float" },
+                        { "type", "number" },
+                        { "x-type-dotnet", "System.Single" },
+                        { "x-nullable", false }
+                    }
+                }),
+                Double = JObject.FromObject(new
+                {
+                    type = "array",
+                    items = new Dictionary<string, object>
+                    {
+                        { "format", "double" },
+                        { "type", "number" },
+                        { "x-type-dotnet", "System.Double" },
+                        { "x-nullable", false }
+                    }
+                }),
+                Decimal = JObject.FromObject(new
+                {
+                    type = "array",
+                    items = new Dictionary<string, object>
+                    {
+                        { "format", "double" },
+                        { "type", "number" },
+                        { "x-type-dotnet", "System.Decimal" },
+                        { "x-nullable", false }
+                    }
+                }),
+                DateTime = JObject.FromObject(new
+                {
+                    type = "array",
+                    items = new Dictionary<string, object>
+                    {
+                        { "format", "date-time" },
+                        { "type", "string" },
+                        { "x-type-dotnet", "System.DateTime" },
+                        { "x-nullable", false }
+                    }
+                }),
+                DateTimeOffset = JObject.FromObject(new
+                {
+                    type = "array",
+                    items = new Dictionary<string, object>
+                    {
+                        { "format", "date-time" },
+                        { "type", "string" },
+                        { "x-type-dotnet", "System.DateTimeOffset" },
+                        { "x-nullable", false }
+                    }
+                }),
+                TimeSpan = JObject.FromObject(new
+                {
+                    type = "array",
+                    items = new Dictionary<string, object>
+                    {
+                        { "type", "string" },
+                        { "x-type-dotnet", "System.TimeSpan" },
+                        { "x-nullable", false }
+                    }
+                }),
+                Guid = JObject.FromObject(new
+                {
+                    type = "array",
+                    items = new Dictionary<string, object>
+                    {
+                        { "format", "uuid" },
+                        { "type", "string" },
+                        { "x-type-dotnet", "System.Guid" },
+                        { "x-nullable", false }
+                    }
+                }),
+                Enum = JObject.FromObject(new
+                {
+                    type = "array",
+                    items = new Dictionary<string, object>
+                    {
+                        { "format", "int32" },
+                        { "enum", typeof(PrimitiveEnum).GetEnumValues() },
+                        { "type", "integer" },
+                        { "x-type-dotnet", typeof(PrimitiveEnum).FullName },
+                        { "x-nullable", false }
+                    }
+                }),
+                Char = JObject.FromObject(new
+                {
+                    type = "array",
+                    items = new Dictionary<string, object>
+                    {
+                        { "type", "string" },
+                        { "x-type-dotnet", "System.Char" },
+                        { "x-nullable", false }
+                    }
+                }),
+                NullableBoolean = JObject.FromObject(new
+                {
+                    type = "array",
+                    items = new Dictionary<string, object>
+                    {
+                        { "type", "boolean" },
+                        { "x-type-dotnet", "System.Boolean" },
+                        { "x-nullable", true }
+                    }
+                }),
+                NullableByte = JObject.FromObject(new
+                {
+                    type = "array",
+                    items = new Dictionary<string, object>
+                    {
+                        { "format", "int32" },
+                        { "type", "integer" },
+                        { "x-type-dotnet", "System.Byte" },
+                        { "x-nullable", true }
+                    }
+                }),
+                NullableSByte = JObject.FromObject(new
+                {
+                    type = "array",
+                    items = new Dictionary<string, object>
+                    {
+                        { "format", "int32" },
+                        { "type", "integer" },
+                        { "x-type-dotnet", "System.SByte" },
+                        { "x-nullable", true }
+                    }
+                }),
+                NullableInt16 = JObject.FromObject(new
+                {
+                    type = "array",
+                    items = new Dictionary<string, object>
+                    {
+                        { "format", "int32" },
+                        { "type", "integer" },
+                        { "x-type-dotnet", "System.Int16" },
+                        { "x-nullable", true }
+                    }
+                }),
+                NullableUInt16 = JObject.FromObject(new
+                {
+                    type = "array",
+                    items = new Dictionary<string, object>
+                    {
+                        { "format", "int32" },
+                        { "type", "integer" },
+                        { "x-type-dotnet", "System.UInt16" },
+                        { "x-nullable", true }
+                    }
+                }),
+                NullableInt32 = JObject.FromObject(new
+                {
+                    type = "array",
+                    items = new Dictionary<string, object>
+                    {
+                        { "format", "int32" },
+                        { "type", "integer" },
+                        { "x-type-dotnet", "System.Int32" },
+                        { "x-nullable", true }
+                    }
+                }),
+                NullableUInt32 = JObject.FromObject(new
+                {
+                    type = "array",
+                    items = new Dictionary<string, object>
+                    {
+                        { "format", "int32" },
+                        { "type", "integer" },
+                        { "x-type-dotnet", "System.UInt32" },
+                        { "x-nullable", true }
+                    }
+                }),
+                NullableInt64 = JObject.FromObject(new
+                {
+                    type = "array",
+                    items = new Dictionary<string, object>
+                    {
+                        { "format", "int64" },
+                        { "type", "integer" },
+                        { "x-type-dotnet", "System.Int64" },
+                        { "x-nullable", true }
+                    }
+                }),
+                NullableUInt64 = JObject.FromObject(new
+                {
+                    type = "array",
+                    items = new Dictionary<string, object>
+                    {
+                        { "format", "int64" },
+                        { "type", "integer" },
+                        { "x-type-dotnet", "System.UInt64" },
+                        { "x-nullable", true }
+                    }
+                }),
+                NullableSingle = JObject.FromObject(new
+                {
+                    type = "array",
+                    items = new Dictionary<string, object>
+                    {
+                        { "format", "float" },
+                        { "type", "number" },
+                        { "x-type-dotnet", "System.Single" },
+                        { "x-nullable", true }
+                    }
+                }),
+                NullableDouble = JObject.FromObject(new
+                {
+                    type = "array",
+                    items = new Dictionary<string, object>
+                    {
+                        { "format", "double" },
+                        { "type", "number" },
+                        { "x-type-dotnet", "System.Double" },
+                        { "x-nullable", true }
+                    }
+                }),
+                NullableDecimal = JObject.FromObject(new
+                {
+                    type = "array",
+                    items = new Dictionary<string, object>
+                    {
+                        { "format", "double" },
+                        { "type", "number" },
+                        { "x-type-dotnet", "System.Decimal" },
+                        { "x-nullable", true }
+                    }
+                }),
+                NullableDateTime = JObject.FromObject(new
+                {
+                    type = "array",
+                    items = new Dictionary<string, object>
+                    {
+                        { "format", "date-time" },
+                        { "type", "string" },
+                        { "x-type-dotnet", "System.DateTime" },
+                        { "x-nullable", true }
+                    }
+                }),
+                NullableDateTimeOffset = JObject.FromObject(new
+                {
+                    type = "array",
+                    items = new Dictionary<string, object>
+                    {
+                        { "format", "date-time" },
+                        { "type", "string" },
+                        { "x-type-dotnet", "System.DateTimeOffset" },
+                        { "x-nullable", true }
+                    }
+                }),
+                NullableTimeSpan = JObject.FromObject(new
+                {
+                    type = "array",
+                    items = new Dictionary<string, object>
+                    {
+                        { "type", "string" },
+                        { "x-type-dotnet", "System.TimeSpan" },
+                        { "x-nullable", true }
+                    }
+                }),
+                NullableGuid = JObject.FromObject(new
+                {
+                    type = "array",
+                    items = new Dictionary<string, object>
+                    {
+                        { "format", "uuid" },
+                        { "type", "string" },
+                        { "x-type-dotnet", "System.Guid" },
+                        { "x-nullable", true }
+                    }
+                }),
+                NullableEnum = JObject.FromObject(new
+                {
+                    type = "array",
+                    items = new Dictionary<string, object>
+                    {
+                        { "format", "int32" },
+                        { "enum", typeof(PrimitiveEnum).GetEnumValues() },
+                        { "type", "integer" },
+                        { "x-type-dotnet", typeof(PrimitiveEnum).FullName },
+                        { "x-nullable", true }
+                    }
+                }),
+                NullableChar = JObject.FromObject(new
+                {
+                    type = "array",
+                    items = new Dictionary<string, object>
+                    {
+                        { "type", "string" },
+                        { "x-type-dotnet", "System.Char" },
+                        { "x-nullable", true }
+                    }
+                }),
+                String = JObject.FromObject(new
+                {
+                    type = "array",
+                    items = new Dictionary<string, object>
+                    {
+                        { "type", "string" },
+                        { "x-type-dotnet", "System.String" },
+                        { "x-nullable", true }
+                    }
+                })
+            });
+            Assert.AreEqual(expectedProps.ToString(), compositeProps.ToString());
         }
 
         [Test]

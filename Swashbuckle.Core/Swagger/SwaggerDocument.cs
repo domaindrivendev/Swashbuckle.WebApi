@@ -157,8 +157,6 @@ namespace Swashbuckle.Swagger
         public bool? required;
 
         public Schema schema;
-
-        public Dictionary<string, object> vendorExtensions = new Dictionary<string, object>();
     }
 
     public class Schema
@@ -262,6 +260,8 @@ namespace Swashbuckle.Swagger
         public IList<object> @enum;
 
         public int? multipleOf;
+
+        public Dictionary<string, object> vendorExtensions = new Dictionary<string, object>();
     }
 
     public class Response

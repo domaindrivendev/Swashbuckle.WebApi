@@ -21,6 +21,7 @@ namespace Swashbuckle.Swagger
             Func<Type, string> schemaIdSelector = null, 
             bool describeAllEnumsAsStrings = false,
             bool describeStringEnumsInCamelCase = false,
+            bool includeExtensionsForPrimitives = false,
             IEnumerable<IOperationFilter> operationFilters = null,
             IEnumerable<IDocumentFilter> documentFilters = null,
             Func<IEnumerable<ApiDescription>, ApiDescription> conflictingActionsResolver = null
@@ -39,6 +40,7 @@ namespace Swashbuckle.Swagger
             SchemaIdSelector = schemaIdSelector ?? DefaultSchemaIdSelector;
             DescribeAllEnumsAsStrings = describeAllEnumsAsStrings;
             DescribeStringEnumsInCamelCase = describeStringEnumsInCamelCase;
+            IncludeExtensionsForPrimitives = includeExtensionsForPrimitives;
             OperationFilters = operationFilters ?? new List<IOperationFilter>();
             DocumentFilters = documentFilters ?? new List<IDocumentFilter>();
             ConflictingActionsResolver = conflictingActionsResolver ?? DefaultConflictingActionsResolver;
@@ -69,6 +71,8 @@ namespace Swashbuckle.Swagger
         public bool DescribeAllEnumsAsStrings { get; private set; }
 
         public bool DescribeStringEnumsInCamelCase { get; private set; }
+
+        public bool IncludeExtensionsForPrimitives { get; private set; }
 
         public IEnumerable<IOperationFilter> OperationFilters { get; private set; }
 

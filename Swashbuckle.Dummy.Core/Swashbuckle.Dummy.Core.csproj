@@ -77,6 +77,8 @@
     <Compile Include="Controllers\NullableTypesController.cs" />
     <Compile Include="Controllers\ObsoletePropertiesController.cs" />
     <Compile Include="Controllers\PathRequiredController.cs" />
+    <Compile Include="Controllers\PrimitiveArrayTypesController.cs" />
+    <Compile Include="Controllers\PrimitiveTypesController.cs" />
     <Compile Include="Controllers\ProtectedResourcesController.cs" />
     <Compile Include="Controllers\SelfReferencingTypesController.cs" />
     <Compile Include="Controllers\CustomersController.cs" />
@@ -105,6 +107,9 @@
     <Compile Include="SwaggerExtensions\AddGetMessageExamples.cs" />
     <Compile Include="SwaggerExtensions\SupportFlaggedEnums.cs" />
     <Compile Include="SwaggerExtensions\UpdateFileDownloadOperations.cs" />
+    <Compile Include="Types\PrimitiveArrayComposite.cs" />
+    <Compile Include="Types\PrimitiveComposite.cs" />
+    <Compile Include="Types\PrimitiveEnum.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="App_Start\SwaggerConfig.cs" />
