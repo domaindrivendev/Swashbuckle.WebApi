@@ -43,14 +43,14 @@ namespace Swashbuckle.Tests.Owin
         [TestFixtureTearDown]
         public void TeardownFixture()
         {
-            _server?.Dispose();
+            if (_server != null) _server.Dispose();
             _server = null;
         }
 
         [TearDown]
         public void Teardown()
         {
-            _server?.Dispose();
+            if (_server != null) _server.Dispose();
             _server = null;
         }
 
