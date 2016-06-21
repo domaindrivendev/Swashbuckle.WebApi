@@ -81,32 +81,32 @@ namespace Swashbuckle.Swagger
 
         private Schema CreateInlineSchema(Type type)
         {
-            if (_customSchemaMappings.ContainsKey(type))
-                return _customSchemaMappings[type]();
-
             var jsonContract = _contractResolver.ResolveContract(type);
 
+            if (_customSchemaMappings.ContainsKey(type))
+                return FilterSchema(_customSchemaMappings[type](), jsonContract);
+
             if (jsonContract is JsonPrimitiveContract)
-                return CreatePrimitiveSchema((JsonPrimitiveContract)jsonContract);
+                return FilterSchema(CreatePrimitiveSchema((JsonPrimitiveContract)jsonContract), jsonContract);
 
             var dictionaryContract = jsonContract as JsonDictionaryContract;
             if (dictionaryContract != null)
                 return dictionaryContract.IsSelfReferencing()
                     ? CreateRefSchema(type)
-                    : CreateDictionarySchema(dictionaryContract);
+                    : FilterSchema(CreateDictionarySchema(dictionaryContract), jsonContract);
 
             var arrayContract = jsonContract as JsonArrayContract;
             if (arrayContract != null)
                 return arrayContract.IsSelfReferencing()
                     ? CreateRefSchema(type)
-                    : CreateArraySchema(arrayContract);
+                    : FilterSchema(CreateArraySchema(arrayContract), jsonContract);
 
             var objectContract = jsonContract as JsonObjectContract;
             if (objectContract != null && !objectContract.IsAmbiguous())
                 return CreateRefSchema(type);
 
             // Fallback to abstract "object"
-            return new Schema { type = "object" };
+            return FilterSchema(new Schema { type = "object" }, jsonContract);
         }
 
         private Schema CreateDefinitionSchema(Type type)
@@ -114,13 +114,13 @@ namespace Swashbuckle.Swagger
             var jsonContract = _contractResolver.ResolveContract(type);
 
             if (jsonContract is JsonDictionaryContract)
-                return CreateDictionarySchema((JsonDictionaryContract)jsonContract);
+                return FilterSchema(CreateDictionarySchema((JsonDictionaryContract)jsonContract), jsonContract);
 
             if (jsonContract is JsonArrayContract)
-                return CreateArraySchema((JsonArrayContract)jsonContract);
+                return FilterSchema(CreateArraySchema((JsonArrayContract)jsonContract), jsonContract);
 
             if (jsonContract is JsonObjectContract)
-                return CreateObjectSchema((JsonObjectContract)jsonContract);
+                return FilterSchema(CreateObjectSchema((JsonObjectContract)jsonContract), jsonContract);
 
             throw new InvalidOperationException(
                 String.Format("Unsupported type - {0} for Defintitions. Must be Dictionary, Array or Object", type));
@@ -135,6 +135,8 @@ namespace Swashbuckle.Swagger
 
             switch (type.FullName)
             {
+                case "System.Boolean":
+                    return new Schema { type = "boolean" };
                 case "System.Byte":
                 case "System.SByte":
                 case "System.Int16":
@@ -151,10 +153,7 @@ namespace Swashbuckle.Swagger
                 case "System.Decimal":
                     return new Schema { type = "number", format = "double" };
                 case "System.Byte[]":
-                case "System.SByte[]":
                     return new Schema { type = "string", format = "byte" };
-                case "System.Boolean":
-                    return new Schema { type = "boolean" };
                 case "System.DateTime":
                 case "System.DateTimeOffset":
                     return new Schema { type = "string", format = "date-time" };
@@ -222,10 +221,10 @@ namespace Swashbuckle.Swagger
         {
             var itemType = arrayContract.CollectionItemType ?? typeof(object);
             return new Schema
-                {
-                    type = "array",
-                    items = CreateInlineSchema(itemType)
-                };
+            {
+                type = "array",
+                items = CreateInlineSchema(itemType)
+            };
         }
 
         private Schema CreateObjectSchema(JsonObjectContract jsonContract)
@@ -242,26 +241,12 @@ namespace Swashbuckle.Swagger
                 .Select(propInfo => propInfo.PropertyName)
                 .ToList();
 
-            var schema = new Schema
+            return new Schema
             {
                 required = required.Any() ? required : null, // required can be null but not empty
                 properties = properties,
                 type = "object"
             };
-
-            // NOTE: In next major version, _modelFilters will completely replace _schemaFilters
-            var modelFilterContext = new ModelFilterContext(jsonContract.UnderlyingType, jsonContract, this);
-            foreach (var filter in _modelFilters)
-            {
-                filter.Apply(schema, modelFilterContext);
-            }
-
-            foreach (var filter in _schemaFilters)
-            {
-                filter.Apply(schema, this, jsonContract.UnderlyingType);
-            }
-
-            return schema;
         }
 
         private Schema CreateRefSchema(Type type)
@@ -282,6 +267,27 @@ namespace Swashbuckle.Swagger
             }
 
             return new Schema { @ref = "#/definitions/" + _referencedTypes[type].SchemaId };
+        }
+
+        private Schema FilterSchema(Schema schema, JsonContract jsonContract)
+        {
+            var jsonObjectContract = jsonContract as JsonObjectContract;
+            if (jsonObjectContract != null)
+            {
+                // NOTE: In next major version, _modelFilters will completely replace _schemaFilters
+                var modelFilterContext = new ModelFilterContext(jsonObjectContract.UnderlyingType, jsonObjectContract, this);
+                foreach (var filter in _modelFilters)
+                {
+                    filter.Apply(schema, modelFilterContext);
+                }
+            }
+
+            foreach (var filter in _schemaFilters)
+            {
+                filter.Apply(schema, this, jsonContract.UnderlyingType);
+            }
+
+            return schema;
         }
     }
 }
