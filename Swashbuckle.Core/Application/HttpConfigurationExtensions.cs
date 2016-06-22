@@ -30,7 +30,7 @@ namespace Swashbuckle.Application
             if (configure != null) configure(config);
 
             httpConfig.Routes.MapHttpRoute(
-                name: "swagger_docs",
+                name: "swagger_docs" + routeTemplate,
                 routeTemplate: routeTemplate,
                 defaults: null,
                 constraints: new { apiVersion = @".+" },
@@ -84,7 +84,7 @@ namespace Swashbuckle.Application
             if (configure != null) configure(config);
 
             _httpConfig.Routes.MapHttpRoute(
-                name: "swagger_ui",
+                name: "swagger_ui" + routeTemplate,
                 routeTemplate: routeTemplate,
                 defaults: null,
                 constraints: new { assetPath = @".+" },
