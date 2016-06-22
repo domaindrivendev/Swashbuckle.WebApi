@@ -126,8 +126,11 @@ Another line of text
             Assert.AreEqual(expected, actual);
         }
 
+        /// <summary>
+        /// common indentation seen in visual studio: {tab}{space}
+        /// </summary>
         [Test]
-        public void XmlComment_handles_mixed_indendation_using_spaces_and_tabs()
+        public void XmlComment_handles_mixed_indendation_using_tab_space()
         {
             string input = @"
 	 ## Test Heading
@@ -149,6 +152,86 @@ Another line of text
 		""key1"": value,
 		""key2"": value
 	}";
+
+            string actual = XmlUtility.NormalizeIndentation(input);
+
+            Assert.AreEqual(expected, actual);
+        }
+
+        /// <summary>
+        /// common indentation seen in visual studio: {space}{tab}
+        /// </summary>
+        [Test]
+        public void XmlComment_handles_mixed_indendation_using_space_tab()
+        {
+            string input = @"
+ 	## Test Heading
+ 	
+ 	Another line of text
+ 	
+ 		var object = {
+ 			""key1"": value,
+ 			""key2"": value
+ 		}
+";
+
+            string expected = 
+@"## Test Heading
+
+Another line of text
+
+	var object = {
+		""key1"": value,
+		""key2"": value
+	}";
+
+            string actual = XmlUtility.NormalizeIndentation(input);
+
+            Assert.AreEqual(expected, actual);
+        }
+
+        /// <summary>
+        /// This particular test ensures leading whitespace is consistent over _all_ lines
+        /// </summary>
+        [Test]
+        public void XmlComment_detects_consistent_space_indendation()
+        {
+            string input = @"
+    Space Indentation Line 1
+    Space Indentation Line 2
+	Misplaced Tab Indentation
+    Space Indentation Line 4
+";
+
+            string expected = 
+@"    Space Indentation Line 1
+    Space Indentation Line 2
+	Misplaced Tab Indentation
+    Space Indentation Line 4";
+
+            string actual = XmlUtility.NormalizeIndentation(input);
+
+            Assert.AreEqual(expected, actual);
+        }
+
+        /// <summary>
+        /// This particular test ensures leading whitespace is consistent over _all_ lines
+        /// </summary>
+        [Test]
+        public void XmlComment_detects_consistent_tab_indendation()
+        {
+            string input = @"
+	Tab Indentation Line 1
+	Tab Indentation Line 2
+    Misplaced Space Indentation
+	Tab Indentation Line 4
+";
+
+            string expected =
+@"	Tab Indentation Line 1
+	Tab Indentation Line 2
+    Misplaced Space Indentation
+	Tab Indentation Line 4";
 
             string actual = XmlUtility.NormalizeIndentation(input);
 

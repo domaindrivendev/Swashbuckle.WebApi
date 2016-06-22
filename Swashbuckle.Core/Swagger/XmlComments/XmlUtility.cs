@@ -48,7 +48,7 @@ namespace Swashbuckle.Swagger.XmlComments
             if (null == lines)
                 throw new ArgumentException("lines");
 
-            if(lines.Length == 0)
+            if (lines.Length == 0)
                 return null;
 
             string[] nonEmptyLines = lines
