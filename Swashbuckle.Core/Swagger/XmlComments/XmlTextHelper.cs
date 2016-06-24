@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Swashbuckle.Swagger.XmlComments
 {
-    public static class XmlUtility
+    public static class XmlTextHelper
     {
         /// <summary>
         /// Messages text from an XML node produced by Visual Studio into a plainer plain text (leading whitespace normalized)

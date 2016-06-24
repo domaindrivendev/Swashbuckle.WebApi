@@ -112,7 +112,7 @@
     <Compile Include="SwaggerUi\EmbeddedAssetProvider.cs" />
     <Compile Include="SwaggerUi\IAssetProvider.cs" />
     <Compile Include="SwaggerUi\StreamExtensions.cs" />
-    <Compile Include="Swagger\XmlComments\XmlUtility.cs" />
+    <Compile Include="Swagger\XmlComments\XmlTextHelper.cs" />
     <Compile Include="Swagger\XmlComments\XPathNavigatorExtensions.cs" />
   </ItemGroup>
   <ItemGroup />

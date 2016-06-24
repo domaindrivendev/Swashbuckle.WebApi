@@ -21,14 +21,14 @@ namespace Swashbuckle.Tests.Swagger
     ///     menu    : Edit > Advanced > View White Space
     /// </summary>
     [TestFixture]
-    public class XmlUtilityTests
+    public class XmlTextHelperTests
     {
         [Test]
         public void XmlComment_returns_verbatim_from_single_line_input()
         {
             string input = @"My single line comment";
             string expected = @"My single line comment";
-            string actual = XmlUtility.NormalizeIndentation(input);
+            string actual = XmlTextHelper.NormalizeIndentation(input);
             Assert.AreEqual(expected, actual);
         }
 
@@ -39,7 +39,7 @@ namespace Swashbuckle.Tests.Swagger
     My single line indented comment
 ";
             string expected = @"My single line indented comment";
-            string actual = XmlUtility.NormalizeIndentation(input);
+            string actual = XmlTextHelper.NormalizeIndentation(input);
             Assert.AreEqual(expected, actual);
         }
 
@@ -65,7 +65,7 @@ Another line of text
 
 Third paragraph";
 
-            string actual = XmlUtility.NormalizeIndentation(input);
+            string actual = XmlTextHelper.NormalizeIndentation(input);
 
             Assert.AreEqual(expected, actual);
         }
@@ -92,7 +92,7 @@ I'm a line affecting the leading whitespace
             
             Third paragraph";
 
-            string actual = XmlUtility.NormalizeIndentation(input);
+            string actual = XmlTextHelper.NormalizeIndentation(input);
 
             Assert.AreEqual(expected, actual);
         }
@@ -121,7 +121,7 @@ Another line of text
 		""key2"": value
 	}";
 
-            string actual = XmlUtility.NormalizeIndentation(input);
+            string actual = XmlTextHelper.NormalizeIndentation(input);
 
             Assert.AreEqual(expected, actual);
         }
@@ -153,7 +153,7 @@ Another line of text
 		""key2"": value
 	}";
 
-            string actual = XmlUtility.NormalizeIndentation(input);
+            string actual = XmlTextHelper.NormalizeIndentation(input);
 
             Assert.AreEqual(expected, actual);
         }
@@ -185,7 +185,7 @@ Another line of text
 		""key2"": value
 	}";
 
-            string actual = XmlUtility.NormalizeIndentation(input);
+            string actual = XmlTextHelper.NormalizeIndentation(input);
 
             Assert.AreEqual(expected, actual);
         }
@@ -209,7 +209,7 @@ Another line of text
 	Misplaced Tab Indentation
     Space Indentation Line 4";
 
-            string actual = XmlUtility.NormalizeIndentation(input);
+            string actual = XmlTextHelper.NormalizeIndentation(input);
 
             Assert.AreEqual(expected, actual);
         }
@@ -233,7 +233,7 @@ Another line of text
     Misplaced Space Indentation
 	Tab Indentation Line 4";
 
-            string actual = XmlUtility.NormalizeIndentation(input);
+            string actual = XmlTextHelper.NormalizeIndentation(input);
 
             Assert.AreEqual(expected, actual);
         }
@@ -279,7 +279,7 @@ Here's an example of posting a new `TestModel` to the test endpoint.
       }
     }";
 
-            string actual = XmlUtility.NormalizeIndentation(input);
+            string actual = XmlTextHelper.NormalizeIndentation(input);
 
             Assert.AreEqual(expected, actual);
         }
@@ -319,7 +319,7 @@ Here's an example of posting a new `TestModel` to the test endpoint.
   }
 }";
 
-            string actual = XmlUtility.NormalizeIndentation(input);
+            string actual = XmlTextHelper.NormalizeIndentation(input);
 
             Assert.AreEqual(expectedButUndesired, actual);
         }
@@ -363,7 +363,7 @@ The above is a sample code block
 
 The above is a sample code block";
 
-            string actual = XmlUtility.NormalizeIndentation(input);
+            string actual = XmlTextHelper.NormalizeIndentation(input);
 
             Assert.AreEqual(expectedButUndesired, actual);
         }

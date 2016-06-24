@@ -17,7 +17,7 @@ namespace Swashbuckle.Swagger.XmlComments
         {
             if (node == null) return null;
 
-            return XmlUtility.NormalizeIndentation(
+            return XmlTextHelper.NormalizeIndentation(
                 ConstPattern.Replace(
                     ParamPattern.Replace(node.InnerXml, GetParamRefName),
                 GetConstRefName)
