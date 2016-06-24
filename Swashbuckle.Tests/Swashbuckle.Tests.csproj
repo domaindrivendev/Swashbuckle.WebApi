@@ -105,6 +105,7 @@
     <Compile Include="Swagger\TypeExtensionsTests.cs" />
     <Compile Include="Swagger\XmlCommentsTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Swagger\XmlTextHelperTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
