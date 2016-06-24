@@ -21,17 +21,21 @@ namespace Swashbuckle.Swagger
         public static bool HasAttribute<T>(this JsonProperty jsonProperty)
         {
             var propInfo = jsonProperty.PropertyInfo();
-            var metadata = propInfo.DeclaringType.GetCustomAttributes(typeof(MetadataTypeAttribute), true).OfType<MetadataTypeAttribute>().ToArray().FirstOrDefault();
-            if (metadata != null) {
-                propInfo = metadata.MetadataClassType.GetProperties().SingleOrDefault(x => x.Name == propInfo.Name);
-            }
             return propInfo != null && Attribute.IsDefined(propInfo, typeof (T));
         }
 
         public static PropertyInfo PropertyInfo(this JsonProperty jsonProperty)
         {
             if(jsonProperty.UnderlyingName == null) return null;
-            return jsonProperty.DeclaringType.GetProperty(jsonProperty.UnderlyingName, jsonProperty.PropertyType);
+
+            var metadata = jsonProperty.DeclaringType.GetCustomAttributes(typeof(MetadataTypeAttribute), true)
+                .FirstOrDefault();
+
+            var typeToReflect = (metadata != null)
+                ? ((MetadataTypeAttribute)metadata).MetadataClassType
+                : jsonProperty.DeclaringType;
+
+            return typeToReflect.GetProperty(jsonProperty.UnderlyingName, jsonProperty.PropertyType);
         }
     }
 }

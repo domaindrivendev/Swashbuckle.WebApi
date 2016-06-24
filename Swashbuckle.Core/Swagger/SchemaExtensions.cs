@@ -14,13 +14,6 @@ namespace Swashbuckle.Swagger
             if (propInfo == null)
                 return schema;
 
-            var metadata = propInfo.DeclaringType.GetCustomAttributes(typeof(MetadataTypeAttribute), true).OfType<MetadataTypeAttribute>().ToArray().FirstOrDefault();
-            if (metadata != null) {
-                propInfo = metadata.MetadataClassType.GetProperties().SingleOrDefault(x => x.Name == propInfo.Name);
-                if (propInfo == null)
-                    return schema;
-            }
-
             foreach (var attribute in propInfo.GetCustomAttributes(false))
             {
                 var regex = attribute as RegularExpressionAttribute;
