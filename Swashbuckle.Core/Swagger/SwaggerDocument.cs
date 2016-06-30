@@ -118,7 +118,7 @@ namespace Swashbuckle.Swagger
 
         public IList<string> schemes;
 
-        public bool deprecated;
+        public bool? deprecated;
 
         public IList<IDictionary<string, IEnumerable<string>>> security;
 
