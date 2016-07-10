@@ -30,18 +30,39 @@ namespace Swashbuckle.SwaggerUi
             );
         }
 
+        public Stream GenerateStreamFromString(string s)
+        {
+            MemoryStream stream = new MemoryStream();
+            StreamWriter writer = new StreamWriter(stream);
+            writer.Write(s);
+            writer.Flush();
+            stream.Position = 0;
+            return stream;
+        }
+        
         private Stream GetEmbeddedResourceStreamFor(EmbeddedAssetDescriptor resourceDescriptor, string rootUrl)
         {
-            var stream = resourceDescriptor.Assembly.GetManifestResourceStream(resourceDescriptor.Name);
+            Dictionary<string, string> templateParams = _templateParams
+                .Union(new[] {new KeyValuePair<string, string>("%(RootUrl)", rootUrl)})
+                .ToDictionary(entry => entry.Key, entry => entry.Value);
+
+            Stream stream;
+
+            if (resourceDescriptor.IsRazorTemplate)
+            {
+                string resultantHtml = ViewRenderer.RenderView(resourceDescriptor.Name, null, null);
+                stream = GenerateStreamFromString(resultantHtml);
+            }
+            else
+            {
+                stream = resourceDescriptor.Assembly.GetManifestResourceStream(resourceDescriptor.Name);
+            }
+
             if (stream == null)
                 throw new AssetNotFound(String.Format("Embedded resource not found - {0}", resourceDescriptor.Name));
 
             if (resourceDescriptor.IsTemplate)
             {
-                var templateParams = _templateParams
-                    .Union(new[] { new KeyValuePair<string, string>("%(RootUrl)", rootUrl) })
-                    .ToDictionary(entry => entry.Key, entry => entry.Value);
-
                 return stream.FindAndReplace(templateParams);
             }
 
