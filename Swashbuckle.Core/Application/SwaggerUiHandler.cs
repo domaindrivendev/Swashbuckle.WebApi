@@ -29,15 +29,17 @@ namespace Swashbuckle.Application
                 var content = ContentFor(webAsset);
                 var response = new HttpResponseMessage
                 {
-                    Content = content,
+                    Content = content
                 };
 
                 if (webAsset.DisableClientCache)
                 {
                     response.Headers.CacheControl = new CacheControlHeaderValue()
                     {
-                        Public = true,
-                        MaxAge = new TimeSpan(1, 0, 0, 0)
+                        NoCache = true,
+                        NoStore = true,
+                        MaxAge = new TimeSpan(0, 0, 0),
+                        MustRevalidate = true
                     };
                 }
 
