@@ -10,15 +10,17 @@ namespace Swashbuckle.SwaggerUi
 
     public class Asset
     {
-        public Asset(Stream stream, string mediaType)
+        public Asset(Stream stream, string mediaType, bool disableCache = false)
         {
             Stream = stream;
             MediaType = mediaType;
+            DisableClientCache = disableCache;
         }
 
         public Stream Stream { get; private set; }
 
         public string MediaType { get; private set; }
+        public bool DisableClientCache { get; set; }
     }
 
     public class AssetNotFound : Exception

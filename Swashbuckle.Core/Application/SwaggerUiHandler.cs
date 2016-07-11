@@ -27,7 +27,21 @@ namespace Swashbuckle.Application
             {
                 var webAsset = swaggerUiProvider.GetAsset(rootUrl, assetPath);
                 var content = ContentFor(webAsset);
-                return TaskFor(new HttpResponseMessage { Content = content });
+                var response = new HttpResponseMessage
+                {
+                    Content = content,
+                };
+
+                if (webAsset.DisableClientCache)
+                {
+                    response.Headers.CacheControl = new CacheControlHeaderValue()
+                    {
+                        Public = true,
+                        MaxAge = new TimeSpan(1, 0, 0, 0)
+                    };
+                }
+
+                return TaskFor(response);
             }
             catch (AssetNotFound ex)
             {

@@ -26,7 +26,8 @@ namespace Swashbuckle.SwaggerUi
             var resourceDescriptor = _pathToAssetMap[path];
             return new Asset(
                 GetEmbeddedResourceStreamFor(resourceDescriptor, rootUrl),
-                InferMediaTypeFrom(resourceDescriptor.Name)
+                InferMediaTypeFrom(resourceDescriptor.Name),
+                resourceDescriptor.IsRazorTemplate
             );
         }
 
