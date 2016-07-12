@@ -249,16 +249,16 @@ namespace Swashbuckle.Swagger
                 type = "object"
             };
 
-            foreach (var filter in _schemaFilters)
-            {
-                filter.Apply(schema, this, jsonContract.UnderlyingType);
-            }
-
             // NOTE: In next major version, _modelFilters will completely replace _schemaFilters
             var modelFilterContext = new ModelFilterContext(jsonContract.UnderlyingType, jsonContract, this);
             foreach (var filter in _modelFilters)
             {
                 filter.Apply(schema, modelFilterContext);
+            }
+
+            foreach (var filter in _schemaFilters)
+            {
+                filter.Apply(schema, this, jsonContract.UnderlyingType);
             }
 
             return schema;
