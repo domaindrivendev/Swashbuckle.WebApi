@@ -177,6 +177,20 @@ namespace Swashbuckle.Tests.SwaggerUi
             Assert.AreEqual(HttpStatusCode.NotFound, response.StatusCode);
         }
 
+        [Test]
+        public void It_exposes_config_for_apiKey_name_and_location()
+        {
+            SetUpHandler(c =>
+                {
+                    c.EnableApiKeySupport("myApiKey", "header");
+                });
+
+            var content = GetContentAsString("http://tempuri.org/swagger/ui/index");
+
+            StringAssert.Contains("apiKeyName: 'myApiKey'", content);
+            StringAssert.Contains("apiKeyIn: 'header'", content);
+        }
+
         [TestCase("http://tempuri.org/swagger/ui/images/logo_small-png",                   Result = "image/png")]
         [TestCase("http://tempuri.org/swagger/ui/css/typography-css",                      Result = "text/css")]
         public string It_returns_correct_asset_mime_type(string resourceUri)
