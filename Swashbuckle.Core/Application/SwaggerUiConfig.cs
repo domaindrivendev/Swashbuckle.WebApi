@@ -34,7 +34,9 @@ namespace Swashbuckle.Application
                 { "%(OAuth2Realm)", "" },
                 { "%(OAuth2AppName)", "" },
                 { "%(OAuth2ScopeSeperator)", " " },
-                { "%(OAuth2AdditionalQueryStringParams)", "{}" }
+                { "%(OAuth2AdditionalQueryStringParams)", "{}" },
+				{ "%(ApiKeyName)", "api_key" },
+				{ "%(ApiKeyIn)", "query" }
             };
             _rootUrlResolver = rootUrlResolver;
 
@@ -131,6 +133,11 @@ namespace Swashbuckle.Application
             if (additionalQueryStringParams != null)
                 _templateParams["%(OAuth2AdditionalQueryStringParams)"] = JsonConvert.SerializeObject(additionalQueryStringParams);
         }
+
+		public void EnableApiKeySupport(string name, string apiKeyIn) {
+			_templateParams["%(ApiKeyName)"] = name;
+			_templateParams["%(ApiKeyIn)"] = apiKeyIn;
+		}
 
         internal IAssetProvider GetSwaggerUiProvider()
         {
