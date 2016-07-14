@@ -6,6 +6,7 @@ using System.Net.Http;
 using System.Web.Http;
 using System.Web.Http.Description;
 using Newtonsoft.Json;
+using Swashbuckle.Application.Swashbuckle.Application;
 using Swashbuckle.Swagger;
 using Swashbuckle.Swagger.Annotations;
 using Swashbuckle.Swagger.FromUriParams;
@@ -34,8 +35,8 @@ namespace Swashbuckle.Application
         private readonly IList<Func<IDocumentFilter>> _documentFilters;
         private Func<IEnumerable<ApiDescription>, ApiDescription> _conflictingActionsResolver;
         private Func<HttpRequestMessage, string> _rootUrlResolver;
-
-        private Func<ISwaggerProvider, ISwaggerProvider> _customProviderFactory;
+        private AutoRestEnumSupportType? _autoRestEnumSupport;
+		private Func<ISwaggerProvider, ISwaggerProvider> _customProviderFactory;
 
         public SwaggerDocsConfig()
         {
@@ -162,7 +163,12 @@ namespace Swashbuckle.Application
             _schemaIdSelector = schemaIdStrategy;
         }
 
-        public void UseFullTypeNameInSchemaIds()
+        public void EnableAutoRestSupportForEnums(AutoRestEnumSupportType type = AutoRestEnumSupportType.Enum)
+        {  
+            _autoRestEnumSupport = type;
+        }
+
+    public void UseFullTypeNameInSchemaIds()
         {
             _schemaIdSelector = t => t.FriendlyId(true);
         }
@@ -245,8 +251,9 @@ namespace Swashbuckle.Application
                 describeStringEnumsInCamelCase: _describeStringEnumsInCamelCase,
                 operationFilters: _operationFilters.Select(factory => factory()),
                 documentFilters: _documentFilters.Select(factory => factory()),
-                conflictingActionsResolver: _conflictingActionsResolver
-            );
+                conflictingActionsResolver: _conflictingActionsResolver,
+                autoRestEnumSupport: _autoRestEnumSupport
+			);
 
             var defaultProvider = new SwaggerGenerator(
                 httpConfig.Services.GetApiExplorer(),
