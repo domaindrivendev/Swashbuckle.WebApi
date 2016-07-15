@@ -123,7 +123,7 @@ namespace Swashbuckle.Swagger
                 return FilterSchema(CreateArraySchema((JsonArrayContract)jsonContract), jsonContract);
 
             if (jsonContract is JsonObjectContract)
-                return FilterSchema(CreateObjectSchema((JsonObjectContract)jsonContract), jsonContract, applyFilter: true);
+                return FilterSchema(CreateObjectSchema((JsonObjectContract)jsonContract), jsonContract);
 
             throw new InvalidOperationException(
                 String.Format("Unsupported type - {0} for Defintitions. Must be Dictionary, Array or Object", type));
@@ -272,29 +272,25 @@ namespace Swashbuckle.Swagger
             return new Schema { @ref = "#/definitions/" + _referencedTypes[type].SchemaId };
         }
 
-        private Schema FilterSchema(Schema schema, JsonContract jsonContract, bool applyFilter = false)
+        private Schema FilterSchema(Schema schema, JsonContract jsonContract)
         {
-            // NOTE: 'applyFilter' is used to force backwards compatible behaviour so only object schemas returned by CreateObjectSchema
-            // are filtered by default. 'applyFiltersToAllSchemas' will override this legacy behaviour to filter all schemas.
-            if (!applyFilter && !_applyFiltersToAllSchemas)
+            if (schema.type == "object" || _applyFiltersToAllSchemas)
             {
-                return schema;
-            }
-
-            var jsonObjectContract = jsonContract as JsonObjectContract;
-            if (jsonObjectContract != null)
-            {
-                // NOTE: In next major version, _modelFilters will completely replace _schemaFilters
-                var modelFilterContext = new ModelFilterContext(jsonObjectContract.UnderlyingType, jsonObjectContract, this);
-                foreach (var filter in _modelFilters)
+                var jsonObjectContract = jsonContract as JsonObjectContract;
+                if (jsonObjectContract != null)
                 {
-                    filter.Apply(schema, modelFilterContext);
+                    // NOTE: In next major version, _modelFilters will completely replace _schemaFilters
+                    var modelFilterContext = new ModelFilterContext(jsonObjectContract.UnderlyingType, jsonObjectContract, this);
+                    foreach (var filter in _modelFilters)
+                    {
+                        filter.Apply(schema, modelFilterContext);
+                    }
                 }
-            }
 
-            foreach (var filter in _schemaFilters)
-            {
-                filter.Apply(schema, this, jsonContract.UnderlyingType);
+                foreach (var filter in _schemaFilters)
+                {
+                    filter.Apply(schema, this, jsonContract.UnderlyingType);
+                }
             }
 
             return schema;
