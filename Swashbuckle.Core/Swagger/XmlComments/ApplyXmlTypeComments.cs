@@ -33,12 +33,15 @@ namespace Swashbuckle.Swagger.XmlComments
                     model.description = summaryNode.ExtractContent();
             }
 
-            foreach (var entry in model.properties)
+            if (model.properties != null)
             {
-                var jsonProperty = context.JsonObjectContract.Properties[entry.Key];
-                if (jsonProperty == null) continue;
+                foreach (var entry in model.properties)
+                {
+                    var jsonProperty = context.JsonObjectContract.Properties[entry.Key];
+                    if (jsonProperty == null) continue;
 
-                ApplyPropertyComments(entry.Value, jsonProperty.PropertyInfo());
+                    ApplyPropertyComments(entry.Value, jsonProperty.PropertyInfo());
+                }
             }
         }
 
