@@ -26,6 +26,7 @@ namespace Swashbuckle.Swagger
         private readonly bool _ignoreObsoleteProperties;
         private readonly bool _describeAllEnumsAsStrings;
         private readonly bool _describeStringEnumsInCamelCase;
+        private readonly bool _applyFiltersToAllSchemas;
 
         private readonly IContractResolver _contractResolver;
 
@@ -44,7 +45,8 @@ namespace Swashbuckle.Swagger
             bool ignoreObsoleteProperties,
             Func<Type, string> schemaIdSelector,
             bool describeAllEnumsAsStrings,
-            bool describeStringEnumsInCamelCase)
+            bool describeStringEnumsInCamelCase,
+            bool applyFiltersToAllSchemas)
         {
             _jsonSerializerSettings = jsonSerializerSettings;
             _customSchemaMappings = customSchemaMappings;
@@ -54,6 +56,7 @@ namespace Swashbuckle.Swagger
             _ignoreObsoleteProperties = ignoreObsoleteProperties;
             _describeAllEnumsAsStrings = describeAllEnumsAsStrings;
             _describeStringEnumsInCamelCase = describeStringEnumsInCamelCase;
+            _applyFiltersToAllSchemas = applyFiltersToAllSchemas;
 
             _contractResolver = jsonSerializerSettings.ContractResolver ?? new DefaultContractResolver();
             _referencedTypes = new Dictionary<Type, SchemaInfo>();
@@ -120,7 +123,7 @@ namespace Swashbuckle.Swagger
                 return FilterSchema(CreateArraySchema((JsonArrayContract)jsonContract), jsonContract);
 
             if (jsonContract is JsonObjectContract)
-                return FilterSchema(CreateObjectSchema((JsonObjectContract)jsonContract), jsonContract);
+                return FilterSchema(CreateObjectSchema((JsonObjectContract)jsonContract), jsonContract, applyFilter: true);
 
             throw new InvalidOperationException(
                 String.Format("Unsupported type - {0} for Defintitions. Must be Dictionary, Array or Object", type));
@@ -269,8 +272,15 @@ namespace Swashbuckle.Swagger
             return new Schema { @ref = "#/definitions/" + _referencedTypes[type].SchemaId };
         }
 
-        private Schema FilterSchema(Schema schema, JsonContract jsonContract)
+        private Schema FilterSchema(Schema schema, JsonContract jsonContract, bool applyFilter = false)
         {
+            // NOTE: 'applyFilter' is used to force backwards compatible behaviour so only object schemas returned by CreateObjectSchema
+            // are filtered by default. 'applyFiltersToAllSchemas' will override this legacy behaviour to filter all schemas.
+            if (!applyFilter && !_applyFiltersToAllSchemas)
+            {
+                return schema;
+            }
+
             var jsonObjectContract = jsonContract as JsonObjectContract;
             if (jsonObjectContract != null)
             {
