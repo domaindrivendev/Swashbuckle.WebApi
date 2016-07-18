@@ -86,6 +86,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Extensions\AutoRestExtensionsTests.cs" />
     <Compile Include="HttpMessageHandlerTestBase.cs" />
     <Compile Include="Owin\BaseInMemoryOwinSwaggerTest.cs" />
     <Compile Include="Owin\InMemoryOwinTest.cs" />
@@ -112,6 +113,10 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Swashbuckle.AutoRestExtensions\Swashbuckle.AutoRestExtensions.csproj">
+      <Project>{0bb59a80-7330-4598-9451-7f7cc3645127}</Project>
+      <Name>Swashbuckle.AutoRestExtensions</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Swashbuckle.Core\Swashbuckle.Core.csproj">
       <Project>{d50a26ff-02c6-4c16-ba94-4cd7d43efbb3}</Project>
       <Name>Swashbuckle.Core</Name>
