@@ -1,5 +1,8 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Linq;
+using System.Reflection;
+using System.Web.Http;
 using System.Web.Http.Controllers;
 using System.Web.Http.Description;
 using System.Xml.XPath;
@@ -14,7 +17,7 @@ namespace Swashbuckle.Swagger.XmlComments
         private const string RemarksTag = "remarks";
         private const string ParameterTag = "param";
         private const string ResponseTag = "response";
-        
+
         private readonly XPathNavigator _navigator;
 
         public ApplyXmlActionComments(string xmlCommentsPath)
@@ -39,20 +42,35 @@ namespace Swashbuckle.Swagger.XmlComments
             if (remarksNode != null)
                 operation.description = remarksNode.ExtractContent();
 
-            ApplyParamComments(operation, methodNode);
+            ApplyParamComments(operation, methodNode, reflectedActionDescriptor.MethodInfo);
 
             ApplyResponseComments(operation, methodNode);
         }
 
-        private static void ApplyParamComments(Operation operation, XPathNavigator methodNode)
+        private static void ApplyParamComments(Operation operation, XPathNavigator methodNode, MethodInfo method)
         {
             if (operation.parameters == null) return;
 
-            var paramNodes = methodNode.Select(ParameterTag);
+            var parameterNames = (from param in method.GetParameters()
+                let attribute =
+                    param.GetCustomAttributes(typeof (FromUriAttribute), true)
+                        .Cast<FromUriAttribute>()
+                        .FirstOrDefault()
+                select new {uriName = !string.IsNullOrWhiteSpace(attribute?.Name) ? attribute.Name : param.Name, name = param.Name}).ToDictionary(x=>x.uriName, z=>z.name);
+
+                             var paramNodes = methodNode.Select(ParameterTag);
             while (paramNodes.MoveNext())
             {
                 var paramNode = paramNodes.Current;
-                var parameter = operation.parameters.SingleOrDefault(param => param.name == paramNode.GetAttribute("name", ""));
+                var parameter = operation.parameters.SingleOrDefault(param =>
+                {
+                    string name = null;
+                    if (!parameterNames.TryGetValue(param.name, out name))
+                    {
+                        name = param.name;
+                    }
+                    return name.Equals(paramNode.GetAttribute("name", ""), StringComparison.OrdinalIgnoreCase);
+                });
                 if (parameter != null)
                     parameter.description = paramNode.ExtractContent();
             }

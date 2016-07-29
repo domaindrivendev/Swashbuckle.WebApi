@@ -20,7 +20,7 @@
         </member>
         <member name="M:Swashbuckle.Dummy.Controllers.XmlAnnotatedController.Search(System.Collections.Generic.IEnumerable{System.String})">
             <summary>
-            Search all registered accounts by keywords 
+            Search all registered accounts by keywords
             </summary>
             <remarks>Restricted to admin users only</remarks>
             <param name="keywords">List of search keywords</param>
@@ -48,7 +48,7 @@
         </member>
         <member name="M:Swashbuckle.Dummy.Controllers.XmlAnnotatedController.UpdateMetadata(System.Int32,System.Collections.Generic.KeyValuePair{System.String,System.String}[])">
             <summary>
-            Updates metadata associated with an account 
+            Updates metadata associated with an account
             </summary>
             <param name="id"></param>
             <param name="metadata"></param>
@@ -111,7 +111,7 @@
         </member>
         <member name="F:Swashbuckle.Dummy.Controllers.Reward`1.value">
             <summary>
-            The monetary value of the reward 
+            The monetary value of the reward
             </summary>
         </member>
         <member name="P:Swashbuckle.Dummy.Controllers.Reward`1.RewardType">

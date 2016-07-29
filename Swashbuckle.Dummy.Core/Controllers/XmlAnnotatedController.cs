@@ -30,7 +30,7 @@ namespace Swashbuckle.Dummy.Controllers
         }
 
         /// <summary>
-        /// Search all registered accounts by keywords 
+        /// Search all registered accounts by keywords
         /// </summary>
         /// <remarks>Restricted to admin users only</remarks>
         /// <param name="keywords">List of search keywords</param>
@@ -49,7 +49,7 @@ namespace Swashbuckle.Dummy.Controllers
         /// <returns></returns>
         [HttpGet]
         [Route("filter")]
-        public IEnumerable<Account> Filter(string q, [FromUri]Page page)
+        public IEnumerable<Account> Filter([FromUri(Name = "$q")]string q, [FromUri]Page page)
         {
             throw new NotImplementedException();
         }
@@ -77,7 +77,7 @@ namespace Swashbuckle.Dummy.Controllers
         }
 
         /// <summary>
-        /// Updates metadata associated with an account 
+        /// Updates metadata associated with an account
         /// </summary>
         /// <param name="id"></param>
         /// <param name="metadata"></param>
@@ -111,7 +111,7 @@ namespace Swashbuckle.Dummy.Controllers
         /// The ID for Accounts is 5 digits long.
         /// </summary>
         public virtual int AccountID { get; set; }
-        
+
         /// <summary>
         /// Uniquely identifies the account
         /// </summary>
@@ -135,7 +135,7 @@ namespace Swashbuckle.Dummy.Controllers
             /// Flag to indicate if marketing emails may be sent
             /// </summary>
             [JsonProperty("allow-marketing-emails")]
-            public string AllowMarketingEmails { get; set; }            
+            public string AllowMarketingEmails { get; set; }
         }
     }
 
@@ -157,7 +157,7 @@ namespace Swashbuckle.Dummy.Controllers
     public class Reward<T>
     {
         /// <summary>
-        /// The monetary value of the reward 
+        /// The monetary value of the reward
         /// </summary>
         public decimal value;
 
