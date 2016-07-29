@@ -1,18 +1,11 @@
-﻿using System;
+﻿// Removed unused namespaces
+using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Dynamic;
 using System.Linq;
-using System.Net.Http;
-using System.Reflection;
-using System.Runtime.Serialization;
-using System.Text;
 using System.Web.Http;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using Newtonsoft.Json.Serialization;
 using Newtonsoft.Json.Converters;
-using System.Net.Http.Formatting;
 
 namespace Swashbuckle.Swagger
 {
@@ -30,7 +23,7 @@ namespace Swashbuckle.Swagger
 
         private readonly IContractResolver _contractResolver;
 
-        private IDictionary<Type, SchemaInfo> _referencedTypes;
+        private readonly IDictionary<Type, SchemaInfo> _referencedTypes;
         private class SchemaInfo
         {
             public string SchemaId;
@@ -66,7 +59,7 @@ namespace Swashbuckle.Swagger
         public Schema GetOrRegister(Type type)
         {
             var schema = CreateInlineSchema(type);
-
+            
             // Ensure Schema's have been fully generated for all referenced types
             while (_referencedTypes.Any(entry => entry.Value.Schema == null))
             {
@@ -82,15 +75,21 @@ namespace Swashbuckle.Swagger
 
         public IDictionary<string, Schema> Definitions { get; private set; }
 
+        private static readonly Type HttpErrorType = typeof(HttpError);
         private Schema CreateInlineSchema(Type type)
         {
             var jsonContract = _contractResolver.ResolveContract(type);
+            if (HttpErrorType == type)
+            {
+                return CreateRefSchema(type);
+            }
 
             if (_customSchemaMappings.ContainsKey(type))
                 return FilterSchema(_customSchemaMappings[type](), jsonContract);
 
-            if (jsonContract is JsonPrimitiveContract)
-                return FilterSchema(CreatePrimitiveSchema((JsonPrimitiveContract)jsonContract), jsonContract);
+            var jsonPrimitiveContract = jsonContract as JsonPrimitiveContract;
+            if (jsonPrimitiveContract != null)
+                return FilterSchema(CreatePrimitiveSchema(jsonPrimitiveContract), jsonPrimitiveContract);
 
             var dictionaryContract = jsonContract as JsonDictionaryContract;
             if (dictionaryContract != null)
@@ -114,19 +113,58 @@ namespace Swashbuckle.Swagger
 
         private Schema CreateDefinitionSchema(Type type)
         {
+            if (type == HttpErrorType)
+                return CreateHttpErrorSchema();
+
             var jsonContract = _contractResolver.ResolveContract(type);
 
-            if (jsonContract is JsonDictionaryContract)
-                return FilterSchema(CreateDictionarySchema((JsonDictionaryContract)jsonContract), jsonContract);
+            var jsonDictionaryContract = jsonContract as JsonDictionaryContract;
+            if (jsonDictionaryContract != null)
+                return FilterSchema(CreateDictionarySchema(jsonDictionaryContract), jsonDictionaryContract);
 
-            if (jsonContract is JsonArrayContract)
-                return FilterSchema(CreateArraySchema((JsonArrayContract)jsonContract), jsonContract);
+            var jsonArrayContract = jsonContract as JsonArrayContract;
+            if (jsonArrayContract != null)
+                return FilterSchema(CreateArraySchema(jsonArrayContract), jsonArrayContract);
 
-            if (jsonContract is JsonObjectContract)
-                return FilterSchema(CreateObjectSchema((JsonObjectContract)jsonContract), jsonContract);
+            var jsonObjectContract = jsonContract as JsonObjectContract;
+            if (jsonObjectContract != null)
+                return FilterSchema(CreateObjectSchema(jsonObjectContract), jsonObjectContract);
 
             throw new InvalidOperationException(
-                String.Format("Unsupported type - {0} for Defintitions. Must be Dictionary, Array or Object", type));
+                String.Format("Unsupported type - {0} for Definitions. Must be Dictionary, Array or Object", type));
+        }
+
+        private Schema CreateHttpErrorSchema()
+        {
+            string schemaId = null;
+            if (!_referencedTypes.ContainsKey(HttpErrorType))
+            {
+                schemaId = _schemaIdSelector(HttpErrorType);
+                if (_referencedTypes.Any(entry => entry.Value.SchemaId == schemaId))
+                {
+                    var conflictingType = _referencedTypes.First(entry => entry.Value.SchemaId == schemaId).Key;
+                    throw new InvalidOperationException(String.Format(
+                        "Conflicting schemaIds: Duplicate schemaIds detected for types {0} and {1}. " +
+                        "See the config setting - \"UseFullTypeNameInSchemaIds\" for a potential workaround",
+                        HttpErrorType.FullName, conflictingType.FullName));
+                }
+
+                _referencedTypes.Add(HttpErrorType, new SchemaInfo { SchemaId = schemaId });
+            }
+
+            var stringSchema = CreateInlineSchema(typeof(string));
+            IDictionary<string, Schema> properties =  new Dictionary<string, Schema>{
+                    {"Message",stringSchema},
+                    {"ExceptionMessage",stringSchema},
+                    {"ExceptionType",stringSchema},
+                    {"StackTrace",stringSchema},
+                };
+            var schema = new Schema
+            {                
+                type = "object",
+                properties = properties
+            };
+            return schema;
         }
 
         private Schema CreatePrimitiveSchema(JsonPrimitiveContract primitiveContract)
@@ -266,15 +304,28 @@ namespace Swashbuckle.Swagger
                         type.FullName, conflictingType.FullName));
                 }
 
+                
                 _referencedTypes.Add(type, new SchemaInfo { SchemaId = schemaId });
             }
 
-            return new Schema { @ref = "#/definitions/" + _referencedTypes[type].SchemaId };
+                return new Schema { @ref = "#/definitions/" + _referencedTypes[type].SchemaId };
         }
 
         private Schema FilterSchema(Schema schema, JsonContract jsonContract)
         {
-            if (schema.type == "object" || _applyFiltersToAllSchemas)
+            if(jsonContract.UnderlyingType == HttpErrorType)
+            {
+                var modelFilterContext = new ModelFilterContext(jsonContract.UnderlyingType, null, this);
+                foreach (var filter in _modelFilters)
+                {
+                    filter.Apply(schema, modelFilterContext);
+                }
+                foreach (var filter in _schemaFilters)
+                {
+                    filter.Apply(schema, this, jsonContract.UnderlyingType);
+                }
+            }
+            else if (schema.type == "object" || _applyFiltersToAllSchemas)
             {
                 var jsonObjectContract = jsonContract as JsonObjectContract;
                 if (jsonObjectContract != null)
