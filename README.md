@@ -502,6 +502,7 @@ If you're using the existing configuration API to customize the final Swagger do
 4. [OWIN Hosted in IIS - Incorrect VirtualPathRoot Handling](#owin-hosted-in-iis---incorrect-virtualpathroot-handling)
 5. [How to add vendor extensions](#how-to-add-vendor-extensions)
 6. [FromUri Query string DataMember names are incorrect](#fromuri-query-string-datamember-names-are-incorrect)
+7. [Remove Duplicate Path Parameters](#remove-duplicate-path-parameters)
 
 ### Swagger-ui showing "Can't read swagger JSON from ..."
 
@@ -619,6 +620,36 @@ public class ComplexTypeOperationFilter : IOperationFilter
             if (attribute != null) return attribute.Name;
         }
         return string.Empty;
+    }
+}
+```
+
+### Remove Duplicate Path Parameters
+
+When using `FromUri` Model Binding, duplicate items can appear as items can be passed as URI parameters, or querystrings. In this case you can add a custom operation filter to remove the duplicates. For example:
+
+```csharp
+public class ComplexTypeOperationFilter : IOperationFilter
+{
+    public void Apply(Operation operation, SchemaRegistry schemaRegistry, ApiDescription apiDescription)
+    {
+       if (operation.parameters == null)
+           return;
+       var complexParameters = operation.parameters.Where(x => x.@in == "query" && !string.IsNullOrWhiteSpace(x.name)).ToArray();
+
+       foreach (var parameter in complexParameters)
+       {
+           if (!parameter.name.Contains('.')) continue;
+           var name = parameter.name.Split('.')[1];
+
+           var opParams = operation.parameters.Where(x => x.name == name);
+           var parameters = opParams as Parameter[] ?? opParams.ToArray();
+
+           if (parameters.Length > 0)
+           {
+               operation.parameters.Remove(parameter);
+           }
+       }
     }
 }
 ```
