@@ -501,6 +501,7 @@ If you're using the existing configuration API to customize the final Swagger do
 3. [Swagger-ui broken by Visual Studio 2013](#swagger-ui-broken-by-visual-studio-2013)
 4. [OWIN Hosted in IIS - Incorrect VirtualPathRoot Handling](#owin-hosted-in-iis---incorrect-virtualpathroot-handling)
 5. [How to add vendor extensions](#how-to-add-vendor-extensions)
+6. [FromUri Query string DataMember names are incorrect](#fromuri-query-string-datamember-names-are-incorrect)
 
 ### Swagger-ui showing "Can't read swagger JSON from ..."
 
@@ -576,3 +577,48 @@ public class ApplySchemaVendorExtensions : ISchemaFilter
 ```
 
 As per the specification, all extension properties should be prefixed by "x-"
+
+### FromUri Query string DataMember names are incorrect
+
+When using `FromUri` Model Binding, it is possible to override the querystring parameter name's using `DataMember`s. In this case you can add a custom operation filter to override the name. For example:
+
+```csharp
+public class ComplexTypeOperationFilter : IOperationFilter
+{
+    public void Apply(Operation operation, SchemaRegistry schemaRegistry, ApiDescription apiDescription)
+    {
+        if (operation.parameters == null)
+            return;
+
+        var parameters = apiDescription.ActionDescriptor.GetParameters();
+        foreach (var parameter in parameters)
+        {
+            foreach (var property in parameter.ParameterType.GetProperties())
+            {
+                var param = operation.parameters.FirstOrDefault(o => o.name.ToLowerInvariant().Contains(property.Name.ToLowerInvariant()));
+
+                if (param == null) continue;
+
+                var name = GetNameFromAttribute(property);
+
+                if (string.IsNullOrEmpty(name))
+                {
+                    operation.parameters.Remove(param);
+                }
+                param.name = GetNameFromAttribute(property);
+            }
+        }
+    }
+    
+    private static string GetNameFromAttribute(PropertyInfo property)
+    {
+        var customAttributes = property.GetCustomAttributes(typeof(DataMemberAttribute), true);
+        if (customAttributes.Length > 0)
+        {
+            var attribute = customAttributes[0] as DataMemberAttribute;
+            if (attribute != null) return attribute.Name;
+        }
+        return string.Empty;
+    }
+}
+```
