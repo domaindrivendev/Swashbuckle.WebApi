@@ -13,10 +13,10 @@ namespace Swashbuckle.Swagger.XmlComments
     public class ApplyXmlActionComments : IOperationFilter
     {
         private const string MemberXPath = "/doc/members/member[@name='{0}']";
-        private const string SummaryTag = "summary";
-        private const string RemarksTag = "remarks";
-        private const string ParameterTag = "param";
-        private const string ResponseTag = "response";
+        private const string SummaryXPath = "summary";
+        private const string RemarksXPath = "remarks";
+        private const string ParamXPath = "param[@name='{0}']";
+        private const string ResponseXPath = "response";
 
         private readonly XPathNavigator _navigator;
 
@@ -34,11 +34,11 @@ namespace Swashbuckle.Swagger.XmlComments
             var methodNode = _navigator.SelectSingleNode(string.Format(MemberXPath, commentId));
             if (methodNode == null) return;
 
-            var summaryNode = methodNode.SelectSingleNode(SummaryTag);
+            var summaryNode = methodNode.SelectSingleNode(SummaryXPath);
             if (summaryNode != null)
                 operation.summary = summaryNode.ExtractContent();
 
-            var remarksNode = methodNode.SelectSingleNode(RemarksTag);
+            var remarksNode = methodNode.SelectSingleNode(RemarksXPath);
             if (remarksNode != null)
                 operation.description = remarksNode.ExtractContent();
 
@@ -51,34 +51,26 @@ namespace Swashbuckle.Swagger.XmlComments
         {
             if (operation.parameters == null) return;
 
-            var parameterNames = (from param in method.GetParameters()
-                let attribute =
-                    param.GetCustomAttributes(typeof (FromUriAttribute), true)
-                        .Cast<FromUriAttribute>()
-                        .FirstOrDefault()
-                select new {uriName = !string.IsNullOrWhiteSpace(attribute?.Name) ? attribute.Name : param.Name, name = param.Name}).ToDictionary(x=>x.uriName, z=>z.name);
-
-                             var paramNodes = methodNode.Select(ParameterTag);
-            while (paramNodes.MoveNext())
+            foreach (var parameter in operation.parameters)
             {
-                var paramNode = paramNodes.Current;
-                var parameter = operation.parameters.SingleOrDefault(param =>
-                {
-                    string name = null;
-                    if (!parameterNames.TryGetValue(param.name, out name))
-                    {
-                        name = param.name;
-                    }
-                    return name.Equals(paramNode.GetAttribute("name", ""), StringComparison.OrdinalIgnoreCase);
-                });
-                if (parameter != null)
+                // Inspect method to find the corresponding action parameter
+                // NOTE: If a parameter binding is present (e.g. [FromUri(Name..)]), then the lookup needs
+                // to be against the "bound" name and not the actual parameter name
+                var actionParameter = method.GetParameters()
+                    .FirstOrDefault(paramInfo =>
+                        HasBoundName(paramInfo, parameter.name) || paramInfo.Name == parameter.name
+                     );
+                if (actionParameter == null) continue;
+
+                var paramNode = methodNode.SelectSingleNode(string.Format(ParamXPath, actionParameter.Name));
+                if (paramNode != null)
                     parameter.description = paramNode.ExtractContent();
             }
         }
 
         private static void ApplyResponseComments(Operation operation, XPathNavigator methodNode)
         {
-            var responseNodes = methodNode.Select(ResponseTag);
+            var responseNodes = methodNode.Select(ResponseXPath);
 
             if (responseNodes.Count > 0)
             {
@@ -98,6 +90,15 @@ namespace Swashbuckle.Swagger.XmlComments
                     operation.responses[statusCode] = response;
                 }
             }
+        }
+
+        private static bool HasBoundName(ParameterInfo paramInfo, string name)
+        {
+            var fromUriAttribute = paramInfo.GetCustomAttributes(false)
+                .OfType<FromUriAttribute>()
+                .FirstOrDefault();
+
+            return (fromUriAttribute != null && fromUriAttribute.Name == name);
         }
     }
 }
