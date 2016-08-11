@@ -118,7 +118,6 @@
   <ItemGroup />
   <ItemGroup>
     <EmbeddedResource Include="SwaggerUi\CustomAssets\discoveryUrlSelector.js" />
-    <EmbeddedResource Include="SwaggerUi\CustomAssets\swagger-oauth.js" />
     <EmbeddedResource Include="SwaggerUi\CustomAssets\typography.css" />
     <EmbeddedResource Include="SwaggerUi\CustomAssets\index.html" />
     <EmbeddedResource Include="SwaggerUi\CustomAssets\screen.css" />
