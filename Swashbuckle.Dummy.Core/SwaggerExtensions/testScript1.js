@@ -1,2 +1,2 @@
-﻿var str1 = "%(DocExpansion)";
+﻿var str1 = "testScript1";
 alert(str1);
