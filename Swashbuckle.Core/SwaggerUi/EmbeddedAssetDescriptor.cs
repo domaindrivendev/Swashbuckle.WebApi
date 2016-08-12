@@ -4,7 +4,7 @@ namespace Swashbuckle.SwaggerUi
 {
     public class EmbeddedAssetDescriptor
     {
-        public EmbeddedAssetDescriptor(Assembly containingAssembly, string name, bool isTemplate = false)
+        public EmbeddedAssetDescriptor(Assembly containingAssembly, string name, bool isTemplate)
         {
             Assembly = containingAssembly;
             Name = name;

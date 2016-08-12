@@ -44,13 +44,12 @@ namespace Swashbuckle.Application
 
             // Use some custom versions to support config and extensionless paths
             var thisAssembly = GetType().Assembly;
-            CustomAsset("index", thisAssembly, "Swashbuckle.SwaggerUi.CustomAssets.index.html");
+            CustomAsset("index", thisAssembly, "Swashbuckle.SwaggerUi.CustomAssets.index.html", isTemplate: true);
             CustomAsset("css/screen-css", thisAssembly, "Swashbuckle.SwaggerUi.CustomAssets.screen.css");
             CustomAsset("css/typography-css", thisAssembly, "Swashbuckle.SwaggerUi.CustomAssets.typography.css");
-            //CustomAsset("lib/swagger-oauth-js", thisAssembly, "Swashbuckle.SwaggerUi.CustomAssets.swagger-oauth.js");
         }
 
-        public void InjectStylesheet(Assembly resourceAssembly, string resourceName, string media = "screen")
+        public void InjectStylesheet(Assembly resourceAssembly, string resourceName, string media = "screen", bool isTemplate = false)
         {
             var path = "ext/" + resourceName.Replace(".", "-");
 
@@ -58,7 +57,7 @@ namespace Swashbuckle.Application
             stringBuilder.AppendLine("<link href='" + path + "' media='" + media + "' rel='stylesheet' type='text/css' />");
             _templateParams["%(StylesheetIncludes)"] = stringBuilder.ToString();
 
-            CustomAsset(path, resourceAssembly, resourceName);
+            CustomAsset(path, resourceAssembly, resourceName, isTemplate);
         }
         
         public void BooleanValues(IEnumerable<string> values)
@@ -76,7 +75,7 @@ namespace Swashbuckle.Application
             _templateParams["%(ValidatorUrl)"] = "null";
         }
 
-        public void InjectJavaScript(Assembly resourceAssembly, string resourceName)
+        public void InjectJavaScript(Assembly resourceAssembly, string resourceName, bool isTemplate = false)
         {
             var path = "ext/" + resourceName.Replace(".", "-");
 
@@ -87,7 +86,7 @@ namespace Swashbuckle.Application
             stringBuilder.Append(path);
             _templateParams["%(CustomScripts)"] = stringBuilder.ToString();
 
-            CustomAsset(path, resourceAssembly, resourceName);
+            CustomAsset(path, resourceAssembly, resourceName, isTemplate);
         }
 
         public void DocExpansion(DocExpansion docExpansion)
@@ -100,9 +99,9 @@ namespace Swashbuckle.Application
             _templateParams["%(SupportedSubmitMethods)"] = String.Join("|", methods).ToLower();
         }
 
-        public void CustomAsset(string path, Assembly resourceAssembly, string resourceName)
+        public void CustomAsset(string path, Assembly resourceAssembly, string resourceName, bool isTemplate = false)
         {
-            _pathToAssetMap[path] = new EmbeddedAssetDescriptor(resourceAssembly, resourceName, path == "index");
+            _pathToAssetMap[path] = new EmbeddedAssetDescriptor(resourceAssembly, resourceName, isTemplate);
         }
 
         public void EnableDiscoveryUrlSelector()
