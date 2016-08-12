@@ -107,7 +107,7 @@
         apisSorter: null, // default to server
         defaultModelRendering: 'schema',
         showRequestHeaders: false,
-        oauth2RedirectUrl: window.location.href.replace('index', 'o2c-html')
+        oauth2RedirectUrl: window.location.href.replace('index', 'o2c-html').split('#')[0]
       });
 
       if (window.swashbuckleConfig.validatorUrl !== '')
