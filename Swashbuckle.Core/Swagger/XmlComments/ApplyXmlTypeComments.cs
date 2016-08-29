@@ -22,6 +22,11 @@ namespace Swashbuckle.Swagger.XmlComments
             _navigator = new XPathDocument(xmlCommentsPath).CreateNavigator();
         }
 
+        public ApplyXmlTypeComments(XPathNavigator xmlCommentsNavigator)
+        {
+            _navigator = xmlCommentsNavigator;
+        }
+
         public void Apply(Schema model, ModelFilterContext context)
         {
             var typeNode = _navigator.SelectSingleNode(

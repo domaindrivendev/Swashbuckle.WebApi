@@ -25,6 +25,11 @@ namespace Swashbuckle.Swagger.XmlComments
             _navigator = new XPathDocument(xmlCommentsPath).CreateNavigator();
         }
 
+        public ApplyXmlActionComments(XPathNavigator xmlCommentsNavigator)
+        {
+            _navigator = xmlCommentsNavigator;
+        }
+
         public void Apply(Operation operation, SchemaRegistry schemaRegistry, ApiDescription apiDescription)
         {
             var methodNode = _navigator.SelectSingleNode(XPathFor(apiDescription.ActionDescriptor));
