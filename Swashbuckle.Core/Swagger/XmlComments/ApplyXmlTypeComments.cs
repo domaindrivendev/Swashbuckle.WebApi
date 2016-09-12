@@ -1,11 +1,5 @@
-﻿using System;
+﻿using System.Reflection;
 using System.Xml.XPath;
-using System.Linq;
-using System.Collections.Generic;
-using System.Text;
-using System.Reflection;
-using Newtonsoft.Json.Serialization;
-using Swashbuckle.Swagger;
 
 namespace Swashbuckle.Swagger.XmlComments
 {
@@ -14,17 +8,23 @@ namespace Swashbuckle.Swagger.XmlComments
         private const string MemberXPath = "/doc/members/member[@name='{0}']";
         private const string SummaryTag = "summary";
 
-        private readonly XPathNavigator _navigator;
-
-        public ApplyXmlTypeComments(string xmlCommentsPath)
+        private readonly XPathDocument _document;
+        
+        public ApplyXmlTypeComments(XPathDocument xmlCommentsDoc)
         {
-            _navigator = new XPathDocument(xmlCommentsPath).CreateNavigator();
+            _document = xmlCommentsDoc;
         }
 
         public void Apply(Schema model, ModelFilterContext context)
         {
+            XPathNavigator navigator;
+            lock (_document)
+            {
+                navigator = _document.CreateNavigator();
+            }
+
             var commentId = XmlCommentsIdHelper.GetCommentIdForType(context.SystemType);
-            var typeNode = _navigator.SelectSingleNode(string.Format(MemberXPath, commentId));
+            var typeNode = navigator.SelectSingleNode(string.Format(MemberXPath, commentId));
 
             if (typeNode != null)
             {
@@ -40,17 +40,17 @@ namespace Swashbuckle.Swagger.XmlComments
                     var jsonProperty = context.JsonObjectContract.Properties[entry.Key];
                     if (jsonProperty == null) continue;
 
-                    ApplyPropertyComments(entry.Value, jsonProperty.PropertyInfo());
+                    ApplyPropertyComments(navigator, entry.Value, jsonProperty.PropertyInfo());
                 }
             }
         }
 
-        private void ApplyPropertyComments(Schema propertySchema, PropertyInfo propertyInfo)
+        private void ApplyPropertyComments(XPathNavigator navigator, Schema propertySchema, PropertyInfo propertyInfo)
         {
             if (propertyInfo == null) return;
 
             var commentId = XmlCommentsIdHelper.GetCommentIdForProperty(propertyInfo);
-            var propertyNode = _navigator.SelectSingleNode(string.Format(MemberXPath, commentId));
+            var propertyNode = navigator.SelectSingleNode(string.Format(MemberXPath, commentId));
             if (propertyNode == null) return;
 
             var propSummaryNode = propertyNode.SelectSingleNode(SummaryTag);

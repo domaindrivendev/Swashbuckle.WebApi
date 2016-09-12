@@ -5,6 +5,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Web.Http;
 using System.Web.Http.Description;
+using System.Xml.XPath;
 using Newtonsoft.Json;
 using Swashbuckle.Swagger;
 using Swashbuckle.Swagger.Annotations;
@@ -210,8 +211,10 @@ namespace Swashbuckle.Application
 
         public void IncludeXmlComments(string filePath)
         {
-            OperationFilter(() => new ApplyXmlActionComments(filePath));
-            ModelFilter(() => new ApplyXmlTypeComments(filePath));
+            var lazyXmlDoc = new Lazy<XPathDocument>(() => new XPathDocument(filePath), isThreadSafe: true);
+
+            OperationFilter(() => new ApplyXmlActionComments(lazyXmlDoc.Value));
+            ModelFilter(() => new ApplyXmlTypeComments(lazyXmlDoc.Value));
         }
 
         public void ResolveConflictingActions(Func<IEnumerable<ApiDescription>, ApiDescription> conflictingActionsResolver)
