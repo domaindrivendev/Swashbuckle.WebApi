@@ -14,8 +14,11 @@ namespace Swashbuckle.Swagger.XmlComments
         private const string RemarksXPath = "remarks";
         private const string ParamXPath = "param[@name='{0}']";
         private const string ResponseXPath = "response";
-        
+
         private readonly XPathDocument _document;
+
+        public ApplyXmlActionComments(string xmlCommentsPath)
+            : this(new XPathDocument(xmlCommentsPath)) { }
 
         public ApplyXmlActionComments(XPathDocument xmlCommentsDoc)
         {

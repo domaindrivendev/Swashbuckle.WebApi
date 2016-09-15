@@ -9,7 +9,10 @@ namespace Swashbuckle.Swagger.XmlComments
         private const string SummaryTag = "summary";
 
         private readonly XPathDocument _document;
-        
+
+        public ApplyXmlTypeComments(string xmlCommentsPath)
+            : this(new XPathDocument(xmlCommentsPath)) { }
+
         public ApplyXmlTypeComments(XPathDocument xmlCommentsDoc)
         {
             _document = xmlCommentsDoc;
@@ -45,7 +48,7 @@ namespace Swashbuckle.Swagger.XmlComments
             }
         }
 
-        private void ApplyPropertyComments(XPathNavigator navigator, Schema propertySchema, PropertyInfo propertyInfo)
+        private static void ApplyPropertyComments(XPathNavigator navigator, Schema propertySchema, PropertyInfo propertyInfo)
         {
             if (propertyInfo == null) return;
 
