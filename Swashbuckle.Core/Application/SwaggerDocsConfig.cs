@@ -211,8 +211,12 @@ namespace Swashbuckle.Application
 
         public void IncludeXmlComments(string filePath)
         {
-            var lazyXmlDoc = new Lazy<XPathDocument>(() => new XPathDocument(filePath), isThreadSafe: true);
+            IncludeXmlComments(() => new XPathDocument(filePath));
+        }
 
+        public void IncludeXmlComments(Func<XPathDocument> factory)
+        {
+            var lazyXmlDoc = new Lazy<XPathDocument>(factory, isThreadSafe: true);
             OperationFilter(() => new ApplyXmlActionComments(lazyXmlDoc.Value));
             ModelFilter(() => new ApplyXmlTypeComments(lazyXmlDoc.Value));
         }
