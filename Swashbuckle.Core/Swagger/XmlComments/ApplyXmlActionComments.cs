@@ -1,12 +1,9 @@
-﻿using System;
-using System.Diagnostics;
-using System.Linq;
+﻿using System.Linq;
 using System.Reflection;
 using System.Web.Http;
 using System.Web.Http.Controllers;
 using System.Web.Http.Description;
 using System.Xml.XPath;
-using Swashbuckle.Swagger;
 
 namespace Swashbuckle.Swagger.XmlComments
 {
@@ -18,11 +15,14 @@ namespace Swashbuckle.Swagger.XmlComments
         private const string ParamXPath = "param[@name='{0}']";
         private const string ResponseXPath = "response";
 
-        private readonly XPathNavigator _navigator;
+        private readonly XPathDocument _document;
 
         public ApplyXmlActionComments(string xmlCommentsPath)
+            : this(new XPathDocument(xmlCommentsPath)) { }
+
+        public ApplyXmlActionComments(XPathDocument xmlCommentsDoc)
         {
-            _navigator = new XPathDocument(xmlCommentsPath).CreateNavigator();
+            _document = xmlCommentsDoc;
         }
 
         public void Apply(Operation operation, SchemaRegistry schemaRegistry, ApiDescription apiDescription)
@@ -30,8 +30,14 @@ namespace Swashbuckle.Swagger.XmlComments
             var reflectedActionDescriptor = apiDescription.ActionDescriptor as ReflectedHttpActionDescriptor;
             if (reflectedActionDescriptor == null) return;
 
+            XPathNavigator navigator;
+            lock (_document)
+            {
+                navigator = _document.CreateNavigator();
+            }
+
             var commentId = XmlCommentsIdHelper.GetCommentIdForMethod(reflectedActionDescriptor.MethodInfo);
-            var methodNode = _navigator.SelectSingleNode(string.Format(MemberXPath, commentId));
+            var methodNode = navigator.SelectSingleNode(string.Format(MemberXPath, commentId));
             if (methodNode == null) return;
 
             var summaryNode = methodNode.SelectSingleNode(SummaryXPath);
