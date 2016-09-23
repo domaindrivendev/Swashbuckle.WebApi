@@ -53,9 +53,11 @@ If your service is self-hosted, just install the Core library:
 
 Then manually enable the Swagger docs and, optionally, the swagger-ui by invoking the following extension methods (in namespace Swashbuckle.Application) on an instance of HttpConfiguration (e.g. in Program.cs)
 
-    httpConfiguration
-        .EnableSwagger(c => c.SingleApiVersion("v1", "A title for your API"))
-        .EnableSwaggerUi();
+```csharp
+httpConfiguration
+     .EnableSwagger(c => c.SingleApiVersion("v1", "A title for your API"))
+     .EnableSwaggerUi();
+```
 
 ### OWIN  ###
 
@@ -65,9 +67,11 @@ If your service is hosted using OWIN middleware, just install the Core library:
 
 Then manually enable the Swagger docs and swagger-ui by invoking the extension methods (in namespace Swashbuckle.Application) on an instance of HttpConfiguration (e.g. in Startup.cs)
 
-    httpConfiguration
-        .EnableSwagger(c => c.SingleApiVersion("v1", "A title for your API"))
-        .EnableSwaggerUi();    
+```csharp
+httpConfiguration
+    .EnableSwagger(c => c.SingleApiVersion("v1", "A title for your API"))
+    .EnableSwaggerUi();    
+```
 
 ## Troubleshooting ##
 
@@ -76,10 +80,11 @@ Troubleshooting??? I thought this was all supposed to be "seamless"? OK you've c
 ## Customizing the Generated Swagger Docs ##
 
 The following snippet demonstrates the minimum configuration required to get the Swagger docs and swagger-ui up and running:
-
-    httpConfiguration
-        .EnableSwagger(c => c.SingleApiVersion("v1", "A title for your API"))
-        .EnableSwaggerUi();
+```csharp
+httpConfiguration
+      .EnableSwagger(c => c.SingleApiVersion("v1", "A title for your API"))
+      .EnableSwaggerUi();
+```
 
 These methods expose a range of configuration and extensibility options that you can pick and choose from, combining the convenience of sensible defaults with the flexibility to customize where you see fit. Read on to learn more.
 
@@ -87,9 +92,11 @@ These methods expose a range of configuration and extensibility options that you
 
 The default route templates for the Swagger docs and swagger-ui are "swagger/docs/{apiVersion}" and "swagger/ui/{\*assetPath}" respectively. You're free to change these so long as the provided templates include the relevant route parameters - {apiVersion} and {\*assetPath}.
 
-    httpConfiguration
-        .EnableSwagger("docs/{apiVersion}/swagger", c => c.SingleApiVersion("v1", "A title for your API"))
-        .EnableSwaggerUi("sandbox/{*assetPath}");
+```csharp
+httpConfiguration
+    .EnableSwagger("docs/{apiVersion}/swagger", c => c.SingleApiVersion("v1", "A title for your API"))
+    .EnableSwaggerUi("sandbox/{*assetPath}");
+```
 
 In this case the URL to swagger-ui will be `sandbox/index`.
 
@@ -97,25 +104,26 @@ In this case the URL to swagger-ui will be `sandbox/index`.
 
 In addition to operation descriptions, Swagger 2.0 includes several properties to describe the service itself. These can all be provided through the configuration API:
 
-    httpConfiguration
-        .EnableSwagger(c =>
-            {
-                c.RootUrl(req => GetRootUrlFromAppConfig());
+```csharp
+httpConfiguration
+    .EnableSwagger(c =>
+        {
+            c.RootUrl(req => GetRootUrlFromAppConfig());
 
-                c.Schemes(new[] { "http", "https" });
+            c.Schemes(new[] { "http", "https" });
 
-                c.SingleApiVersion("v1", "Swashbuckle.Dummy")
-                    .Description("A sample API for testing and prototyping Swashbuckle features")
-                    .TermsOfService("Some terms")
-                    .Contact(cc => cc
-                        .Name("Some contact")
-                        .Url("http://tempuri.org/contact")
-                        .Email("some.contact@tempuri.org"))
-                    .License(lc => lc
-                        .Name("Some License")
-                        .Url("http://tempuri.org/license"));
-            });
-
+            c.SingleApiVersion("v1", "Swashbuckle.Dummy")
+                .Description("A sample API for testing and prototyping Swashbuckle features")
+                .TermsOfService("Some terms")
+                .Contact(cc => cc
+                    .Name("Some contact")
+                    .Url("http://tempuri.org/contact")
+                    .Email("some.contact@tempuri.org"))
+                .License(lc => lc
+                    .Name("Some License")
+                    .Url("http://tempuri.org/license"));
+        });
+```
 #### RootUrl ####
 
 By default, the service root url is inferred from the request used to access the docs. However, there may be situations (e.g. proxy and load-balanced environments) where this does not resolve correctly. You can workaround this by providing your own code to determine the root URL.
@@ -134,21 +142,23 @@ __NOTE__: If your Web API is hosted in IIS, you should avoid using full-stops in
 
 If your API has multiple versions, use __MultipleApiVersions__ instead of __SingleApiVersion__. In this case, you provide a lambda that tells Swashbuckle which actions should be included in the docs for a given API version. Like __SingleApiVersion__, __Version__ also returns an "Info" builder so you can provide additional metadata per API version.
 
-    httpConfiguration
-        .EnableSwagger(c =>
-            {
-                c.MultipleApiVersions(
-                    (apiDesc, targetApiVersion) => ResolveVersionSupportByRouteConstraint(apiDesc, targetApiVersion),
-                    (vc) =>
-                    {
-                        vc.Version("v2", "Swashbuckle Dummy API V2");
-                        vc.Version("v1", "Swashbuckle Dummy API V1");
-                    });
-            });
-        .EnableSwaggerUi(c =>
-            {
-                c.EnableDiscoveryUrlSelector();
-            });
+```csharp
+httpConfiguration
+    .EnableSwagger(c =>
+        {
+            c.MultipleApiVersions(
+                (apiDesc, targetApiVersion) => ResolveVersionSupportByRouteConstraint(apiDesc, targetApiVersion),
+                (vc) =>
+                {
+                    vc.Version("v2", "Swashbuckle Dummy API V2");
+                    vc.Version("v1", "Swashbuckle Dummy API V1");
+                });
+        });
+    .EnableSwaggerUi(c =>
+        {
+            c.EnableDiscoveryUrlSelector();
+        });
+```
 
 \* You can also enable a select box in the swagger-ui (as shown above) that displays a discovery URL for each version. This provides a convenient way for users to browse documentation for different API versions.
 
@@ -156,35 +166,36 @@ If your API has multiple versions, use __MultipleApiVersions__ instead of __Sing
 
 You can use BasicAuth, __ApiKey__ or __OAuth2__ options to describe security schemes for the API. See https://github.com/swagger-api/swagger-spec/blob/master/versions/2.0.md for more details.
 
-    httpConfiguration
-        .EnableSwagger(c =>
-            {
-                //c.BasicAuth("basic")
-                //    .Description("Basic HTTP Authentication");
+```csharp
+httpConfiguration
+     .EnableSwagger(c =>
+         {
+             //c.BasicAuth("basic")
+             //    .Description("Basic HTTP Authentication");
 
-                //c.ApiKey("apiKey")
-                //    .Description("API Key Authentication")
-                //    .Name("apiKey")
-                //    .In("header");
+             //c.ApiKey("apiKey")
+             //    .Description("API Key Authentication")
+             //    .Name("apiKey")
+             //    .In("header");
 
-                c.OAuth2("oauth2")
-                    .Description("OAuth2 Implicit Grant")
-                    .Flow("implicit")
-                    .AuthorizationUrl("http://petstore.swagger.wordnik.com/api/oauth/dialog")
-                    //.TokenUrl("https://tempuri.org/token")
-                    .Scopes(scopes =>
-                    {
-                        scopes.Add("read", "Read access to protected resources");
-                        scopes.Add("write", "Write access to protected resources");
-                    });
+             c.OAuth2("oauth2")
+                 .Description("OAuth2 Implicit Grant")
+                 .Flow("implicit")
+                 .AuthorizationUrl("http://petstore.swagger.wordnik.com/api/oauth/dialog")
+                 //.TokenUrl("https://tempuri.org/token")
+                 .Scopes(scopes =>
+                 {
+                     scopes.Add("read", "Read access to protected resources");
+                     scopes.Add("write", "Write access to protected resources");
+                 });
 
-                c.OperationFilter<AssignOAuth2SecurityRequirements>();
-            });
-        .EnableSwaggerUi(c =>
-            {
-                c.EnableOAuth2Support("test-client-id", "test-realm", "Swagger UI");
-            });
-
+             c.OperationFilter<AssignOAuth2SecurityRequirements>();
+         });
+     .EnableSwaggerUi(c =>
+         {
+             c.EnableOAuth2Support("test-client-id", "test-realm", "Swagger UI");
+         });
+```
 __NOTE:__ These only define the schemes and need to be coupled with a corresponding "security" property at the document or operation level to indicate which schemes are required for each operation.  To do this, you'll need to implement a custom IDocumentFilter and/or IOperationFilter to set these properties according to your specific authorization implementation
 
 \* If your API supports the OAuth2 Implicit flow, and you've described it correctly, according to the Swagger 2.0 specification, you can enable UI support as shown above.
@@ -193,16 +204,17 @@ __NOTE:__ These only define the schemes and need to be coupled with a correspond
 
 If necessary, you can ignore obsolete actions and provide custom grouping/sorting strategies for the list of Operations in a Swagger document:
 
-    httpConfiguration
-        .EnableSwagger(c =>
-            {
-                c.IgnoreObsoleteActions();
+```csharp
+httpConfiguration
+    .EnableSwagger(c =>
+        {
+            c.IgnoreObsoleteActions();
 
-                c.GroupActionsBy(apiDesc => apiDesc.HttpMethod.ToString());
+            c.GroupActionsBy(apiDesc => apiDesc.HttpMethod.ToString());
 
-                c.OrderActionGroupsBy(new DescendingAlphabeticComparer());
-            });
-
+            c.OrderActionGroupsBy(new DescendingAlphabeticComparer());
+        });
+```
 #### IgnoreObsoleteActions ####
 
 Set this flag to omit operation descriptions for any actions decorated with the Obsolete attribute
@@ -221,21 +233,23 @@ You can also specify a custom sort order for groups (as defined by __GroupAction
 
 Swashbuckle makes a best attempt at generating Swagger compliant JSON schemas for the various types exposed in your API. However, there may be occasions when more control of the output is needed.  This is supported through the following options:
 
-    httpConfiguration
-        .EnableSwagger(c =>
-            {
-                c.MapType<ProductType>(() => new Schema { type = "integer", format = "int32" });
+```csharp
+httpConfiguration
+      .EnableSwagger(c =>
+          {
+              c.MapType<ProductType>(() => new Schema { type = "integer", format = "int32" });
 
-                c.SchemaFilter<ApplySchemaVendorExtensions>();
+              c.SchemaFilter<ApplySchemaVendorExtensions>();
 
-                //c.UseFullTypeNameInSchemaIds();
+              //c.UseFullTypeNameInSchemaIds();
 
-                c.SchemaId(t => t.FullName.Contains('`') ? t.FullName.Substring(0, t.FullName.IndexOf('`')) : t.FullName);
-                
-                c.IgnoreObsoleteProperties();
+              c.SchemaId(t => t.FullName.Contains('`') ? t.FullName.Substring(0, t.FullName.IndexOf('`')) : t.FullName);
+              
+              c.IgnoreObsoleteProperties();
 
-                c.DescribeAllEnumsAsStrings();
-            });
+              c.DescribeAllEnumsAsStrings();
+          });
+```
 
 #### MapType ####
 
@@ -251,7 +265,9 @@ If you want to post-modify "complex" Schemas once they've been generated, across
 
 ISchemaFilter has the following interface:
 
-    void Apply(Schema schema, SchemaRegistry schemaRegistry, Type type);
+```csharp
+void Apply(Schema schema, SchemaRegistry schemaRegistry, Type type);
+```
 
 A typical implementation will inspect the system Type and modify the Schema accordingly. If necessary, the schemaRegistry can be used to obtain or register Schemas for other Types
 
@@ -275,21 +291,24 @@ In accordance with the built in JsonSerializer, Swashbuckle will, by default, de
 
 Similar to Schema filters, Swashbuckle also supports Operation and Document filters:
 
-    httpConfiguration
-        .EnableSwagger(c => c.SingleApiVersion("v1", "A title for your API"))
-            {
-                c.OperationFilter<AddDefaultResponse>();
+```csharp
+httpConfiguration
+     .EnableSwagger(c => c.SingleApiVersion("v1", "A title for your API"))
+         {
+             c.OperationFilter<AddDefaultResponse>();
 
-                c.DocumentFilter<ApplyDocumentVendorExtensions>();
-            });
-
+             c.DocumentFilter<ApplyDocumentVendorExtensions>();
+         });
+```
 #### OperationFilter ####
 
 Post-modify Operation descriptions once they've been generated by wiring up one or more Operation filters.
 
 IOperationFilter has the following interface:
 
-    void Apply(Operation operation, SchemaRegistry schemaRegistry, ApiDescription apiDescription);
+```csharp
+void Apply(Operation operation, SchemaRegistry schemaRegistry, ApiDescription apiDescription);
+```
 
 A typical implementation will inspect the ApiDescription and modify the Operation accordingly. If necessary, the schemaRegistry can be used to obtain or register Schemas for Types that are used in the Operation.
 
@@ -299,7 +318,9 @@ Post-modify the entire Swagger document by wiring up one or more Document filter
 
 IDocumentFilter has the following interface:
 
-    void Apply(SwaggerDocument swaggerDoc, SchemaRegistry schemaRegistry, IApiExplorer apiExplorer);
+```csharp
+void Apply(SwaggerDocument swaggerDoc, SchemaRegistry schemaRegistry, IApiExplorer apiExplorer);
+```
 
 This gives full control to modify the final SwaggerDocument. You can gain additional context from the provided SwaggerDocument (e.g. version) and IApiExplorer. You should have a good understanding of the [Swagger 2.0 spec.](https://github.com/swagger-api/swagger-spec/blob/master/versions/2.0.md) before using this option.
 
@@ -307,11 +328,13 @@ This gives full control to modify the final SwaggerDocument. You can gain additi
 
 The default implementation of ISwaggerProvider, the interface used to obtain Swagger metadata for a given API, is the SwaggerGenerator. If neccessary, you can inject your own implementation or wrap the existing one with additional behavior. For example, you could use this option to inject a "Caching Proxy" that attempts to retrieve the SwaggerDocument from a cache before delegating to the built-in generator:
 
-    httpConfiguration
-        .EnableSwagger(c => c.SingleApiVersion("v1", "A title for your API"))
-            {
-				c.CustomProvider((defaultProvider) => new CachingSwaggerProvider(defaultProvider));
-            });
+```csharp
+httpConfiguration
+      .EnableSwagger(c => c.SingleApiVersion("v1", "A title for your API"))
+          {
+        c.CustomProvider((defaultProvider) => new CachingSwaggerProvider(defaultProvider));
+          });
+```
 
 ### Including XML Comments ###
 
@@ -324,48 +347,52 @@ If you annotate Controllers and API Types with [Xml Comments](http://msdn.micros
 * **Property summary** -> Schema.description (i.e. on a property Schema)
 
 You can enable this by providing the path to one or more XML comments files:
-
-    httpConfiguration
-        .EnableSwagger(c =>
-            {
-                c.SingleApiVersion("v1", "A title for your API");
-                c.IncludeXmlComments(GetXmlCommentsPathForControllers());
-                c.IncludeXmlComments(GetXmlCommentsPathForModels());
-            });
+```csharp
+httpConfiguration
+    .EnableSwagger(c =>
+        {
+            c.SingleApiVersion("v1", "A title for your API");
+            c.IncludeXmlComments(GetXmlCommentsPathForControllers());
+            c.IncludeXmlComments(GetXmlCommentsPathForModels());
+        });
+```
 
 NOTE: You will need to enable output of the XML documentation file. This is enabled by going to project properties -> Build -> Output. The "XML documentation file" needs to be checked and a path assigned, such as "bin\Debug\MyProj.XML". You will also want to verify this across each build configuration. Here's an example of reading the file, but it may need to be modified according to your specific project settings:
 
-    httpConfiguration
-        .EnableSwagger(c =>
-            {
-                var baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
-                var commentsFileName = Assembly.GetExecutingAssembly().GetName().Name + ".XML";
-                var commentsFile = Path.Combine(baseDirectory, commentsFileName);
+```csharp
+httpConfiguration
+    .EnableSwagger(c =>
+        {
+            var baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
+            var commentsFileName = Assembly.GetExecutingAssembly().GetName().Name + ".XML";
+            var commentsFile = Path.Combine(baseDirectory, commentsFileName);
 
-                c.SingleApiVersion("v1", "A title for your API");
-                c.IncludeXmlComments(commentsFile);
-                c.IncludeXmlComments(GetXmlCommentsPathForModels());
-            });
-
+            c.SingleApiVersion("v1", "A title for your API");
+            c.IncludeXmlComments(commentsFile);
+            c.IncludeXmlComments(GetXmlCommentsPathForModels());
+        });
+```
 #### Response Codes ####
 
 Swashbuckle will automatically create a "success" response for each operation based on the action's return type. If it's a void, the status code will be 204 (No content), otherwise 200 (Ok). This mirrors WebApi's default behavior. If you need to change this and/or list additional response codes, you can use the non-standard "response" tag:
 
-    /// <response code="201">Account created</response>
-    /// <response code="400">Username already in use</response>
-    public int Create(Account account)
-
+```csharp
+/// <response code="201">Account created</response>
+/// <response code="400">Username already in use</response>
+public int Create(Account account)
+```
 ### Working Around Swagger 2.0 Constraints ###
 
 In contrast to Web API, Swagger 2.0 does not include the query string component when mapping a URL to an action. As a result, Swashbuckle will raise an exception if it encounters multiple actions with the same path (sans query string) and HTTP method. You can workaround this by providing a custom strategy to pick a winner or merge the descriptions for the purposes of the Swagger docs 
 
-    httpConfiguration
-        .EnableSwagger((c) =>
-            {
-                c.SingleApiVersion("v1", "A title for your API"));
-                c.ResolveConflictingActions(apiDescriptions => apiDescriptions.First());
-            });
-
+```csharp
+httpConfiguration
+    .EnableSwagger((c) =>
+        {
+            c.SingleApiVersion("v1", "A title for your API"));
+            c.ResolveConflictingActions(apiDescriptions => apiDescriptions.First());
+        });
+```
 See the following discussion for more details:
 
 <https://github.com/domaindrivendev/Swashbuckle/issues/142>
@@ -378,18 +405,20 @@ The swagger-ui is a JavaScript application hosted in a single HTML page (index.h
 
 If you're happy with the basic look and feel but want to make some minor tweaks, the following options may be sufficient:
 
-    httpConfiguration
-        .EnableSwagger(c => c.SingleApiVersion("v1", "A title for your API"))
-        .EnableSwaggerUi(c =>
-            {
-                c.InjectStylesheet(containingAssembly, "Swashbuckle.Dummy.SwaggerExtensions.testStyles1.css");
-                c.InjectJavaScript(containingAssembly, "Swashbuckle.Dummy.SwaggerExtensions.testScript1.js");
-                c.BooleanValues(new[] { "0", "1" });
-                c.SetValidatorUrl("http://localhost/validator");
-                c.DisableValidator();
-                c.DocExpansion(DocExpansion.List);
-				c.SupportedSubmitMethods("GET", "HEAD")
-            });
+```csharp
+httpConfiguration
+    .EnableSwagger(c => c.SingleApiVersion("v1", "A title for your API"))
+    .EnableSwaggerUi(c =>
+        {
+            c.InjectStylesheet(containingAssembly, "Swashbuckle.Dummy.SwaggerExtensions.testStyles1.css");
+            c.InjectJavaScript(containingAssembly, "Swashbuckle.Dummy.SwaggerExtensions.testScript1.js");
+            c.BooleanValues(new[] { "0", "1" });
+            c.SetValidatorUrl("http://localhost/validator");
+            c.DisableValidator();
+            c.DocExpansion(DocExpansion.List);
+c.SupportedSubmitMethods("GET", "HEAD")
+        });
+```
 
 #### InjectStylesheet ####
 
@@ -421,12 +450,14 @@ As an alternative, you can inject your own version of "index.html" and customize
 
 For compatibility, you should base your custom "index.html" off [this version](https://github.com/domaindrivendev/Swashbuckle/blob/v5.2.1/Swashbuckle.Core/SwaggerUi/CustomAssets/index.html)
 
-    httpConfiguration
-        .EnableSwagger(c => c.SingleApiVersion("v1", "A title for your API"))
-        .EnableSwaggerUi(c =>
-            {
-                c.CustomAsset("index", yourAssembly, "YourWebApiProject.SwaggerExtensions.index.html");
-            });
+```csharp
+httpConfiguration
+     .EnableSwagger(c => c.SingleApiVersion("v1", "A title for your API"))
+     .EnableSwaggerUi(c =>
+         {
+             c.CustomAsset("index", yourAssembly, "YourWebApiProject.SwaggerExtensions.index.html");
+         });
+```
 
 ### Injecting Custom Content ###
 
@@ -470,6 +501,8 @@ If you're using the existing configuration API to customize the final Swagger do
 3. [Swagger-ui broken by Visual Studio 2013](#swagger-ui-broken-by-visual-studio-2013)
 4. [OWIN Hosted in IIS - Incorrect VirtualPathRoot Handling](#owin-hosted-in-iis---incorrect-virtualpathroot-handling)
 5. [How to add vendor extensions](#how-to-add-vendor-extensions)
+6. [FromUri Query string DataMember names are incorrect](#fromuri-query-string-datamember-names-are-incorrect)
+7. [Remove Duplicate Path Parameters](#remove-duplicate-path-parameters)
 
 ### Swagger-ui showing "Can't read swagger JSON from ..."
 
@@ -485,18 +518,21 @@ Swashbuckle serves an embedded version of the swagger-ui through the Web API pip
 
 In previous versions of Swashbuckle, this was resolved by adding the following setting to your Web.config:
 
-    <system.webServer>
-      <modules runAllManagedModulesForAllRequests="true">
-    </modules>
+```xml
+<system.webServer>
+  <modules runAllManagedModulesForAllRequests="true" />
+</system.webServer>
+```
 
 This is no longer neccessary in Swashbuckle 5.0 because it serves the swagger-ui through extensionless URL's.
 
 However, if you're using the SingleApiVersion, MultipleApiVersions or CustomAsset configuration settings you could still get this error. Check to ensure you're not specifying a value that causes a URL with an extension to be referenced in the UI. For example a full-stop in a version number ...
 
-    httpConfiguration
-        .EnableSwagger(c => c.SingleApiVersion("1.0", "A title for your API"))
-        .EnableSwaggerUi();
-
+```csharp
+httpConfiguration
+    .EnableSwagger(c => c.SingleApiVersion("1.0", "A title for your API"))
+    .EnableSwaggerUi();
+```
 will result in a discovery URL like this "/swagger/docs/1.0" where the full-stop is treated as a file extension.
 
 ### Swagger-ui broken by Visual Studio 2013 ###
@@ -507,33 +543,113 @@ Although this JavaScript SHOULD have no affect on your production code, it appea
 
 I hope to find a permanent fix, but in the meantime, you'll need to workaround this issue by disabling the feature in your web.config:
 
-    <appSettings>
-        <add key="vs:EnableBrowserLink" value="false"/>
-    </appSettings>< appSettings>
-
+```xml
+<appSettings>
+    <add key="vs:EnableBrowserLink" value="false"/>
+</appSettings>
+```
 ### OWIN Hosted in IIS - Incorrect VirtualPathRoot Handling
 
 When you host Web API 2 on top of OWIN/SystemWeb, Swashbuckle cannot correctly resolve VirtualPathRoot by default.
 
 You must either explicitly set VirtualPathRoot in your HttpConfiguration at startup, or perform customization like this to fix automatic discovery:
 
-    SwaggerSpecConfig.Customize(c =>
-    {
-        c.ResolveBasePathUsing(req =>
-            req.RequestUri.GetLeftPart(UriPartial.Authority) +
-            req.GetRequestContext().VirtualPathRoot.TrimEnd('/'));
-    }
+```csharp
+SwaggerSpecConfig.Customize(c =>
+{
+    c.ResolveBasePathUsing(req =>
+        req.RequestUri.GetLeftPart(UriPartial.Authority) +
+        req.GetRequestContext().VirtualPathRoot.TrimEnd('/'));
+}
+```
 
-### How to add vendor extensions ###
+### How to add vendor extensions
 
 Swagger 2.0 allows additional meta-data (aka vendor extensions) to be added at various points in the Swagger document. Swashbuckle supports this by including a "vendorExtensions" dictionary with each of the extensible Swagger types. Meta-data can be added to these dictionaries from custom Schema, Operation or Document filters. For example:
 
-    public class ApplySchemaVendorExtensions : ISchemaFilter
+```csharp
+public class ApplySchemaVendorExtensions : ISchemaFilter
+{
+    public void Apply(Schema schema, SchemaRegistry schemaRegistry, Type type)
     {
-        public void Apply(Schema schema, SchemaRegistry schemaRegistry, Type type)
-        {
-            schema.vendorExtensions.Add("x-foo", "bar");
-        }
+        schema.vendorExtensions.Add("x-foo", "bar");
     }
+}
+```
 
 As per the specification, all extension properties should be prefixed by "x-"
+
+### FromUri Query string DataMember names are incorrect
+
+When using `FromUri` Model Binding, it is possible to override the querystring parameter name's using `DataMember`s. In this case you can add a custom operation filter to override the name. For example:
+
+```csharp
+public class ComplexTypeOperationFilter : IOperationFilter
+{
+    public void Apply(Operation operation, SchemaRegistry schemaRegistry, ApiDescription apiDescription)
+    {
+        if (operation.parameters == null)
+            return;
+
+        var parameters = apiDescription.ActionDescriptor.GetParameters();
+        foreach (var parameter in parameters)
+        {
+            foreach (var property in parameter.ParameterType.GetProperties())
+            {
+                var param = operation.parameters.FirstOrDefault(o => o.name.ToLowerInvariant().Contains(property.Name.ToLowerInvariant()));
+
+                if (param == null) continue;
+
+                var name = GetNameFromAttribute(property);
+
+                if (string.IsNullOrEmpty(name))
+                {
+                    operation.parameters.Remove(param);
+                }
+                param.name = GetNameFromAttribute(property);
+            }
+        }
+    }
+    
+    private static string GetNameFromAttribute(PropertyInfo property)
+    {
+        var customAttributes = property.GetCustomAttributes(typeof(DataMemberAttribute), true);
+        if (customAttributes.Length > 0)
+        {
+            var attribute = customAttributes[0] as DataMemberAttribute;
+            if (attribute != null) return attribute.Name;
+        }
+        return string.Empty;
+    }
+}
+```
+
+### Remove Duplicate Path Parameters
+
+When using `FromUri` Model Binding, duplicate items can appear as items can be passed as URI parameters, or querystrings. In this case you can add a custom operation filter to remove the duplicates. For example:
+
+```csharp
+public class ComplexTypeOperationFilter : IOperationFilter
+{
+    public void Apply(Operation operation, SchemaRegistry schemaRegistry, ApiDescription apiDescription)
+    {
+       if (operation.parameters == null)
+           return;
+       var complexParameters = operation.parameters.Where(x => x.@in == "query" && !string.IsNullOrWhiteSpace(x.name)).ToArray();
+
+       foreach (var parameter in complexParameters)
+       {
+           if (!parameter.name.Contains('.')) continue;
+           var name = parameter.name.Split('.')[1];
+
+           var opParams = operation.parameters.Where(x => x.name == name);
+           var parameters = opParams as Parameter[] ?? opParams.ToArray();
+
+           if (parameters.Length > 0)
+           {
+               operation.parameters.Remove(parameter);
+           }
+       }
+    }
+}
+```
