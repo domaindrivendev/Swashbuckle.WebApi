@@ -71,6 +71,8 @@ namespace Swashbuckle.Swagger
                 filter.Apply(swaggerDoc, schemaRegistry, _apiExplorer);
             }
 
+            schemaRegistry.FinializeSchema();
+
             return swaggerDoc;
         }
 
