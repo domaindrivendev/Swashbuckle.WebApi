@@ -34,7 +34,7 @@ namespace Swashbuckle.Application
         private bool _applyFiltersToAllSchemas;
         private readonly IList<Func<IOperationFilter>> _operationFilters;
         private readonly IList<Func<IDocumentFilter>> _documentFilters;
-        private readonly IList<string> _xmlCommentFiles;
+        private readonly IList<Func<XPathDocument>> _xmlDocFactories;
         private Func<IEnumerable<ApiDescription>, ApiDescription> _conflictingActionsResolver;
         private Func<HttpRequestMessage, string> _rootUrlResolver;
 
@@ -55,7 +55,7 @@ namespace Swashbuckle.Application
             _applyFiltersToAllSchemas = false;
             _operationFilters = new List<Func<IOperationFilter>>();
             _documentFilters = new List<Func<IDocumentFilter>>();
-            _xmlCommentFiles = new List<string>();
+            _xmlDocFactories = new List<Func<XPathDocument>>();
             _rootUrlResolver = DefaultRootUrlResolver;
 
             SchemaFilter<ApplySwaggerSchemaFilterAttributes>();
@@ -211,9 +211,14 @@ namespace Swashbuckle.Application
             _documentFilters.Add(factory);
         }
 
+        public void IncludeXmlComments(Func<XPathDocument> xmlDocFactory)
+        {
+            _xmlDocFactories.Add(xmlDocFactory);
+        }
+
         public void IncludeXmlComments(string filePath)
         {
-            _xmlCommentFiles.Add(filePath);
+            _xmlDocFactories.Add(() => new XPathDocument(filePath));
         }
 
         public void ResolveConflictingActions(Func<IEnumerable<ApiDescription>, ApiDescription> conflictingActionsResolver)
@@ -239,11 +244,11 @@ namespace Swashbuckle.Application
                 ? _securitySchemeBuilders.ToDictionary(kvp => kvp.Key, kvp => kvp.Value.Build())
                 : null;
 
-            foreach (var filePath in _xmlCommentFiles)
+            foreach (var xmlDocFactory in _xmlDocFactories)
             {
-                var xPathDoc = new XPathDocument(filePath);
-                _operationFilters.Add(() => new ApplyXmlActionComments(xPathDoc));
-                _modelFilters.Add(() => new ApplyXmlTypeComments(xPathDoc));
+                var xmlDoc = xmlDocFactory();
+                _operationFilters.Add(() => new ApplyXmlActionComments(xmlDoc));
+                _modelFilters.Add(() => new ApplyXmlTypeComments(xmlDoc));
             }
 
             var options = new SwaggerGeneratorOptions(

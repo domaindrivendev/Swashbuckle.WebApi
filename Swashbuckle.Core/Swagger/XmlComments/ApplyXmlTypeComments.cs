@@ -8,22 +8,22 @@ namespace Swashbuckle.Swagger.XmlComments
         private const string MemberXPath = "/doc/members/member[@name='{0}']";
         private const string SummaryTag = "summary";
 
-        private readonly XPathDocument _document;
+        private readonly XPathDocument _xmlDoc;
 
-        public ApplyXmlTypeComments(string xmlCommentsPath)
-            : this(new XPathDocument(xmlCommentsPath)) { }
+        public ApplyXmlTypeComments(string filePath)
+            : this(new XPathDocument(filePath)) { }
 
-        public ApplyXmlTypeComments(XPathDocument xmlCommentsDoc)
+        public ApplyXmlTypeComments(XPathDocument xmlDoc)
         {
-            _document = xmlCommentsDoc;
+            _xmlDoc = xmlDoc;
         }
 
         public void Apply(Schema model, ModelFilterContext context)
         {
             XPathNavigator navigator;
-            lock (_document)
+            lock (_xmlDoc)
             {
-                navigator = _document.CreateNavigator();
+                navigator = _xmlDoc.CreateNavigator();
             }
 
             var commentId = XmlCommentsIdHelper.GetCommentIdForType(context.SystemType);

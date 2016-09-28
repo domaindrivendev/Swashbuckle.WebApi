@@ -15,14 +15,14 @@ namespace Swashbuckle.Swagger.XmlComments
         private const string ParamXPath = "param[@name='{0}']";
         private const string ResponseXPath = "response";
 
-        private readonly XPathDocument _document;
+        private readonly XPathDocument _xmlDoc;
 
-        public ApplyXmlActionComments(string xmlCommentsPath)
-            : this(new XPathDocument(xmlCommentsPath)) { }
+        public ApplyXmlActionComments(string filePath)
+            : this(new XPathDocument(filePath)) { }
 
-        public ApplyXmlActionComments(XPathDocument xmlCommentsDoc)
+        public ApplyXmlActionComments(XPathDocument xmlDoc)
         {
-            _document = xmlCommentsDoc;
+            _xmlDoc = xmlDoc;
         }
 
         public void Apply(Operation operation, SchemaRegistry schemaRegistry, ApiDescription apiDescription)
@@ -31,9 +31,9 @@ namespace Swashbuckle.Swagger.XmlComments
             if (reflectedActionDescriptor == null) return;
 
             XPathNavigator navigator;
-            lock (_document)
+            lock (_xmlDoc)
             {
-                navigator = _document.CreateNavigator();
+                navigator = _xmlDoc.CreateNavigator();
             }
 
             var commentId = XmlCommentsIdHelper.GetCommentIdForMethod(reflectedActionDescriptor.MethodInfo);
