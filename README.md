@@ -555,9 +555,9 @@ When you host Web API 2 on top of OWIN/SystemWeb, Swashbuckle cannot correctly r
 You must either explicitly set VirtualPathRoot in your HttpConfiguration at startup, or perform customization like this to fix automatic discovery:
 
 ```csharp
-SwaggerSpecConfig.Customize(c =>
+httpConfiguration.EnableSwagger(c => 
 {
-    c.ResolveBasePathUsing(req =>
+    c.RootUrl(req =>
         req.RequestUri.GetLeftPart(UriPartial.Authority) +
         req.GetRequestContext().VirtualPathRoot.TrimEnd('/'));
 }
