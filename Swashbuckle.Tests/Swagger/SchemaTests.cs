@@ -784,6 +784,18 @@ namespace Swashbuckle.Tests.Swagger
         }
 
         [Test]
+        public void It_handles_recursion_if_called_again_within_a_filter()
+        {
+            SetUpCustomRouteFor<ProductsController>("PrimitiveTypes/{action}");
+            SetUpHandler(c =>
+            {
+                c.SchemaFilter<RecursiveCallSchemaFilter>();
+            });
+
+            var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/v1");
+        }
+
+        [Test]
         [ExpectedException(typeof(InvalidOperationException))]
         public void It_errors_on_multiple_types_with_the_same_class_name()
         {

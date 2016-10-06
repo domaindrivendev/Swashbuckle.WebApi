@@ -30,10 +30,11 @@ namespace Swashbuckle.Swagger
 
         private readonly IContractResolver _contractResolver;
 
-        private IDictionary<Type, SchemaInfo> _referencedTypes;
-        private class SchemaInfo
+        private IDictionary<Type, WorkItem> _workItems;
+        private class WorkItem
         {
             public string SchemaId;
+            public bool InProgress;
             public Schema Schema;
         }
 
@@ -59,7 +60,7 @@ namespace Swashbuckle.Swagger
             _applyFiltersToAllSchemas = applyFiltersToAllSchemas;
 
             _contractResolver = jsonSerializerSettings.ContractResolver ?? new DefaultContractResolver();
-            _referencedTypes = new Dictionary<Type, SchemaInfo>();
+            _workItems = new Dictionary<Type, WorkItem>();
             Definitions = new Dictionary<string, Schema>();
         }
 
@@ -67,14 +68,16 @@ namespace Swashbuckle.Swagger
         {
             var schema = CreateInlineSchema(type);
 
-            // Ensure Schema's have been fully generated for all referenced types
-            while (_referencedTypes.Any(entry => entry.Value.Schema == null))
+            // Iterate outstanding work items (i.e. referenced types) and generate the corresponding definition
+            while (_workItems.Any(entry => entry.Value.Schema == null && !entry.Value.InProgress))
             {
-                var typeMapping = _referencedTypes.First(entry => entry.Value.Schema == null);
-                var schemaInfo = typeMapping.Value;
+                var typeMapping = _workItems.First(entry => entry.Value.Schema == null && !entry.Value.InProgress);
+                var workItem = typeMapping.Value;
 
-                schemaInfo.Schema = CreateDefinitionSchema(typeMapping.Key);
-                Definitions.Add(schemaInfo.SchemaId, schemaInfo.Schema);
+                workItem.InProgress = true;
+                workItem.Schema = CreateDefinitionSchema(typeMapping.Key);
+                Definitions.Add(workItem.SchemaId, workItem.Schema);
+                workItem.InProgress = false;
             }
 
             return schema;
@@ -254,22 +257,22 @@ namespace Swashbuckle.Swagger
 
         private Schema CreateRefSchema(Type type)
         {
-            if (!_referencedTypes.ContainsKey(type))
+            if (!_workItems.ContainsKey(type))
             {
                 var schemaId = _schemaIdSelector(type); 
-                if (_referencedTypes.Any(entry => entry.Value.SchemaId == schemaId))
+                if (_workItems.Any(entry => entry.Value.SchemaId == schemaId))
                 {
-                    var conflictingType = _referencedTypes.First(entry => entry.Value.SchemaId == schemaId).Key;
+                    var conflictingType = _workItems.First(entry => entry.Value.SchemaId == schemaId).Key;
                     throw new InvalidOperationException(String.Format(
                         "Conflicting schemaIds: Duplicate schemaIds detected for types {0} and {1}. " +
                         "See the config setting - \"UseFullTypeNameInSchemaIds\" for a potential workaround",
                         type.FullName, conflictingType.FullName));
                 }
 
-                _referencedTypes.Add(type, new SchemaInfo { SchemaId = schemaId });
+                _workItems.Add(type, new WorkItem { SchemaId = schemaId });
             }
 
-            return new Schema { @ref = "#/definitions/" + _referencedTypes[type].SchemaId };
+            return new Schema { @ref = "#/definitions/" + _workItems[type].SchemaId };
         }
 
         private Schema FilterSchema(Schema schema, JsonContract jsonContract)
