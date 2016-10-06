@@ -144,14 +144,14 @@ namespace Swashbuckle.Swagger
                 responses.Add("200", new Response { description = "OK", schema = schemaRegistry.GetOrRegister(responseType) });
 
             var operation = new Operation
-            { 
-                tags = new [] { _options.GroupingKeySelector(apiDesc) },
+            {
+                tags = new[] { _options.GroupingKeySelector(apiDesc) },
                 operationId = apiDesc.FriendlyId(),
                 produces = apiDesc.Produces().ToList(),
                 consumes = apiDesc.Consumes().ToList(),
                 parameters = parameters.Any() ? parameters : null, // parameters can be null but not empty
                 responses = responses,
-                deprecated = apiDesc.IsObsolete()
+                deprecated = apiDesc.IsObsolete() ? true : (bool?) null
             };
 
             foreach (var filter in _options.OperationFilters)
