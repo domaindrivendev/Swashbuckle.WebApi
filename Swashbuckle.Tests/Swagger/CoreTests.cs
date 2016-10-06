@@ -120,8 +120,7 @@ namespace Swashbuckle.Tests.Swagger
                                             }
                                         }
                                     }
-                                },
-                                deprecated = false
+                                }
                             }
                         }
                     },
@@ -160,8 +159,7 @@ namespace Swashbuckle.Tests.Swagger
                                             description = "No Content",
                                         }
                                     }
-                                },
-                                deprecated = false
+                                }
                             },
                             delete = new
                             {
@@ -188,8 +186,7 @@ namespace Swashbuckle.Tests.Swagger
                                             description = "No Content",
                                         }
                                     }
-                                },
-                                deprecated = false
+                                }
                             }
                         }
                     },
@@ -227,8 +224,7 @@ namespace Swashbuckle.Tests.Swagger
                                             }
                                         }
                                     }
-                                },
-                                deprecated = false
+                                }
                             },
                             post = new
                             {
@@ -259,8 +255,7 @@ namespace Swashbuckle.Tests.Swagger
                                             }
                                         }
                                     }
-                                },
-                                deprecated = false
+                                }
                             }
                         }
                     },
@@ -293,8 +288,7 @@ namespace Swashbuckle.Tests.Swagger
                                             schema = JObject.Parse("{ $ref: \"#/definitions/Product\" }")
                                         }
                                     }
-                                },
-                                deprecated = false
+                                }
                             }
                         }
                     }
@@ -312,7 +306,7 @@ namespace Swashbuckle.Tests.Swagger
             var putOp = swagger["paths"]["/obsoleteactions/{id}"]["put"];
             var deleteOp = swagger["paths"]["/obsoleteactions/{id}"]["delete"];
 
-            Assert.IsFalse((bool)putOp["deprecated"]);
+            Assert.IsNull(putOp["deprecated"]);
             Assert.IsTrue((bool)deleteOp["deprecated"]);
         }
 
