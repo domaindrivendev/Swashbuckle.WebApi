@@ -66,18 +66,28 @@ namespace Swashbuckle.Swagger
         public Schema GetOrRegister(Type type)
         {
             var schema = CreateInlineSchema(type);
+            var referencedType = null as SchemaInfo;
 
-            // Ensure Schema's have been fully generated for all referenced types
-            while (_referencedTypes.Any(entry => entry.Value.Schema == null))
+            if (!_referencedTypes.TryGetValue(type, out referencedType))
+                return schema;
+
+            if (referencedType.Schema == null)
             {
-                var typeMapping = _referencedTypes.First(entry => entry.Value.Schema == null);
-                var schemaInfo = typeMapping.Value;
+                referencedType.Schema = CreateDefinitionSchema(type);
+                Definitions.Add(referencedType.SchemaId, referencedType.Schema);
+            }
 
+            return referencedType.Schema ?? schema;
+        }
+        internal void FinializeSchema()
+        {
+            // Ensure Schema's have been fully generated for all referenced types
+            foreach (var typeMapping in _referencedTypes.Where(t => t.Value.Schema == null).ToArray())
+            {
+                var schemaInfo = typeMapping.Value;
                 schemaInfo.Schema = CreateDefinitionSchema(typeMapping.Key);
                 Definitions.Add(schemaInfo.SchemaId, schemaInfo.Schema);
             }
-
-            return schema;
         }
 
         public IDictionary<string, Schema> Definitions { get; private set; }
