@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 using System.Reflection;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 
 namespace Swashbuckle.Swagger
@@ -9,7 +10,7 @@ namespace Swashbuckle.Swagger
     {
         public static bool IsRequired(this JsonProperty jsonProperty)
         {
-            return jsonProperty.HasAttribute<RequiredAttribute>();
+            return jsonProperty.HasAttribute<RequiredAttribute>() || jsonProperty.Required == Required.Always;
         }
 
         public static bool IsObsolete(this JsonProperty jsonProperty)
