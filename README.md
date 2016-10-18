@@ -503,6 +503,7 @@ If you're using the existing configuration API to customize the final Swagger do
 5. [How to add vendor extensions](#how-to-add-vendor-extensions)
 6. [FromUri Query string DataMember names are incorrect](#fromuri-query-string-datamember-names-are-incorrect)
 7. [Remove Duplicate Path Parameters](#remove-duplicate-path-parameters)
+8. [Deploying behind Load Balancer / Reverse Proxies](#deploying-behind-load-balancer-/-reverse-proxies)
 
 ### Swagger-ui showing "Can't read swagger JSON from ..."
 
@@ -653,3 +654,7 @@ public class ComplexTypeOperationFilter : IOperationFilter
     }
 }
 ```
+
+### Deploying behind Load Balancer / Reverse Proxies ###
+
+Swashbuckle attempts to populate the [Swagger "host"](http://swagger.io/specification/#swaggerObject) property from HTTP headers that are sent with the request for Swagger JSON. This may cause issues in load balancer / reverse proxy environments, particularly if non-standard headers are used to pass on the outer most host name. You can workaround this by providing your own function for determining your API's root URL based on vendor-specific headers. Checkout #705 for some potential implementations.
