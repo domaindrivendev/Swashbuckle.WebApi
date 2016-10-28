@@ -101,6 +101,7 @@ namespace Swashbuckle.Application
 
         public void CustomAsset(string path, Assembly resourceAssembly, string resourceName, bool isTemplate = false)
         {
+            if (path == "index") isTemplate = true;
             _pathToAssetMap[path] = new EmbeddedAssetDescriptor(resourceAssembly, resourceName, isTemplate);
         }
 
