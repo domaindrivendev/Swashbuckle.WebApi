@@ -99,6 +99,50 @@ namespace Swashbuckle.Tests.Swagger
         }
 
         [Test]
+        public void It_provides_validation_properties_for_metadata_annotated_types() {
+            SetUpDefaultRouteFor<MetadataAnnotatedTypesController>();
+
+            var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/v1");
+            var definitions = swagger["definitions"];
+            Assert.IsNotNull(definitions);
+
+            var expected = JObject.FromObject(new {
+                PaymentWithMetadata = new {
+                    required = new string[] { "Amount", "CardNumber", "ExpMonth", "ExpYear" },
+                    type = "object",
+                    properties = new {
+                        Amount = new {
+                            format = "double",
+                            type = "number",
+                        },
+                        CardNumber = new {
+                            pattern = "^[3-6]?\\d{12,15}$",
+                            type = "string"
+                        },
+                        ExpMonth = new {
+                            format = "int32",
+                            maximum = 12,
+                            minimum = 1,
+                            type = "integer",
+                        },
+                        ExpYear = new {
+                            format = "int32",
+                            maximum = 99,
+                            minimum = 14,
+                            type = "integer",
+                        },
+                        Note = new {
+                            maxLength = 500,
+                            minLength = 10,
+                            type = "string"
+                        }
+                    }
+                }
+            });
+            Assert.AreEqual(expected.ToString(), definitions.ToString());
+        }
+
+        [Test]
         public void It_provides_validation_properties_for_annotated_types()
         {
             SetUpDefaultRouteFor<AnnotatedTypesController>();
