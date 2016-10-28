@@ -244,13 +244,6 @@ namespace Swashbuckle.Application
                 ? _securitySchemeBuilders.ToDictionary(kvp => kvp.Key, kvp => kvp.Value.Build())
                 : null;
 
-            foreach (var xmlDocFactory in _xmlDocFactories)
-            {
-                var xmlDoc = xmlDocFactory();
-                _operationFilters.Add(() => new ApplyXmlActionComments(xmlDoc));
-                _modelFilters.Add(() => new ApplyXmlTypeComments(xmlDoc));
-            }
-
             var options = new SwaggerGeneratorOptions(
                 versionSupportResolver: _versionSupportResolver,
                 schemes: _schemes,
@@ -260,13 +253,13 @@ namespace Swashbuckle.Application
                 groupingKeyComparer: _groupingKeyComparer,
                 customSchemaMappings: _customSchemaMappings,
                 schemaFilters: _schemaFilters.Select(factory => factory()),
-                modelFilters: _modelFilters.Select(factory => factory()),
+                modelFilters: GetModelFilters(),
                 ignoreObsoleteProperties: _ignoreObsoleteProperties,
                 schemaIdSelector: _schemaIdSelector,
                 describeAllEnumsAsStrings: _describeAllEnumsAsStrings,
                 describeStringEnumsInCamelCase: _describeStringEnumsInCamelCase,
                 applyFiltersToAllSchemas: _applyFiltersToAllSchemas,
-                operationFilters: _operationFilters.Select(factory => factory()),
+                operationFilters: GetOperationFilters(),
                 documentFilters: _documentFilters.Select(factory => factory()),
                 conflictingActionsResolver: _conflictingActionsResolver
             );
@@ -313,6 +306,22 @@ namespace Swashbuckle.Application
         {
             IEnumerable<string> list;
             return request.Headers.TryGetValues(headerName, out list) ? list.FirstOrDefault() : null;
+        }
+
+        private IEnumerable<IOperationFilter> GetOperationFilters()
+        {
+            return _xmlDocFactories
+                .Select(xmlFactory => new ApplyXmlActionComments(xmlFactory()))
+                .Concat(_operationFilters
+                    .Select(filterFactory => filterFactory()));
+        }
+
+        private IEnumerable<IModelFilter> GetModelFilters()
+        {
+            return _xmlDocFactories
+                .Select(xmlFactory => new ApplyXmlTypeComments(xmlFactory()))
+                .Concat(_modelFilters
+                    .Select(filterFactory => filterFactory()));
         }
     }
 }

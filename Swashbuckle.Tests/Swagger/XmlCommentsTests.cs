@@ -6,6 +6,7 @@ using System.Net.Http;
 using Swashbuckle.Application;
 using Swashbuckle.Dummy.Controllers;
 using Swashbuckle.Tests.Swagger;
+using Swashbuckle.Dummy.SwaggerExtensions;
 
 namespace Swashbuckle.Tests.Swagger
 {
@@ -22,7 +23,7 @@ namespace Swashbuckle.Tests.Swagger
         {
             SetUpAttributeRoutesFrom(typeof(XmlAnnotatedController).Assembly);
             SetUpDefaultRouteFor<XmlAnnotatedController>();
-            SetUpHandler(c => c.IncludeXmlComments(String.Format(@"{0}\XmlComments.xml", AppDomain.CurrentDomain.BaseDirectory)));
+            SetUpHandler(IncludeXmlComments);
         }
 
         [Test]
@@ -207,6 +208,25 @@ namespace Swashbuckle.Tests.Swagger
             var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/v1");
             var valueProperty = swagger["definitions"]["Reward[String]"]["properties"]["value"];
             Assert.IsNull(valueProperty["description"]);
+        }
+
+        [Test]
+        public void It_does_not_clear_previously_added_responses()
+        {
+            SetUpHandler(c =>
+            {
+                IncludeXmlComments(c);
+                c.OperationFilter<InternalServerErrorResponseOperationFilter>();
+            });
+
+            var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/v1");
+            var responsesProperty = swagger["paths"]["/xmlannotated"]["post"]["responses"];
+            Assert.IsNotNull(responsesProperty["500"]);
+        }
+
+        private void IncludeXmlComments(SwaggerDocsConfig config)
+        {
+            config.IncludeXmlComments(String.Format(@"{0}\XmlComments.xml", AppDomain.CurrentDomain.BaseDirectory));
         }
     }
 }
