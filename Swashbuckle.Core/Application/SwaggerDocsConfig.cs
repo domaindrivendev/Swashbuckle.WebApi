@@ -247,8 +247,8 @@ namespace Swashbuckle.Application
             foreach (var xmlDocFactory in _xmlDocFactories)
             {
                 var xmlDoc = xmlDocFactory();
-                _operationFilters.Add(() => new ApplyXmlActionComments(xmlDoc));
-                _modelFilters.Add(() => new ApplyXmlTypeComments(xmlDoc));
+                _operationFilters.Insert(0, () => new ApplyXmlActionComments(xmlDoc));
+                _modelFilters.Insert(0, () => new ApplyXmlTypeComments(xmlDoc));
             }
 
             var options = new SwaggerGeneratorOptions(
