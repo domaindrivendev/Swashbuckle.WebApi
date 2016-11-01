@@ -150,7 +150,7 @@ namespace Swashbuckle.Application
         }
 
         // NOTE: In next major version, ModelFilter will completely replace SchemaFilter
-        internal  void ModelFilter<TFilter>()
+        internal void ModelFilter<TFilter>()
             where TFilter : IModelFilter, new()
         {
             ModelFilter(() => new TFilter());
@@ -244,6 +244,17 @@ namespace Swashbuckle.Application
                 ? _securitySchemeBuilders.ToDictionary(kvp => kvp.Key, kvp => kvp.Value.Build())
                 : null;
 
+            // NOTE: Instantiate & add the XML comments filters here so they're executed before any
+            // custom filters AND so they can share the same XPathDocument (perf. optimization)
+            var modelFilters = _modelFilters.Select(factory => factory()).ToList();
+            var operationFilters = _operationFilters.Select(factory => factory()).ToList();
+            foreach (var xmlDocFactory in _xmlDocFactories)
+            {
+                var xmlDoc = xmlDocFactory();
+                modelFilters.Insert(0, new ApplyXmlTypeComments(xmlDoc));
+                operationFilters.Insert(0, new ApplyXmlActionComments(xmlDoc));
+            }
+
             var options = new SwaggerGeneratorOptions(
                 versionSupportResolver: _versionSupportResolver,
                 schemes: _schemes,
@@ -253,13 +264,13 @@ namespace Swashbuckle.Application
                 groupingKeyComparer: _groupingKeyComparer,
                 customSchemaMappings: _customSchemaMappings,
                 schemaFilters: _schemaFilters.Select(factory => factory()),
-                modelFilters: GetModelFilters(),
+                modelFilters: modelFilters,
                 ignoreObsoleteProperties: _ignoreObsoleteProperties,
                 schemaIdSelector: _schemaIdSelector,
                 describeAllEnumsAsStrings: _describeAllEnumsAsStrings,
                 describeStringEnumsInCamelCase: _describeStringEnumsInCamelCase,
                 applyFiltersToAllSchemas: _applyFiltersToAllSchemas,
-                operationFilters: GetOperationFilters(),
+                operationFilters: operationFilters,
                 documentFilters: _documentFilters.Select(factory => factory()),
                 conflictingActionsResolver: _conflictingActionsResolver
             );
@@ -306,22 +317,6 @@ namespace Swashbuckle.Application
         {
             IEnumerable<string> list;
             return request.Headers.TryGetValues(headerName, out list) ? list.FirstOrDefault() : null;
-        }
-
-        private IEnumerable<IOperationFilter> GetOperationFilters()
-        {
-            return _xmlDocFactories
-                .Select(xmlFactory => new ApplyXmlActionComments(xmlFactory()))
-                .Concat(_operationFilters
-                    .Select(filterFactory => filterFactory()));
-        }
-
-        private IEnumerable<IModelFilter> GetModelFilters()
-        {
-            return _xmlDocFactories
-                .Select(xmlFactory => new ApplyXmlTypeComments(xmlFactory()))
-                .Concat(_modelFilters
-                    .Select(filterFactory => filterFactory()));
         }
     }
 }
