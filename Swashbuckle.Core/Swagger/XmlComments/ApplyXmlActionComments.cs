@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using System.Web.Http;
 using System.Web.Http.Controllers;
@@ -105,6 +106,53 @@ namespace Swashbuckle.Swagger.XmlComments
                 .FirstOrDefault();
 
             return (fromUriAttribute != null && fromUriAttribute.Name == name);
+        }
+    }
+
+    public class ApplyXmlResourceComments : IDocumentFilter
+    {
+        private const string RemarksXPath = "remarks";
+
+        private readonly XPathDocument _xmlDoc;
+
+        public ApplyXmlResourceComments(string filePath)
+            : this(new XPathDocument(filePath)) { }
+
+        public ApplyXmlResourceComments(XPathDocument xmlDoc)
+        {
+            _xmlDoc = xmlDoc;
+        }
+
+        public void Apply(SwaggerDocument swaggerDoc, SchemaRegistry schemaRegistry, IApiExplorer apiExplorer)
+        {
+            XPathNavigator navigator;
+            lock (_xmlDoc)
+            {
+                navigator = _xmlDoc.CreateNavigator();
+            }
+
+            foreach (var tag in GetTags(apiExplorer, navigator))
+            {
+                if (swaggerDoc.tags == null)
+                {
+                    swaggerDoc.tags = new List<Tag>();
+                }
+
+                if(swaggerDoc.tags.Any(t => t.name == tag.name)) continue;
+
+                swaggerDoc.tags.Add(tag);
+            }
+        }
+
+        private IEnumerable<Tag> GetTags(IApiExplorer apiExplorer, XPathNavigator navigator)
+        {
+            foreach (var controllerDesc in apiExplorer.ApiDescriptions.Select(a => a.ActionDescriptor.ControllerDescriptor))
+            {
+                var controllerNode = navigator.SelectSingleNode($"/doc/members/member[@name=\"T:{controllerDesc.ControllerType}\"]");
+                var remarksNode = controllerNode?.SelectSingleNode(RemarksXPath);
+                if(remarksNode == null) continue;
+                yield return new Tag{ name = controllerDesc.ControllerName, description = remarksNode.Value};
+            }
         }
     }
 }

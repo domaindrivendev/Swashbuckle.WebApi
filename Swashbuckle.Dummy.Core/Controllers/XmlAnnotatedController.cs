@@ -5,6 +5,10 @@ using Newtonsoft.Json;
 
 namespace Swashbuckle.Dummy.Controllers
 {
+    /// <summary>
+    /// Xml Annotated Controller />.
+    /// </summary>
+    /// <remarks>Test tags on xml annotated controller</remarks>
     [RoutePrefix("xmlannotated")]
     public class XmlAnnotatedController : ApiController
     {

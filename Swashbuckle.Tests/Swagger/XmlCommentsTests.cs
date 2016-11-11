@@ -162,6 +162,19 @@ namespace Swashbuckle.Tests.Swagger
         }
 
         [Test]
+        public void It_documents_schema_tags_from_controller_remarks_tags()
+        {
+            Configuration.Routes.Clear();
+            SetUpCustomRouteFor<XmlAnnotatedController>("XmlAnnotated/{id}/{action}");
+
+            var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/v1");
+            var tags = swagger["tags"];
+            Assert.IsNotNull(tags[0]);
+            Assert.AreEqual("XmlAnnotated", tags[0]["name"].ToString());
+            Assert.AreEqual("Test tags on xml annotated controller", tags[0]["description"].ToString());
+        }
+
+        [Test]
         public void It_handles_actions_with_array_of_generic_parameters()
         {
             var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/v1");
