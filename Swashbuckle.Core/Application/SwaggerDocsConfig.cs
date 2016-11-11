@@ -248,11 +248,13 @@ namespace Swashbuckle.Application
             // custom filters AND so they can share the same XPathDocument (perf. optimization)
             var modelFilters = _modelFilters.Select(factory => factory()).ToList();
             var operationFilters = _operationFilters.Select(factory => factory()).ToList();
+            var documentFilters = _documentFilters.Select(factory => factory()).ToList();
             foreach (var xmlDocFactory in _xmlDocFactories)
             {
                 var xmlDoc = xmlDocFactory();
                 modelFilters.Insert(0, new ApplyXmlTypeComments(xmlDoc));
                 operationFilters.Insert(0, new ApplyXmlActionComments(xmlDoc));
+                documentFilters.Insert(0, new ApplyXmlResourceComments(xmlDoc));
             }
 
             var options = new SwaggerGeneratorOptions(
@@ -271,7 +273,7 @@ namespace Swashbuckle.Application
                 describeStringEnumsInCamelCase: _describeStringEnumsInCamelCase,
                 applyFiltersToAllSchemas: _applyFiltersToAllSchemas,
                 operationFilters: operationFilters,
-                documentFilters: _documentFilters.Select(factory => factory()),
+                documentFilters: documentFilters,
                 conflictingActionsResolver: _conflictingActionsResolver
             );
 
