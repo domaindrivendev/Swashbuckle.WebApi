@@ -2,7 +2,7 @@
 
 namespace Swashbuckle.Swagger
 {
-    public interface ISwaggerObject
+    public interface IExtensible
     {
         Dictionary<string, object> vendorExtensions { get; set; }
     }

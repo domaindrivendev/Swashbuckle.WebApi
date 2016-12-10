@@ -13,7 +13,7 @@ namespace Swashbuckle.Application
     {
         public override bool CanConvert(Type objectType)
         {
-            return objectType.GetInterface(nameof(ISwaggerObject)) != null;
+            return objectType.GetInterface(nameof(IExtensible)) != null;
         }
 
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
@@ -22,9 +22,9 @@ namespace Swashbuckle.Application
             var instance = Activator.CreateInstance(objectType);
             serializer.Populate(jObject.CreateReader(), instance);
 
-            if (objectType.GetInterface(nameof(ISwaggerObject)) != null)
+            if (objectType.GetInterface(nameof(IExtensible)) != null)
             {
-                var swaggerObject = instance as ISwaggerObject;
+                var swaggerObject = instance as IExtensible;
                 foreach (var property in jObject.Properties().Where(p => p.Name.StartsWith("x-")))
                 {
                     swaggerObject.vendorExtensions.Add(property.Name, property.Value);
@@ -41,13 +41,14 @@ namespace Swashbuckle.Application
 
             writer.WriteStartObject();
 
+            var isIExtensible = value?.GetType().GetInterface(nameof(IExtensible)) != null;
             foreach (var jsonProp in jsonContract.Properties) 
             {
                 var propValue = jsonProp.ValueProvider.GetValue(value);
                 if (propValue == null && serializer.NullValueHandling == NullValueHandling.Ignore)
                     continue;
 
-                if (jsonProp.PropertyName == "vendorExtensions")
+                if (isIExtensible && jsonProp.PropertyName == "vendorExtensions")
                 {
                     var vendorExtensions = (IDictionary<string, object>)propValue;
                     if (vendorExtensions.Any()) 

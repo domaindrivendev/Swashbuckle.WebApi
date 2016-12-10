@@ -4,7 +4,7 @@ using Newtonsoft.Json;
 
 namespace Swashbuckle.Swagger
 {
-    public class SwaggerDocument : ISwaggerObject
+    public class SwaggerDocument : IExtensible
     {
         public readonly string swagger = "2.0";
 
@@ -39,7 +39,7 @@ namespace Swashbuckle.Swagger
         public Dictionary<string, object> vendorExtensions { get; set; } = new Dictionary<string, object>();
     }
 
-    public class Info : ISwaggerObject
+    public class Info : IExtensible
     {
         public string version;
 
@@ -72,7 +72,7 @@ namespace Swashbuckle.Swagger
         public string url;
     }
 
-    public class PathItem : ISwaggerObject
+    public class PathItem : IExtensible
     {
         [JsonProperty("$ref")]
         public string @ref;
@@ -96,7 +96,7 @@ namespace Swashbuckle.Swagger
         public Dictionary<string, object> vendorExtensions { get; set; } = new Dictionary<string, object>();
     }
 
-    public class Operation : ISwaggerObject
+    public class Operation : IExtensible
     {
         public IList<string> tags;
 
@@ -125,7 +125,7 @@ namespace Swashbuckle.Swagger
         public Dictionary<string, object> vendorExtensions { get; set; } = new Dictionary<string, object>();
     }
 
-    public class Tag : ISwaggerObject
+    public class Tag : IExtensible
     {
         public string name;
 
@@ -159,7 +159,7 @@ namespace Swashbuckle.Swagger
         public Schema schema;
     }
 
-    public class Schema : ISwaggerObject
+    public class Schema : IExtensible
     {
         [JsonProperty("$ref")]
         public string @ref;
@@ -225,7 +225,7 @@ namespace Swashbuckle.Swagger
         public Dictionary<string, object> vendorExtensions { get; set; } = new Dictionary<string, object>();
     }
 
-    public class PartialSchema : ISwaggerObject
+    public class PartialSchema : IExtensible
     {
         public string type;
 
@@ -264,7 +264,7 @@ namespace Swashbuckle.Swagger
         public Dictionary<string, object> vendorExtensions { get; set; } = new Dictionary<string, object>();
     }
 
-    public class Response : ISwaggerObject
+    public class Response : IExtensible
     {
         public string description;
 
@@ -295,7 +295,7 @@ namespace Swashbuckle.Swagger
         public bool? wrapped;
     }
 
-    public class SecurityScheme : ISwaggerObject
+    public class SecurityScheme : IExtensible
     {
         public string type;
 
