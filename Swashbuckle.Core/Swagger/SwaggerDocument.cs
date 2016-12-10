@@ -4,7 +4,7 @@ using Newtonsoft.Json;
 
 namespace Swashbuckle.Swagger
 {
-    public class SwaggerDocument
+    public class SwaggerDocument : ISwaggerObject
     {
         public readonly string swagger = "2.0";
 
@@ -36,10 +36,10 @@ namespace Swashbuckle.Swagger
 
         public ExternalDocs externalDocs;
 
-        public Dictionary<string, object> vendorExtensions = new Dictionary<string, object>();
+        public Dictionary<string, object> vendorExtensions { get; set; } = new Dictionary<string, object>();
     }
 
-    public class Info
+    public class Info : ISwaggerObject
     {
         public string version;
 
@@ -53,7 +53,7 @@ namespace Swashbuckle.Swagger
 
         public License license;
 
-        public Dictionary<string, object> vendorExtensions = new Dictionary<string, object>();
+        public Dictionary<string, object> vendorExtensions { get; set; } = new Dictionary<string, object>();
     }
 
     public class Contact
@@ -72,7 +72,7 @@ namespace Swashbuckle.Swagger
         public string url;
     }
 
-    public class PathItem
+    public class PathItem : ISwaggerObject
     {
         [JsonProperty("$ref")]
         public string @ref;
@@ -93,10 +93,10 @@ namespace Swashbuckle.Swagger
 
         public IList<Parameter> parameters;
 
-        public Dictionary<string, object> vendorExtensions = new Dictionary<string, object>();
+        public Dictionary<string, object> vendorExtensions { get; set; } = new Dictionary<string, object>();
     }
 
-    public class Operation
+    public class Operation : ISwaggerObject
     {
         public IList<string> tags;
 
@@ -122,10 +122,10 @@ namespace Swashbuckle.Swagger
 
         public IList<IDictionary<string, IEnumerable<string>>> security;
 
-        public Dictionary<string, object> vendorExtensions = new Dictionary<string, object>();
+        public Dictionary<string, object> vendorExtensions { get; set; } = new Dictionary<string, object>();
     }
 
-    public class Tag
+    public class Tag : ISwaggerObject
     {
         public string name;
 
@@ -133,7 +133,7 @@ namespace Swashbuckle.Swagger
 
         public ExternalDocs externalDocs;
 
-        public Dictionary<string, object> vendorExtensions = new Dictionary<string, object>();
+        public Dictionary<string, object> vendorExtensions { get; set; } = new Dictionary<string, object>();
     }
 
     public class ExternalDocs
@@ -159,7 +159,7 @@ namespace Swashbuckle.Swagger
         public Schema schema;
     }
 
-    public class Schema
+    public class Schema : ISwaggerObject
     {
         [JsonProperty("$ref")]
         public string @ref;
@@ -222,10 +222,10 @@ namespace Swashbuckle.Swagger
 
         public object example;
 
-        public Dictionary<string, object> vendorExtensions = new Dictionary<string, object>();
+        public Dictionary<string, object> vendorExtensions { get; set; } = new Dictionary<string, object>();
     }
 
-    public class PartialSchema
+    public class PartialSchema : ISwaggerObject
     {
         public string type;
 
@@ -261,10 +261,10 @@ namespace Swashbuckle.Swagger
 
         public int? multipleOf;
 
-        public Dictionary<string, object> vendorExtensions = new Dictionary<string, object>();
+        public Dictionary<string, object> vendorExtensions { get; set; } = new Dictionary<string, object>();
     }
 
-    public class Response
+    public class Response : ISwaggerObject
     {
         public string description;
 
@@ -274,7 +274,7 @@ namespace Swashbuckle.Swagger
 
         public object examples;
 
-        public Dictionary<string, object> vendorExtensions = new Dictionary<string, object>();
+        public Dictionary<string, object> vendorExtensions { get; set; } = new Dictionary<string, object>();
     }
 
     public class Header : PartialSchema
@@ -295,7 +295,7 @@ namespace Swashbuckle.Swagger
         public bool? wrapped;
     }
 
-    public class SecurityScheme
+    public class SecurityScheme : ISwaggerObject
     {
         public string type;
 
@@ -313,6 +313,6 @@ namespace Swashbuckle.Swagger
 
         public IDictionary<string, string> scopes;
 
-        public Dictionary<string, object> vendorExtensions = new Dictionary<string, object>();
+        public Dictionary<string, object> vendorExtensions { get; set; } = new Dictionary<string, object>();
     }
 }

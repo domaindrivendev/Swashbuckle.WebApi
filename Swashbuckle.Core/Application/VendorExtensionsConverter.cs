@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Newtonsoft.Json.Serialization;
 using Swashbuckle.Swagger;
 
@@ -12,12 +13,26 @@ namespace Swashbuckle.Application
     {
         public override bool CanConvert(Type objectType)
         {
-            return objectType.GetField("vendorExtensions") != null;
+            return objectType.GetInterface(nameof(ISwaggerObject)) != null;
         }
 
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
         {
-            throw new NotImplementedException();
+            var jObject = JObject.Load(reader);
+            var instance = Activator.CreateInstance(objectType);
+            serializer.Populate(jObject.CreateReader(), instance);
+
+            if (objectType.GetInterface(nameof(ISwaggerObject)) != null)
+            {
+                var swaggerObject = instance as ISwaggerObject;
+                foreach (var property in jObject.Properties().Where(p => p.Name.StartsWith("x-")))
+                {
+                    swaggerObject.vendorExtensions.Add(property.Name, property.Value);
+                }
+                return swaggerObject;
+            }
+
+            return instance;
         }
 
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
