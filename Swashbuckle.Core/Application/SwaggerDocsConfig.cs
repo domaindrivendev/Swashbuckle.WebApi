@@ -263,7 +263,7 @@ namespace Swashbuckle.Application
                 groupingKeySelector: _groupingKeySelector,
                 groupingKeyComparer: _groupingKeyComparer,
                 customSchemaMappings: _customSchemaMappings,
-                schemaFilters: _schemaFilters.Select(factory => factory()),
+                schemaFilters: _schemaFilters.Select(factory => factory()).ToList(),
                 modelFilters: modelFilters,
                 ignoreObsoleteProperties: _ignoreObsoleteProperties,
                 schemaIdSelector: _schemaIdSelector,
@@ -271,7 +271,7 @@ namespace Swashbuckle.Application
                 describeStringEnumsInCamelCase: _describeStringEnumsInCamelCase,
                 applyFiltersToAllSchemas: _applyFiltersToAllSchemas,
                 operationFilters: operationFilters,
-                documentFilters: _documentFilters.Select(factory => factory()),
+                documentFilters: _documentFilters.Select(factory => factory()).ToList(),
                 conflictingActionsResolver: _conflictingActionsResolver
             );
 
