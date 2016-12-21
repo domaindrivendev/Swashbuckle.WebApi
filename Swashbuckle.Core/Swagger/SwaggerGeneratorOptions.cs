@@ -22,6 +22,7 @@ namespace Swashbuckle.Swagger
             bool describeAllEnumsAsStrings = false,
             bool describeStringEnumsInCamelCase = false,
             bool applyFiltersToAllSchemas = false,
+            bool mergeDuplicateSchemas = false,
             IEnumerable<IOperationFilter> operationFilters = null,
             IEnumerable<IDocumentFilter> documentFilters = null,
             Func<IEnumerable<ApiDescription>, ApiDescription> conflictingActionsResolver = null
@@ -41,6 +42,7 @@ namespace Swashbuckle.Swagger
             DescribeAllEnumsAsStrings = describeAllEnumsAsStrings;
             DescribeStringEnumsInCamelCase = describeStringEnumsInCamelCase;
             ApplyFiltersToAllSchemas = applyFiltersToAllSchemas;
+            MergeDuplicateSchemas = mergeDuplicateSchemas;
             OperationFilters = operationFilters ?? new List<IOperationFilter>();
             DocumentFilters = documentFilters ?? new List<IDocumentFilter>();
             ConflictingActionsResolver = conflictingActionsResolver ?? DefaultConflictingActionsResolver;
@@ -73,6 +75,8 @@ namespace Swashbuckle.Swagger
         public bool DescribeStringEnumsInCamelCase { get; private set; }
 
         public bool ApplyFiltersToAllSchemas { get; private set; }
+
+        public bool MergeDuplicateSchemas { get; private set; }
 
         public IEnumerable<IOperationFilter> OperationFilters { get; private set; }
 

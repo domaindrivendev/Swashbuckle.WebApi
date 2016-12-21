@@ -27,10 +27,12 @@ namespace Swashbuckle.Swagger
         private readonly bool _describeAllEnumsAsStrings;
         private readonly bool _describeStringEnumsInCamelCase;
         private readonly bool _applyFiltersToAllSchemas;
+        private readonly bool _mergeDuplicateSchemas;
 
         private readonly IContractResolver _contractResolver;
 
         private IDictionary<Type, WorkItem> _workItems;
+
         private class WorkItem
         {
             public string SchemaId;
@@ -47,7 +49,8 @@ namespace Swashbuckle.Swagger
             Func<Type, string> schemaIdSelector,
             bool describeAllEnumsAsStrings,
             bool describeStringEnumsInCamelCase,
-            bool applyFiltersToAllSchemas)
+            bool applyFiltersToAllSchemas,
+            bool mergeDuplicateSchemas)
         {
             _jsonSerializerSettings = jsonSerializerSettings;
             _customSchemaMappings = customSchemaMappings;
@@ -58,6 +61,7 @@ namespace Swashbuckle.Swagger
             _describeAllEnumsAsStrings = describeAllEnumsAsStrings;
             _describeStringEnumsInCamelCase = describeStringEnumsInCamelCase;
             _applyFiltersToAllSchemas = applyFiltersToAllSchemas;
+            _mergeDuplicateSchemas = mergeDuplicateSchemas;
 
             _contractResolver = jsonSerializerSettings.ContractResolver ?? new DefaultContractResolver();
             _workItems = new Dictionary<Type, WorkItem>();
@@ -76,7 +80,8 @@ namespace Swashbuckle.Swagger
 
                 workItem.InProgress = true;
                 workItem.Schema = CreateDefinitionSchema(typeMapping.Key);
-                Definitions.Add(workItem.SchemaId, workItem.Schema);
+                if (!Definitions.ContainsKey(workItem.SchemaId))
+                    Definitions.Add(workItem.SchemaId, workItem.Schema);
                 workItem.InProgress = false;
             }
 
@@ -260,7 +265,7 @@ namespace Swashbuckle.Swagger
             if (!_workItems.ContainsKey(type))
             {
                 var schemaId = _schemaIdSelector(type); 
-                if (_workItems.Any(entry => entry.Value.SchemaId == schemaId))
+                if (!_mergeDuplicateSchemas && _workItems.Any(entry => entry.Value.SchemaId == schemaId))
                 {
                     var conflictingType = _workItems.First(entry => entry.Value.SchemaId == schemaId).Key;
                     throw new InvalidOperationException(String.Format(
