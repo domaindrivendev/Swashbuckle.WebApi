@@ -34,6 +34,11 @@
 
   <script type="text/javascript">
     $(function () {
+      
+      //if cache is false, jQuery's getScript function adds a timestamp as postfix to all script URLs, which causes a MappingNotFound exception.
+      $.ajaxSetup({
+        cache: true
+      });
 
       // Get Swashbuckle config into JavaScript
       function arrayFrom(configString) {
