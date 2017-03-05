@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Diagnostics;
 using System.Dynamic;
 using System.Linq;
 using System.Net.Http;
@@ -175,26 +176,33 @@ namespace Swashbuckle.Swagger
             var stringEnumConverter = primitiveContract.Converter as StringEnumConverter
                 ?? _jsonSerializerSettings.Converters.OfType<StringEnumConverter>().FirstOrDefault();
 
-            if (_describeAllEnumsAsStrings || stringEnumConverter != null)
-            {
-                var camelCase = _describeStringEnumsInCamelCase
+            var camelCase = _describeStringEnumsInCamelCase
                     || (stringEnumConverter != null && stringEnumConverter.CamelCaseText);
 
-                return new Schema
-                {
-                    type = "string",
-                    @enum = camelCase
-                        ? type.GetEnumNamesForSerialization().Select(name => name.ToCamelCase()).ToArray()
-                        : type.GetEnumNamesForSerialization()
-                };
-            }
-            
-            return new Schema
+            var textEnumSchema = new Schema
+            {
+                type = "string",
+                @enum = camelCase
+                       ? type.GetEnumNamesForSerialization().Select(name => name.ToCamelCase()).ToArray()
+                       : type.GetEnumNamesForSerialization()
+            };
+
+            var intEnumSchema = new Schema
             {
                 type = "integer",
                 format = "int32",
                 @enum = type.GetEnumValues().Cast<object>().ToArray()
             };
+
+            if (_describeAllEnumsAsStrings || stringEnumConverter != null)
+            {
+                textEnumSchema.vendorExtensions.Add("x-values", intEnumSchema.@enum);
+                return textEnumSchema;
+            }
+
+            intEnumSchema.vendorExtensions.Add("x-names", textEnumSchema.@enum);
+
+            return intEnumSchema;
         }
 
         private Schema CreateDictionarySchema(JsonDictionaryContract dictionaryContract)

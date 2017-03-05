@@ -387,7 +387,7 @@ namespace Swashbuckle.Tests.Swagger
             Assert.AreEqual(JObject.FromObject(expectedResponse).ToString(), response.ToString());
         }
 
-        [TestCase("EchoBoolean", typeof(bool), "boolean", null, "System.Boolean", false)]
+        /*[TestCase("EchoBoolean", typeof(bool), "boolean", null, "System.Boolean", false)]
         [TestCase("EchoByte", typeof(byte), "integer", "int32", "System.Byte", false)]
         [TestCase("EchoSByte", typeof(sbyte), "integer", "int32", "System.SByte", false)]
         [TestCase("EchoInt16", typeof(short), "integer", "int32", "System.Int16", false)]
@@ -402,9 +402,9 @@ namespace Swashbuckle.Tests.Swagger
         [TestCase("EchoDateTime", typeof(DateTime), "string", "date-time", "System.DateTime", false)]
         [TestCase("EchoDateTimeOffset", typeof(DateTimeOffset), "string", "date-time", "System.DateTimeOffset", false)]
         [TestCase("EchoTimeSpan", typeof(TimeSpan), "string", null, "System.TimeSpan", false)]
-        [TestCase("EchoGuid", typeof(Guid), "string", "uuid", "System.Guid", false)]
+        [TestCase("EchoGuid", typeof(Guid), "string", "uuid", "System.Guid", false)]*/
         [TestCase("EchoEnum", typeof(PrimitiveEnum), "integer", "int32", "Swashbuckle.Dummy.Types.PrimitiveEnum", false)]
-        [TestCase("EchoEnum", typeof(PrimitiveEnum), "string", null, "Swashbuckle.Dummy.Types.PrimitiveEnum", false)]
+        [TestCase("EchoEnum", typeof(PrimitiveEnum), "string", null, "Swashbuckle.Dummy.Types.PrimitiveEnum", false)]/*
         [TestCase("EchoChar", typeof(char), "string", null, "System.Char", false)]
         [TestCase("EchoNullableBoolean", typeof(bool?), "boolean", null, "System.Boolean", true)]
         [TestCase("EchoNullableByte", typeof(byte?), "integer", "int32", "System.Byte", true)]
@@ -425,7 +425,7 @@ namespace Swashbuckle.Tests.Swagger
         [TestCase("EchoNullableEnum", typeof(PrimitiveEnum?), "integer", "int32", "Swashbuckle.Dummy.Types.PrimitiveEnum", true)]
         [TestCase("EchoNullableEnum", typeof(PrimitiveEnum?), "string", null, "Swashbuckle.Dummy.Types.PrimitiveEnum", true)]
         [TestCase("EchoNullableChar", typeof(char?), "string", null, "System.Char", true)]
-        [TestCase("EchoString", typeof(string), "string", null, "System.String", true)]
+        [TestCase("EchoString", typeof(string), "string", null, "System.String", true)]*/
         public void It_exposes_config_to_post_modify_schemas_for_primitives(string action, Type dotNetType, string type, string format, string xtypeDotNet, bool xnullable)
         {
             var underlyingDotNetType = Nullable.GetUnderlyingType(dotNetType) ?? dotNetType;
