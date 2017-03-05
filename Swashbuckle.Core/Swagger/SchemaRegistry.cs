@@ -179,29 +179,45 @@ namespace Swashbuckle.Swagger
             var camelCase = _describeStringEnumsInCamelCase
                     || (stringEnumConverter != null && stringEnumConverter.CamelCaseText);
 
+            string[] names = type.GetEnumNamesForSerialization().ToArray();
+
+            if (camelCase)
+            {
+                names = names.Select(name => name.ToCamelCase()).ToArray();
+            }
+
             var textEnumSchema = new Schema
             {
                 type = "string",
-                @enum = camelCase
-                       ? type.GetEnumNamesForSerialization().Select(name => name.ToCamelCase()).ToArray()
-                       : type.GetEnumNamesForSerialization()
+                @enum = names
             };
+
+            var values = type.GetEnumValues().Cast<int>().ToArray();
 
             var intEnumSchema = new Schema
             {
                 type = "integer",
                 format = "int32",
-                @enum = type.GetEnumValues().Cast<object>().ToArray()
+                @enum = values.Cast<object>().ToArray()
             };
+
+            var namesAndValuesAreSame = textEnumSchema.@enum == intEnumSchema.@enum.Cast<string>();
 
             if (_describeAllEnumsAsStrings || stringEnumConverter != null)
             {
-                textEnumSchema.vendorExtensions.Add("x-values", intEnumSchema.@enum);
+                if (!namesAndValuesAreSame)
+                {
+                    textEnumSchema.vendorExtensions.Add("x-values", intEnumSchema.@enum);
+                }
+
                 return textEnumSchema;
             }
 
-            intEnumSchema.vendorExtensions.Add("x-names", textEnumSchema.@enum);
-
+            if (!namesAndValuesAreSame)
+            {
+                intEnumSchema.vendorExtensions.Add("x-names", textEnumSchema.@enum);
+            }
+            
             return intEnumSchema;
         }
 
