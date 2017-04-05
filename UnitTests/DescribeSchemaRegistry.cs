@@ -1,5 +1,4 @@
-﻿using System;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SchemaGenerator;
 
 namespace UnitTests
@@ -8,11 +7,11 @@ namespace UnitTests
     public class DescribeSchemaRegistry
     {
         [TestMethod]
-        public void TestMethod1()
+        public void ItShouldCreateOneDefinition()
         {
             var sut = new SchemaRegistry();
             var actual = sut.GetOrRegister(typeof(SomeClass));
-            
+            Assert.AreEqual(sut.Definitions.Count, 1);
         }
 
         class SomeClass
