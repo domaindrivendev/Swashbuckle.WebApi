@@ -1,6 +1,6 @@
 :heavy_exclamation_mark::heavy_exclamation_mark::heavy_exclamation_mark: Looking to use Swashbuckle with ASP.NET Core???|
 --------------
-This project and corresponding Nuget packages are specifically for ASP.NET Web API applications. If you're looking to use Swashbuckle with ASP.NET Core, checkout https://github.com/domaindrivendev/Swashbuckle.AspNetCore.|
+This project and corresponding Nuget packages are specifically for ASP.NET Web API applications. If you're looking to use Swashbuckle with ASP.NET Core, checkout [https://github.com/domaindrivendev/Swashbuckle.AspNetCore](https://github.com/domaindrivendev/Swashbuckle.AspNetCore)
 
 Swashbuckle
 =========
