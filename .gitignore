@@ -1,16 +1,5 @@
-[Oo]bj/
-[Bb]in/
-App_Data
-[Pp]ackages
-Logs
-PrecompiledWeb/
+﻿################################################################################
+# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
+################################################################################
 
-_ReSharper.*
-*crunch*
-
-*.user
-*.suo
-*.cache
-*.dotCover
-*.dotsettings
-!*.proj
+/packages
