@@ -1,1 +1,0 @@
-﻿var str2 = 'foobar';
