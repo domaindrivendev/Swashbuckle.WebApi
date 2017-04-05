@@ -477,7 +477,7 @@ This version of Swashbuckle makes the transition to Swagger 2.0. The 2.0 specifi
 If you're using the existing configuration API to customize the final Swagger document and/or swagger-ui, you will need to port the code manually. The static __Customize__ methods on SwaggerSpecConfig and SwaggerUiConfig have been replaced with extension methods on HttpConfiguration - __EnableSwagger__ and __EnableSwaggerUi__. All options from version 4.0 are made available through these methods, albeit with slightly different naming and syntax. Refer to the tables below for a summary of changes:
 
 
-| 4.0 | 5.0 Equivalant | Additional Notes |
+| 4.0 | 5.0 Equivalent | Additional Notes |
 | --------------- | --------------- | ---------------- |
 | ResolveBasePathUsing | RootUrl | |
 | ResolveTargetVersionUsing | N/A | version is now implicit in the docs URL e.g. "swagger/docs/{apiVersion}" |
