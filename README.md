@@ -658,7 +658,7 @@ public class ComplexTypeOperationFilter : IOperationFilter
 
 ### Deploying behind Load Balancer / Reverse Proxies
 
-Swashbuckle attempts to populate the [Swagger "host"](http://swagger.io/specification/#swaggerObject) property from HTTP headers that are sent with the request for Swagger JSON. This may cause issues in load balancer / reverse proxy environments, particularly if non-standard headers are used to pass on the outer most host name. You can workaround this by providing your own function for determining your API's root URL based on vendor-specific headers. Checkout #705 for some potential implementations.
+Swashbuckle attempts to populate the [Swagger "host"](http://swagger.io/specification/#swaggerObject) property from HTTP headers that are sent with the request for Swagger JSON. This may cause issues in load balancer / reverse proxy environments, particularly if non-standard headers are used to pass on the outer most host name. You can workaround this by providing your own function for determining your API's root URL based on vendor-specific headers. Checkout [issue 705](https://github.com/domaindrivendev/Swashbuckle/issues/705) for some potential implementations.
 
 ### 500 : {"Message":"An error has occurred."}
 
