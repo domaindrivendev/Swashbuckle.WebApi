@@ -1,6 +1,6 @@
-:heavy_exclamation_mark::heavy_exclamation_mark::heavy_exclamation_mark: Looking to use Swashbuckle with ASP.NET Core???
---------------
-This project and corresponding Nuget packages are specifically for ASP.NET Web API applications. If you're looking to use Swashbuckle with ASP.NET Core, checkout https://github.com/domaindrivendev/Swashbuckle.AspNetCore
+| :mega: Calling for Maintainers |
+|--------------|
+| With the introduction of [ASP.NET Core](https://www.asp.net/core), I've now shifted my focus to the Core-specific project - [Swashbuckle.AspNetCore](https://github.com/domaindrivendev/Swashbuckle.AspNetCore). That will be receiving most of my (already limited) personal time, and so I won't have the capacity to maintain this one at a sufficient rate. Still, I'd love to see it live on and am seeking one or two "core" contributors / maintainers to help out. Ideally, these would be people who have already contributed through PRs and understand the inner workings and overall design. Once signed-up, we can agree on an approach that works - ultimately, I want to remove myself as the bottleneck to merging PRs and getting fresh Nugets published. If you're interested, please let me know by adding a comment [here](https://github.com/domaindrivendev/Swashbuckle/issues/1053) |
 
 Swashbuckle
 =========
