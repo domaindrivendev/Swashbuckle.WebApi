@@ -23,7 +23,7 @@ Once you have a Web API that can describe itself in Swagger, you've opened the t
 * Out-of-the-box support for leveraging Xml comments
 * Support for describing ApiKey, Basic Auth and OAuth2 schemes ... including UI support for the Implicit OAuth2 flow
 
-**\*Swashbuckle 5.0**
+**Swashbuckle 5.0**
 
 Swashbuckle 5.0 makes the transition to Swagger 2.0. The 2.0 schema is significantly different to its predecessor (1.2) and, as a result, the Swashbuckle config interface has undergone yet another overhaul. Checkout the [transition guide](#transitioning-to-swashbuckle-50) if you're upgrading from a prior version.
 
