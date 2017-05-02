@@ -29,7 +29,7 @@ namespace Swashbuckle.Application
 
             try
             {
-                var swaggerDoc = swaggerProvider.GetSwagger(rootUrl, apiVersion);
+                var swaggerDoc = swaggerProvider.GetSwagger(rootUrl, apiVersion.ToUpper());
                 var content = ContentFor(request, swaggerDoc);
                 return TaskFor(new HttpResponseMessage { Content = content });
             }
@@ -59,7 +59,7 @@ namespace Swashbuckle.Application
                 }
             };
             // NOTE: The custom converter would not be neccessary in Newtonsoft.Json >= 5.0.5 as JsonExtensionData
-            // provides similar functionality. But, need to stick with older version for WebApi 5.0.0 compatibility 
+            // provides similar functionality. But, need to stick with older version for WebApi 5.0.0 compatibility
             return new[] { jsonFormatter };
         }
 
