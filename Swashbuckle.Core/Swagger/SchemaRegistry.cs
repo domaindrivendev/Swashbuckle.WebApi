@@ -1,18 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Dynamic;
-using System.Linq;
-using System.Net.Http;
-using System.Reflection;
-using System.Runtime.Serialization;
-using System.Text;
-using System.Web.Http;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using Newtonsoft.Json.Serialization;
+﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
-using System.Net.Http.Formatting;
+using Newtonsoft.Json.Serialization;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Swashbuckle.Swagger
 {
@@ -95,17 +86,20 @@ namespace Swashbuckle.Swagger
             if (jsonContract is JsonPrimitiveContract)
                 return FilterSchema(CreatePrimitiveSchema((JsonPrimitiveContract)jsonContract), jsonContract);
 
-            if (jsonContract is JsonDictionaryContract dictionaryContract)
+            var dictionaryContract = jsonContract as JsonDictionaryContract;
+            if (dictionaryContract != null)
                 return dictionaryContract.IsSelfReferencing()
                     ? CreateRefSchema(type)
                     : FilterSchema(CreateDictionarySchema(dictionaryContract), jsonContract);
 
-            if (jsonContract is JsonArrayContract arrayContract)
+            var arrayContract = jsonContract as JsonArrayContract;
+            if (arrayContract != null)
                 return arrayContract.IsSelfReferencing()
                     ? CreateRefSchema(type)
                     : FilterSchema(CreateArraySchema(arrayContract), jsonContract);
 
-            if (jsonContract is JsonObjectContract objectContract && !objectContract.IsAmbiguous())
+            var objectContract = jsonContract as JsonObjectContract;
+            if (objectContract != null && !objectContract.IsAmbiguous())
                 return CreateRefSchema(type);
 
             // Fallback to abstract "object"
@@ -185,7 +179,7 @@ namespace Swashbuckle.Swagger
                         : type.GetEnumNamesForSerialization()
                 };
             }
-            
+
             return new Schema
             {
                 type = "integer",
@@ -256,7 +250,7 @@ namespace Swashbuckle.Swagger
         {
             if (!_workItems.ContainsKey(type))
             {
-                var schemaId = _schemaIdSelector(type); 
+                var schemaId = _schemaIdSelector(type);
                 if (_workItems.Any(entry => entry.Value.SchemaId == schemaId))
                 {
                     var conflictingType = _workItems.First(entry => entry.Value.SchemaId == schemaId).Key;
@@ -276,7 +270,8 @@ namespace Swashbuckle.Swagger
         {
             if (schema.type == "object" || _applyFiltersToAllSchemas)
             {
-                if (jsonContract is JsonObjectContract jsonObjectContract)
+                var jsonObjectContract = jsonContract as JsonObjectContract;
+                if (jsonObjectContract != null)
                 {
                     // NOTE: In next major version, _modelFilters will completely replace _schemaFilters
                     var modelFilterContext = new ModelFilterContext(jsonObjectContract.UnderlyingType, jsonObjectContract, this);
