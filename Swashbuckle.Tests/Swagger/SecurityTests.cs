@@ -32,7 +32,7 @@ namespace Swashbuckle.Tests.SwaggerFilters
                         .Description("Basic HTTP Authentication");
                 });
 
-            var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/v1");
+            var swagger = GetContent<JObject>(TEMP_URI.DOCS);
             var securityDefinitions = swagger["securityDefinitions"];
             var expected = JObject.FromObject(new
                 {
@@ -57,7 +57,7 @@ namespace Swashbuckle.Tests.SwaggerFilters
                         .In("header");
                 });
 
-            var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/v1");
+            var swagger = GetContent<JObject>(TEMP_URI.DOCS);
             var securityDefinitions = swagger["securityDefinitions"];
             var expected = JObject.FromObject(new
                 {
@@ -90,7 +90,7 @@ namespace Swashbuckle.Tests.SwaggerFilters
                         });
                 });
 
-            var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/v1");
+            var swagger = GetContent<JObject>(TEMP_URI.DOCS);
             var securityDefinitions = swagger["securityDefinitions"];
             var expected = JObject.FromObject(new
                 {

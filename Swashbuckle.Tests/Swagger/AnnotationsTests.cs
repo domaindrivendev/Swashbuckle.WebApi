@@ -1,9 +1,8 @@
-﻿using System.Collections.Generic;
-using System.Diagnostics;
-using Newtonsoft.Json.Linq;
+﻿using Newtonsoft.Json.Linq;
 using NUnit.Framework;
 using Swashbuckle.Dummy.Controllers;
 using Swashbuckle.Dummy.SwaggerExtensions;
+using System.Collections.Generic;
 
 namespace Swashbuckle.Tests.Swagger
 {
@@ -27,7 +26,7 @@ namespace Swashbuckle.Tests.Swagger
         [Test]
         public void It_assigns_operation_properties_from_swagger_operation_attribute()
         {
-            var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/v1");
+            var swagger = GetContent<JObject>(TEMP_URI.DOCS);
 
             var putOperation = swagger["paths"]["/swaggerannotated/{id}"]["put"];
 
@@ -43,7 +42,7 @@ namespace Swashbuckle.Tests.Swagger
             SetUpDefaultRouteFor<ProductsController>();
             SetUpHandler(c => c.OperationFilter<ApplyResponseVendorExtensions>());
 
-            var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/v1");
+            var swagger = GetContent<JObject>(TEMP_URI.DOCS);
             var xProp = swagger["paths"]["/products"]["get"]["responses"]["200"]["x-foo"];
 
             Assert.IsNotNull(xProp);
@@ -53,7 +52,7 @@ namespace Swashbuckle.Tests.Swagger
         [Test]
         public void It_documents_responses_from_swagger_response_attributes()
         {
-            var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/v1");
+            var swagger = GetContent<JObject>(TEMP_URI.DOCS);
 
             var postResponses = swagger["paths"]["/swaggerannotated"]["post"]["responses"];
             var expected = JObject.FromObject(new Dictionary<string, object>()
@@ -113,7 +112,7 @@ namespace Swashbuckle.Tests.Swagger
         [Test]
         public void It_supports_per_type_filters_via_swagger_schema_filter_attribute()
         {
-            var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/v1");
+            var swagger = GetContent<JObject>(TEMP_URI.DOCS);
 
             var messageExamples = swagger["definitions"]["Message"]["default"];
             var expected = JObject.FromObject(new
@@ -128,7 +127,7 @@ namespace Swashbuckle.Tests.Swagger
         [Test]
         public void It_supports_per_action_filters_via_swagger_operation_filter_attribute()
         {
-            var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/v1");
+            var swagger = GetContent<JObject>(TEMP_URI.DOCS);
 
             var responseExamples = swagger["paths"]["/swaggerannotated/{id}"]["get"]["responses"]["200"]["examples"];
             var expected = JObject.FromObject(new Dictionary<string, object>()

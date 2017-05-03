@@ -95,20 +95,17 @@ namespace Swashbuckle.Swagger
             if (jsonContract is JsonPrimitiveContract)
                 return FilterSchema(CreatePrimitiveSchema((JsonPrimitiveContract)jsonContract), jsonContract);
 
-            var dictionaryContract = jsonContract as JsonDictionaryContract;
-            if (dictionaryContract != null)
+            if (jsonContract is JsonDictionaryContract dictionaryContract)
                 return dictionaryContract.IsSelfReferencing()
                     ? CreateRefSchema(type)
                     : FilterSchema(CreateDictionarySchema(dictionaryContract), jsonContract);
 
-            var arrayContract = jsonContract as JsonArrayContract;
-            if (arrayContract != null)
+            if (jsonContract is JsonArrayContract arrayContract)
                 return arrayContract.IsSelfReferencing()
                     ? CreateRefSchema(type)
                     : FilterSchema(CreateArraySchema(arrayContract), jsonContract);
 
-            var objectContract = jsonContract as JsonObjectContract;
-            if (objectContract != null && !objectContract.IsAmbiguous())
+            if (jsonContract is JsonObjectContract objectContract && !objectContract.IsAmbiguous())
                 return CreateRefSchema(type);
 
             // Fallback to abstract "object"
@@ -279,8 +276,7 @@ namespace Swashbuckle.Swagger
         {
             if (schema.type == "object" || _applyFiltersToAllSchemas)
             {
-                var jsonObjectContract = jsonContract as JsonObjectContract;
-                if (jsonObjectContract != null)
+                if (jsonContract is JsonObjectContract jsonObjectContract)
                 {
                     // NOTE: In next major version, _modelFilters will completely replace _schemaFilters
                     var modelFilterContext = new ModelFilterContext(jsonObjectContract.UnderlyingType, jsonObjectContract, this);
