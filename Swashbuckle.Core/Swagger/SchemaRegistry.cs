@@ -188,7 +188,7 @@ namespace Swashbuckle.Swagger
                         : type.GetEnumNamesForSerialization()
                 };
             }
-            
+
             return new Schema
             {
                 type = "integer",
@@ -208,7 +208,7 @@ namespace Swashbuckle.Swagger
                 {
                     type = "object",
                     properties = Enum.GetNames(keyType).ToDictionary(
-                        (name) => dictionaryContract.PropertyNameResolver(name),
+                        (name) => dictionaryContract.DictionaryKeyResolver(name),
                         (name) => CreateInlineSchema(valueType)
                     )
                 };
@@ -259,7 +259,7 @@ namespace Swashbuckle.Swagger
         {
             if (!_workItems.ContainsKey(type))
             {
-                var schemaId = _schemaIdSelector(type); 
+                var schemaId = _schemaIdSelector(type);
                 if (_workItems.Any(entry => entry.Value.SchemaId == schemaId))
                 {
                     var conflictingType = _workItems.First(entry => entry.Value.SchemaId == schemaId).Key;

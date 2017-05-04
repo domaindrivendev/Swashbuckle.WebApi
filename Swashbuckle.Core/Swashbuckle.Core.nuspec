@@ -14,6 +14,7 @@
     <tags>Swagger SwaggerUi Documentation Discovery Help WebApi AspNet AspNetWebApi Docs SelfHost OWIN</tags>
     <dependencies>
       <dependency id="Microsoft.AspNet.WebApi.Core" version="4.0.20710" />
+      <dependency id="Newtonsoft.Json" version="7.0.1" />
     </dependencies>
   </metadata>
 </package>
