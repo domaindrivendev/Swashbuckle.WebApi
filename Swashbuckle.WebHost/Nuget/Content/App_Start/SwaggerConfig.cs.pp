@@ -248,6 +248,8 @@ namespace $rootnamespace$
         {
             public void Apply(SwaggerDocument swaggerDoc, SchemaRegistry schemaRegistry, IApiExplorer apiExplorer)
             {
+                // Include the given data type in the final SwaggerDocument
+                //
                 //schemaRegistry.GetOrRegister(typeof(ExtraType));
             }
         }
