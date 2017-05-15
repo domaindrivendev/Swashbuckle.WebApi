@@ -211,6 +211,15 @@ namespace Swashbuckle.Tests.Swagger
         }
 
         [Test]
+        public void It_does_not_load_bad_xml()
+        {
+            SetUpHandler(c => { c.IncludeXmlComments("BadXml.xml"); });
+
+            var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/v1");
+            Assert.IsNotNull(swagger["paths"]);
+        }
+
+        [Test]
         public void It_does_not_clear_previously_added_responses()
         {
             SetUpHandler(c =>

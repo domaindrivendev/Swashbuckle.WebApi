@@ -218,7 +218,8 @@ namespace Swashbuckle.Application
 
         public void IncludeXmlComments(string filePath)
         {
-            _xmlDocFactories.Add(() => new XPathDocument(filePath));
+            if (System.IO.File.Exists(filePath))
+                _xmlDocFactories.Add(() => new XPathDocument(filePath));
         }
 
         public void ResolveConflictingActions(Func<IEnumerable<ApiDescription>, ApiDescription> conflictingActionsResolver)
@@ -309,7 +310,7 @@ namespace Swashbuckle.Application
 
             var httpConfiguration = request.GetConfiguration();
             var virtualPathRoot = httpConfiguration.VirtualPathRoot.TrimEnd('/');
-            
+
             return string.Format("{0}://{1}:{2}{3}", scheme, host, port, virtualPathRoot);
         }
 
