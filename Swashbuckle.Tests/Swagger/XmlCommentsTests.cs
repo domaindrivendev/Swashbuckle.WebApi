@@ -2,11 +2,11 @@
 using NUnit.Framework;
 using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
-using System.Net.Http;
 using Swashbuckle.Application;
 using Swashbuckle.Dummy.Controllers;
-using Swashbuckle.Tests.Swagger;
 using Swashbuckle.Dummy.SwaggerExtensions;
+using Swashbuckle.Swagger;
+using System.Web.Http.Description;
 
 namespace Swashbuckle.Tests.Swagger
 {
@@ -227,6 +227,35 @@ namespace Swashbuckle.Tests.Swagger
         private void IncludeXmlComments(SwaggerDocsConfig config)
         {
             config.IncludeXmlComments(String.Format(@"{0}\XmlComments.xml", AppDomain.CurrentDomain.BaseDirectory));
+        }
+
+        [Test]
+        public void It_loads_multiple_xml_comments()
+        {
+            SetUpHandler(c =>
+            {
+                IncludeMultipleXmlComments(c, AppDomain.CurrentDomain.BaseDirectory);
+                c.DocumentFilter<ApplyDocumentVendorExtensions>();
+            });
+
+            var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/v1");
+            var definitions = swagger["definitions"];
+            Assert.IsNotNull(definitions["SubAccount"]["description"]);
+            Assert.IsNotNull(definitions["MockSequence"]["description"]);
+        }
+
+        private void IncludeMultipleXmlComments(SwaggerDocsConfig config, string basedir)
+        {
+            config.IncludeXmlComments(new[] { $@"{basedir}\Moq.xml", $@"{basedir}\XmlComments.xml" });
+        }
+
+        private class ApplyDocumentVendorExtensions : IDocumentFilter
+        {
+            public void Apply(SwaggerDocument swaggerDoc, SchemaRegistry schemaRegistry, IApiExplorer apiExplorer)
+            {
+                schemaRegistry.GetOrRegister(typeof(SubAccount));
+                schemaRegistry.GetOrRegister(typeof(Moq.MockSequence));
+            }
         }
     }
 }

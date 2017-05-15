@@ -221,6 +221,14 @@ namespace Swashbuckle.Application
             _xmlDocFactories.Add(() => new XPathDocument(filePath));
         }
 
+        public void IncludeXmlComments(string[] filePaths)
+        {
+            foreach (var filePath in filePaths)
+            {
+                IncludeXmlComments(filePath);
+            }
+        }
+
         public void ResolveConflictingActions(Func<IEnumerable<ApiDescription>, ApiDescription> conflictingActionsResolver)
         {
             _conflictingActionsResolver = conflictingActionsResolver;
@@ -309,7 +317,7 @@ namespace Swashbuckle.Application
 
             var httpConfiguration = request.GetConfiguration();
             var virtualPathRoot = httpConfiguration.VirtualPathRoot.TrimEnd('/');
-            
+
             return string.Format("{0}://{1}:{2}{3}", scheme, host, port, virtualPathRoot);
         }
 
