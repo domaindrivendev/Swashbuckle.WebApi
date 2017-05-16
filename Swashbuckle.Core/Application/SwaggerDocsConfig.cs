@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -218,10 +219,10 @@ namespace Swashbuckle.Application
 
         public void IncludeXmlComments(string filePath)
         {
-            if (System.IO.File.Exists(filePath))
+            if (File.Exists(filePath))
                 _xmlDocFactories.Add(() => new XPathDocument(filePath));
             else
-                throw new Exception("XML Comment file not found!");
+                throw new FileNotFoundException("XML Comment file not found!");
         }
 
         public void ResolveConflictingActions(Func<IEnumerable<ApiDescription>, ApiDescription> conflictingActionsResolver)
