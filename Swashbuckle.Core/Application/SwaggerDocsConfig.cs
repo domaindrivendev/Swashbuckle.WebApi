@@ -220,6 +220,8 @@ namespace Swashbuckle.Application
         {
             if (System.IO.File.Exists(filePath))
                 _xmlDocFactories.Add(() => new XPathDocument(filePath));
+            else
+                throw new Exception("XML Comment file not found!");
         }
 
         public void ResolveConflictingActions(Func<IEnumerable<ApiDescription>, ApiDescription> conflictingActionsResolver)

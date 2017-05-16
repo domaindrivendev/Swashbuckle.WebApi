@@ -213,10 +213,18 @@ namespace Swashbuckle.Tests.Swagger
         [Test]
         public void It_does_not_load_bad_xml()
         {
-            SetUpHandler(c => { c.IncludeXmlComments("BadXml.xml"); });
-
-            var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/v1");
-            Assert.IsNotNull(swagger["paths"]);
+            Exception ex = null;
+            try
+            {
+                SetUpHandler(c => { c.IncludeXmlComments("BadXml.xml"); });
+            }
+            catch (Exception e)
+            {
+                ex = e;
+            }
+            Assert.IsNotNull(ex);
+            // The exception message should contain something related to XML
+            Assert.IsTrue(ex.Message.Contains("XML"));
         }
 
         [Test]
