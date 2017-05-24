@@ -54,12 +54,14 @@ namespace Swashbuckle.Swagger
 
             var rootUri = new Uri(rootUrl);
             var port = (!rootUri.IsDefaultPort) ? ":" + rootUri.Port : string.Empty;
+            var tags = new List<Tag>();
 
             var swaggerDoc = new SwaggerDocument
             {
                 info = info,
                 host = rootUri.Host + port,
                 basePath = (rootUri.AbsolutePath != "/") ? rootUri.AbsolutePath : null,
+                tags = tags,
                 schemes = (_options.Schemes != null) ? _options.Schemes.ToList() : new[] { rootUri.Scheme }.ToList(),
                 paths = paths,
                 definitions = schemaRegistry.Definitions,

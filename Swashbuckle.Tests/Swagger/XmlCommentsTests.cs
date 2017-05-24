@@ -89,7 +89,7 @@ namespace Swashbuckle.Tests.Swagger
         {
             var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/v1");            
 
-            Assert.IsNotNull(swagger);
+            Assert.IsNotNull(swagger["tags"]);
             Assert.IsTrue(swagger.ToString().Contains("XmlAnnotatedController"));
         }
 
