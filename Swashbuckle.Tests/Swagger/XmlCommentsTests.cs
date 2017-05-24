@@ -85,6 +85,15 @@ namespace Swashbuckle.Tests.Swagger
         }
 
         [Test]
+        public void It_documents_controllers()
+        {
+            var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/v1");            
+
+            Assert.IsNotNull(swagger);
+            Assert.IsTrue(swagger.ToString().Contains("XmlAnnotatedController"));
+        }
+
+        [Test]
         public void It_documents_schemas_from_type_summary_tags()
         {
             var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/v1");
