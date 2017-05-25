@@ -87,10 +87,13 @@ namespace Swashbuckle.Tests.Swagger
         [Test]
         public void It_documents_controllers()
         {
+            var key = "XmlAnnotatedController";
             var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/v1");            
-
-            Assert.IsNotNull(swagger["tags"]);
-            Assert.IsTrue(swagger.ToString().Contains("XmlAnnotatedController"));
+            
+            var tag = swagger.SelectToken($"$.tags[?(@.name == '{key}')]");
+            Assert.IsNotNull(tag);
+            Assert.IsNotNull(tag["description"]);
+            Assert.IsTrue(tag["description"].ToString().Contains(key));
         }
 
         [Test]
