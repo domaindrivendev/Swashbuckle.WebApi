@@ -56,8 +56,11 @@ namespace Swashbuckle.Swagger
             var port = (!rootUri.IsDefaultPort) ? ":" + rootUri.Port : string.Empty;
 
             var controllers = apiDescriptions
-                .GroupBy(x => x.ActionDescriptor.ControllerDescriptor.ControllerType)
-                .Select(x => new ModelFilterContext(x.Key, null, null) );
+                .GroupBy(x => x.ActionDescriptor.ControllerDescriptor)
+                .Select(x => new {
+                    name = x.Key.ControllerName,
+                    context = new ModelFilterContext(x.Key.ControllerType, null, null)
+                });
 
             var tags = new List<Tag>();
             foreach (var filter in _options.ModelFilters)
@@ -65,10 +68,10 @@ namespace Swashbuckle.Swagger
                 foreach (var c in controllers)
                 {
                     var model = new Schema();
-                    filter.Apply(model, c);
+                    filter.Apply(model, c.context);
                     if (!string.IsNullOrEmpty(model.description))
-                        tags.Add(new Tag() { name = c.SystemType.Name, description = model.description });
-                }                
+                        tags.Add(new Tag() { name = c.name, description = model.description });
+                }
             }
 
             var swaggerDoc = new SwaggerDocument
@@ -87,7 +90,7 @@ namespace Swashbuckle.Swagger
             {
                 filter.Apply(swaggerDoc, schemaRegistry, _apiExplorer);
             }
-            
+
             return swaggerDoc;
         }
 
@@ -201,7 +204,7 @@ namespace Swashbuckle.Swagger
             {
                 parameter.type = "string";
                 parameter.required = true;
-                return parameter; 
+                return parameter;
             }
 
             parameter.required = location == "path" || !paramDesc.ParameterDescriptor.IsOptional;
