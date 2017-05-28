@@ -7,6 +7,7 @@ namespace Swashbuckle.Swagger.XmlComments
     {
         private const string MemberXPath = "/doc/members/member[@name='{0}']";
         private const string SummaryTag = "summary";
+        private const string ExampleTag = "example";
 
         private readonly XPathDocument _xmlDoc;
 
@@ -31,9 +32,13 @@ namespace Swashbuckle.Swagger.XmlComments
 
             if (typeNode != null)
             {
-                var summaryNode = typeNode.SelectSingleNode(SummaryTag);
-                if (summaryNode != null)
+                var summaryNode = typeNode.SelectSingleNode( SummaryTag );
+                if( summaryNode != null )
                     model.description = summaryNode.ExtractContent();
+
+                var exampleNode = typeNode.SelectSingleNode( ExampleTag );
+                if( exampleNode != null )
+                    model.example = exampleNode.ExtractContent();
             }
 
             if (model.properties != null)
@@ -60,6 +65,12 @@ namespace Swashbuckle.Swagger.XmlComments
             if (propSummaryNode != null)
             {
                 propertySchema.description = propSummaryNode.ExtractContent();
+            }
+
+            var propExampleNode = propertyNode.SelectSingleNode( ExampleTag );
+            if( propExampleNode != null )
+            {
+                propertySchema.example = propExampleNode.ExtractContent();
             }
         }
     }

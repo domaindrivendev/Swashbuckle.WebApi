@@ -110,16 +110,19 @@ namespace Swashbuckle.Dummy.Controllers
         /// <summary>
         /// The ID for Accounts is 5 digits long.
         /// </summary>
+        /// <example>78312</example>
         public virtual int AccountID { get; set; }
 
         /// <summary>
         /// Uniquely identifies the account
         /// </summary>
+        /// <example>TestUser</example>
         public string Username { get; set; }
 
         /// <summary>
         /// For authentication
         /// </summary>
+        /// <example>TestPassword</example>
         public string Password { get; set; }
 
         public AccountPreferences Preferences { get; set; }

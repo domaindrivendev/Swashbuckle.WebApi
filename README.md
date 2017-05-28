@@ -381,6 +381,35 @@ Swashbuckle will automatically create a "success" response for each operation ba
 /// <response code="400">Username already in use</response>
 public int Create(Account account)
 ```
+#### Response Models ####
+
+Swashbuckle will automatically generate the right model definition based on the response type; but you can customise this using an attribute, and using XMLComments you can provide more contextual information:
+
+```csharp
+public class Account
+{
+    /// <summary>
+    /// The ID for Accounts is 5 digits long.
+    /// </summary>
+    /// <example>78312</example>
+    public int AccountId { get; set; }
+
+    /// <summary>
+    /// Uniquely identifies the account
+    /// </summary>
+    /// <example>TestUser</example>
+    public string UserName { get; set; }
+
+    /// <summary>
+    /// For authentication
+    /// </summary>
+    public int UserPassword { get; set; }
+}
+
+[SwaggerResponse( HttpStatusCode.OK, Description = "Returns an array of accounts", Type = typeof( IEnumerable<Account> ) )]
+public int GetAccounts()
+```
+
 ### Working Around Swagger 2.0 Constraints ###
 
 In contrast to Web API, Swagger 2.0 does not include the query string component when mapping a URL to an action. As a result, Swashbuckle will raise an exception if it encounters multiple actions with the same path (sans query string) and HTTP method. You can workaround this by providing a custom strategy to pick a winner or merge the descriptions for the purposes of the Swagger docs 
