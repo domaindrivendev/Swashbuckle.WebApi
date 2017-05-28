@@ -126,8 +126,10 @@ namespace Swashbuckle.Tests.Swagger
 
             var parameters = swagger["paths"]["/xmlannotated/GetById"]["get"]["parameters"];
             Assert.IsNotNull(parameters);
+
             Assert.IsNotNull(parameters.First["required"]);
             Assert.AreEqual("False", parameters.First["required"].ToString());
+
             Assert.IsNotNull(parameters.First["default"]);
             Assert.AreEqual("123456", parameters.First["default"].ToString());
         }

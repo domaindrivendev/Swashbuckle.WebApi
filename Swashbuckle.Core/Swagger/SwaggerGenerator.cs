@@ -184,11 +184,10 @@ namespace Swashbuckle.Swagger
             {
                 parameter.type = "string";
                 parameter.required = true;
-                return parameter; 
+                return parameter;
             }
 
             parameter.required = location == "path" || !paramDesc.ParameterDescriptor.IsOptional;
-            parameter.@default = paramDesc.ParameterDescriptor.DefaultValue;
 
             var schema = schemaRegistry.GetOrRegister(paramDesc.ParameterDescriptor.ParameterType);
             if (parameter.@in == "body")
@@ -196,6 +195,7 @@ namespace Swashbuckle.Swagger
             else
                 parameter.PopulateFrom(schema);
 
+            parameter.@default = paramDesc.ParameterDescriptor.DefaultValue;
             return parameter;
         }
     }
