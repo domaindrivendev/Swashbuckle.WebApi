@@ -120,6 +120,19 @@ namespace Swashbuckle.Tests.Swagger
         }
 
         [Test]
+        public void It_documents_schema_default_parameters()
+        {
+            var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/v1");
+
+            var parameters = swagger["paths"]["/xmlannotated/GetById"]["get"]["parameters"];
+            Assert.IsNotNull(parameters);
+            Assert.IsNotNull(parameters.First["required"]);
+            Assert.AreEqual("False", parameters.First["required"].ToString());
+            Assert.IsNotNull(parameters.First["default"]);
+            Assert.AreEqual("123456", parameters.First["default"].ToString());
+        }
+
+        [Test]
         public void It_documents_schema_properties_favoring_property_summary_tags_from_derived_vs_base_classes()
         {
             var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/v1");
