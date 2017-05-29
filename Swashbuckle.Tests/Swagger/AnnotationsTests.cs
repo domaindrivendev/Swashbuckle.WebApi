@@ -96,7 +96,8 @@ namespace Swashbuckle.Tests.Swagger
                             schema = new
                             {
                                 type = "array",
-                                items = JObject.Parse("{ $ref: \"#/definitions/Message\" }") 
+                                items = JObject.Parse("{ $ref: \"#/definitions/Message\" }"),
+                                xml = JObject.Parse( "{ \"name\": \"Message\", \"wrapped\": true }" )
                             }
                         }
                     },

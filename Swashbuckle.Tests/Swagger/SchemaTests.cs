@@ -64,7 +64,8 @@ namespace Swashbuckle.Tests.Swagger
                                 format = "double",
                                 type = "number"
                             }
-                        }
+                        },
+                        xml = JObject.Parse( "{ \"name\": \"Product\" }" )
                     }
                 });
             Assert.AreEqual(expected.ToString(), definitions.ToString());
@@ -136,7 +137,8 @@ namespace Swashbuckle.Tests.Swagger
                             minLength = 10,
                             type = "string"
                         }
-                    }
+                    },
+                    xml = JObject.Parse( "{ \"name\": \"PaymentWithMetadata\" }" )
                 }
             });
             Assert.AreEqual(expected.ToString(), definitions.ToString());
@@ -189,7 +191,8 @@ namespace Swashbuckle.Tests.Swagger
                                 minLength = 10,
                                 type = "string"
                             }
-                        }
+                        },
+                        xml = JObject.Parse( "{ \"name\": \"Payment\" }" )
                     }
                 });
             Assert.AreEqual(expected.ToString(), definitions.ToString());
@@ -224,7 +227,8 @@ namespace Swashbuckle.Tests.Swagger
                             {
                                 type = "string"
                             }
-                        }
+                        },
+                        xml = JObject.Parse( "{ \"name\": \"Elephant\" }" )
                     },
                     Animal = new
                     {
@@ -235,7 +239,8 @@ namespace Swashbuckle.Tests.Swagger
                             {
                                 type = "string"
                             }
-                        }
+                        },
+                        xml = JObject.Parse( "{ \"name\": \"Animal\" }" )
                     }
                 });
             Assert.AreEqual(expected.ToString(), definitions.ToString());
@@ -261,7 +266,8 @@ namespace Swashbuckle.Tests.Swagger
                                 format = "int32",
                                 type = "integer"
                             }
-                        }
+                        },
+                        xml = JObject.Parse( "{ \"name\": \"Lookup\" }" )
                     }
                 });
             Assert.AreEqual(expected.ToString(), definitions.ToString());
@@ -293,7 +299,8 @@ namespace Swashbuckle.Tests.Swagger
                                 @enum = new[] { "A", "B" },
                                 type = "string"
                             }
-                        }
+                        },
+                        xml = JObject.Parse( "{ \"name\": \"JsonRequest\" }" )
                     }
                 });
             Assert.AreEqual(expected.ToString(), definitions.ToString());
@@ -573,9 +580,10 @@ namespace Swashbuckle.Tests.Swagger
                     schema = new
                     {
                         type = "array",
-                        items = expectedParameterItems
+                        items = expectedParameterItems,
+                        xml = JObject.Parse( "{ \"name\": \"value\" }" )
                     }
-                });
+                } );
             Assert.AreEqual(expectedParameter.ToString(), parameter.ToString());
 
             var expectedResponseItems = new Dictionary<string, object>();
@@ -675,9 +683,11 @@ namespace Swashbuckle.Tests.Swagger
                             LineItems = new
                             {
                                 type = "array",
-                                items = JObject.Parse("{ $ref: \"#/definitions/LineItem\" }")
+                                items = JObject.Parse("{ $ref: \"#/definitions/LineItem\" }"),
+                                xml = JObject.Parse( "{ \"name\": \"LineItems\", \"wrapped\": true }" )
                             }
-                        }
+                        },
+                        xml = JObject.Parse( "{ \"name\": \"Order\" }" )
                     },
                     LineItem = new
                     {
@@ -694,7 +704,8 @@ namespace Swashbuckle.Tests.Swagger
                                 format = "int32",
                                 type = "integer"
                             }
-                        }
+                        },
+                        xml = JObject.Parse( "{ \"name\": \"LineItem\" }" )
                     }
                 });
             Assert.AreEqual(expected.ToString(), definitions.ToString());
@@ -724,9 +735,11 @@ namespace Swashbuckle.Tests.Swagger
                             SubComponents = new
                             {
                                 type = "array",
-                                items = JObject.Parse("{ $ref: \"#/definitions/Component\" }")
+                                items = JObject.Parse("{ $ref: \"#/definitions/Component\" }"),
+                                xml = JObject.Parse( "{ \"name\": \"SubComponents\", \"wrapped\": true }" )
                             }
-                        }
+                        },
+                        xml = JObject.Parse( "{ \"name\": \"Component\" }" )
                     },
                     // Breaks current swagger-ui
                     //ListOfSelf = new
@@ -761,7 +774,8 @@ namespace Swashbuckle.Tests.Swagger
                         {
                             format = "int32",
                             type = "integer"
-                        }
+                        },
+                        xml = JObject.Parse( "{ \"name\": \"items\", \"wrapped\": true }" )
                     }
                 });
             Assert.AreEqual(expected.ToString(), schema.ToString());
@@ -787,8 +801,9 @@ namespace Swashbuckle.Tests.Swagger
                                 Name = new
                                 {
                                     type = "string" 
-                                } 
-                            }
+                                }
+                            },
+                            xml = JObject.Parse("{ \"name\": \"DynamicObjectSubType\" }")
                         }
                     }
                 });
@@ -820,7 +835,8 @@ namespace Swashbuckle.Tests.Swagger
                                     format = "int32",
                                     type = "integer"
                                 }
-                            }
+                            },
+                            xml = JObject.Parse("{ \"name\": \"Contact\" }")
                         }
                     }
                 });
