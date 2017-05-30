@@ -64,9 +64,9 @@ namespace Swashbuckle.Swagger
             Definitions = new Dictionary<string, Schema>();
         }
 
-        public Schema GetOrRegister(Type type)
+        public Schema GetOrRegister(Type type, string typeName = null)
         {
-            var schema = CreateInlineSchema(type);
+            var schema = CreateInlineSchema(type, typeName );
 
             // Iterate outstanding work items (i.e. referenced types) and generate the corresponding definition
             while (_workItems.Any(entry => entry.Value.Schema == null && !entry.Value.InProgress))
@@ -85,7 +85,7 @@ namespace Swashbuckle.Swagger
 
         public IDictionary<string, Schema> Definitions { get; private set; }
 
-        private Schema CreateInlineSchema(Type type)
+        private Schema CreateInlineSchema(Type type, string typeName = null)
         {
             var jsonContract = _contractResolver.ResolveContract(type);
 
@@ -105,7 +105,7 @@ namespace Swashbuckle.Swagger
             if (arrayContract != null)
                 return arrayContract.IsSelfReferencing()
                     ? CreateRefSchema(type)
-                    : FilterSchema(CreateArraySchema(arrayContract, true), jsonContract);
+                    : FilterSchema(CreateArraySchema(arrayContract, true, typeName), jsonContract);
 
             var objectContract = jsonContract as JsonObjectContract;
             if (objectContract != null && !objectContract.IsAmbiguous())
@@ -223,7 +223,7 @@ namespace Swashbuckle.Swagger
             }
         }
 
-        private Schema CreateArraySchema(JsonArrayContract arrayContract, bool isWrapped = false)
+        private Schema CreateArraySchema(JsonArrayContract arrayContract, bool isWrapped = false, string typeName = null)
         {
             var itemType = arrayContract.CollectionItemType ?? typeof(object);
             var s = new Schema
@@ -233,7 +233,7 @@ namespace Swashbuckle.Swagger
             };
             if( itemType.Namespace != "System" && itemType.Namespace != "Enum" )
             {
-                s.xml = new Xml { name = itemType.Name, wrapped = isWrapped };
+                s.xml = new Xml { name = typeName ?? itemType.Name, wrapped = isWrapped };
             }
             return s;
         }
