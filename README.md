@@ -458,7 +458,7 @@ Specify which HTTP operations will have the 'Try it out!' option. An empty param
 
 As an alternative, you can inject your own version of "index.html" and customize the markup and swagger-ui directly. Use the __CustomAsset__ option to instruct Swashbuckle to return your version instead of the default when a request is made for "index". As with all custom content, the file must be included in your project as an "Embedded Resource", and then the resource's "Logical Name" is passed to the method as shown below. See [Injecting Custom Content](#injecting-custom-content) for step by step instructions.
 
-For compatibility, you should base your custom "index.html" off [this version](https://github.com/domaindrivendev/Swashbuckle/blob/v5.3.2/Swashbuckle.Core/SwaggerUi/CustomAssets/index.html)
+For compatibility, you should base your custom "index.html" off [this version](https://github.com/domaindrivendev/Swashbuckle/blob/v5.5.3/Swashbuckle.Core/SwaggerUi/CustomAssets/index.html)
 
 ```csharp
 httpConfiguration
