@@ -100,6 +100,16 @@ httpConfiguration
 
 In this case the URL to swagger-ui will be `sandbox/index`.
 
+### Pretty Print ###
+
+If you want the output Swagger docs to be indented properly, enable the __PrettyPrint__ option as following:
+
+```cs
+httpConfiguration
+    .EnableSwagger(c => c.PrettyPrint())
+    .EnableSwaggerUi();
+```
+
 ### Additional Service Metadata ###
 
 In addition to operation descriptions, Swagger 2.0 includes several properties to describe the service itself. These can all be provided through the configuration API:
