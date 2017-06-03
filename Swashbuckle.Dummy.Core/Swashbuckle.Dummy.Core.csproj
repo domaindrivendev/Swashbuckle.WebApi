@@ -111,6 +111,7 @@
     <Compile Include="SwaggerExtensions\SupportFlaggedEnums.cs" />
     <Compile Include="SwaggerExtensions\UpdateFileDownloadOperations.cs" />
     <Compile Include="Types\PrimitiveEnum.cs" />
+    <Compile Include="Types\SimpleComposite.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="App_Start\SwaggerConfig.cs" />

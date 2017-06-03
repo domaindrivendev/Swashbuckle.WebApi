@@ -190,5 +190,10 @@ namespace Swashbuckle.Dummy.Controllers
         {
             return value;
         }
+
+        public SimpleComposite EchoComposite(SimpleComposite value)
+        {
+            return value;
+        }
     }
 }

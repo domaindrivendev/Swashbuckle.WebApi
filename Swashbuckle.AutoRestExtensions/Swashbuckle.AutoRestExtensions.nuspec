@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>Swashbuckle.AutoRestExtensions</id>
+    <version>$version$</version>
+    <title>Swashbuckle.AutoRestExtensions</title>
+    <authors>Richard Morris</authors>
+    <licenseUrl>http://opensource.org/licenses/BSD-3-Clause</licenseUrl>
+    <projectUrl>https://github.com/domaindrivendev/Swashbuckle</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description></description>
+    <releaseNotes></releaseNotes>
+    <summary>Adds extensions to Swashbuckle to enlighten AutoRest integration</summary>
+    <copyright>Copyright 2016</copyright>
+    <tags>Swagger Swashbuckle AutoRest</tags>
+    <dependencies>
+      <dependency id="Swashbuckle.Core" version="5.3.2" />
+    </dependencies>
+  </metadata>
+</package>

@@ -372,232 +372,201 @@ namespace Swashbuckle.Tests.Swagger
                 { "required", true },
                 { "type", "string" },
                 { "format", "guid" },
-                { "x-type-dotnet", "System.Guid" },
-                { "x-nullable", false }
+                { "x-schema", "foobar" }
             };
             Assert.AreEqual(JObject.FromObject(expectedParameter).ToString(), parameter.ToString());
 
-            var expectedResponse = new Dictionary<string, object>()
+            var expectedResponse = new Dictionary<string, object>
             {
                 { "format", "guid" },
                 { "type", "string" },
-                { "x-type-dotnet", "System.Guid" },
-                { "x-nullable", false }
+                { "x-schema", "foobar" }
             };
             Assert.AreEqual(JObject.FromObject(expectedResponse).ToString(), response.ToString());
         }
 
-        [TestCase("EchoBoolean", typeof(bool), "boolean", null, "System.Boolean", false)]
-        [TestCase("EchoByte", typeof(byte), "integer", "int32", "System.Byte", false)]
-        [TestCase("EchoSByte", typeof(sbyte), "integer", "int32", "System.SByte", false)]
-        [TestCase("EchoInt16", typeof(short), "integer", "int32", "System.Int16", false)]
-        [TestCase("EchoUInt16", typeof(ushort), "integer", "int32", "System.UInt16", false)]
-        [TestCase("EchoInt32", typeof(int), "integer", "int32", "System.Int32", false)]
-        [TestCase("EchoUInt32", typeof(uint), "integer", "int32", "System.UInt32", false)]
-        [TestCase("EchoInt64", typeof(long), "integer", "int64", "System.Int64", false)]
-        [TestCase("EchoUInt64", typeof(ulong), "integer", "int64", "System.UInt64", false)]
-        [TestCase("EchoSingle", typeof(float), "number", "float", "System.Single", false)]
-        [TestCase("EchoDouble", typeof(double), "number", "double", "System.Double", false)]
-        [TestCase("EchoDecimal", typeof(decimal), "number", "double", "System.Decimal", false)]
-        [TestCase("EchoDateTime", typeof(DateTime), "string", "date-time", "System.DateTime", false)]
-        [TestCase("EchoDateTimeOffset", typeof(DateTimeOffset), "string", "date-time", "System.DateTimeOffset", false)]
-        [TestCase("EchoTimeSpan", typeof(TimeSpan), "string", null, "System.TimeSpan", false)]
-        [TestCase("EchoGuid", typeof(Guid), "string", "uuid", "System.Guid", false)]
-        [TestCase("EchoEnum", typeof(PrimitiveEnum), "integer", "int32", "Swashbuckle.Dummy.Types.PrimitiveEnum", false)]
-        [TestCase("EchoEnum", typeof(PrimitiveEnum), "string", null, "Swashbuckle.Dummy.Types.PrimitiveEnum", false)]
-        [TestCase("EchoChar", typeof(char), "string", null, "System.Char", false)]
-        [TestCase("EchoNullableBoolean", typeof(bool?), "boolean", null, "System.Boolean", true)]
-        [TestCase("EchoNullableByte", typeof(byte?), "integer", "int32", "System.Byte", true)]
-        [TestCase("EchoNullableSByte", typeof(sbyte?), "integer", "int32", "System.SByte", true)]
-        [TestCase("EchoNullableInt16", typeof(short?), "integer", "int32", "System.Int16", true)]
-        [TestCase("EchoNullableUInt16", typeof(ushort?), "integer", "int32", "System.UInt16", true)]
-        [TestCase("EchoNullableInt32", typeof(int?), "integer", "int32", "System.Int32", true)]
-        [TestCase("EchoNullableUInt32", typeof(uint?), "integer", "int32", "System.UInt32", true)]
-        [TestCase("EchoNullableInt64", typeof(long?), "integer", "int64", "System.Int64", true)]
-        [TestCase("EchoNullableUInt64", typeof(ulong?), "integer", "int64", "System.UInt64", true)]
-        [TestCase("EchoNullableSingle", typeof(float?), "number", "float", "System.Single", true)]
-        [TestCase("EchoNullableDouble", typeof(double?), "number", "double", "System.Double", true)]
-        [TestCase("EchoNullableDecimal", typeof(decimal?), "number", "double", "System.Decimal", true)]
-        [TestCase("EchoNullableDateTime", typeof(DateTime?), "string", "date-time", "System.DateTime", true)]
-        [TestCase("EchoNullableDateTimeOffset", typeof(DateTimeOffset?), "string", "date-time", "System.DateTimeOffset", true)]
-        [TestCase("EchoNullableTimeSpan", typeof(TimeSpan?), "string", null, "System.TimeSpan", true)]
-        [TestCase("EchoNullableGuid", typeof(Guid?), "string", "uuid", "System.Guid", true)]
-        [TestCase("EchoNullableEnum", typeof(PrimitiveEnum?), "integer", "int32", "Swashbuckle.Dummy.Types.PrimitiveEnum", true)]
-        [TestCase("EchoNullableEnum", typeof(PrimitiveEnum?), "string", null, "Swashbuckle.Dummy.Types.PrimitiveEnum", true)]
-        [TestCase("EchoNullableChar", typeof(char?), "string", null, "System.Char", true)]
-        [TestCase("EchoString", typeof(string), "string", null, "System.String", true)]
-        public void It_exposes_config_to_post_modify_schemas_for_primitives(string action, Type dotNetType, string type, string format, string xtypeDotNet, bool xnullable)
+        [Test]
+        public void It_exposes_config_to_post_modify_schemas_for_primitives()
         {
-            var underlyingDotNetType = Nullable.GetUnderlyingType(dotNetType) ?? dotNetType;
             SetUpCustomRouteFor<PrimitiveTypesController>("PrimitiveTypes/{action}");
             SetUpHandler(c =>
             {
-                if (underlyingDotNetType.IsEnum && type == "string")
-                {
-                    c.DescribeAllEnumsAsStrings();
-                }
                 c.SchemaFilter<ApplySchemaVendorExtensions>();
                 c.ApplyFiltersToAllSchemas();
             });
 
             var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/v1");
-            var operation = swagger["paths"]["/PrimitiveTypes/" + action]["post"];
+            var operation = swagger["paths"]["/PrimitiveTypes/EchoBoolean"]["post"];
             var parameter = operation["parameters"][0];
             var response = operation["responses"]["200"]["schema"];
 
-            var method = typeof(PrimitiveTypesController).GetMethod(action);
-            Assert.AreEqual(dotNetType, method.GetParameters()[0].ParameterType);
-            Assert.AreEqual(dotNetType, method.ReturnType);
+            var method = typeof(PrimitiveTypesController).GetMethod("EchoBoolean");
+            Assert.AreEqual(typeof(bool), method.GetParameters()[0].ParameterType);
+            Assert.AreEqual(typeof(bool), method.ReturnType);
 
             var expectedParameter = new Dictionary<string, object>
             {
                 { "name", "value" },
                 { "in", "query" },
                 { "required", true },
-                { "type", type }
+                { "type", "boolean" },
+                { "x-schema", "foobar" }
             };
-            if (format != null)
-            {
-                expectedParameter.Add("format", format);
-            }
-            if (underlyingDotNetType.IsEnum)
-            {
-                expectedParameter.Add("enum", type == "string" ? underlyingDotNetType.GetEnumNames() : underlyingDotNetType.GetEnumValues());
-            }
-            expectedParameter.Add("x-type-dotnet", xtypeDotNet);
-            expectedParameter.Add("x-nullable", xnullable);
             Assert.AreEqual(JObject.FromObject(expectedParameter).ToString(), parameter.ToString());
 
-            var expectedResponse = new Dictionary<string, object>();
-            if (format != null)
+            var expectedResponse = new Dictionary<string, object>
             {
-                expectedResponse.Add("format", format);
-            }
-            if (underlyingDotNetType.IsEnum)
-            {
-                expectedResponse.Add("enum", type == "string" ? underlyingDotNetType.GetEnumNames() : underlyingDotNetType.GetEnumValues());
-            }
-            expectedResponse.Add("type", type);
-            expectedResponse.Add("x-type-dotnet", xtypeDotNet);
-            expectedResponse.Add("x-nullable", xnullable);
+                { "type", "boolean" },
+                { "x-schema", "foobar" }
+            };
             Assert.AreEqual(JObject.FromObject(expectedResponse).ToString(), response.ToString());
         }
 
-        [TestCase("EchoBoolean", typeof(bool), "boolean", null, "System.Boolean", false)]
-        [TestCase("EchoByte", typeof(byte), "string", "byte", "System.Byte[]", true)] // Special case
-        [TestCase("EchoSByte", typeof(sbyte), "integer", "int32", "System.SByte", false)]
-        [TestCase("EchoInt16", typeof(short), "integer", "int32", "System.Int16", false)]
-        [TestCase("EchoUInt16", typeof(ushort), "integer", "int32", "System.UInt16", false)]
-        [TestCase("EchoInt32", typeof(int), "integer", "int32", "System.Int32", false)]
-        [TestCase("EchoUInt32", typeof(uint), "integer", "int32", "System.UInt32", false)]
-        [TestCase("EchoInt64", typeof(long), "integer", "int64", "System.Int64", false)]
-        [TestCase("EchoUInt64", typeof(ulong), "integer", "int64", "System.UInt64", false)]
-        [TestCase("EchoSingle", typeof(float), "number", "float", "System.Single", false)]
-        [TestCase("EchoDouble", typeof(double), "number", "double", "System.Double", false)]
-        [TestCase("EchoDecimal", typeof(decimal), "number", "double", "System.Decimal", false)]
-        [TestCase("EchoDateTime", typeof(DateTime), "string", "date-time", "System.DateTime", false)]
-        [TestCase("EchoDateTimeOffset", typeof(DateTimeOffset), "string", "date-time", "System.DateTimeOffset", false)]
-        [TestCase("EchoTimeSpan", typeof(TimeSpan), "string", null, "System.TimeSpan", false)]
-        [TestCase("EchoGuid", typeof(Guid), "string", "uuid", "System.Guid", false)]
-        [TestCase("EchoEnum", typeof(PrimitiveEnum), "integer", "int32", "Swashbuckle.Dummy.Types.PrimitiveEnum", false)]
-        [TestCase("EchoEnum", typeof(PrimitiveEnum), "string", null, "Swashbuckle.Dummy.Types.PrimitiveEnum", false)]
-        [TestCase("EchoChar", typeof(char), "string", null, "System.Char", false)]
-        [TestCase("EchoNullableBoolean", typeof(bool?), "boolean", null, "System.Boolean", true)]
-        [TestCase("EchoNullableByte", typeof(byte?), "integer", "int32", "System.Byte", true)]
-        [TestCase("EchoNullableSByte", typeof(sbyte?), "integer", "int32", "System.SByte", true)]
-        [TestCase("EchoNullableInt16", typeof(short?), "integer", "int32", "System.Int16", true)]
-        [TestCase("EchoNullableUInt16", typeof(ushort?), "integer", "int32", "System.UInt16", true)]
-        [TestCase("EchoNullableInt32", typeof(int?), "integer", "int32", "System.Int32", true)]
-        [TestCase("EchoNullableUInt32", typeof(uint?), "integer", "int32", "System.UInt32", true)]
-        [TestCase("EchoNullableInt64", typeof(long?), "integer", "int64", "System.Int64", true)]
-        [TestCase("EchoNullableUInt64", typeof(ulong?), "integer", "int64", "System.UInt64", true)]
-        [TestCase("EchoNullableSingle", typeof(float?), "number", "float", "System.Single", true)]
-        [TestCase("EchoNullableDouble", typeof(double?), "number", "double", "System.Double", true)]
-        [TestCase("EchoNullableDecimal", typeof(decimal?), "number", "double", "System.Decimal", true)]
-        [TestCase("EchoNullableDateTime", typeof(DateTime?), "string", "date-time", "System.DateTime", true)]
-        [TestCase("EchoNullableDateTimeOffset", typeof(DateTimeOffset?), "string", "date-time", "System.DateTimeOffset", true)]
-        [TestCase("EchoNullableTimeSpan", typeof(TimeSpan?), "string", null, "System.TimeSpan", true)]
-        [TestCase("EchoNullableGuid", typeof(Guid?), "string", "uuid", "System.Guid", true)]
-        [TestCase("EchoNullableEnum", typeof(PrimitiveEnum?), "integer", "int32", "Swashbuckle.Dummy.Types.PrimitiveEnum", true)]
-        [TestCase("EchoNullableEnum", typeof(PrimitiveEnum?), "string", null, "Swashbuckle.Dummy.Types.PrimitiveEnum", true)]
-        [TestCase("EchoNullableChar", typeof(char?), "string", null, "System.Char", true)]
-        [TestCase("EchoString", typeof(string), "string", null, "System.String", true)]
-        public void It_exposes_config_to_post_modify_schemas_for_primitive_arrays(string action, Type dotNetType, string type, string format, string xtypeDotNet, bool xnullable)
+        [Test]
+        public void It_exposes_config_to_post_modify_schemas_for_arrays()
         {
-            var underlyingDotNetType = Nullable.GetUnderlyingType(dotNetType) ?? dotNetType;
             SetUpCustomRouteFor<PrimitiveArrayTypesController>("PrimitiveArrayTypes/{action}");
             SetUpHandler(c =>
             {
-                if (underlyingDotNetType.IsEnum && type == "string")
-                {
-                    c.DescribeAllEnumsAsStrings();
-                }
                 c.SchemaFilter<ApplySchemaVendorExtensions>();
                 c.ApplyFiltersToAllSchemas();
             });
 
             var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/v1");
-            var operation = swagger["paths"]["/PrimitiveArrayTypes/" + action]["post"];
+            var operation = swagger["paths"]["/PrimitiveArrayTypes/EchoBoolean"]["post"];
             var parameter = operation["parameters"][0];
             var response = operation["responses"]["200"]["schema"];
 
-            var method = typeof(PrimitiveArrayTypesController).GetMethod(action);
-            Assert.AreEqual(dotNetType.MakeArrayType(), method.GetParameters()[0].ParameterType);
-            Assert.AreEqual(dotNetType.MakeArrayType(), method.ReturnType);
+            var method = typeof(PrimitiveArrayTypesController).GetMethod("EchoBoolean");
+            Assert.AreEqual(typeof(bool[]), method.GetParameters()[0].ParameterType);
+            Assert.AreEqual(typeof(bool[]), method.ReturnType);
 
-            var expectedParameterItems = new Dictionary<string, object>();
-            if (format != null)
+            var expectedItems = new Dictionary<string, object>
             {
-                expectedParameterItems.Add("format", format);
-            }
-            if (underlyingDotNetType.IsEnum)
+                { "type", "boolean" },
+                { "x-schema", "foobar" }
+            };
+
+            var expectedParameter = new Dictionary<string, object>
             {
-                expectedParameterItems.Add("enum", type == "string" ? underlyingDotNetType.GetEnumNames() : underlyingDotNetType.GetEnumValues());
-            }
-            expectedParameterItems.Add("type", type);
-            expectedParameterItems.Add("x-type-dotnet", xtypeDotNet);
-            expectedParameterItems.Add("x-nullable", xnullable);
-            var expectedParameter = (format == "byte") // Special case
-                ? JObject.FromObject(new
-                {
-                    name = "value",
-                    @in = "body",
-                    required = true,
-                    schema = expectedParameterItems
-                })
-                : JObject.FromObject(new
-                {
-                    name = "value",
-                    @in = "body",
-                    required = true,
-                    schema = new
+                { "name", "value" },
+                { "in", "body" },
+                { "required", true },
+                { "schema", new Dictionary<string, object>
                     {
-                        type = "array",
-                        items = expectedParameterItems
+                        { "type", "array" },
+                        { "items", expectedItems },
+                        { "x-schema", "foobar" }
                     }
-                });
-            Assert.AreEqual(expectedParameter.ToString(), parameter.ToString());
+                }
+            };
+            Assert.AreEqual(JObject.FromObject(expectedParameter).ToString(), parameter.ToString());
 
-            var expectedResponseItems = new Dictionary<string, object>();
-            if (format != null)
+            var expectedResponse = new Dictionary<string, object>
             {
-                expectedResponseItems.Add("format", format);
-            }
-            if (underlyingDotNetType.IsEnum)
+                { "type", "array" },
+                { "items", expectedItems },
+                { "x-schema", "foobar" }
+            };
+            Assert.AreEqual(JObject.FromObject(expectedResponse).ToString(), response.ToString());
+        }
+
+        [Test]
+        public void It_exposes_config_to_post_modify_schemas_for_dictionaries()
+        {
+            SetUpCustomRouteFor<DictionaryTypesController>("term-definitions");
+            SetUpHandler(c =>
             {
-                expectedResponseItems.Add("enum", type == "string" ? underlyingDotNetType.GetEnumNames() : underlyingDotNetType.GetEnumValues());
-            }
-            expectedResponseItems.Add("type", type);
-            expectedResponseItems.Add("x-type-dotnet", xtypeDotNet);
-            expectedResponseItems.Add("x-nullable", xnullable);
-            var expectedResponse = (format == "byte") // Special case
-                ? JObject.FromObject(expectedResponseItems)
-                : JObject.FromObject(new
+                c.SchemaFilter<ApplySchemaVendorExtensions>();
+                c.ApplyFiltersToAllSchemas();
+            });
+
+            var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/v1");
+            var operation = swagger["paths"]["/term-definitions"]["post"];
+            var parameter = operation["parameters"][0];
+            var response = operation["responses"]["200"]["schema"];
+
+            var method = typeof(DictionaryTypesController).GetMethod("UpdateTermDescriptions");
+            Assert.AreEqual(typeof(IDictionary<Term, string>), method.GetParameters()[0].ParameterType);
+            Assert.AreEqual(typeof(IDictionary<Term, string>), method.ReturnType);
+
+            var expectedValue = new Dictionary<string, object>
+            {
+                { "type", "string" },
+                { "x-schema", "foobar" }
+            };
+
+            var expectedParameter = new Dictionary<string, object>
+            {
+                { "name", "terms" },
+                { "in", "body" },
+                { "required", true },
+                { "schema", new Dictionary<string, object>
+                    {
+                        { "type", "object" },
+                        {
+                            "properties", new Dictionary<string, object>
+                            {
+                                { "TermA", expectedValue },
+                                { "TermB", expectedValue }
+                            }
+                        },
+                        { "x-schema", "foobar" }
+                    }
+                }
+            };
+            Assert.AreEqual(JObject.FromObject(expectedParameter).ToString(), parameter.ToString());
+
+            var expectedResponse = new Dictionary<string, object>
+            {
+                { "type", "object" },
                 {
-                    type = "array",
-                    items = expectedResponseItems
-                });
-            Assert.AreEqual(expectedResponse.ToString(), response.ToString());
+                    "properties", new Dictionary<string, object>
+                    {
+                        { "TermA", expectedValue },
+                        { "TermB", expectedValue }
+                    }
+                },
+                { "x-schema", "foobar" }
+            };
+            Assert.AreEqual(JObject.FromObject(expectedResponse).ToString(), response.ToString());
+        }
+
+        [Test]
+        public void It_exposes_config_to_post_modify_schemas_for_objects()
+        {
+            SetUpCustomRouteFor<PrimitiveTypesController>("PrimitiveTypes/{action}");
+            SetUpHandler(c =>
+            {
+                c.SchemaFilter<ApplySchemaVendorExtensions>();
+                c.ApplyFiltersToAllSchemas();
+            });
+
+            var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/v1");
+            var definition = swagger["definitions"]["SimpleComposite"];
+
+            var expectedDefinition = new Dictionary<string, object>
+            {
+                { "type", "object" },
+                { "properties", new Dictionary<string, object>
+                    {
+                        { "Boolean", new Dictionary<string, object>
+                            {
+                                { "type", "boolean" },
+                                { "x-schema", "foobar" }
+                            }
+                        },
+                        { "String", new Dictionary<string, object>
+                            {
+                                { "type", "string" },
+                                { "x-schema", "foobar" }
+                            }
+                        }
+                    }
+                },
+                { "x-schema", "foobar" }
+            };
+            Assert.AreEqual(JObject.FromObject(expectedDefinition).ToString(), definition.ToString());
         }
 
         [Test]
