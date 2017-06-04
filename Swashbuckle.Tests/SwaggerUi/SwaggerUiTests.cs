@@ -1,11 +1,9 @@
 ﻿using System;
-using System.Net.Http;
 using System.Net;
 using System.Collections.Generic;
 using NUnit.Framework;
 using Swashbuckle.Application;
 using Swashbuckle.Dummy;
-using Swashbuckle.SwaggerUi;
 
 namespace Swashbuckle.Tests.SwaggerUi
 {
@@ -21,6 +19,16 @@ namespace Swashbuckle.Tests.SwaggerUi
         {
             // Default set-up
             SetUpHandler();
+        }
+
+        [Test]
+        public void It_changes_the_title ()
+        {
+            string rndTitle = $"TEST_TITLE_{Guid.NewGuid()}";
+            SetUpHandler(c => { c.DocumentTitle(rndTitle); });
+
+            var content = GetContentAsString("http://tempuri.org/swagger/ui/index");
+            StringAssert.Contains(rndTitle, content);
         }
 
         [Test]
