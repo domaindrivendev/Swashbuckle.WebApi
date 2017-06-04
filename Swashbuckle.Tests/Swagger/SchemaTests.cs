@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Net.Http;
+using System.Dynamic;
 using System.Linq;
 using NUnit.Framework;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json.Converters;
 using Swashbuckle.Dummy.Controllers;
-using Swashbuckle.Application;
 using Swashbuckle.Swagger;
 using Swashbuckle.Dummy.SwaggerExtensions;
 using Swashbuckle.Dummy.Types;
@@ -36,6 +35,12 @@ namespace Swashbuckle.Tests.Swagger
             var definitions = swagger["definitions"];
             Assert.IsNotNull(definitions);
 
+            dynamic type = new ExpandoObject();
+            type.format = "int32";
+            type.@enum = new[] {2, 4};
+            type.type = "integer";
+            ((IDictionary<string, object>)type).Add("x-names", new[] { "Publication", "Album" });
+
             var expected = JObject.FromObject(new
                 {
                     Product = new
@@ -49,12 +54,7 @@ namespace Swashbuckle.Tests.Swagger
                                 type = "integer",
                                 readOnly = true
                             },
-                            Type = new
-                            {
-                                format = "int32",
-                                @enum = new[] { 2, 4 },
-                                type = "integer"
-                            },
+                            Type = type,
                             Description = new
                             {
                                 type = "string"
@@ -67,7 +67,7 @@ namespace Swashbuckle.Tests.Swagger
                         }
                     }
                 });
-            Assert.AreEqual(expected.ToString(), definitions.ToString());
+            Assert.IsTrue(JToken.DeepEquals(expected, definitions));
         }
 
         [Test]
@@ -277,26 +277,28 @@ namespace Swashbuckle.Tests.Swagger
             var definitions = swagger["definitions"];
             Assert.IsNotNull(definitions);
 
+            dynamic category = new ExpandoObject();
+            category.@enum = new[] {"A", "B"};
+            category.type = "string";
+            ((IDictionary<string, object>)category).Add("x-values", new[] { 2, 4 });
+
             var expected = JObject.FromObject(new
+            {
+                JsonRequest = new
                 {
-                    JsonRequest = new
+                    type = "object",
+                    properties = new
                     {
-                        type = "object",
-                        properties = new
+                        foobar = new
                         {
-                            foobar = new
-                            {
-                                type = "string"
-                            },
-                            Category = new
-                            {
-                                @enum = new[] { "A", "B" },
-                                type = "string"
-                            }
-                        }
+                            type = "string"
+                        },
+                        Category = category
                     }
-                });
-            Assert.AreEqual(expected.ToString(), definitions.ToString());
+                }
+            });
+
+            Assert.IsTrue(JToken.DeepEquals(expected, definitions));
         }
 
         [Test]
@@ -309,12 +311,14 @@ namespace Swashbuckle.Tests.Swagger
             var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/v1");
             var typeSchema = swagger["definitions"]["Product"]["properties"]["Type"];
 
-            var expected = JObject.FromObject(new
-                {
-                    @enum = new[] { "publication", "album" },
-                    type = "string"
-                });
-            Assert.AreEqual(expected.ToString(), typeSchema.ToString());
+            dynamic category = new ExpandoObject();
+            category.@enum = new[] { "publication", "album" };
+            category.type = "string";
+            ((IDictionary<string, object>)category).Add("x-values", new[] { 2, 4 });
+
+            var expected = JObject.FromObject(category);
+
+            Assert.IsTrue(JToken.DeepEquals(expected, typeSchema));
         }
 
         [Test]
@@ -387,45 +391,7 @@ namespace Swashbuckle.Tests.Swagger
             Assert.AreEqual(JObject.FromObject(expectedResponse).ToString(), response.ToString());
         }
 
-        [TestCase("EchoBoolean", typeof(bool), "boolean", null, "System.Boolean", false)]
-        [TestCase("EchoByte", typeof(byte), "integer", "int32", "System.Byte", false)]
-        [TestCase("EchoSByte", typeof(sbyte), "integer", "int32", "System.SByte", false)]
-        [TestCase("EchoInt16", typeof(short), "integer", "int32", "System.Int16", false)]
-        [TestCase("EchoUInt16", typeof(ushort), "integer", "int32", "System.UInt16", false)]
-        [TestCase("EchoInt32", typeof(int), "integer", "int32", "System.Int32", false)]
-        [TestCase("EchoUInt32", typeof(uint), "integer", "int32", "System.UInt32", false)]
-        [TestCase("EchoInt64", typeof(long), "integer", "int64", "System.Int64", false)]
-        [TestCase("EchoUInt64", typeof(ulong), "integer", "int64", "System.UInt64", false)]
-        [TestCase("EchoSingle", typeof(float), "number", "float", "System.Single", false)]
-        [TestCase("EchoDouble", typeof(double), "number", "double", "System.Double", false)]
-        [TestCase("EchoDecimal", typeof(decimal), "number", "double", "System.Decimal", false)]
-        [TestCase("EchoDateTime", typeof(DateTime), "string", "date-time", "System.DateTime", false)]
-        [TestCase("EchoDateTimeOffset", typeof(DateTimeOffset), "string", "date-time", "System.DateTimeOffset", false)]
-        [TestCase("EchoTimeSpan", typeof(TimeSpan), "string", null, "System.TimeSpan", false)]
-        [TestCase("EchoGuid", typeof(Guid), "string", "uuid", "System.Guid", false)]
-        [TestCase("EchoEnum", typeof(PrimitiveEnum), "integer", "int32", "Swashbuckle.Dummy.Types.PrimitiveEnum", false)]
-        [TestCase("EchoEnum", typeof(PrimitiveEnum), "string", null, "Swashbuckle.Dummy.Types.PrimitiveEnum", false)]
-        [TestCase("EchoChar", typeof(char), "string", null, "System.Char", false)]
-        [TestCase("EchoNullableBoolean", typeof(bool?), "boolean", null, "System.Boolean", true)]
-        [TestCase("EchoNullableByte", typeof(byte?), "integer", "int32", "System.Byte", true)]
-        [TestCase("EchoNullableSByte", typeof(sbyte?), "integer", "int32", "System.SByte", true)]
-        [TestCase("EchoNullableInt16", typeof(short?), "integer", "int32", "System.Int16", true)]
-        [TestCase("EchoNullableUInt16", typeof(ushort?), "integer", "int32", "System.UInt16", true)]
-        [TestCase("EchoNullableInt32", typeof(int?), "integer", "int32", "System.Int32", true)]
-        [TestCase("EchoNullableUInt32", typeof(uint?), "integer", "int32", "System.UInt32", true)]
-        [TestCase("EchoNullableInt64", typeof(long?), "integer", "int64", "System.Int64", true)]
-        [TestCase("EchoNullableUInt64", typeof(ulong?), "integer", "int64", "System.UInt64", true)]
-        [TestCase("EchoNullableSingle", typeof(float?), "number", "float", "System.Single", true)]
-        [TestCase("EchoNullableDouble", typeof(double?), "number", "double", "System.Double", true)]
-        [TestCase("EchoNullableDecimal", typeof(decimal?), "number", "double", "System.Decimal", true)]
-        [TestCase("EchoNullableDateTime", typeof(DateTime?), "string", "date-time", "System.DateTime", true)]
-        [TestCase("EchoNullableDateTimeOffset", typeof(DateTimeOffset?), "string", "date-time", "System.DateTimeOffset", true)]
-        [TestCase("EchoNullableTimeSpan", typeof(TimeSpan?), "string", null, "System.TimeSpan", true)]
-        [TestCase("EchoNullableGuid", typeof(Guid?), "string", "uuid", "System.Guid", true)]
-        [TestCase("EchoNullableEnum", typeof(PrimitiveEnum?), "integer", "int32", "Swashbuckle.Dummy.Types.PrimitiveEnum", true)]
-        [TestCase("EchoNullableEnum", typeof(PrimitiveEnum?), "string", null, "Swashbuckle.Dummy.Types.PrimitiveEnum", true)]
-        [TestCase("EchoNullableChar", typeof(char?), "string", null, "System.Char", true)]
-        [TestCase("EchoString", typeof(string), "string", null, "System.String", true)]
+        [Test, TestCaseSource(nameof(GetTestCasesForPrimitives))]
         public void It_exposes_config_to_post_modify_schemas_for_primitives(string action, Type dotNetType, string type, string format, string xtypeDotNet, bool xnullable)
         {
             var underlyingDotNetType = Nullable.GetUnderlyingType(dotNetType) ?? dotNetType;
@@ -443,7 +409,7 @@ namespace Swashbuckle.Tests.Swagger
             var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/v1");
             var operation = swagger["paths"]["/PrimitiveTypes/" + action]["post"];
             var parameter = operation["parameters"][0];
-            var response = operation["responses"]["200"]["schema"];
+            JToken response = operation["responses"]["200"]["schema"];
 
             var method = typeof(PrimitiveTypesController).GetMethod(action);
             Assert.AreEqual(dotNetType, method.GetParameters()[0].ParameterType);
@@ -462,66 +428,47 @@ namespace Swashbuckle.Tests.Swagger
             }
             if (underlyingDotNetType.IsEnum)
             {
-                expectedParameter.Add("enum", type == "string" ? underlyingDotNetType.GetEnumNames() : underlyingDotNetType.GetEnumValues());
+                AddEnumValuesValue(type, expectedParameter, underlyingDotNetType);
             }
             expectedParameter.Add("x-type-dotnet", xtypeDotNet);
             expectedParameter.Add("x-nullable", xnullable);
-            Assert.AreEqual(JObject.FromObject(expectedParameter).ToString(), parameter.ToString());
+
+            Assert.IsTrue(JToken.DeepEquals(JObject.FromObject(expectedParameter), parameter));
 
             var expectedResponse = new Dictionary<string, object>();
             if (format != null)
             {
                 expectedResponse.Add("format", format);
             }
+
+            expectedResponse.Add("type", type);
+
             if (underlyingDotNetType.IsEnum)
             {
-                expectedResponse.Add("enum", type == "string" ? underlyingDotNetType.GetEnumNames() : underlyingDotNetType.GetEnumValues());
+                AddEnumValuesValue(type, expectedResponse, underlyingDotNetType);
             }
-            expectedResponse.Add("type", type);
+
             expectedResponse.Add("x-type-dotnet", xtypeDotNet);
             expectedResponse.Add("x-nullable", xnullable);
-            Assert.AreEqual(JObject.FromObject(expectedResponse).ToString(), response.ToString());
+
+            Assert.IsTrue(JToken.DeepEquals(JObject.FromObject(expectedResponse), response));
         }
 
-        [TestCase("EchoBoolean", typeof(bool), "boolean", null, "System.Boolean", false)]
-        [TestCase("EchoByte", typeof(byte), "string", "byte", "System.Byte[]", true)] // Special case
-        [TestCase("EchoSByte", typeof(sbyte), "integer", "int32", "System.SByte", false)]
-        [TestCase("EchoInt16", typeof(short), "integer", "int32", "System.Int16", false)]
-        [TestCase("EchoUInt16", typeof(ushort), "integer", "int32", "System.UInt16", false)]
-        [TestCase("EchoInt32", typeof(int), "integer", "int32", "System.Int32", false)]
-        [TestCase("EchoUInt32", typeof(uint), "integer", "int32", "System.UInt32", false)]
-        [TestCase("EchoInt64", typeof(long), "integer", "int64", "System.Int64", false)]
-        [TestCase("EchoUInt64", typeof(ulong), "integer", "int64", "System.UInt64", false)]
-        [TestCase("EchoSingle", typeof(float), "number", "float", "System.Single", false)]
-        [TestCase("EchoDouble", typeof(double), "number", "double", "System.Double", false)]
-        [TestCase("EchoDecimal", typeof(decimal), "number", "double", "System.Decimal", false)]
-        [TestCase("EchoDateTime", typeof(DateTime), "string", "date-time", "System.DateTime", false)]
-        [TestCase("EchoDateTimeOffset", typeof(DateTimeOffset), "string", "date-time", "System.DateTimeOffset", false)]
-        [TestCase("EchoTimeSpan", typeof(TimeSpan), "string", null, "System.TimeSpan", false)]
-        [TestCase("EchoGuid", typeof(Guid), "string", "uuid", "System.Guid", false)]
-        [TestCase("EchoEnum", typeof(PrimitiveEnum), "integer", "int32", "Swashbuckle.Dummy.Types.PrimitiveEnum", false)]
-        [TestCase("EchoEnum", typeof(PrimitiveEnum), "string", null, "Swashbuckle.Dummy.Types.PrimitiveEnum", false)]
-        [TestCase("EchoChar", typeof(char), "string", null, "System.Char", false)]
-        [TestCase("EchoNullableBoolean", typeof(bool?), "boolean", null, "System.Boolean", true)]
-        [TestCase("EchoNullableByte", typeof(byte?), "integer", "int32", "System.Byte", true)]
-        [TestCase("EchoNullableSByte", typeof(sbyte?), "integer", "int32", "System.SByte", true)]
-        [TestCase("EchoNullableInt16", typeof(short?), "integer", "int32", "System.Int16", true)]
-        [TestCase("EchoNullableUInt16", typeof(ushort?), "integer", "int32", "System.UInt16", true)]
-        [TestCase("EchoNullableInt32", typeof(int?), "integer", "int32", "System.Int32", true)]
-        [TestCase("EchoNullableUInt32", typeof(uint?), "integer", "int32", "System.UInt32", true)]
-        [TestCase("EchoNullableInt64", typeof(long?), "integer", "int64", "System.Int64", true)]
-        [TestCase("EchoNullableUInt64", typeof(ulong?), "integer", "int64", "System.UInt64", true)]
-        [TestCase("EchoNullableSingle", typeof(float?), "number", "float", "System.Single", true)]
-        [TestCase("EchoNullableDouble", typeof(double?), "number", "double", "System.Double", true)]
-        [TestCase("EchoNullableDecimal", typeof(decimal?), "number", "double", "System.Decimal", true)]
-        [TestCase("EchoNullableDateTime", typeof(DateTime?), "string", "date-time", "System.DateTime", true)]
-        [TestCase("EchoNullableDateTimeOffset", typeof(DateTimeOffset?), "string", "date-time", "System.DateTimeOffset", true)]
-        [TestCase("EchoNullableTimeSpan", typeof(TimeSpan?), "string", null, "System.TimeSpan", true)]
-        [TestCase("EchoNullableGuid", typeof(Guid?), "string", "uuid", "System.Guid", true)]
-        [TestCase("EchoNullableEnum", typeof(PrimitiveEnum?), "integer", "int32", "Swashbuckle.Dummy.Types.PrimitiveEnum", true)]
-        [TestCase("EchoNullableEnum", typeof(PrimitiveEnum?), "string", null, "Swashbuckle.Dummy.Types.PrimitiveEnum", true)]
-        [TestCase("EchoNullableChar", typeof(char?), "string", null, "System.Char", true)]
-        [TestCase("EchoString", typeof(string), "string", null, "System.String", true)]
+        private static void AddEnumValuesValue(string type, IDictionary<string, object> expectedParameter, Type underlyingDotNetType)
+        {
+            if (type == "string")
+            {
+                expectedParameter.Add("enum", underlyingDotNetType.GetEnumNames());
+                expectedParameter.Add("x-values", underlyingDotNetType.GetEnumValues());
+            }
+            else
+            {
+                expectedParameter.Add("enum", underlyingDotNetType.GetEnumValues());
+                expectedParameter.Add("x-names", underlyingDotNetType.GetEnumNames());
+            }
+        }
+
+        [Test, TestCaseSource(nameof(GetTestCasesForPrimitiveArrays))]
         public void It_exposes_config_to_post_modify_schemas_for_primitive_arrays(string action, Type dotNetType, string type, string format, string xtypeDotNet, bool xnullable)
         {
             var underlyingDotNetType = Nullable.GetUnderlyingType(dotNetType) ?? dotNetType;
@@ -552,7 +499,7 @@ namespace Swashbuckle.Tests.Swagger
             }
             if (underlyingDotNetType.IsEnum)
             {
-                expectedParameterItems.Add("enum", type == "string" ? underlyingDotNetType.GetEnumNames() : underlyingDotNetType.GetEnumValues());
+                AddEnumValuesValue(type, expectedParameterItems, underlyingDotNetType);
             }
             expectedParameterItems.Add("type", type);
             expectedParameterItems.Add("x-type-dotnet", xtypeDotNet);
@@ -576,7 +523,8 @@ namespace Swashbuckle.Tests.Swagger
                         items = expectedParameterItems
                     }
                 });
-            Assert.AreEqual(expectedParameter.ToString(), parameter.ToString());
+
+            Assert.IsTrue(JToken.DeepEquals(expectedParameter, parameter));
 
             var expectedResponseItems = new Dictionary<string, object>();
             if (format != null)
@@ -585,7 +533,7 @@ namespace Swashbuckle.Tests.Swagger
             }
             if (underlyingDotNetType.IsEnum)
             {
-                expectedResponseItems.Add("enum", type == "string" ? underlyingDotNetType.GetEnumNames() : underlyingDotNetType.GetEnumValues());
+                AddEnumValuesValue(type, expectedResponseItems, underlyingDotNetType);
             }
             expectedResponseItems.Add("type", type);
             expectedResponseItems.Add("x-type-dotnet", xtypeDotNet);
@@ -597,7 +545,69 @@ namespace Swashbuckle.Tests.Swagger
                     type = "array",
                     items = expectedResponseItems
                 });
-            Assert.AreEqual(expectedResponse.ToString(), response.ToString());
+
+            Assert.IsTrue(JToken.DeepEquals(expectedResponse, response));
+        }
+
+
+        public static IEnumerable<object[]> GetTestCasesForPrimitives()
+        {
+            yield return new object[] { "EchoByte", typeof(byte), "integer", "int32", "System.Byte", false }; // Special case
+            foreach (var testCase in GetTestCases())
+            {
+                yield return testCase;
+            }
+        }
+
+        public static IEnumerable<object[]> GetTestCasesForPrimitiveArrays()
+        {
+            yield return new object[] { "EchoByte", typeof(byte), "string", "byte", "System.Byte[]", true }; // Special case
+            foreach (var testCase in GetTestCases())
+            {
+                yield return testCase;
+            }
+        }
+
+        public static IEnumerable<object[]> GetTestCases()
+        {
+            yield return new object[] { "EchoBoolean", typeof(bool), "boolean", null, "System.Boolean", false };
+            yield return new object[] { "EchoSByte", typeof(sbyte), "integer", "int32", "System.SByte", false };
+            yield return new object[] { "EchoInt16", typeof(short), "integer", "int32", "System.Int16", false };
+            yield return new object[] { "EchoUInt16", typeof(ushort), "integer", "int32", "System.UInt16", false };
+            yield return new object[] { "EchoInt32", typeof(int), "integer", "int32", "System.Int32", false };
+            yield return new object[] { "EchoUInt32", typeof(uint), "integer", "int32", "System.UInt32", false };
+            yield return new object[] { "EchoInt64", typeof(long), "integer", "int64", "System.Int64", false };
+            yield return new object[] { "EchoUInt64", typeof(ulong), "integer", "int64", "System.UInt64", false };
+            yield return new object[] { "EchoSingle", typeof(float), "number", "float", "System.Single", false };
+            yield return new object[] { "EchoDouble", typeof(double), "number", "double", "System.Double", false };
+            yield return new object[] { "EchoDecimal", typeof(decimal), "number", "double", "System.Decimal", false };
+            yield return new object[] { "EchoDateTime", typeof(DateTime), "string", "date-time", "System.DateTime", false };
+            yield return new object[] { "EchoDateTimeOffset", typeof(DateTimeOffset), "string", "date-time", "System.DateTimeOffset", false };
+            yield return new object[] { "EchoTimeSpan", typeof(TimeSpan), "string", null, "System.TimeSpan", false };
+            yield return new object[] { "EchoGuid", typeof(Guid), "string", "uuid", "System.Guid", false };
+            yield return new object[] { "EchoEnum", typeof(PrimitiveEnum), "integer", "int32", "Swashbuckle.Dummy.Types.PrimitiveEnum", false };
+            yield return new object[] { "EchoEnum", typeof(PrimitiveEnum), "string", null, "Swashbuckle.Dummy.Types.PrimitiveEnum", false };
+            yield return new object[] { "EchoChar", typeof(char), "string", null, "System.Char", false };
+            yield return new object[] { "EchoNullableBoolean", typeof(bool?), "boolean", null, "System.Boolean", true };
+            yield return new object[] { "EchoNullableByte", typeof(byte?), "integer", "int32", "System.Byte", true };
+            yield return new object[] { "EchoNullableSByte", typeof(sbyte?), "integer", "int32", "System.SByte", true };
+            yield return new object[] { "EchoNullableInt16", typeof(short?), "integer", "int32", "System.Int16", true };
+            yield return new object[] { "EchoNullableUInt16", typeof(ushort?), "integer", "int32", "System.UInt16", true };
+            yield return new object[] { "EchoNullableInt32", typeof(int?), "integer", "int32", "System.Int32", true };
+            yield return new object[] { "EchoNullableUInt32", typeof(uint?), "integer", "int32", "System.UInt32", true };
+            yield return new object[] { "EchoNullableInt64", typeof(long?), "integer", "int64", "System.Int64", true };
+            yield return new object[] { "EchoNullableUInt64", typeof(ulong?), "integer", "int64", "System.UInt64", true };
+            yield return new object[] { "EchoNullableSingle", typeof(float?), "number", "float", "System.Single", true };
+            yield return new object[] { "EchoNullableDouble", typeof(double?), "number", "double", "System.Double", true };
+            yield return new object[] { "EchoNullableDecimal", typeof(decimal?), "number", "double", "System.Decimal", true };
+            yield return new object[] { "EchoNullableDateTime", typeof(DateTime?), "string", "date-time", "System.DateTime", true };
+            yield return new object[] { "EchoNullableDateTimeOffset", typeof(DateTimeOffset?), "string", "date-time", "System.DateTimeOffset", true };
+            yield return new object[] { "EchoNullableTimeSpan", typeof(TimeSpan?), "string", null, "System.TimeSpan", true };
+            yield return new object[] { "EchoNullableGuid", typeof(Guid?), "string", "uuid", "System.Guid", true };
+            yield return new object[] { "EchoNullableEnum", typeof(PrimitiveEnum?), "integer", "int32", "Swashbuckle.Dummy.Types.PrimitiveEnum", true };
+            yield return new object[] { "EchoNullableEnum", typeof(PrimitiveEnum?), "string", null, "Swashbuckle.Dummy.Types.PrimitiveEnum", true };
+            yield return new object[] { "EchoNullableChar", typeof(char?), "string", null, "System.Char", true };
+            yield return new object[] { "EchoString", typeof(string), "string", null, "System.String", true };
         }
 
         [Test]
