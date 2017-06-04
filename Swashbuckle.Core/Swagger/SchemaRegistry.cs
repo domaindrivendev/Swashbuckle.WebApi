@@ -155,7 +155,7 @@ namespace Swashbuckle.Swagger
                 case "System.DateTimeOffset":
                     return new Schema { type = "string", format = "date-time" };
                 case "System.Guid":
-                    return new Schema { type = "string", format = "uuid" };
+                    return new Schema { type = "string", format = "uuid", example = Guid.Empty };
                 default:
                     return new Schema { type = "string" };
             }

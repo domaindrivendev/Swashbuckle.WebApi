@@ -23,7 +23,7 @@ Once you have a Web API that can describe itself in Swagger, you've opened the t
 * Out-of-the-box support for leveraging Xml comments
 * Support for describing ApiKey, Basic Auth and OAuth2 schemes ... including UI support for the Implicit OAuth2 flow
 
-**\*Swashbuckle 5.0**
+**Swashbuckle 5.0**
 
 Swashbuckle 5.0 makes the transition to Swagger 2.0. The 2.0 schema is significantly different to its predecessor (1.2) and, as a result, the Swashbuckle config interface has undergone yet another overhaul. Checkout the [transition guide](#transitioning-to-swashbuckle-50) if you're upgrading from a prior version.
 
@@ -99,6 +99,16 @@ httpConfiguration
 ```
 
 In this case the URL to swagger-ui will be `sandbox/index`.
+
+### Pretty Print ###
+
+If you want the output Swagger docs to be indented properly, enable the __PrettyPrint__ option as following:
+
+```cs
+httpConfiguration
+    .EnableSwagger(c => c.PrettyPrint())
+    .EnableSwaggerUi();
+```
 
 ### Additional Service Metadata ###
 
@@ -448,7 +458,7 @@ Specify which HTTP operations will have the 'Try it out!' option. An empty param
 
 As an alternative, you can inject your own version of "index.html" and customize the markup and swagger-ui directly. Use the __CustomAsset__ option to instruct Swashbuckle to return your version instead of the default when a request is made for "index". As with all custom content, the file must be included in your project as an "Embedded Resource", and then the resource's "Logical Name" is passed to the method as shown below. See [Injecting Custom Content](#injecting-custom-content) for step by step instructions.
 
-For compatibility, you should base your custom "index.html" off [this version](https://github.com/domaindrivendev/Swashbuckle/blob/v5.2.1/Swashbuckle.Core/SwaggerUi/CustomAssets/index.html)
+For compatibility, you should base your custom "index.html" off [this version](https://github.com/domaindrivendev/Swashbuckle/blob/v5.5.3/Swashbuckle.Core/SwaggerUi/CustomAssets/index.html)
 
 ```csharp
 httpConfiguration
@@ -466,7 +476,7 @@ The __InjectStylesheet__, __InjectJavaScript__ and __CustomAsset__ options all s
 1. Add a new file to your Web API project.
 2. In Solution Explorer, right click the file and open its properties window. Change the "Build Action" to "Embedded Resource".
 
-This will embed the file in your assembly and register it with a "Logical Name". This can then be passed to the relevant configuration method. It's based on the Project's default namespace, file location and file extension. For example, given a default namespace of "YourWebApiProject" and a file located at "/SwaggerExtensions/index.html", then the resource will be assigned the name - "YourWebApiProject.SwaggerExtensions.index.html".
+This will embed the file in your assembly and register it with a "Logical Name". This can then be passed to the relevant configuration method. It's based on the Project's default namespace, file location and file extension. For example, given a default namespace of "YourWebApiProject" and a file located at "/SwaggerExtensions/index.html", then the resource will be assigned the name - "YourWebApiProject.SwaggerExtensions.index.html". If you use "Swagger" as the root folder name for your custom assets, this will collide with the default route templates and the page will not be loaded correctly.
 
 ## Transitioning to Swashbuckle 5.0 ##
 

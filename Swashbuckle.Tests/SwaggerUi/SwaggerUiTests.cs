@@ -22,6 +22,16 @@ namespace Swashbuckle.Tests.SwaggerUi
         }
 
         [Test]
+        public void It_changes_the_title ()
+        {
+            string rndTitle = $"TEST_TITLE_{Guid.NewGuid()}";
+            SetUpHandler(c => { c.DocumentTitle(rndTitle); });
+
+            var content = GetContentAsString("http://tempuri.org/swagger/ui/index");
+            StringAssert.Contains(rndTitle, content);
+        }
+
+        [Test]
         public void It_serves_the_embedded_swagger_ui()
         {
             var content = GetContentAsString(TEMP_URI.INDEX);
@@ -30,7 +40,7 @@ namespace Swashbuckle.Tests.SwaggerUi
             StringAssert.Contains("discoveryPaths: arrayFrom('swagger/docs/v1')", content);
             StringAssert.Contains("swagger-ui-container", content);
         }
-        
+
         [Test]
         public void It_exposes_config_to_inject_custom_stylesheets()
         {
@@ -55,7 +65,7 @@ namespace Swashbuckle.Tests.SwaggerUi
             content = GetContentAsString("http://tempuri.org/swagger/ui/ext/Swashbuckle-Dummy-SwaggerExtensions-testStyles2-css");
             StringAssert.StartsWith("h2", content);
         }
-        
+
         [Test]
         public void It_exposes_config_for_swagger_ui_settings()
         {
@@ -72,7 +82,7 @@ namespace Swashbuckle.Tests.SwaggerUi
             StringAssert.Contains("booleanValues: arrayFrom('1|0')", content);
             StringAssert.Contains("supportedSubmitMethods: arrayFrom('get|head')", content);
         }
-        
+
         [Test]
         public void It_exposes_config_for_swagger_ui_outh2_settings()
         {
@@ -132,7 +142,7 @@ namespace Swashbuckle.Tests.SwaggerUi
             content = GetContentAsString("http://tempuri.org/swagger/ui/ext/Swashbuckle-Dummy-SwaggerExtensions-testScript2-js");
             StringAssert.StartsWith("var str2", content);
         }
-        
+
         [Test]
         public void It_exposes_config_to_serve_custom_assets()
         {
@@ -166,7 +176,7 @@ namespace Swashbuckle.Tests.SwaggerUi
 
             StringAssert.Contains("validatorUrl: stringOrNullFrom('null')", content);
         }
-        
+
         [Test]
         public void It_errors_on_asset_not_found_and_returns_status_not_found()
         {
