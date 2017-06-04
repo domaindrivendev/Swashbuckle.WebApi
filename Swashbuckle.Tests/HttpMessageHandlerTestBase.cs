@@ -1,17 +1,12 @@
-﻿using System.Net;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using NUnit.Framework;
-using Swashbuckle.Application;
+﻿using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
+using System.Reflection;
 using System.Threading;
 using System.Web.Http;
 using System.Web.Http.Hosting;
 using System.Web.Http.Routing;
-using Swashbuckle.Dummy.Controllers;
-using System.Reflection;
 
 namespace Swashbuckle.Tests
 {
@@ -19,6 +14,12 @@ namespace Swashbuckle.Tests
     public abstract class HttpMessageHandlerTestBase<THandler>
         where THandler : HttpMessageHandler
     {
+        public struct TEMP_URI
+        {
+            public const string DOCS = "http://tempuri.org/swagger/docs/v1";
+            public const string INDEX = "http://tempuri.org/swagger/ui/index";
+        }
+
         private string _routeTemplate;
 
         protected HttpMessageHandlerTestBase(string routeTemplate) 

@@ -1,9 +1,9 @@
-﻿using System;
-using System.Net;
-using System.Collections.Generic;
-using NUnit.Framework;
+﻿using NUnit.Framework;
 using Swashbuckle.Application;
 using Swashbuckle.Dummy;
+using System;
+using System.Collections.Generic;
+using System.Net;
 
 namespace Swashbuckle.Tests.SwaggerUi
 {
@@ -34,7 +34,7 @@ namespace Swashbuckle.Tests.SwaggerUi
         [Test]
         public void It_serves_the_embedded_swagger_ui()
         {
-            var content = GetContentAsString("http://tempuri.org/swagger/ui/index");
+            var content = GetContentAsString(TEMP_URI.INDEX);
 
             StringAssert.Contains("rootUrl: 'http://tempuri.org:80'", content);
             StringAssert.Contains("discoveryPaths: arrayFrom('swagger/docs/v1')", content);
@@ -52,7 +52,7 @@ namespace Swashbuckle.Tests.SwaggerUi
                 });
 
 
-            var content = GetContentAsString("http://tempuri.org/swagger/ui/index");
+            var content = GetContentAsString(TEMP_URI.INDEX);
 
             StringAssert.Contains(
                 "<link href='ext/Swashbuckle-Dummy-SwaggerExtensions-testStyles1-css' media='screen' rel='stylesheet' type='text/css' />\r\n" +
@@ -76,7 +76,7 @@ namespace Swashbuckle.Tests.SwaggerUi
                     c.SupportedSubmitMethods("GET", "HEAD");
                 });
 
-            var content = GetContentAsString("http://tempuri.org/swagger/ui/index");
+            var content = GetContentAsString(TEMP_URI.INDEX);
 
             StringAssert.Contains("docExpansion: 'full'", content);
             StringAssert.Contains("booleanValues: arrayFrom('1|0')", content);
@@ -97,7 +97,7 @@ namespace Swashbuckle.Tests.SwaggerUi
                         new Dictionary<string, string> { { "TestHeader", "TestValue" } });
                 });
 
-            var content = GetContentAsString("http://tempuri.org/swagger/ui/index");
+            var content = GetContentAsString(TEMP_URI.INDEX);
 
             StringAssert.Contains("oAuth2Enabled: ('true' == 'true')", content);
             StringAssert.Contains("oAuth2ClientId: 'test-client-id'", content);
@@ -113,7 +113,7 @@ namespace Swashbuckle.Tests.SwaggerUi
         {
             SetUpHandler(c => c.EnableDiscoveryUrlSelector());
 
-            var content = GetContentAsString("http://tempuri.org/swagger/ui/index");
+            var content = GetContentAsString(TEMP_URI.INDEX);
 
             StringAssert.Contains("Swashbuckle-SwaggerUi-CustomAssets-discoveryUrlSelector-js", content);
         }
@@ -128,7 +128,7 @@ namespace Swashbuckle.Tests.SwaggerUi
                     c.InjectJavaScript(assembly, "Swashbuckle.Dummy.SwaggerExtensions.testScript2.js");
                 });
 
-            var content = GetContentAsString("http://tempuri.org/swagger/ui/index");
+            var content = GetContentAsString(TEMP_URI.INDEX);
 
             StringAssert.Contains(
                 "customScripts: " +
@@ -152,7 +152,7 @@ namespace Swashbuckle.Tests.SwaggerUi
                     c.CustomAsset("index", assembly, "Swashbuckle.Dummy.SwaggerExtensions.myIndex.html");
                 });
 
-            var content = GetContentAsString("http://tempuri.org/swagger/ui/index");
+            var content = GetContentAsString(TEMP_URI.INDEX);
 
             StringAssert.Contains("My Index", content);
         }
@@ -162,7 +162,7 @@ namespace Swashbuckle.Tests.SwaggerUi
         {
             SetUpHandler(c => c.SetValidatorUrl("http://my-validator.url"));
 
-            var content = GetContentAsString("http://tempuri.org/swagger/ui/index");
+            var content = GetContentAsString(TEMP_URI.INDEX);
 
             StringAssert.Contains("validatorUrl: stringOrNullFrom('http://my-validator.url')", content);
         }
@@ -172,7 +172,7 @@ namespace Swashbuckle.Tests.SwaggerUi
         {
             SetUpHandler(c => c.DisableValidator());
 
-            var content = GetContentAsString("http://tempuri.org/swagger/ui/index");
+            var content = GetContentAsString(TEMP_URI.INDEX);
 
             StringAssert.Contains("validatorUrl: stringOrNullFrom('null')", content);
         }
@@ -193,31 +193,29 @@ namespace Swashbuckle.Tests.SwaggerUi
                     c.EnableApiKeySupport("myApiKey", "header");
                 });
 
-            var content = GetContentAsString("http://tempuri.org/swagger/ui/index");
+            var content = GetContentAsString(TEMP_URI.INDEX);
 
             StringAssert.Contains("apiKeyName: 'myApiKey'", content);
             StringAssert.Contains("apiKeyIn: 'header'", content);
         }
 
-        [TestCase("http://tempuri.org/swagger/ui/images/logo_small-png",                   Result = "image/png")]
-        [TestCase("http://tempuri.org/swagger/ui/css/typography-css",                      Result = "text/css")]
-        public string It_returns_correct_asset_mime_type(string resourceUri)
+        [TestCase("http://tempuri.org/swagger/ui/images/logo_small-png", "image/png")]
+        [TestCase("http://tempuri.org/swagger/ui/css/typography-css",    "text/css")]
+        public void It_returns_correct_asset_mime_type(string resourceUri, string mediaType)
         {
             var response = Get(resourceUri);
 
             System.Diagnostics.Debug.WriteLine(string.Format("[{0}] {1} => {2}", response.StatusCode, resourceUri, response.Content.Headers.ContentType.MediaType));
 
             Assert.AreEqual(response.StatusCode, HttpStatusCode.OK);
-
-            return response.Content.Headers.ContentType.MediaType;
+            Assert.AreEqual(response.Content.Headers.ContentType.MediaType, mediaType);
         }
 
         private void SetUpHandler(Action<SwaggerUiConfig> configure = null)
         {
             var swaggerUiConfig = new SwaggerUiConfig(new[] { "swagger/docs/v1" }, SwaggerDocsConfig.DefaultRootUrlResolver);
 
-            if (configure != null)
-                configure(swaggerUiConfig);
+            configure?.Invoke(swaggerUiConfig);
 
             Handler = new SwaggerUiHandler(swaggerUiConfig);
         }
