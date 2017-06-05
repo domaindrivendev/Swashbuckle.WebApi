@@ -188,6 +188,7 @@ namespace Swashbuckle.Swagger
             }
 
             parameter.required = location == "path" || !paramDesc.ParameterDescriptor.IsOptional;
+            parameter.description = paramDesc.Documentation;
 
             var schema = schemaRegistry.GetOrRegister(paramDesc.ParameterDescriptor.ParameterType);
             if (parameter.@in == "body")
