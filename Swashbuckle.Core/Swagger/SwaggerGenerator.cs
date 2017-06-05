@@ -195,7 +195,8 @@ namespace Swashbuckle.Swagger
             else
                 parameter.PopulateFrom(schema);
 
-            parameter.@default = paramDesc.ParameterDescriptor.DefaultValue;
+            if (paramDesc.ParameterDescriptor.DefaultValue != null)
+                parameter.@default = paramDesc.ParameterDescriptor.DefaultValue;
             return parameter;
         }
     }
