@@ -4,6 +4,11 @@
         <name>Swashbuckle.Dummy.Core</name>
     </assembly>
     <members>
+        <member name="T:Swashbuckle.Dummy.Controllers.XmlAnnotatedController">
+            <summary>
+            XmlAnnotatedController
+            </summary>
+        </member>
         <member name="M:Swashbuckle.Dummy.Controllers.XmlAnnotatedController.Create(Swashbuckle.Dummy.Controllers.Account)">
             <summary>
             Registers a new Account based on <paramref name="account"/>.

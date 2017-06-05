@@ -85,6 +85,18 @@ namespace Swashbuckle.Tests.Swagger
         }
 
         [Test]
+        public void It_documents_controllers()
+        {
+            var key = "XmlAnnotated";
+            var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/v1");
+
+            var tag = swagger.SelectToken($"$.tags[?(@.name == '{key}')]");
+            Assert.IsNotNull(tag);
+            Assert.IsNotNull(tag["description"]);
+            Assert.IsTrue(tag["description"].ToString().Contains(key));
+        }
+
+        [Test]
         public void It_documents_schemas_from_type_summary_tags()
         {
             var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/v1");

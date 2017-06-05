@@ -1,11 +1,9 @@
-﻿using System.Linq;
-using System.Collections.Generic;
-using System.Web.Http.Description;
+﻿using Newtonsoft.Json;
 using System;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
-using System.Net.Http.Formatting;
+using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
+using System.Web.Http.Description;
 
 namespace Swashbuckle.Swagger
 {
@@ -46,8 +44,10 @@ namespace Swashbuckle.Swagger
             if (info == null)
                 throw new UnknownApiVersion(apiVersion);
 
-            var paths = GetApiDescriptionsFor(apiVersion)
-                .Where(apiDesc => !(_options.IgnoreObsoleteActions && apiDesc.IsObsolete()))
+            var apiDescriptions = GetApiDescriptionsFor(apiVersion)
+                .Where(apiDesc => !(_options.IgnoreObsoleteActions && apiDesc.IsObsolete()));
+
+            var paths = apiDescriptions
                 .OrderBy(_options.GroupingKeySelector, _options.GroupingKeyComparer)
                 .GroupBy(apiDesc => apiDesc.RelativePathSansQueryString())
                 .ToDictionary(group => "/" + group.Key, group => CreatePathItem(group, schemaRegistry));
@@ -55,11 +55,31 @@ namespace Swashbuckle.Swagger
             var rootUri = new Uri(rootUrl);
             var port = (!rootUri.IsDefaultPort) ? ":" + rootUri.Port : string.Empty;
 
+            var controllers = apiDescriptions
+                .GroupBy(x => x.ActionDescriptor.ControllerDescriptor)
+                .Select(x => new {
+                    name = x.Key.ControllerName,
+                    context = new ModelFilterContext(x.Key.ControllerType, null, null)
+                });
+
+            var tags = new List<Tag>();
+            foreach (var filter in _options.ModelFilters)
+            {
+                foreach (var c in controllers)
+                {
+                    var model = new Schema();
+                    filter.Apply(model, c.context);
+                    if (!string.IsNullOrEmpty(model.description))
+                        tags.Add(new Tag() { name = c.name, description = model.description });
+                }
+            }
+
             var swaggerDoc = new SwaggerDocument
             {
                 info = info,
                 host = rootUri.Host + port,
                 basePath = (rootUri.AbsolutePath != "/") ? rootUri.AbsolutePath : null,
+                tags = (tags.Count > 0) ? tags : null,
                 schemes = (_options.Schemes != null) ? _options.Schemes.ToList() : new[] { rootUri.Scheme }.ToList(),
                 paths = paths,
                 definitions = schemaRegistry.Definitions,
@@ -184,7 +204,7 @@ namespace Swashbuckle.Swagger
             {
                 parameter.type = "string";
                 parameter.required = true;
-                return parameter; 
+                return parameter;
             }
 
             parameter.required = location == "path" || !paramDesc.ParameterDescriptor.IsOptional;
