@@ -1,9 +1,11 @@
 ﻿using System.Collections.Generic;
-using System.Diagnostics;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using NUnit.Framework;
 using Swashbuckle.Dummy.Controllers;
 using Swashbuckle.Dummy.SwaggerExtensions;
+using Swashbuckle.Swagger;
+using Swashbuckle.Application;
 
 namespace Swashbuckle.Tests.Swagger
 {
@@ -48,6 +50,23 @@ namespace Swashbuckle.Tests.Swagger
 
             Assert.IsNotNull(xProp);
             Assert.AreEqual("bar", xProp.ToString());            
+        }
+
+        [Test]
+        public void It_deserializes_vendor_extensions()
+        {
+            SetUpDefaultRouteFor<ProductsController>();
+            SetUpHandler(c => c.OperationFilter<ApplyResponseVendorExtensions>());
+
+            var swaggerContents = GetContentAsString("http://tempuri.org/swagger/docs/v1");
+            var swagger = JsonConvert.DeserializeObject<SwaggerDocument>(swaggerContents, new JsonSerializerSettings
+            {
+                Converters = new[] { new VendorExtensionsConverter() }
+            });
+            var xProp = swagger.paths["/products"].get.responses["200"].vendorExtensions["x-foo"];
+
+            Assert.IsNotNull(xProp);
+            Assert.AreEqual("bar", xProp.ToString());
         }
 
         [Test]
