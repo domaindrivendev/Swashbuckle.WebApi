@@ -1,11 +1,9 @@
-﻿using System.Linq;
-using System.Collections.Generic;
-using System.Web.Http.Description;
+﻿using Newtonsoft.Json;
 using System;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
-using System.Net.Http.Formatting;
+using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
+using System.Web.Http.Description;
 
 namespace Swashbuckle.Swagger
 {
@@ -50,7 +48,7 @@ namespace Swashbuckle.Swagger
                 .Where(apiDesc => !(_options.IgnoreObsoleteActions && apiDesc.IsObsolete()))
                 .OrderBy(_options.GroupingKeySelector, _options.GroupingKeyComparer)
                 .GroupBy(apiDesc => apiDesc.RelativePathSansQueryString())
-                .ToDictionary(group => "/" + group.Key, group => CreatePathItem(group, schemaRegistry));
+                .ToDictionary(group => "/" + group.Key, group => CreatePathItem(group, schemaRegistry, apiVersion));
 
             var rootUri = new Uri(rootUrl);
             var port = (!rootUri.IsDefaultPort) ? ":" + rootUri.Port : string.Empty;
@@ -66,7 +64,7 @@ namespace Swashbuckle.Swagger
                 securityDefinitions = _options.SecurityDefinitions
             };
 
-            foreach(var filter in _options.DocumentFilters)
+            foreach (var filter in _options.DocumentFilters)
             {
                 filter.Apply(swaggerDoc, schemaRegistry, _apiExplorer);
             }
@@ -81,7 +79,7 @@ namespace Swashbuckle.Swagger
                 : _apiExplorer.ApiDescriptions.Where(apiDesc => _options.VersionSupportResolver(apiDesc, apiVersion));
         }
 
-        private PathItem CreatePathItem(IEnumerable<ApiDescription> apiDescriptions, SchemaRegistry schemaRegistry)
+        private PathItem CreatePathItem(IEnumerable<ApiDescription> apiDescriptions, SchemaRegistry schemaRegistry, string apiVersion)
         {
             var pathItem = new PathItem();
 
@@ -100,25 +98,25 @@ namespace Swashbuckle.Swagger
                 switch (httpMethod)
                 {
                     case "get":
-                        pathItem.get = CreateOperation(apiDescription, schemaRegistry);
+                        pathItem.get = CreateOperation(apiDescription, schemaRegistry, apiVersion);
                         break;
                     case "put":
-                        pathItem.put = CreateOperation(apiDescription, schemaRegistry);
+                        pathItem.put = CreateOperation(apiDescription, schemaRegistry, apiVersion);
                         break;
                     case "post":
-                        pathItem.post = CreateOperation(apiDescription, schemaRegistry);
+                        pathItem.post = CreateOperation(apiDescription, schemaRegistry, apiVersion);
                         break;
                     case "delete":
-                        pathItem.delete = CreateOperation(apiDescription, schemaRegistry);
+                        pathItem.delete = CreateOperation(apiDescription, schemaRegistry, apiVersion);
                         break;
                     case "options":
-                        pathItem.options = CreateOperation(apiDescription, schemaRegistry);
+                        pathItem.options = CreateOperation(apiDescription, schemaRegistry, apiVersion);
                         break;
                     case "head":
-                        pathItem.head = CreateOperation(apiDescription, schemaRegistry);
+                        pathItem.head = CreateOperation(apiDescription, schemaRegistry, apiVersion);
                         break;
                     case "patch":
-                        pathItem.patch = CreateOperation(apiDescription, schemaRegistry);
+                        pathItem.patch = CreateOperation(apiDescription, schemaRegistry, apiVersion);
                         break;
                 }
             }
@@ -126,7 +124,7 @@ namespace Swashbuckle.Swagger
             return pathItem;
         }
 
-        private Operation CreateOperation(ApiDescription apiDesc, SchemaRegistry schemaRegistry)
+        private Operation CreateOperation(ApiDescription apiDesc, SchemaRegistry schemaRegistry, string apiVersion)
         {
             var parameters = apiDesc.ParameterDescriptions
                 .Select(paramDesc =>
@@ -151,7 +149,8 @@ namespace Swashbuckle.Swagger
                 consumes = apiDesc.Consumes().ToList(),
                 parameters = parameters.Any() ? parameters : null, // parameters can be null but not empty
                 responses = responses,
-                deprecated = apiDesc.IsObsolete() ? true : (bool?) null
+                deprecated = apiDesc.IsObsolete() ? true : (bool?)null,
+                apiVersion = apiVersion
             };
 
             foreach (var filter in _options.OperationFilters)
@@ -184,7 +183,7 @@ namespace Swashbuckle.Swagger
             {
                 parameter.type = "string";
                 parameter.required = true;
-                return parameter; 
+                return parameter;
             }
 
             parameter.required = location == "path" || !paramDesc.ParameterDescriptor.IsOptional;
