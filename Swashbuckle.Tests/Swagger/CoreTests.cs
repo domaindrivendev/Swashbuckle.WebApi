@@ -543,6 +543,21 @@ namespace Swashbuckle.Tests.Swagger
         }
 
         [Test]
+        public void It_handles_overloaded_attribute_routes()
+        {
+            SetUpAttributeRoutesFrom(typeof(OverloadedAttributeRoutesController).Assembly);
+
+            var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/v1");
+            
+            var opIds = swagger["paths"]
+                .SelectMany(path => path)
+                .SelectMany(action => action)
+                .Select(action => action.First()["operationId"].ToString());
+            
+            Assert.AreEqual(opIds.Count(), opIds.GroupBy(x => x).Count());
+        }
+
+        [Test]
         public void It_handles_json_formatter_not_present()
         {
             SetUpDefaultRouteFor<ProductsController>();
