@@ -1,14 +1,12 @@
-﻿using System;
-using System.Net.Http;
-using System.Threading;
-using System.Threading.Tasks;
+﻿using System.Net.Http;
 using System.Web.Http;
 using System.Net.Http.Formatting;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
 using System.Collections.Generic;
 using Swashbuckle.Swagger;
 using System.Net;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Swashbuckle.Application
 {
@@ -23,6 +21,12 @@ namespace Swashbuckle.Application
 
         protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
         {
+            if (!Thread.CurrentPrincipal.Identity.IsAuthenticated)
+            {
+                var response = request.CreateResponse(HttpStatusCode.Unauthorized);
+                return Task.FromResult(response);
+            }
+
             var swaggerProvider = _config.GetSwaggerProvider(request);
             var rootUrl = _config.GetRootUrl(request);
             var apiVersion = request.GetRouteData().Values["apiVersion"].ToString();
@@ -31,11 +35,11 @@ namespace Swashbuckle.Application
             {
                 var swaggerDoc = swaggerProvider.GetSwagger(rootUrl, apiVersion);
                 var content = ContentFor(request, swaggerDoc);
-                return TaskFor(new HttpResponseMessage { Content = content });
+                return Task.FromResult(new HttpResponseMessage { Content = content });
             }
             catch (UnknownApiVersion ex)
             {
-                return TaskFor(request.CreateErrorResponse(HttpStatusCode.NotFound, ex));
+                return Task.FromResult(request.CreateErrorResponse(HttpStatusCode.NotFound, ex));
             }
         }
 
@@ -61,13 +65,6 @@ namespace Swashbuckle.Application
             // NOTE: The custom converter would not be neccessary in Newtonsoft.Json >= 5.0.5 as JsonExtensionData
             // provides similar functionality. But, need to stick with older version for WebApi 5.0.0 compatibility 
             return new[] { jsonFormatter };
-        }
-
-        private Task<HttpResponseMessage> TaskFor(HttpResponseMessage response)
-        {
-            var tsc = new TaskCompletionSource<HttpResponseMessage>();
-            tsc.SetResult(response);
-            return tsc.Task;
         }
     }
 }
