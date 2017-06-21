@@ -22,16 +22,6 @@ namespace Swashbuckle.Tests.SwaggerUi
         }
 
         [Test]
-        public void It_changes_the_title ()
-        {
-            string rndTitle = $"TEST_TITLE_{Guid.NewGuid()}";
-            SetUpHandler(c => { c.DocumentTitle(rndTitle); });
-
-            var content = GetContentAsString("http://tempuri.org/swagger/ui/index");
-            StringAssert.Contains(rndTitle, content);
-        }
-
-        [Test]
         public void It_serves_the_embedded_swagger_ui()
         {
             var content = GetContentAsString("http://tempuri.org/swagger/ui/index");
@@ -64,6 +54,16 @@ namespace Swashbuckle.Tests.SwaggerUi
 
             content = GetContentAsString("http://tempuri.org/swagger/ui/ext/Swashbuckle-Dummy-SwaggerExtensions-testStyles2-css");
             StringAssert.StartsWith("h2", content);
+        }
+
+        [Test]
+        public void It_exposes_config_to_set_the_page_title()
+        {
+            string customTitle = string.Format("TEST_TITLE_{0}", Guid.NewGuid());
+            SetUpHandler(c => { c.DocumentTitle(customTitle); });
+
+            var content = GetContentAsString("http://tempuri.org/swagger/ui/index");
+            StringAssert.Contains(customTitle, content);
         }
 
         [Test]
