@@ -211,6 +211,23 @@ namespace Swashbuckle.Tests.Swagger
         }
 
         [Test]
+        public void It_does_not_load_bad_xml()
+        {
+            Exception ex = null;
+            try
+            {
+                SetUpHandler(c => { c.IncludeXmlComments("BadXml.xml"); });
+            }
+            catch (Exception e)
+            {
+                ex = e;
+            }
+            Assert.IsNotNull(ex);
+            // The exception message should contain something related to XML
+            Assert.IsTrue(ex.Message.Contains("XML"));
+        }
+
+        [Test]
         public void It_does_not_clear_previously_added_responses()
         {
             SetUpHandler(c =>
