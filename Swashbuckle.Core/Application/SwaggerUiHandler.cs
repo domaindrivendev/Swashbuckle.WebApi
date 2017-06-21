@@ -25,7 +25,7 @@ namespace Swashbuckle.Application
 
             try
             {
-                var webAsset = swaggerUiProvider.GetAsset(rootUrl, assetPath);
+                var webAsset = swaggerUiProvider.GetAsset(rootUrl, assetPath.TrimEnd('/'));
                 var content = ContentFor(webAsset);
                 return TaskFor(new HttpResponseMessage { Content = content, RequestMessage = request });
             }

@@ -32,6 +32,14 @@ namespace Swashbuckle.Tests.SwaggerUi
         }
 
         [Test]
+        public void It_serves_the_embedded_swagger_ui_with_ending_slash()
+        {
+            var content = GetContentAsString("http://tempuri.org/swagger/ui/index/");
+
+            StringAssert.Contains("swagger-ui-container", content);
+        }
+
+        [Test]
         public void It_exposes_config_to_inject_custom_stylesheets()
         {
             SetUpHandler(c =>
