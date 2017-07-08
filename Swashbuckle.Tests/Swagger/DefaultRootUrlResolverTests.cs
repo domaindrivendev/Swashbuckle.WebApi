@@ -26,10 +26,10 @@
             request.Headers.Add("X-Forwarded-Proto", "https");
             request.Headers.Add("X-Forwarded-Host", "acmecorp.org");
             request.Headers.Add("X-Forwarded-Port", "8080");
-
+            request.Headers.Add("X-Forwarded-Prefix", "/api");
             var rootUrl = SwaggerDocsConfig.DefaultRootUrlResolver(request);
 
-            Assert.AreEqual("https://acmecorp.org:8080", rootUrl);
+            Assert.AreEqual("https://acmecorp.org:8080/api", rootUrl);
         }
 
         [TestCase("http://tempuri.org", "http://tempuri.org")]
