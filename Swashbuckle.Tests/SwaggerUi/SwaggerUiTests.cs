@@ -26,7 +26,7 @@ namespace Swashbuckle.Tests.SwaggerUi
         {
             var content = GetContentAsString("http://tempuri.org/swagger/ui/index");
 
-            StringAssert.Contains("rootUrl: 'http://tempuri.org:80'", content);
+            StringAssert.Contains("rootUrl: 'http://tempuri.org'", content);
             StringAssert.Contains("discoveryPaths: arrayFrom('swagger/docs/v1')", content);
             StringAssert.Contains("swagger-ui-container", content);
         }
