@@ -69,8 +69,14 @@ namespace Swashbuckle.Swagger.XmlComments
                 if (actionParameter == null) continue;
 
                 var paramNode = methodNode.SelectSingleNode(string.Format(ParamXPath, actionParameter.Name));
+
                 if (paramNode != null)
-                    parameter.description = paramNode.ExtractContent();
+                {
+                    var description = paramNode.ExtractContent();
+
+                    if (!string.IsNullOrEmpty(description))
+                        parameter.description = description;
+                }
             }
         }
 
