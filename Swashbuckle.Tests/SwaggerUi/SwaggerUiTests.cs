@@ -199,17 +199,16 @@ namespace Swashbuckle.Tests.SwaggerUi
             StringAssert.Contains("apiKeyIn: 'header'", content);
         }
 
-        [TestCase("http://tempuri.org/swagger/ui/images/logo_small-png",                   Result = "image/png")]
-        [TestCase("http://tempuri.org/swagger/ui/css/typography-css",                      Result = "text/css")]
-        public string It_returns_correct_asset_mime_type(string resourceUri)
+        [TestCase("http://tempuri.org/swagger/ui/images/logo_small-png", "image/png")]
+        [TestCase("http://tempuri.org/swagger/ui/css/typography-css", "text/css")]
+        public void It_returns_correct_asset_mime_type(string resourceUri, string expectedMimeType)
         {
             var response = Get(resourceUri);
 
             System.Diagnostics.Debug.WriteLine(string.Format("[{0}] {1} => {2}", response.StatusCode, resourceUri, response.Content.Headers.ContentType.MediaType));
 
-            Assert.AreEqual(response.StatusCode, HttpStatusCode.OK);
-
-            return response.Content.Headers.ContentType.MediaType;
+            Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
+            Assert.AreEqual(expectedMimeType, response.Content.Headers.ContentType.MediaType);
         }
 
         private void SetUpHandler(Action<SwaggerUiConfig> configure = null)
