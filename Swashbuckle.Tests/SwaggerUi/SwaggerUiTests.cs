@@ -115,7 +115,7 @@ namespace Swashbuckle.Tests.SwaggerUi
 
             var content = GetContentAsString("http://tempuri.org/swagger/ui/index");
 
-            StringAssert.Contains("Swashbuckle-SwaggerUi-CustomAssets-discoveryUrlSelector-js", content);
+            StringAssert.Contains ("discoveryUrlSelectorEnabled: ('true' == 'true')", content);
         }
 
         [Test]
