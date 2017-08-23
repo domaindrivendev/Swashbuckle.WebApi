@@ -836,12 +836,12 @@ namespace Swashbuckle.Tests.Swagger
         }
 
         [Test]
-        [ExpectedException(typeof(InvalidOperationException))]
         public void It_errors_on_multiple_types_with_the_same_class_name()
         {
             SetUpDefaultRouteFor<ConflictingTypesController>();
 
-            var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/v1");
+            Assert.Throws<InvalidOperationException>(
+                delegate { GetContent<JObject>("http://tempuri.org/swagger/docs/v1"); });
         }
 
         [Test]

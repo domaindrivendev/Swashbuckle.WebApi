@@ -15,7 +15,6 @@ using System.Reflection;
 
 namespace Swashbuckle.Tests
 {
-    [TestFixture]
     public abstract class HttpMessageHandlerTestBase<THandler>
         where THandler : HttpMessageHandler
     {
