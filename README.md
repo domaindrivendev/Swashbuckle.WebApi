@@ -5,6 +5,8 @@
 Swashbuckle
 =========
 
+[![Build status](https://ci.appveyor.com/api/projects/status/qoesh4nm6tb6diuk?svg=true)](https://ci.appveyor.com/project/domaindrivendev/swashbuckle)
+
 Seamlessly adds a [Swagger](http://swagger.io/) to WebApi projects! Combines ApiExplorer and Swagger/swagger-ui to provide a rich discovery, documentation and playground experience to your API consumers.
 
 In addition to its Swagger generator, Swashbuckle also contains an embedded version of [swagger-ui](https://github.com/swagger-api/swagger-ui) which it will automatically serve up once Swashbuckle is installed. This means you can complement your API with a slick discovery UI to assist consumers with their integration efforts. Best of all, it requires minimal coding and maintenance, allowing you to focus on building an awesome API!

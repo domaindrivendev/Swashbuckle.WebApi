@@ -560,12 +560,12 @@ namespace Swashbuckle.Tests.Swagger
         }
 
         [Test]
-        [ExpectedException(typeof(NotSupportedException))]
         public void It_errors_on_multiple_actions_with_same_path_and_method()
         {
             SetUpDefaultRouteFor<ConflictingActionsController>();
 
-            var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/v1");
+            Assert.Throws<NotSupportedException>(
+                delegate { GetContent<JObject>("http://tempuri.org/swagger/docs/v1"); });
         }
     }
 }
