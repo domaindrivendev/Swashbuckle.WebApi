@@ -110,6 +110,20 @@ namespace Swashbuckle.Tests.Swagger
         }
 
         [Test]
+        public void It_documents_schema_properties_from_property_example_tags()
+        {
+            var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/v1");
+
+            var usernameProperty = swagger["definitions"]["Account"]["properties"]["Username"];
+            Assert.IsNotNull(usernameProperty["example"]);
+            Assert.AreEqual("simon", usernameProperty["example"].ToString());
+
+            var passwordProperty = swagger["definitions"]["Account"]["properties"]["Password"];
+            Assert.IsNotNull(passwordProperty["example"]);
+            Assert.AreEqual("Password1234", passwordProperty["example"].ToString());
+        }
+
+        [Test]
         public void It_documents_schema_properties_including_property_summary_tags_from_base_classes()
         {
             var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/v1");
@@ -127,6 +141,16 @@ namespace Swashbuckle.Tests.Swagger
             var usernameProperty = swagger["definitions"]["SubAccount"]["properties"]["AccountID"];
             Assert.IsNotNull(usernameProperty["description"]);
             Assert.AreEqual("The Account ID for SubAccounts should be 7 digits.", usernameProperty["description"].ToString());
+        }
+
+        [Test]
+        public void It_documents_schema_properties_favoring_property_example_tags_from_derived_vs_base_classes()
+        {
+            var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/v1");
+
+            var usernameProperty = swagger["definitions"]["SubAccount"]["properties"]["AccountID"];
+            Assert.IsNotNull(usernameProperty["description"]);
+            Assert.AreEqual("AB123456/C", usernameProperty["example"].ToString());
         }
 
         [Test]
