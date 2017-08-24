@@ -357,6 +357,7 @@ If you annotate Controllers and API Types with [Xml Comments](http://msdn.micros
 * **Parameter summary** -> Parameter.description
 * **Type summary** -> Schema.descripton
 * **Property summary** -> Schema.description (i.e. on a property Schema)
+* **Property example** -> Schema.example (i.e. on a property Schema)
 
 You can enable this by providing the path to one or more XML comments files:
 ```csharp
