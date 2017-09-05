@@ -13,9 +13,9 @@ Please remember that Swashbuckle is a free and open-source project provided to t
 
 ## Feature Requests ##
 
-Fundamentally, Swashbuckle is a library that attempts to generate an accurate description of your API, using [Swagger 2.0](https://swagger.io/docs/specification/2-0/basic-structure/), according to the routes, controllers and models that you've implemented. So, the resulting API documentation is driven by "actual" behavior as opposed to "intended" behavior. This is an important distinction to consider when submitting feature requests. For example, a feature that leverages built-in attributes (e.g. AuthorizeAttribute, RequiredAttribute etc.) would be more aligned to the project goals than one that introduces custom, documentation-specific attributes that have no impact on actual API behavior.
+Fundamentally, Swashbuckle is a library that attempts to generate an accurate description for APIs built on WebAPI, using [Swagger 2.0](https://swagger.io/docs/specification/2-0/basic-structure/), according to the routes, controllers and models that have been implemented. So, the resulting API documentation is driven by "actual" behavior as opposed to "intended" behavior. This is an important distinction to consider when submitting feature requests. For example, a feature that leverages built-in attributes that affect runtime behavior (e.g. AuthorizeAttribute, RequiredAttribute etc.) would be more aligned to the project goals than one that introduces custom attributes that drive documentation and nothing else.
 
-It's also worth noting that Swashbuckle ships with an embedded version of the [swagger-ui](swagger-ui), providing a powerful documentation solution when combined with the auto-generated Swagger, but is not responsible for the development of that library and therefore any UI-specific features.
+It's also worth noting that Swashbuckle ships with an embedded version of the [swagger-ui](https://github.com/swagger-api/swagger-ui), providing a powerful documentation solution when combined with the auto-generated Swagger, but is not responsible for the development of that library and therefore any UI-specific features.
 
 Feel free to submit feature requests but please keep these constraints in mind when doing so.
 
