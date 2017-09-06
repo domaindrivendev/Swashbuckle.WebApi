@@ -166,7 +166,7 @@ namespace Swashbuckle.Swagger
         {
             if (apiDesc.RelativePathSansQueryString().Contains("{" + paramDesc.Name + "}"))
                 return "path";
-            else if (paramDesc.Source == ApiParameterSource.FromBody && apiDesc.HttpMethod != HttpMethod.Get)
+            else if (paramDesc.Source == ApiParameterSource.FromBody)
                 return "body";
             else
                 return "query";
