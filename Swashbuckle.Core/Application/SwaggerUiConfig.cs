@@ -23,6 +23,7 @@ namespace Swashbuckle.Application
                 { "%(DocumentTitle)", "Swagger UI" },
                 { "%(StylesheetIncludes)", "" },
                 { "%(DiscoveryPaths)", String.Join("|", discoveryPaths) },
+                { "%(DiscoveryUrlSelectorEnabled)", "false" },
                 { "%(BooleanValues)", "true|false" },
                 { "%(ValidatorUrl)", "" },
                 { "%(CustomScripts)", "" },
@@ -35,8 +36,8 @@ namespace Swashbuckle.Application
                 { "%(OAuth2AppName)", "" },
                 { "%(OAuth2ScopeSeperator)", " " },
                 { "%(OAuth2AdditionalQueryStringParams)", "{}" },
-				{ "%(ApiKeyName)", "api_key" },
-				{ "%(ApiKeyIn)", "query" }
+                { "%(ApiKeyName)", "api_key" },
+                { "%(ApiKeyIn)", "query" }
             };
             _rootUrlResolver = rootUrlResolver;
 
@@ -112,7 +113,7 @@ namespace Swashbuckle.Application
 
         public void EnableDiscoveryUrlSelector()
         {
-            InjectJavaScript(GetType().Assembly, "Swashbuckle.SwaggerUi.CustomAssets.discoveryUrlSelector.js");
+            _templateParams["%(DiscoveryUrlSelectorEnabled)"] = "true";
         }
 
         public void EnableOAuth2Support(string clientId, string realm, string appName)
