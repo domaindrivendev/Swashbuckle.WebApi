@@ -2,13 +2,14 @@
 using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
+using System.Threading;
 using System.Web.Http;
 
 namespace Swashbuckle.Dummy.Controllers
 {
     public class ProductsController : ApiController
     {
-        public int Create(Product product)
+        public int Create(Product product, CancellationToken cancellationToken)
         {
             throw new NotImplementedException();
         }
