@@ -424,11 +424,10 @@ httpConfiguration
         {
             c.InjectStylesheet(containingAssembly, "Swashbuckle.Dummy.SwaggerExtensions.testStyles1.css");
             c.InjectJavaScript(containingAssembly, "Swashbuckle.Dummy.SwaggerExtensions.testScript1.js");
-            c.BooleanValues(new[] { "0", "1" });
             c.SetValidatorUrl("http://localhost/validator");
             c.DisableValidator();
             c.DocExpansion(DocExpansion.List);
-c.SupportedSubmitMethods("GET", "HEAD")
+            c.SupportedSubmitMethods("GET", "HEAD")
         });
 ```
 
@@ -439,10 +438,6 @@ Use this to enrich the UI with one or more additional CSS stylesheets. The file(
 #### InjectJavaScript ####
 
 Use this to invoke one or more custom JavaScripts after the swagger-ui has loaded. The file(s) must be included in your project as an "Embedded Resource", and then the resource's "Logical Name" is passed to the method as shown above. See [Injecting Custom Content](#injecting-custom-content) for step by step instructions.
-
-#### BooleanValues ####
-
-The swagger-ui renders boolean data types as a dropdown. By default, it provides "true" and "false" strings as the possible choices. You can use this option to change these to something else, for example 0 and 1.
 
 #### SetValidatorUrl/DisableValidator ####
 

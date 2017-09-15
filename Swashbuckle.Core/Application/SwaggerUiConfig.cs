@@ -23,7 +23,6 @@ namespace Swashbuckle.Application
                 { "%(DocumentTitle)", "Swagger UI" },
                 { "%(StylesheetIncludes)", "" },
                 { "%(DiscoveryPaths)", String.Join("|", discoveryPaths) },
-                { "%(BooleanValues)", "true|false" },
                 { "%(ValidatorUrl)", "" },
                 { "%(CustomScripts)", "" },
                 { "%(DocExpansion)", "none" },
@@ -58,11 +57,6 @@ namespace Swashbuckle.Application
             _templateParams["%(StylesheetIncludes)"] = stringBuilder.ToString();
 
             CustomAsset(path, resourceAssembly, resourceName, isTemplate);
-        }
-
-        public void BooleanValues(IEnumerable<string> values)
-        {
-            _templateParams["%(BooleanValues)"] = String.Join("|", values);
         }
 
         public void DocumentTitle(string title)
