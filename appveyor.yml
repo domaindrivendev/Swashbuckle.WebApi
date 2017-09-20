@@ -3,6 +3,7 @@ init:
 
 before_build:
   - git submodule update --init
+  - nuget restore
 
 build:
   project: Swashbuckle.sln
