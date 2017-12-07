@@ -20,7 +20,7 @@ namespace Swashbuckle.Dummy.Areas.SampleOne.Controllers
 
         public void Delete(int id)
         {
-            throw new NotImplementedException();
+            
         }
 
         [Route("")]

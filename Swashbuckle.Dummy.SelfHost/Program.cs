@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Configuration;
 using System.Web.Http.SelfHost;
 
 namespace Swashbuckle.Dummy.SelfHost
@@ -8,8 +9,9 @@ namespace Swashbuckle.Dummy.SelfHost
         static void Main(string[] args)
         {
             var config = new HttpSelfHostConfiguration("http://localhost:8080");
+            bool.TryParse(ConfigurationManager.AppSettings["isolateAreaSwaggers"], out var isolateAreaSwaggers);
 
-            SwaggerConfig.Register(config);
+            SwaggerConfig.Register(config, isolateAreaSwaggers);
             WebApiConfig.Register(config);
 
             using (var server = new HttpSelfHostServer(config))

@@ -1,11 +1,9 @@
-﻿using System;
-using System.Net.Http;
+﻿using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Web.Http;
 using System.Net.Http.Formatting;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
 using System.Collections.Generic;
 using Swashbuckle.Swagger;
 using System.Net;
@@ -15,10 +13,14 @@ namespace Swashbuckle.Application
     public class SwaggerDocsHandler : HttpMessageHandler
     {
         private readonly SwaggerDocsConfig _config;
+        private readonly AreaDescription _area;
+        private readonly IList<AreaDescription> _allAreas;
 
-        public SwaggerDocsHandler(SwaggerDocsConfig config)
+        public SwaggerDocsHandler(SwaggerDocsConfig config, AreaDescription area = null, IList<AreaDescription> allAreas = null)
         {
             _config = config;
+            _area = area;
+            _allAreas = allAreas ?? new List<AreaDescription>();
         }
 
         protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
@@ -29,7 +31,11 @@ namespace Swashbuckle.Application
 
             try
             {
-                var swaggerDoc = swaggerProvider.GetSwagger(rootUrl, apiVersion);
+                var swaggerDoc = 
+                    _area == null && _allAreas.Count <= 0
+                    ? swaggerProvider.GetSwagger(rootUrl, apiVersion) 
+                    : swaggerProvider.GetSwagger(rootUrl, apiVersion, _area, _allAreas);
+
                 var content = ContentFor(request, swaggerDoc);
                 return TaskFor(new HttpResponseMessage { Content = content });
             }

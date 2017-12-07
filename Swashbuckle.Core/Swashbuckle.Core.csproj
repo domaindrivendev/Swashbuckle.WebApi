@@ -42,6 +42,9 @@
     <AssemblyOriginatorKeyFile>Swashbuckle.Core.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <PropertyGroup />
+  <PropertyGroup>
+    <RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="Newtonsoft.Json, Version=7.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.7.0.1\lib\net40\Newtonsoft.Json.dll</HintPath>
@@ -88,6 +91,7 @@
     <Compile Include="Application\SwaggerDocsConfig.cs" />
     <Compile Include="Application\HttpConfigurationExtensions.cs" />
     <Compile Include="Swagger\Annotations\ApplySwaggerResponseAttributes.cs" />
+    <Compile Include="Swagger\AreaDescription.cs" />
     <Compile Include="Swagger\XmlComments\XmlCommentsIdHelper.cs" />
     <Compile Include="Swagger\IModelFilter.cs" />
     <Compile Include="Swagger\StringExtensions.cs" />
