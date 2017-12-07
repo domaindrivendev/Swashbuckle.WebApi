@@ -9,7 +9,8 @@ namespace Swashbuckle.Dummy.SelfHost
         static void Main(string[] args)
         {
             var config = new HttpSelfHostConfiguration("http://localhost:8080");
-            bool.TryParse(ConfigurationManager.AppSettings["isolateAreaSwaggers"], out var isolateAreaSwaggers);
+            bool isolateAreaSwaggers;
+            bool.TryParse(ConfigurationManager.AppSettings["isolateAreaSwaggers"], out isolateAreaSwaggers);
 
             SwaggerConfig.Register(config, isolateAreaSwaggers);
             WebApiConfig.Register(config);

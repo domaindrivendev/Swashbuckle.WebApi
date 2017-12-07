@@ -9,7 +9,8 @@ namespace Swashbuckle.Dummy.WebHost
     {
         protected void Application_Start()
         {
-            bool.TryParse(ConfigurationManager.AppSettings["isolateAreaSwaggers"], out var isolateAreaSwaggers);
+            bool isolateAreaSwaggers;
+            bool.TryParse(ConfigurationManager.AppSettings["isolateAreaSwaggers"], out isolateAreaSwaggers);
 
             AreaRegistration.RegisterAllAreas();
             SwaggerConfig.Register(GlobalConfiguration.Configuration, isolateAreaSwaggers);
