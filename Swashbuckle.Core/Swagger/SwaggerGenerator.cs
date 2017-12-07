@@ -45,7 +45,8 @@ namespace Swashbuckle.Swagger
                 _options.DescribeStringEnumsInCamelCase,
                 _options.ApplyFiltersToAllSchemas);
 
-            _apiVersions.TryGetValue(apiVersion, out var info);
+            Info info;
+            _apiVersions.TryGetValue(apiVersion, out info);
             if (info == null)
                 throw new UnknownApiVersion(apiVersion);
 
