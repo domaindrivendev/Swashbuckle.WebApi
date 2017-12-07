@@ -5,6 +5,7 @@ using Newtonsoft.Json.Serialization;
 using Swashbuckle.Application;
 using System.Net.Http;
 using System.Collections.Generic;
+using System.Reflection;
 using System.Web.Http.Routing;
 using Newtonsoft.Json;
 
@@ -36,6 +37,7 @@ namespace Swashbuckle.Application
                 constraints: new { apiVersion = @".+" },
                 handler: new SwaggerDocsHandler(config)
             );
+
 
             return new SwaggerEnabledConfiguration(
                 httpConfig,

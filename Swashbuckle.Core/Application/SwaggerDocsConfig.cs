@@ -286,12 +286,12 @@ namespace Swashbuckle.Application
                 : defaultProvider;
         }
 
-        internal string GetRootUrl(HttpRequestMessage swaggerRequest)
+        public string GetRootUrl(HttpRequestMessage swaggerRequest)
         {
             return _rootUrlResolver(swaggerRequest);
         }
 
-        internal IEnumerable<string> GetApiVersions()
+        public IEnumerable<string> GetApiVersions()
         {
             return _versionInfoBuilder.Build().Select(entry => entry.Key);
         }
@@ -316,7 +316,7 @@ namespace Swashbuckle.Application
             return urb.Uri.AbsoluteUri.TrimEnd('/');
         }
 
-        private static string GetHeaderValue(HttpRequestMessage request, string headerName)
+        public static string GetHeaderValue(HttpRequestMessage request, string headerName)
         {
             IEnumerable<string> list;
             return request.Headers.TryGetValues(headerName, out list) ? list.FirstOrDefault() : null;

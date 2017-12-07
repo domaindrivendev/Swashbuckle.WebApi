@@ -30,6 +30,9 @@ namespace Swashbuckle.Swagger
         }
 
         public SwaggerDocument GetSwagger(string rootUrl, string apiVersion)
+            => GetSwagger(rootUrl, apiVersion, null, new List<AreaDescription>());
+
+        public SwaggerDocument GetSwagger(string rootUrl, string apiVersion, AreaDescription area, IList<AreaDescription> allAreas)
         {
             var schemaRegistry = new SchemaRegistry(
                 _jsonSerializerSettings,
@@ -47,7 +50,7 @@ namespace Swashbuckle.Swagger
             if (info == null)
                 throw new UnknownApiVersion(apiVersion);
 
-            var paths = GetApiDescriptionsFor(apiVersion)
+            var paths = GetApiDescriptionsFor(apiVersion, area, allAreas)
                 .Where(apiDesc => !(_options.IgnoreObsoleteActions && apiDesc.IsObsolete()))
                 .OrderBy(_options.GroupingKeySelector, _options.GroupingKeyComparer)
                 .GroupBy(apiDesc => apiDesc.RelativePathSansQueryString())
@@ -61,7 +64,7 @@ namespace Swashbuckle.Swagger
                 info = info,
                 host = rootUri.Host + port,
                 basePath = (rootUri.AbsolutePath != "/") ? rootUri.AbsolutePath : null,
-                schemes = (_options.Schemes != null) ? _options.Schemes.ToList() : new[] { rootUri.Scheme }.ToList(),
+                schemes = _options.Schemes?.ToList() ?? new[] { rootUri.Scheme }.ToList(),
                 paths = paths,
                 definitions = schemaRegistry.Definitions,
                 securityDefinitions = _options.SecurityDefinitions
@@ -75,11 +78,32 @@ namespace Swashbuckle.Swagger
             return swaggerDoc;
         }
 
-        private IEnumerable<ApiDescription> GetApiDescriptionsFor(string apiVersion)
+        private IEnumerable<ApiDescription> GetApiDescriptionsFor(string apiVersion, AreaDescription area, IList<AreaDescription> allAreas)
         {
-            return (_options.VersionSupportResolver == null)
+            var apiDescriptions = _options.VersionSupportResolver == null
                 ? _apiExplorer.ApiDescriptions
                 : _apiExplorer.ApiDescriptions.Where(apiDesc => _options.VersionSupportResolver(apiDesc, apiVersion));
+
+            if (area == null && allAreas.Count <= 0)
+                return apiDescriptions;
+
+            if (area == null)
+                return GetApiDescriptionsExcludingAreas(apiDescriptions, allAreas);
+
+            return GetAreaApiDescriptionsFor(area, apiDescriptions);
+        }
+
+        private static IEnumerable<ApiDescription> GetApiDescriptionsExcludingAreas(IEnumerable<ApiDescription> apiDescriptions, IList<AreaDescription> areas)
+        {
+            var areasApiDescriptions = areas.SelectMany(area => GetAreaApiDescriptionsFor(area, apiDescriptions)).ToArray();
+            
+            return apiDescriptions.Except(areasApiDescriptions).ToList();
+        }
+
+        private static IEnumerable<ApiDescription> GetAreaApiDescriptionsFor(AreaDescription area, IEnumerable<ApiDescription> apiDescriptions)
+        {
+            return apiDescriptions
+                .Where(api => api.ActionDescriptor.ControllerDescriptor.ControllerType.Namespace.StartsWith(area.RegistrationType.Namespace));
         }
 
         private PathItem CreatePathItem(IEnumerable<ApiDescription> apiDescriptions, SchemaRegistry schemaRegistry)

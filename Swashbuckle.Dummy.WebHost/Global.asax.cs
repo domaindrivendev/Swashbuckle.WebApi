@@ -1,5 +1,7 @@
-﻿using System.Web;
+﻿using System.Configuration;
+using System.Web;
 using System.Web.Http;
+using System.Web.Mvc;
 
 namespace Swashbuckle.Dummy.WebHost
 {
@@ -7,7 +9,11 @@ namespace Swashbuckle.Dummy.WebHost
     {
         protected void Application_Start()
         {
-            SwaggerConfig.Register(GlobalConfiguration.Configuration);            
+            bool isolateAreaSwaggers;
+            bool.TryParse(ConfigurationManager.AppSettings["isolateAreaSwaggers"], out isolateAreaSwaggers);
+
+            AreaRegistration.RegisterAllAreas();
+            SwaggerConfig.Register(GlobalConfiguration.Configuration, isolateAreaSwaggers);
             GlobalConfiguration.Configure(WebApiConfig.Register);
         }
     }

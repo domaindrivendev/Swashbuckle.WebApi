@@ -5,6 +5,7 @@ using System.Web.Http;
 using System.Collections.Generic;
 using System.Web.Http.Description;
 using System.Web.Http.Routing.Constraints;
+using System.Web.Mvc;
 using Swashbuckle.Application;
 using Swashbuckle.Swagger;
 using Swashbuckle.Dummy.Controllers;
@@ -15,9 +16,46 @@ namespace Swashbuckle.Dummy
 {
     public class SwaggerConfig
     {
-        public static void Register(HttpConfiguration httpConfig)
+        public static void Register(HttpConfiguration httpConfig, bool isolateAreas)
         {
             var thisAssembly = typeof(SwaggerConfig).Assembly;
+
+            if (isolateAreas)
+            {
+                httpConfig.EnableSwaggerPerArea(thisAssembly, (c, area) =>
+                    {
+                        c.Schemes(new[] {"http", "https"});
+
+                        c.SingleApiVersion("v1", $"Swashbuckle Dummy (area {area.Name})")
+                            .Description(
+                                $"A sample API area ({area.Name}) for testing and prototyping Swashbuckle features")
+                            .TermsOfService("Some terms")
+                            .Contact(cc => cc
+                                .Name("Some contact")
+                                .Url("http://tempuri.org/contact")
+                                .Email("some.contact@tempuri.org"))
+                            .License(lc => lc
+                                .Name("Some License")
+                                .Url("http://tempuri.org/license"));
+
+                        c.IncludeXmlComments(GetXmlCommentsPath());
+                        c.ResolveConflictingActions(apiDescriptions => apiDescriptions.First());
+                        c.SchemaFilter<ApplySchemaVendorExtensions>();
+                        c.SchemaId(t => t.FullName.Contains('`') ? t.FullName.Substring(0, t.FullName.IndexOf('`')) : t.FullName);
+                        c.IgnoreObsoleteProperties();
+                        c.DescribeAllEnumsAsStrings();
+                        c.OperationFilter<AddDefaultResponse>();
+                        c.OperationFilter<AssignOAuth2SecurityRequirements>();
+                        c.OperationFilter<AddFileUploadParams>();
+                        c.OperationFilter<SupportFlaggedEnums>();
+                        c.OperationFilter<UpdateFileDownloadOperations>();
+                        c.DocumentFilter<ApplyDocumentVendorExtensions>();
+                        c.CustomProvider((defaultProvider) => new CachingSwaggerProvider(defaultProvider));
+                    })
+                    .EnableSwaggerUi();
+                
+                return;
+            }
 
             httpConfig 
                 .EnableSwagger(c =>
