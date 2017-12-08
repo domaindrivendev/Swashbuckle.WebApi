@@ -7,6 +7,7 @@ using Newtonsoft.Json.Serialization;
 using System.Net.Http.Formatting;
 using System.Net.Http;
 using System.Threading;
+using System.ComponentModel;
 
 namespace Swashbuckle.Swagger
 {
@@ -197,6 +198,11 @@ namespace Swashbuckle.Swagger
             parameter.required = location == "path" || !paramDesc.ParameterDescriptor.IsOptional;
             parameter.@default = paramDesc.ParameterDescriptor.DefaultValue;
 
+            var description = paramDesc.ParameterDescriptor.GetCustomAttributes<DescriptionAttribute>().FirstOrDefault();
+            if (description != null)
+            {
+                parameter.description = description.Description;
+            }
             var schema = schemaRegistry.GetOrRegister(paramDesc.ParameterDescriptor.ParameterType);
             if (parameter.@in == "body")
                 parameter.schema = schema;
