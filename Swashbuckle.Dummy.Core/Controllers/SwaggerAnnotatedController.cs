@@ -32,7 +32,8 @@ namespace Swashbuckle.Dummy.Controllers
 
         [HttpPut]
         [SwaggerOperation("UpdateMessage", Tags = new[] { "messages" }, Schemes = new[] { "ws" })]
-        public void Put(int id, Message message)
+        
+        public void Put([SwaggerDescription("param description")]int id, Message message)
         {
             throw new NotImplementedException();
         }
@@ -41,6 +42,7 @@ namespace Swashbuckle.Dummy.Controllers
     [SwaggerSchemaFilter(typeof(AddMessageDefault))]
     public class Message
     {
+        [SwaggerDescription("param model description")]
         public string Title { get; set; }
         public string Content { get; set; }
     }
