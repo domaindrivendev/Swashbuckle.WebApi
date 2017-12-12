@@ -3,6 +3,7 @@ using System.Linq;
 using System.Reflection;
 using System.ComponentModel.DataAnnotations;
 using Newtonsoft.Json.Serialization;
+using Swashbuckle.Swagger.Annotations;
 
 namespace Swashbuckle.Swagger
 {
@@ -43,6 +44,18 @@ namespace Swashbuckle.Swagger
             if (!jsonProperty.Writable)
                 schema.readOnly = true;
 
+            return schema;
+        }
+
+        public static Schema WithDescriptionProperty(this Schema schema, JsonProperty jsonProperty)
+        {
+            var propInfo = jsonProperty.PropertyInfo();
+            if (propInfo == null)
+                return schema;
+
+            var attrib = propInfo.GetCustomAttributes(false).OfType<SwaggerDescriptionAttribute>().FirstOrDefault();
+            schema.description = attrib?.Description;
+            
             return schema;
         }
 

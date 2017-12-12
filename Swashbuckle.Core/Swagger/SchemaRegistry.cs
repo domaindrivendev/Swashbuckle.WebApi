@@ -240,7 +240,7 @@ namespace Swashbuckle.Swagger
                 .Where(p => !(_ignoreObsoleteProperties && p.IsObsolete()))
                 .ToDictionary(
                     prop => prop.PropertyName,
-                    prop => CreateInlineSchema(prop.PropertyType).WithValidationProperties(prop)
+                    prop => CreateInlineSchema(prop.PropertyType).WithValidationProperties(prop).WithDescriptionProperty(prop)
                 );
 
             var required = jsonContract.Properties.Where(prop => prop.IsRequired())
