@@ -140,6 +140,7 @@ namespace Swashbuckle.Swagger
                     })
                  .ToList();
 
+            var description = apiDesc.ActionDescriptor.GetCustomAttributes<SwaggerDescriptionAttribute>().FirstOrDefault();
             var responses = new Dictionary<string, Response>();
             var responseType = apiDesc.ResponseType();
             if (responseType == null || responseType == typeof(void))
@@ -150,6 +151,8 @@ namespace Swashbuckle.Swagger
             var operation = new Operation
             {
                 tags = new[] { _options.GroupingKeySelector(apiDesc) },
+                description = description?.Description,
+                summary = description?.Summary,
                 operationId = apiDesc.FriendlyId(),
                 produces = apiDesc.Produces().ToList(),
                 consumes = apiDesc.Consumes().ToList(),
