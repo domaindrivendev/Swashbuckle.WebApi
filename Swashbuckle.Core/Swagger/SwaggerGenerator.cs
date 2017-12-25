@@ -65,7 +65,7 @@ namespace Swashbuckle.Swagger
                 securityDefinitions = _options.SecurityDefinitions
             };
 
-            foreach(var filter in _options.DocumentFilters)
+            foreach (var filter in _options.DocumentFilters)
             {
                 filter.Apply(swaggerDoc, schemaRegistry, _apiExplorer);
             }
@@ -151,14 +151,14 @@ namespace Swashbuckle.Swagger
             var operation = new Operation
             {
                 tags = new[] { _options.GroupingKeySelector(apiDesc) },
-                description = description?.Description,
-                summary = description?.Summary,
+                description = description != null ? description.Description : null,
+                summary = description != null ? description.Summary : null,
                 operationId = apiDesc.FriendlyId(),
                 produces = apiDesc.Produces().ToList(),
                 consumes = apiDesc.Consumes().ToList(),
                 parameters = parameters.Any() ? parameters : null, // parameters can be null but not empty
                 responses = responses,
-                deprecated = apiDesc.IsObsolete() ? true : (bool?) null
+                deprecated = apiDesc.IsObsolete() ? true : (bool?)null
             };
 
             foreach (var filter in _options.OperationFilters)
@@ -192,7 +192,7 @@ namespace Swashbuckle.Swagger
             {
                 parameter.type = "string";
                 parameter.required = true;
-                return parameter; 
+                return parameter;
             }
 
             parameter.required = location == "path" || !paramDesc.ParameterDescriptor.IsOptional;
