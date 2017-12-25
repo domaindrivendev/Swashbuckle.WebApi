@@ -54,8 +54,7 @@ namespace Swashbuckle.Swagger
                 return schema;
 
             var attrib = propInfo.GetCustomAttributes(false).OfType<SwaggerDescriptionAttribute>().FirstOrDefault();
-            schema.description = attrib?.Description;
-            
+            schema.description = attrib != null ? attrib.Description : null;
             return schema;
         }
 
