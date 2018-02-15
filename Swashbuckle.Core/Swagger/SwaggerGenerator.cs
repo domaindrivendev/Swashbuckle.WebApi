@@ -6,6 +6,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using System.Net.Http.Formatting;
 using System.Net.Http;
+using System.Threading;
 
 namespace Swashbuckle.Swagger
 {
@@ -129,6 +130,11 @@ namespace Swashbuckle.Swagger
         private Operation CreateOperation(ApiDescription apiDesc, SchemaRegistry schemaRegistry)
         {
             var parameters = apiDesc.ParameterDescriptions
+                .Where(paramDesc =>
+                    {
+                        var paramDescriptor = paramDesc.ParameterDescriptor;
+                        return (paramDescriptor == null || paramDescriptor.ParameterType != typeof(CancellationToken));
+                    })
                 .Select(paramDesc =>
                     {
                         string location = GetParameterLocation(apiDesc, paramDesc);
@@ -166,7 +172,7 @@ namespace Swashbuckle.Swagger
         {
             if (apiDesc.RelativePathSansQueryString().Contains("{" + paramDesc.Name + "}"))
                 return "path";
-            else if (paramDesc.Source == ApiParameterSource.FromBody && apiDesc.HttpMethod != HttpMethod.Get)
+            else if (paramDesc.Source == ApiParameterSource.FromBody)
                 return "body";
             else
                 return "query";
@@ -180,6 +186,7 @@ namespace Swashbuckle.Swagger
                 name = paramDesc.Name
             };
 
+            // e.g. route parameters
             if (paramDesc.ParameterDescriptor == null)
             {
                 parameter.type = "string";

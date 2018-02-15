@@ -47,7 +47,6 @@
       window.swashbuckleConfig = {
         rootUrl: '%(RootUrl)',
         discoveryPaths: arrayFrom('%(DiscoveryPaths)'),
-        booleanValues: arrayFrom('%(BooleanValues)'),
         validatorUrl: stringOrNullFrom('%(ValidatorUrl)'),
         customScripts: arrayFrom('%(CustomScripts)'),
         docExpansion: '%(DocExpansion)',
@@ -74,7 +73,6 @@
       window.swaggerUi = new SwaggerUi({
         url: swashbuckleConfig.rootUrl + "/" + swashbuckleConfig.discoveryPaths[0],
         dom_id: "swagger-ui-container",
-        booleanValues: swashbuckleConfig.booleanValues,
         supportedSubmitMethods: swashbuckleConfig.supportedSubmitMethods,
         onComplete: function(swaggerApi, swaggerUi){
           if (typeof initOAuth == "function" && swashbuckleConfig.oAuth2Enabled) {
