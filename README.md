@@ -449,7 +449,7 @@ Use this option to control how the Operation listing is displayed. It can be set
 
 #### SupportedSubmitMethods ####
 
-Specify which HTTP operations will have the 'Try it out!' option. An empty paramter list disables it for all operations.
+Specify which HTTP operations will have the 'Try it out!' option. An empty parameter list disables it for all operations.
 
 ### Provide your own "index" file ###
 
