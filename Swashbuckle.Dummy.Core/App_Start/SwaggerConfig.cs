@@ -218,7 +218,7 @@ namespace Swashbuckle.Dummy
                         //
                         c.DocExpansion(DocExpansion.List);
 
-                        // Specify which HTTP operations will have the 'Try it out!' option. An empty paramter list disables
+                        // Specify which HTTP operations will have the 'Try it out!' option. An empty parameter list disables
                         // it for all operations.
                         //
                         //c.SupportedSubmitMethods("GET", "HEAD");
