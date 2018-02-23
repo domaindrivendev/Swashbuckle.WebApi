@@ -3,10 +3,8 @@ using System.Collections.Generic;
 using System.Web.Http.Description;
 using System;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
-using System.Net.Http.Formatting;
-using System.Net.Http;
 using System.Threading;
+using Swashbuckle.Swagger.Annotations;
 
 namespace Swashbuckle.Swagger
 {
@@ -67,7 +65,7 @@ namespace Swashbuckle.Swagger
                 securityDefinitions = _options.SecurityDefinitions
             };
 
-            foreach(var filter in _options.DocumentFilters)
+            foreach (var filter in _options.DocumentFilters)
             {
                 filter.Apply(swaggerDoc, schemaRegistry, _apiExplorer);
             }
@@ -142,6 +140,7 @@ namespace Swashbuckle.Swagger
                     })
                  .ToList();
 
+            var description = apiDesc.ActionDescriptor.GetCustomAttributes<SwaggerDescriptionAttribute>().FirstOrDefault();
             var responses = new Dictionary<string, Response>();
             var responseType = apiDesc.ResponseType();
             if (responseType == null || responseType == typeof(void))
@@ -152,12 +151,14 @@ namespace Swashbuckle.Swagger
             var operation = new Operation
             {
                 tags = new[] { _options.GroupingKeySelector(apiDesc) },
+                description = description != null ? description.Description : null,
+                summary = description != null ? description.Summary : null,
                 operationId = apiDesc.FriendlyId(),
                 produces = apiDesc.Produces().ToList(),
                 consumes = apiDesc.Consumes().ToList(),
                 parameters = parameters.Any() ? parameters : null, // parameters can be null but not empty
                 responses = responses,
-                deprecated = apiDesc.IsObsolete() ? true : (bool?) null
+                deprecated = apiDesc.IsObsolete() ? true : (bool?)null
             };
 
             foreach (var filter in _options.OperationFilters)
@@ -191,12 +192,17 @@ namespace Swashbuckle.Swagger
             {
                 parameter.type = "string";
                 parameter.required = true;
-                return parameter; 
+                return parameter;
             }
 
             parameter.required = location == "path" || !paramDesc.ParameterDescriptor.IsOptional;
             parameter.@default = paramDesc.ParameterDescriptor.DefaultValue;
 
+            var description = paramDesc.ParameterDescriptor.GetCustomAttributes<SwaggerDescriptionAttribute>().FirstOrDefault();
+            if (description != null)
+            {
+                parameter.description = description.Description;
+            }
             var schema = schemaRegistry.GetOrRegister(paramDesc.ParameterDescriptor.ParameterType);
             if (parameter.@in == "body")
                 parameter.schema = schema;
