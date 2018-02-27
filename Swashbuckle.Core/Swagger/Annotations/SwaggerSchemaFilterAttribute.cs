@@ -2,7 +2,7 @@
 
 namespace Swashbuckle.Swagger.Annotations
 {
-    [AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
+    [AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]
     public class SwaggerSchemaFilterAttribute : Attribute
     {
         public SwaggerSchemaFilterAttribute(Type filterType)
