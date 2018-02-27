@@ -224,6 +224,21 @@ namespace Swashbuckle.Tests.Swagger
             Assert.IsNotNull(responsesProperty["500"]);
         }
 
+        [Test]
+        public void It_documents_schema_default_parameters()
+        {
+            var swagger = GetContent<JObject>( "http://tempuri.org/swagger/docs/v1" );
+
+            var parameters = swagger["paths"]["/xmlannotated/GetById"]["get"]["parameters"];
+            Assert.IsNotNull( parameters );
+
+            Assert.IsNotNull( parameters.First["required"] );
+            Assert.AreEqual( "False", parameters.First["required"].ToString() );
+
+            Assert.IsNotNull( parameters.First["default"] );
+            Assert.AreEqual( "123456", parameters.First["default"].ToString() );
+        }
+
         private void IncludeXmlComments(SwaggerDocsConfig config)
         {
             config.IncludeXmlComments(String.Format(@"{0}\XmlComments.xml", AppDomain.CurrentDomain.BaseDirectory));
