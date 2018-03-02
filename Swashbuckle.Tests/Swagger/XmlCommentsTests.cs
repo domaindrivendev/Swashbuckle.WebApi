@@ -110,6 +110,24 @@ namespace Swashbuckle.Tests.Swagger
         }
 
         [Test]
+        public void It_documents_schema_properties_from_property_example_tags()
+        {
+            var swagger = GetContent<JObject>( "http://tempuri.org/swagger/docs/v1" );
+
+            var passwordAccountId = swagger[ "definitions" ][ "Account" ][ "properties" ][ "AccountID" ];
+            Assert.IsNotNull( passwordAccountId[ "example" ] );
+            Assert.AreEqual( "78312", passwordAccountId[ "example" ].ToString() );
+
+            var usernameProperty = swagger[ "definitions" ][ "Account" ][ "properties" ][ "Username" ];
+            Assert.IsNotNull( usernameProperty[ "example" ] );
+            Assert.AreEqual( "TestUser", usernameProperty[ "example" ].ToString() );
+
+            var passwordProperty = swagger[ "definitions" ][ "Account" ][ "properties" ][ "Password" ];
+            Assert.IsNotNull( passwordProperty[ "example" ] );
+            Assert.AreEqual( "TestPassword", passwordProperty[ "example" ].ToString() );
+        }
+
+        [Test]
         public void It_documents_schema_properties_including_property_summary_tags_from_base_classes()
         {
             var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/v1");
