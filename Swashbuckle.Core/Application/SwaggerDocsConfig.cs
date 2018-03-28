@@ -238,8 +238,26 @@ namespace Swashbuckle.Application
 
         internal ISwaggerProvider GetSwaggerProvider(HttpRequestMessage swaggerRequest)
         {
-            var httpConfig = swaggerRequest.GetConfiguration();
+            return GetSwaggerProvider(swaggerRequest.GetConfiguration());
+        }
 
+        public ISwaggerProvider GetSwaggerProvider(HttpConfiguration httpConfig)
+        {
+            var options = GetSwaggerGeneratorOptions();
+            
+            var defaultProvider = new SwaggerGenerator(
+                httpConfig.Services.GetApiExplorer(),
+                httpConfig.SerializerSettingsOrDefault(),
+                _versionInfoBuilder.Build(),
+                options);
+
+            return (_customProviderFactory != null)
+                ? _customProviderFactory(defaultProvider)
+                : defaultProvider;
+        }
+
+        public SwaggerGeneratorOptions GetSwaggerGeneratorOptions()
+        {
             var securityDefintitions = _securitySchemeBuilders.Any()
                 ? _securitySchemeBuilders.ToDictionary(kvp => kvp.Key, kvp => kvp.Value.Build())
                 : null;
@@ -254,8 +272,8 @@ namespace Swashbuckle.Application
                 modelFilters.Insert(0, new ApplyXmlTypeComments(xmlDoc));
                 operationFilters.Insert(0, new ApplyXmlActionComments(xmlDoc));
             }
-
-            var options = new SwaggerGeneratorOptions(
+            
+            return new SwaggerGeneratorOptions(
                 versionSupportResolver: _versionSupportResolver,
                 schemes: _schemes,
                 securityDefinitions: securityDefintitions,
@@ -274,16 +292,6 @@ namespace Swashbuckle.Application
                 documentFilters: _documentFilters.Select(factory => factory()).ToList(),
                 conflictingActionsResolver: _conflictingActionsResolver
             );
-
-            var defaultProvider = new SwaggerGenerator(
-                httpConfig.Services.GetApiExplorer(),
-                httpConfig.SerializerSettingsOrDefault(),
-                _versionInfoBuilder.Build(),
-                options);
-
-            return (_customProviderFactory != null)
-                ? _customProviderFactory(defaultProvider)
-                : defaultProvider;
         }
 
         internal string GetRootUrl(HttpRequestMessage swaggerRequest)
