@@ -12,7 +12,7 @@ namespace Swashbuckle.Swagger
 {
     public class SwaggerGenerator : ISwaggerProvider
     {
-        private readonly IApiExplorer _apiExplorer;
+        private IApiExplorer _apiExplorer;
         private readonly JsonSerializerSettings _jsonSerializerSettings;
         private readonly IDictionary<string, Info> _apiVersions;
         private readonly SwaggerGeneratorOptions _options;
@@ -27,6 +27,12 @@ namespace Swashbuckle.Swagger
             _jsonSerializerSettings = jsonSerializerSettings;
             _apiVersions = apiVersions;
             _options = options ?? new SwaggerGeneratorOptions();
+        }
+
+        public IApiExplorer ApiExplorer
+        {
+            get { return _apiExplorer; }
+            set { _apiExplorer = value; }
         }
 
         public SwaggerDocument GetSwagger(string rootUrl, string apiVersion)
