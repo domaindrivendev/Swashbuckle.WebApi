@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
-VisualStudioVersion = 12.0.30501.0
+VisualStudioVersion = 12.0.40629.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "swagger-ui", "http://localhost:55139", "{DDE07B02-DD45-4ABF-96D3-A4FBB144BBA1}"
 	ProjectSection(WebsiteProperties) = preProject
@@ -22,6 +22,27 @@ Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "swagger-ui", "http://localh
 		Release.AspNetCompiler.FixedNames = "false"
 		Release.AspNetCompiler.Debug = "False"
 		SlnRelativePath = "swagger-ui\"
+	EndProjectSection
+EndProject
+Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "swagger-ui-2.1.1", "http://localhost:55138", "{0FE34E57-58A3-4A78-AA09-C643594BAC80}"
+	ProjectSection(WebsiteProperties) = preProject
+		UseIISExpress = "true"
+		TargetFrameworkMoniker = ".NETFramework,Version%3Dv4.0"
+		Debug.AspNetCompiler.VirtualPath = "/localhost_55138"
+		Debug.AspNetCompiler.PhysicalPath = "swagger-ui-2.1.1\"
+		Debug.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_55138\"
+		Debug.AspNetCompiler.Updateable = "true"
+		Debug.AspNetCompiler.ForceOverwrite = "true"
+		Debug.AspNetCompiler.FixedNames = "false"
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.VirtualPath = "/localhost_55138"
+		Release.AspNetCompiler.PhysicalPath = "swagger-ui-2.1.1\"
+		Release.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_55138\"
+		Release.AspNetCompiler.Updateable = "true"
+		Release.AspNetCompiler.ForceOverwrite = "true"
+		Release.AspNetCompiler.FixedNames = "false"
+		Release.AspNetCompiler.Debug = "False"
+		SlnRelativePath = "swagger-ui-2.1.1\"
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{67E5A2D2-56E1-4195-AEAF-8F9812559F49}"
@@ -63,6 +84,10 @@ Global
 		{DDE07B02-DD45-4ABF-96D3-A4FBB144BBA1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{DDE07B02-DD45-4ABF-96D3-A4FBB144BBA1}.Release|Any CPU.ActiveCfg = Debug|Any CPU
 		{DDE07B02-DD45-4ABF-96D3-A4FBB144BBA1}.Release|Any CPU.Build.0 = Debug|Any CPU
+		{0FE34E57-58A3-4A78-AA09-C643594BAC80}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0FE34E57-58A3-4A78-AA09-C643594BAC80}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0FE34E57-58A3-4A78-AA09-C643594BAC80}.Release|Any CPU.ActiveCfg = Debug|Any CPU
+		{0FE34E57-58A3-4A78-AA09-C643594BAC80}.Release|Any CPU.Build.0 = Debug|Any CPU
 		{D50A26FF-02C6-4C16-BA94-4CD7D43EFBB3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{D50A26FF-02C6-4C16-BA94-4CD7D43EFBB3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D50A26FF-02C6-4C16-BA94-4CD7D43EFBB3}.Release|Any CPU.ActiveCfg = Release|Any CPU

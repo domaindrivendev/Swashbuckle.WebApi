@@ -1,6 +1,6 @@
 ﻿(function () {
     var DiscoveryUrlSelector = Backbone.View.extend({
-        render: function() {
+        render: function () {
             // Don't re-render on subsequent reloads
             var defaultVal = this.$el.val()
             if (this.$el.prop('tagName') != 'SELECT') {
@@ -13,7 +13,7 @@
                     .css('font-size', '0.9em');
 
                 var rootUrl = this.options.rootUrl;
-                _.each(this.options.discoveryPaths, function(path) {
+                _.each(this.options.discoveryPaths, function (path) {
                     var option = $('<option>' + rootUrl + "/" + path + '</option>');
                     select.append(option);
                 });
