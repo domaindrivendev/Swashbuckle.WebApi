@@ -14,6 +14,10 @@ namespace Swashbuckle.Application
         private readonly Dictionary<string, string> _templateParams;
         private readonly Func<HttpRequestMessage, string> _rootUrlResolver;
 
+        // Routing Prefix to the Swagger UI
+        public string RoutePrefix { set; get; }
+
+
         public SwaggerUiConfig(IEnumerable<string> discoveryPaths, Func<HttpRequestMessage, string> rootUrlResolver)
         {
             _pathToAssetMap = new Dictionary<string, EmbeddedAssetDescriptor>();
@@ -34,8 +38,8 @@ namespace Swashbuckle.Application
                 { "%(OAuth2AppName)", "" },
                 { "%(OAuth2ScopeSeperator)", " " },
                 { "%(OAuth2AdditionalQueryStringParams)", "{}" },
-				{ "%(ApiKeyName)", "api_key" },
-				{ "%(ApiKeyIn)", "query" }
+                { "%(ApiKeyName)", "api_key" },
+                { "%(ApiKeyIn)", "query" }
             };
             _rootUrlResolver = rootUrlResolver;
 
@@ -133,10 +137,11 @@ namespace Swashbuckle.Application
                 _templateParams["%(OAuth2AdditionalQueryStringParams)"] = JsonConvert.SerializeObject(additionalQueryStringParams);
         }
 
-		public void EnableApiKeySupport(string name, string apiKeyIn) {
-			_templateParams["%(ApiKeyName)"] = name;
-			_templateParams["%(ApiKeyIn)"] = apiKeyIn;
-		}
+        public void EnableApiKeySupport(string name, string apiKeyIn)
+        {
+            _templateParams["%(ApiKeyName)"] = name;
+            _templateParams["%(ApiKeyIn)"] = apiKeyIn;
+        }
 
         internal IAssetProvider GetSwaggerUiProvider()
         {

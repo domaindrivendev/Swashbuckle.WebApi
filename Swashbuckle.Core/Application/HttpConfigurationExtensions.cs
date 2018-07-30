@@ -14,20 +14,24 @@ namespace Swashbuckle.Application
     {
         private static readonly string DefaultRouteTemplate = "swagger/docs/{apiVersion}";
 
-        public static SwaggerEnabledConfiguration EnableSwagger(
-            this HttpConfiguration httpConfig,
-            Action<SwaggerDocsConfig> configure = null)
+        public static SwaggerEnabledConfiguration EnableSwagger(this HttpConfiguration httpConfig, Action<SwaggerDocsConfig> configure = null)
         {
             return EnableSwagger(httpConfig, DefaultRouteTemplate, configure);
         }
 
-        public static SwaggerEnabledConfiguration EnableSwagger(
-            this HttpConfiguration httpConfig,
-            string routeTemplate,
-            Action<SwaggerDocsConfig> configure = null)
+        public static SwaggerEnabledConfiguration EnableSwagger(this HttpConfiguration httpConfig, string routeTemplate, Action<SwaggerDocsConfig> configure = null)
         {
             var config = new SwaggerDocsConfig();
-            if (configure != null) configure(config);
+
+            if (configure != null)
+            {
+                configure(config);
+            }
+
+            if (!string.IsNullOrWhiteSpace(config.RoutePrefix))
+            {
+                routeTemplate = config.RoutePrefix + "/" + routeTemplate;
+            }
 
             httpConfig.Routes.MapHttpRoute(
                 name: "swagger_docs" + routeTemplate,
@@ -76,20 +80,26 @@ namespace Swashbuckle.Application
             EnableSwaggerUi(DefaultRouteTemplate, configure);
         }
 
-        public void EnableSwaggerUi(
-            string routeTemplate,
-            Action<SwaggerUiConfig> configure = null)
+        public void EnableSwaggerUi(string routeTemplate, Action<SwaggerUiConfig> configure = null)
         {
             var config = new SwaggerUiConfig(_discoveryPaths, _rootUrlResolver);
-            if (configure != null) configure(config);
+
+            if (configure != null)
+            {
+                configure(config);
+            }
+
+            if (!string.IsNullOrWhiteSpace(config.RoutePrefix))
+            {
+                routeTemplate = config.RoutePrefix + "/" + routeTemplate;
+            }
 
             _httpConfig.Routes.MapHttpRoute(
                 name: "swagger_ui" + routeTemplate,
                 routeTemplate: routeTemplate,
                 defaults: null,
                 constraints: new { assetPath = @".+" },
-                handler: new SwaggerUiHandler(config)
-            );
+                handler: new SwaggerUiHandler(config));
 
             if (routeTemplate == DefaultRouteTemplate)
             {
@@ -100,6 +110,17 @@ namespace Swashbuckle.Application
                     constraints: new { uriResolution = new HttpRouteDirectionConstraint(HttpRouteDirection.UriResolution) },
                     handler: new RedirectHandler(_rootUrlResolver, "swagger/ui/index"));
             }
+
+            if (routeTemplate == config.RoutePrefix + "/" + DefaultRouteTemplate)
+            {
+                _httpConfig.Routes.MapHttpRoute(
+                    name: "swagger_ui_shortcut" + routeTemplate,
+                    routeTemplate: config.RoutePrefix + "/" + "swagger",
+                    defaults: null,
+                    constraints: new { uriResolution = new HttpRouteDirectionConstraint(HttpRouteDirection.UriResolution) },
+                    handler: new RedirectHandler(_rootUrlResolver, config.RoutePrefix + "/" + "swagger/ui/index"));
+            }
+
         }
     }
 }

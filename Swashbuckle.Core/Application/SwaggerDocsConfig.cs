@@ -40,6 +40,9 @@ namespace Swashbuckle.Application
 
         private Func<ISwaggerProvider, ISwaggerProvider> _customProviderFactory;
 
+        // Routing Prefix to the Swagger Docs
+        public string RoutePrefix { set; get; }
+
         public SwaggerDocsConfig()
         {
             _versionInfoBuilder = new VersionInfoBuilder();
