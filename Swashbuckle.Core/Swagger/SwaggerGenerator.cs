@@ -43,7 +43,11 @@ namespace Swashbuckle.Swagger
                 _options.ApplyFiltersToAllSchemas);
 
             Info info;
-            _apiVersions.TryGetValue(apiVersion, out info);
+            if (apiVersion.ToLower() == "latest")
+                info = _apiVersions.OrderByDescending(x => x.Value.version).First().Value;
+            else
+                _apiVersions.TryGetValue(apiVersion, out info);
+
             if (info == null)
                 throw new UnknownApiVersion(apiVersion);
 
