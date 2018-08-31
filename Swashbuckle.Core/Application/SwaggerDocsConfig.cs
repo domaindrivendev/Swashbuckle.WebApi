@@ -311,7 +311,9 @@ namespace Swashbuckle.Application
             var httpConfiguration = request.GetConfiguration();
             var virtualPathRoot = httpConfiguration.VirtualPathRoot;
 
-            var urb = new UriBuilder(scheme, host, int.Parse(port), prefix + virtualPathRoot);
+            var uri = new Uri(host);
+
+            var urb = new UriBuilder(scheme, uri.Host, int.Parse(port), prefix + virtualPathRoot);
 
             return urb.Uri.AbsoluteUri.TrimEnd('/');
         }
