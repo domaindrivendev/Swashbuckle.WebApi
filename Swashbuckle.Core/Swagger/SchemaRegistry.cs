@@ -1,18 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Dynamic;
 using System.Linq;
-using System.Net.Http;
-using System.Reflection;
-using System.Runtime.Serialization;
-using System.Text;
-using System.Web.Http;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using Newtonsoft.Json.Serialization;
 using Newtonsoft.Json.Converters;
-using System.Net.Http.Formatting;
 
 namespace Swashbuckle.Swagger
 {
@@ -30,7 +21,7 @@ namespace Swashbuckle.Swagger
 
         private readonly IContractResolver _contractResolver;
 
-        private IDictionary<Type, WorkItem> _workItems;
+        private readonly IDictionary<Type, WorkItem> _workItems;
         private class WorkItem
         {
             public string SchemaId;
@@ -163,6 +154,8 @@ namespace Swashbuckle.Swagger
                 case "System.DateTime":
                 case "System.DateTimeOffset":
                     return new Schema { type = "string", format = "date-time" };
+                case "System.TimeSpan":
+                    return new Schema { type = "string", format = "time-span" };
                 case "System.Guid":
                     return new Schema { type = "string", format = "uuid", example = Guid.Empty };
                 default:
