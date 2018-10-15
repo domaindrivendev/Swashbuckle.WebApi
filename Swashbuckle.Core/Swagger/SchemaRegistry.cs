@@ -168,12 +168,14 @@ namespace Swashbuckle.Swagger
             var stringEnumConverter = primitiveContract.Converter as StringEnumConverter
                 ?? _jsonSerializerSettings.Converters.OfType<StringEnumConverter>().FirstOrDefault();
 
+            Schema schema;
+
             if (_describeAllEnumsAsStrings || stringEnumConverter != null)
             {
                 var camelCase = _describeStringEnumsInCamelCase
                     || (stringEnumConverter != null && stringEnumConverter.CamelCaseText);
 
-                return new Schema
+                schema = new Schema
                 {
                     type = "string",
                     @enum = camelCase
@@ -181,13 +183,25 @@ namespace Swashbuckle.Swagger
                         : type.GetEnumNamesForSerialization()
                 };
             }
-
-            return new Schema
+            else
             {
-                type = "integer",
-                format = "int32",
-                @enum = type.GetEnumValues().Cast<object>().ToArray()
-            };
+                schema = new Schema
+                {
+                    type = "integer",
+                    format = "int32",
+                    @enum = type.GetEnumValues().Cast<object>().ToArray()
+                };
+            }
+
+            if (schema.vendorExtensions == null)
+            {
+                schema.vendorExtensions = new Dictionary<string, object>();
+            }
+
+            schema.vendorExtensions["x-enum-fullname"] = type.FullName;
+            schema.vendorExtensions["x-enum-name"] = type.Name;
+
+            return schema;
         }
 
         private Schema CreateDictionarySchema(JsonDictionaryContract dictionaryContract)
