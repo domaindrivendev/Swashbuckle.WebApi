@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Net.Http;
 using System.Linq;
 using NUnit.Framework;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json.Converters;
 using Swashbuckle.Dummy.Controllers;
-using Swashbuckle.Application;
 using Swashbuckle.Swagger;
 using Swashbuckle.Dummy.SwaggerExtensions;
 using Swashbuckle.Dummy.Types;
@@ -108,7 +106,7 @@ namespace Swashbuckle.Tests.Swagger
 
             var expected = JObject.FromObject(new {
                 PaymentWithMetadata = new {
-                    required = new string[] { "Amount", "CardNumber", "ExpMonth", "ExpYear" },
+                    required = new[] { "Amount", "CardNumber", "ExpMonth", "ExpYear" },
                     type = "object",
                     properties = new {
                         Amount = new {
@@ -155,7 +153,7 @@ namespace Swashbuckle.Tests.Swagger
                 {
                     Payment = new
                     {
-                        required = new string[] { "Amount", "CardNumber", "ExpMonth", "ExpYear" },
+                        required = new[] { "Amount", "CardNumber", "ExpMonth", "ExpYear" },
                         type = "object",
                         properties = new
                         {
@@ -401,7 +399,7 @@ namespace Swashbuckle.Tests.Swagger
         [TestCase("EchoDecimal", typeof(decimal), "number", "double", "System.Decimal", false)]
         [TestCase("EchoDateTime", typeof(DateTime), "string", "date-time", "System.DateTime", false)]
         [TestCase("EchoDateTimeOffset", typeof(DateTimeOffset), "string", "date-time", "System.DateTimeOffset", false)]
-        [TestCase("EchoTimeSpan", typeof(TimeSpan), "string", null, "System.TimeSpan", false)]
+        [TestCase("EchoTimeSpan", typeof(TimeSpan), "string", "time-span", "System.TimeSpan", false)]
         [TestCase("EchoEnum", typeof(PrimitiveEnum), "integer", "int32", "Swashbuckle.Dummy.Types.PrimitiveEnum", false)]
         [TestCase("EchoEnum", typeof(PrimitiveEnum), "string", null, "Swashbuckle.Dummy.Types.PrimitiveEnum", false)]
         [TestCase("EchoChar", typeof(char), "string", null, "System.Char", false)]
@@ -419,7 +417,7 @@ namespace Swashbuckle.Tests.Swagger
         [TestCase("EchoNullableDecimal", typeof(decimal?), "number", "double", "System.Decimal", true)]
         [TestCase("EchoNullableDateTime", typeof(DateTime?), "string", "date-time", "System.DateTime", true)]
         [TestCase("EchoNullableDateTimeOffset", typeof(DateTimeOffset?), "string", "date-time", "System.DateTimeOffset", true)]
-        [TestCase("EchoNullableTimeSpan", typeof(TimeSpan?), "string", null, "System.TimeSpan", true)]
+        [TestCase("EchoNullableTimeSpan", typeof(TimeSpan?), "string", "time-span", "System.TimeSpan", true)]
         [TestCase("EchoNullableEnum", typeof(PrimitiveEnum?), "integer", "int32", "Swashbuckle.Dummy.Types.PrimitiveEnum", true)]
         [TestCase("EchoNullableEnum", typeof(PrimitiveEnum?), "string", null, "Swashbuckle.Dummy.Types.PrimitiveEnum", true)]
         [TestCase("EchoNullableChar", typeof(char?), "string", null, "System.Char", true)]
@@ -495,7 +493,7 @@ namespace Swashbuckle.Tests.Swagger
         [TestCase("EchoDecimal", typeof(decimal), "number", "double", "System.Decimal", false)]
         [TestCase("EchoDateTime", typeof(DateTime), "string", "date-time", "System.DateTime", false)]
         [TestCase("EchoDateTimeOffset", typeof(DateTimeOffset), "string", "date-time", "System.DateTimeOffset", false)]
-        [TestCase("EchoTimeSpan", typeof(TimeSpan), "string", null, "System.TimeSpan", false)]
+        [TestCase("EchoTimeSpan", typeof(TimeSpan), "string", "time-span", "System.TimeSpan", false)]
         [TestCase("EchoEnum", typeof(PrimitiveEnum), "integer", "int32", "Swashbuckle.Dummy.Types.PrimitiveEnum", false)]
         [TestCase("EchoEnum", typeof(PrimitiveEnum), "string", null, "Swashbuckle.Dummy.Types.PrimitiveEnum", false)]
         [TestCase("EchoChar", typeof(char), "string", null, "System.Char", false)]
@@ -513,7 +511,7 @@ namespace Swashbuckle.Tests.Swagger
         [TestCase("EchoNullableDecimal", typeof(decimal?), "number", "double", "System.Decimal", true)]
         [TestCase("EchoNullableDateTime", typeof(DateTime?), "string", "date-time", "System.DateTime", true)]
         [TestCase("EchoNullableDateTimeOffset", typeof(DateTimeOffset?), "string", "date-time", "System.DateTimeOffset", true)]
-        [TestCase("EchoNullableTimeSpan", typeof(TimeSpan?), "string", null, "System.TimeSpan", true)]
+        [TestCase("EchoNullableTimeSpan", typeof(TimeSpan?), "string", "time-span", "System.TimeSpan", true)]
         [TestCase("EchoNullableEnum", typeof(PrimitiveEnum?), "integer", "int32", "Swashbuckle.Dummy.Types.PrimitiveEnum", true)]
         [TestCase("EchoNullableEnum", typeof(PrimitiveEnum?), "string", null, "Swashbuckle.Dummy.Types.PrimitiveEnum", true)]
         [TestCase("EchoNullableChar", typeof(char?), "string", null, "System.Char", true)]

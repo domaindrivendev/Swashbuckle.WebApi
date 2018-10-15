@@ -1,18 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Dynamic;
 using System.Linq;
-using System.Net.Http;
-using System.Reflection;
-using System.Runtime.Serialization;
-using System.Text;
-using System.Web.Http;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using Newtonsoft.Json.Serialization;
 using Newtonsoft.Json.Converters;
-using System.Net.Http.Formatting;
 
 namespace Swashbuckle.Swagger
 {
@@ -30,7 +21,7 @@ namespace Swashbuckle.Swagger
 
         private readonly IContractResolver _contractResolver;
 
-        private IDictionary<Type, WorkItem> _workItems;
+        private readonly IDictionary<Type, WorkItem> _workItems;
         private class WorkItem
         {
             public string SchemaId;
@@ -163,6 +154,8 @@ namespace Swashbuckle.Swagger
                 case "System.DateTime":
                 case "System.DateTimeOffset":
                     return new Schema { type = "string", format = "date-time" };
+                case "System.TimeSpan":
+                    return new Schema { type = "string", format = "time-span" };
                 case "System.Guid":
                     return new Schema { type = "string", format = "uuid", example = Guid.Empty };
                 default:
@@ -175,12 +168,14 @@ namespace Swashbuckle.Swagger
             var stringEnumConverter = primitiveContract.Converter as StringEnumConverter
                 ?? _jsonSerializerSettings.Converters.OfType<StringEnumConverter>().FirstOrDefault();
 
+            Schema schema;
+
             if (_describeAllEnumsAsStrings || stringEnumConverter != null)
             {
                 var camelCase = _describeStringEnumsInCamelCase
                     || (stringEnumConverter != null && stringEnumConverter.CamelCaseText);
 
-                return new Schema
+                schema = new Schema
                 {
                     type = "string",
                     @enum = camelCase
@@ -188,13 +183,25 @@ namespace Swashbuckle.Swagger
                         : type.GetEnumNamesForSerialization()
                 };
             }
-
-            return new Schema
+            else
             {
-                type = "integer",
-                format = "int32",
-                @enum = type.GetEnumValues().Cast<object>().ToArray()
-            };
+                schema = new Schema
+                {
+                    type = "integer",
+                    format = "int32",
+                    @enum = type.GetEnumValues().Cast<object>().ToArray()
+                };
+            }
+
+            if (schema.vendorExtensions == null)
+            {
+                schema.vendorExtensions = new Dictionary<string, object>();
+            }
+
+            schema.vendorExtensions["x-enum-fullname"] = type.FullName;
+            schema.vendorExtensions["x-enum-name"] = type.Name;
+
+            return schema;
         }
 
         private Schema CreateDictionarySchema(JsonDictionaryContract dictionaryContract)
