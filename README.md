@@ -5,6 +5,28 @@
 Swashbuckle
 =========
 
+>>>
+**FORKed** to:
+- fix unit tests (missing resource, and EOL issues)
+
+- use of the static version of swagger-ui that coded against
+	- (https://github.com/swagger-api/swagger-ui/tree/64dc3060b3700b12e466f8d67b7d7ec3574b015f)
+- update to .NET 4.5
+- consolidate dependency
+
+Note:
+- Need to install in VS:
+ - NUnit Test 3 Adapter
+- If swagger-ui needs to be updated, need to fetch submodule swagger-ui (what about tags ? like https://github.com/swagger-api/swagger-ui/tree/v2.1.5)
+ - git submodule update --init --force --remote
+- Need to build swagger-ui
+ - npm install
+ - npm run build
+ - copy dist
+
+Original readme : 
+<<<
+
 [![Build status](https://ci.appveyor.com/api/projects/status/qoesh4nm6tb6diuk?svg=true)](https://ci.appveyor.com/project/domaindrivendev/swashbuckle)
 
 Seamlessly adds a [Swagger](http://swagger.io/) to WebApi projects! Combines ApiExplorer and Swagger/swagger-ui to provide a rich discovery, documentation and playground experience to your API consumers.
