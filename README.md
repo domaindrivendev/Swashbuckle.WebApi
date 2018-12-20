@@ -6,7 +6,7 @@ Swashbuckle
 =========
 
 >>>
-**FORKed** to:
+**FORKED** from https://github.com/domaindrivendev/Swashbuckle in order to:
 - fix unit tests (missing resource, and EOL issues)
 
 - use of the static version of swagger-ui that coded against
@@ -16,13 +16,13 @@ Swashbuckle
 
 Note:
 - Need to install in VS:
- - NUnit Test 3 Adapter
+	- NUnit Test 3 Adapter
 - If swagger-ui needs to be updated, need to fetch submodule swagger-ui (what about tags ? like https://github.com/swagger-api/swagger-ui/tree/v2.1.5)
- - git submodule update --init --force --remote
+	- git submodule update --init --force --remote
 - Need to build swagger-ui
- - npm install
- - npm run build
- - copy dist
+	- npm install
+	- npm run build
+	- edit swashbuckle.core.csproj copy step to link to submodule swagger-ui build
 
 Original readme : 
 <<<
