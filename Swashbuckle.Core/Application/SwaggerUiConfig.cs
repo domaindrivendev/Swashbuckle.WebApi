@@ -46,6 +46,7 @@ namespace Swashbuckle.Application
             CustomAsset("index", thisAssembly, "Swashbuckle.SwaggerUi.CustomAssets.index.html", isTemplate: true);
             CustomAsset("css/screen-css", thisAssembly, "Swashbuckle.SwaggerUi.CustomAssets.screen.css");
             CustomAsset("css/typography-css", thisAssembly, "Swashbuckle.SwaggerUi.CustomAssets.typography.css");
+            CustomAsset("images/logo_small-png", thisAssembly, "Swashbuckle.SwaggerUi.CustomAssets.logo_small.png");
         }
 
         public void InjectStylesheet(Assembly resourceAssembly, string resourceName, string media = "screen", bool isTemplate = false)
