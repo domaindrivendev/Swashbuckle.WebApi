@@ -16,12 +16,10 @@ namespace Swashbuckle.Swagger
 
             foreach (var attribute in propInfo.GetCustomAttributes(false))
             {
-                var regex = attribute as RegularExpressionAttribute;
-                if (regex != null)
+                if (attribute is RegularExpressionAttribute regex)
                     schema.pattern = regex.Pattern;
 
-                var range = attribute as RangeAttribute;
-                if (range != null)
+                if (attribute is RangeAttribute range)
                 {
                     int maximum;
                     if (Int32.TryParse(range.Maximum.ToString(), out maximum))
@@ -32,11 +30,20 @@ namespace Swashbuckle.Swagger
                         schema.minimum = minimum;
                 }
 
-                var length = attribute as StringLengthAttribute;
-                if (length != null)
+                if (attribute is StringLengthAttribute length)
                 {
                     schema.maxLength = length.MaximumLength;
                     schema.minLength = length.MinimumLength;
+                }
+
+                if (attribute is MaxLengthAttribute maxLength)
+                {
+                    schema.maxLength = maxLength.Length;
+                }
+
+                if (attribute is MinLengthAttribute minLength)
+                {
+                    schema.minLength = minLength.Length;
                 }
             }
 
