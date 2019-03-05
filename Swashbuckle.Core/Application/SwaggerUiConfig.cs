@@ -46,6 +46,10 @@ namespace Swashbuckle.Application
             CustomAsset("index", thisAssembly, "Swashbuckle.SwaggerUi.CustomAssets.index.html", isTemplate: true);
             CustomAsset("css/screen-css", thisAssembly, "Swashbuckle.SwaggerUi.CustomAssets.screen.css");
             CustomAsset("css/typography-css", thisAssembly, "Swashbuckle.SwaggerUi.CustomAssets.typography.css");
+
+            // Map route-path for logos to the embedded png's
+            CustomAsset("images/favicon-32x32-png", thisAssembly, "favicon-32x32.png");
+            CustomAsset("images/favicon-16x16-png", thisAssembly, "favicon-16x16.png");
         }
 
         public void InjectStylesheet(Assembly resourceAssembly, string resourceName, string media = "screen", bool isTemplate = false)
