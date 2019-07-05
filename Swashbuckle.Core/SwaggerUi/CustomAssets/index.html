@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>Swagger UI</title>
+  <title>%(DocumentTitle)</title>
   <link rel="icon" type="image/png" href="images/favicon-32x32-png" sizes="32x32" />
   <link rel="icon" type="image/png" href="images/favicon-16x16-png" sizes="16x16" />
   <link href='css/typography-css' media='screen' rel='stylesheet' type='text/css'/>
@@ -47,7 +47,6 @@
       window.swashbuckleConfig = {
         rootUrl: '%(RootUrl)',
         discoveryPaths: arrayFrom('%(DiscoveryPaths)'),
-        booleanValues: arrayFrom('%(BooleanValues)'),
         validatorUrl: stringOrNullFrom('%(ValidatorUrl)'),
         customScripts: arrayFrom('%(CustomScripts)'),
         docExpansion: '%(DocExpansion)',
@@ -74,7 +73,6 @@
       window.swaggerUi = new SwaggerUi({
         url: swashbuckleConfig.rootUrl + "/" + swashbuckleConfig.discoveryPaths[0],
         dom_id: "swagger-ui-container",
-        booleanValues: swashbuckleConfig.booleanValues,
         supportedSubmitMethods: swashbuckleConfig.supportedSubmitMethods,
         onComplete: function(swaggerApi, swaggerUi){
           if (typeof initOAuth == "function" && swashbuckleConfig.oAuth2Enabled) {

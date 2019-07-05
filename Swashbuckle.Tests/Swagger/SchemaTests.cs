@@ -409,7 +409,6 @@ namespace Swashbuckle.Tests.Swagger
         [TestCase("EchoDateTime", typeof(DateTime), "string", "date-time", "System.DateTime", false)]
         [TestCase("EchoDateTimeOffset", typeof(DateTimeOffset), "string", "date-time", "System.DateTimeOffset", false)]
         [TestCase("EchoTimeSpan", typeof(TimeSpan), "string", null, "System.TimeSpan", false)]
-        [TestCase("EchoGuid", typeof(Guid), "string", "uuid", "System.Guid", false)]
         [TestCase("EchoEnum", typeof(PrimitiveEnum), "integer", "int32", "Swashbuckle.Dummy.Types.PrimitiveEnum", false)]
         [TestCase("EchoEnum", typeof(PrimitiveEnum), "string", null, "Swashbuckle.Dummy.Types.PrimitiveEnum", false)]
         [TestCase("EchoChar", typeof(char), "string", null, "System.Char", false)]
@@ -428,7 +427,6 @@ namespace Swashbuckle.Tests.Swagger
         [TestCase("EchoNullableDateTime", typeof(DateTime?), "string", "date-time", "System.DateTime", true)]
         [TestCase("EchoNullableDateTimeOffset", typeof(DateTimeOffset?), "string", "date-time", "System.DateTimeOffset", true)]
         [TestCase("EchoNullableTimeSpan", typeof(TimeSpan?), "string", null, "System.TimeSpan", true)]
-        [TestCase("EchoNullableGuid", typeof(Guid?), "string", "uuid", "System.Guid", true)]
         [TestCase("EchoNullableEnum", typeof(PrimitiveEnum?), "integer", "int32", "Swashbuckle.Dummy.Types.PrimitiveEnum", true)]
         [TestCase("EchoNullableEnum", typeof(PrimitiveEnum?), "string", null, "Swashbuckle.Dummy.Types.PrimitiveEnum", true)]
         [TestCase("EchoNullableChar", typeof(char?), "string", null, "System.Char", true)]
@@ -522,7 +520,6 @@ namespace Swashbuckle.Tests.Swagger
         [TestCase("EchoNullableDateTime", typeof(DateTime?), "string", "date-time", "System.DateTime", true)]
         [TestCase("EchoNullableDateTimeOffset", typeof(DateTimeOffset?), "string", "date-time", "System.DateTimeOffset", true)]
         [TestCase("EchoNullableTimeSpan", typeof(TimeSpan?), "string", null, "System.TimeSpan", true)]
-        [TestCase("EchoNullableGuid", typeof(Guid?), "string", "uuid", "System.Guid", true)]
         [TestCase("EchoNullableEnum", typeof(PrimitiveEnum?), "integer", "int32", "Swashbuckle.Dummy.Types.PrimitiveEnum", true)]
         [TestCase("EchoNullableEnum", typeof(PrimitiveEnum?), "string", null, "Swashbuckle.Dummy.Types.PrimitiveEnum", true)]
         [TestCase("EchoNullableChar", typeof(char?), "string", null, "System.Char", true)]
@@ -933,12 +930,12 @@ namespace Swashbuckle.Tests.Swagger
         }
 
         [Test]
-        [ExpectedException(typeof(InvalidOperationException))]
         public void It_errors_on_multiple_types_with_the_same_class_name()
         {
             SetUpDefaultRouteFor<ConflictingTypesController>();
 
-            var swagger = GetContent<JObject>("http://tempuri.org/swagger/docs/v1");
+            Assert.Throws<InvalidOperationException>(
+                delegate { GetContent<JObject>("http://tempuri.org/swagger/docs/v1"); });
         }
 
         [Test]

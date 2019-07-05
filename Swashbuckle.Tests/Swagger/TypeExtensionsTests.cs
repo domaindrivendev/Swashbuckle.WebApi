@@ -5,6 +5,7 @@ using NUnit.Framework;
 
 namespace Swashbuckle.Swagger
 {
+    [TestFixture]
     public class TypeExtensionsTests
     {
         [TestCase(typeof(DateTime), "DateTime")]

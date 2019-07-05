@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using System.Net.Http;
 using System.Collections.Generic;
 using System.Reflection;
@@ -21,9 +20,9 @@ namespace Swashbuckle.Application
 
             _templateParams = new Dictionary<string, string>
             {
+                { "%(DocumentTitle)", "Swagger UI" },
                 { "%(StylesheetIncludes)", "" },
                 { "%(DiscoveryPaths)", String.Join("|", discoveryPaths) },
-                { "%(BooleanValues)", "true|false" },
                 { "%(ValidatorUrl)", "" },
                 { "%(CustomScripts)", "" },
                 { "%(DocExpansion)", "none" },
@@ -59,10 +58,10 @@ namespace Swashbuckle.Application
 
             CustomAsset(path, resourceAssembly, resourceName, isTemplate);
         }
-        
-        public void BooleanValues(IEnumerable<string> values)
+
+        public void DocumentTitle(string title)
         {
-            _templateParams["%(BooleanValues)"] = String.Join("|", values);
+            _templateParams["%(DocumentTitle)"] = title;
         }
 
         public void SetValidatorUrl(string url)

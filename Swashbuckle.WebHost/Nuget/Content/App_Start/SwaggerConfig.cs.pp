@@ -13,7 +13,7 @@ namespace $rootnamespace$
         {
             var thisAssembly = typeof(SwaggerConfig).Assembly;
 
-            GlobalConfiguration.Configuration 
+            GlobalConfiguration.Configuration
                 .EnableSwagger(c =>
                     {
                         // By default, the service root url is inferred from the request used to access the docs.
@@ -33,6 +33,10 @@ namespace $rootnamespace$
                         // additional fields by chaining methods off SingleApiVersion.
                         //
                         c.SingleApiVersion("v1", "$rootnamespace$");
+
+                        // If you want the output Swagger docs to be indented properly, enable the "PrettyPrint" option.
+                        //
+                        //c.PrettyPrint();
 
                         // If your API has multiple versions, use "MultipleApiVersions" instead of "SingleApiVersion".
                         // In this case, you must provide a lambda that tells Swashbuckle which actions should be
@@ -127,18 +131,18 @@ namespace $rootnamespace$
 
                         // Alternatively, you can provide your own custom strategy for inferring SchemaId's for
                         // describing "complex" types in your API.
-                        //  
+                        //
                         //c.SchemaId(t => t.FullName.Contains('`') ? t.FullName.Substring(0, t.FullName.IndexOf('`')) : t.FullName);
 
                         // Set this flag to omit schema property descriptions for any type properties decorated with the
-                        // Obsolete attribute 
+                        // Obsolete attribute
                         //c.IgnoreObsoleteProperties();
 
                         // In accordance with the built in JsonSerializer, Swashbuckle will, by default, describe enums as integers.
                         // You can change the serializer behavior by configuring the StringToEnumConverter globally or for a given
                         // enum type. Swashbuckle will honor this change out-of-the-box. However, if you use a different
                         // approach to serialize enums as strings, you can also force Swashbuckle to describe them as strings.
-                        // 
+                        //
                         //c.DescribeAllEnumsAsStrings();
 
                         // Similar to Schema filters, Swashbuckle also supports Operation and Document filters:
@@ -164,7 +168,7 @@ namespace $rootnamespace$
                         // In contrast to WebApi, Swagger 2.0 does not include the query string component when mapping a URL
                         // to an action. As a result, Swashbuckle will raise an exception if it encounters multiple actions
                         // with the same path (sans query string) and HTTP method. You can workaround this by providing a
-                        // custom strategy to pick a winner or merge the descriptions for the purposes of the Swagger docs 
+                        // custom strategy to pick a winner or merge the descriptions for the purposes of the Swagger docs
                         //
                         //c.ResolveConflictingActions(apiDescriptions => apiDescriptions.First());
 
@@ -175,6 +179,11 @@ namespace $rootnamespace$
                     })
                 .EnableSwaggerUi(c =>
                     {
+                        // Use the "DocumentTitle" option to change the Document title.
+                        // Very helpful when you have multiple Swagger pages open, to tell them apart.
+                        //
+                        //c.DocumentTitle("My Swagger UI");
+
                         // Use the "InjectStylesheet" option to enrich the UI with one or more additional CSS stylesheets.
                         // The file must be included in your project as an "Embedded Resource", and then the resource's
                         // "Logical Name" is passed to the method as shown below.
@@ -186,12 +195,6 @@ namespace $rootnamespace$
                         // "Logical Name" is passed to the method as shown above.
                         //
                         //c.InjectJavaScript(thisAssembly, "Swashbuckle.Dummy.SwaggerExtensions.testScript1.js");
-
-                        // The swagger-ui renders boolean data types as a dropdown. By default, it provides "true" and "false"
-                        // strings as the possible choices. You can use this option to change these to something else,
-                        // for example 0 and 1.
-                        //
-                        //c.BooleanValues(new[] { "0", "1" });
 
                         // By default, swagger-ui will validate specs against swagger.io's online validator and display the result
                         // in a badge at the bottom of the page. Use these options to set a different validator URL or to disable the
@@ -205,7 +208,7 @@ namespace $rootnamespace$
                         //
                         //c.DocExpansion(DocExpansion.List);
 
-                        // Specify which HTTP operations will have the 'Try it out!' option. An empty paramter list disables
+                        // Specify which HTTP operations will have the 'Try it out!' option. An empty parameter list disables
                         // it for all operations.
                         //
                         //c.SupportedSubmitMethods("GET", "HEAD");
@@ -237,7 +240,7 @@ namespace $rootnamespace$
                         //);
 
                         // If your API supports ApiKey, you can override the default values.
-                        // "apiKeyIn" can either be "query" or "header"                                                
+                        // "apiKeyIn" can either be "query" or "header"
                         //
                         //c.EnableApiKeySupport("apiKey", "header");
                     });

@@ -306,11 +306,14 @@ namespace Swashbuckle.Application
             var scheme = GetHeaderValue(request, "X-Forwarded-Proto") ?? request.RequestUri.Scheme;
             var host = GetHeaderValue(request, "X-Forwarded-Host") ?? request.RequestUri.Host;
             var port = GetHeaderValue(request, "X-Forwarded-Port") ?? request.RequestUri.Port.ToString(CultureInfo.InvariantCulture);
+            var prefix = GetHeaderValue(request, "X-Forwarded-Prefix") ?? string.Empty;
 
             var httpConfiguration = request.GetConfiguration();
-            var virtualPathRoot = httpConfiguration.VirtualPathRoot.TrimEnd('/');
-            
-            return string.Format("{0}://{1}:{2}{3}", scheme, host, port, virtualPathRoot);
+            var virtualPathRoot = httpConfiguration.VirtualPathRoot;
+
+            var urb = new UriBuilder(scheme, host, int.Parse(port), prefix + virtualPathRoot);
+
+            return urb.Uri.AbsoluteUri.TrimEnd('/');
         }
 
         private static string GetHeaderValue(HttpRequestMessage request, string headerName)

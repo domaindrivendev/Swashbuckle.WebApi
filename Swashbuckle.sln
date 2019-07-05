@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.23107.0
+# Visual Studio 2013
+VisualStudioVersion = 12.0.30501.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "swagger-ui", "http://localhost:55139", "{DDE07B02-DD45-4ABF-96D3-A4FBB144BBA1}"
 	ProjectSection(WebsiteProperties) = preProject
@@ -45,8 +45,12 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Swashbuckle.Dummy.Core", "S
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Swashbuckle.Dummy.SelfHost", "Swashbuckle.Dummy.SelfHost\Swashbuckle.Dummy.SelfHost.csproj", "{2D1F2F73-5828-413C-9FD0-6F81A964C82D}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{C63363AF-2303-4489-8287-95D94C414663}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{1C2DFC9F-AC30-4057-AC24-8D859C9F0DE8}"
 	ProjectSection(SolutionItems) = preProject
+		appveyor.yml = appveyor.yml
+		CONTRIBUTING.md = CONTRIBUTING.md
+		ISSUE_TEMPLATE.md = ISSUE_TEMPLATE.md
+		LICENSE = LICENSE
 		README.md = README.md
 	EndProjectSection
 EndProject

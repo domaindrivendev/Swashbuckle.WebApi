@@ -206,12 +206,6 @@ namespace Swashbuckle.Dummy
                         //
                         //c.InjectJavaScript(thisAssembly, "Swashbuckle.Dummy.SwaggerExtensions.testScript1.js");
 
-                        // The swagger-ui renders boolean data types as a dropdown. By default, it provides "true" and "false"
-                        // strings as the possible choices. You can use this option to change these to something else,
-                        // for example 0 and 1.
-                        //
-                        c.BooleanValues(new[] { "0", "1" });
-
                         // By default, swagger-ui will validate specs against swagger.io's online validator and display the result
                         // in a badge at the bottom of the page. Use these options to set a different validator URL or to disable the
                         // feature entirely.
@@ -224,7 +218,7 @@ namespace Swashbuckle.Dummy
                         //
                         c.DocExpansion(DocExpansion.List);
 
-                        // Specify which HTTP operations will have the 'Try it out!' option. An empty paramter list disables
+                        // Specify which HTTP operations will have the 'Try it out!' option. An empty parameter list disables
                         // it for all operations.
                         //
                         //c.SupportedSubmitMethods("GET", "HEAD");

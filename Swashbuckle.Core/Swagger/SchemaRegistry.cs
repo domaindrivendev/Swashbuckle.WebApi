@@ -164,7 +164,7 @@ namespace Swashbuckle.Swagger
                 case "System.DateTimeOffset":
                     return new Schema { type = "string", format = "date-time" };
                 case "System.Guid":
-                    return new Schema { type = "string", format = "uuid" };
+                    return new Schema { type = "string", format = "uuid", example = Guid.Empty };
                 default:
                     return new Schema { type = "string" };
             }
@@ -188,7 +188,7 @@ namespace Swashbuckle.Swagger
                         : type.GetEnumNamesForSerialization()
                 };
             }
-            
+
             return new Schema
             {
                 type = "integer",
@@ -208,7 +208,7 @@ namespace Swashbuckle.Swagger
                 {
                     type = "object",
                     properties = Enum.GetNames(keyType).ToDictionary(
-                        (name) => dictionaryContract.PropertyNameResolver(name),
+                        (name) => dictionaryContract.DictionaryKeyResolver(name),
                         (name) => CreateInlineSchema(valueType)
                     )
                 };
@@ -269,7 +269,7 @@ namespace Swashbuckle.Swagger
         {
             if (!_workItems.ContainsKey(type))
             {
-                var schemaId = _schemaIdSelector(type); 
+                var schemaId = _schemaIdSelector(type);
                 if (_workItems.Any(entry => entry.Value.SchemaId == schemaId))
                 {
                     var conflictingType = _workItems.First(entry => entry.Value.SchemaId == schemaId).Key;

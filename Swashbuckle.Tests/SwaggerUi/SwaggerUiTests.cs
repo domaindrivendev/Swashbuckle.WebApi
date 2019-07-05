@@ -1,11 +1,9 @@
 ﻿using System;
-using System.Net.Http;
 using System.Net;
 using System.Collections.Generic;
 using NUnit.Framework;
 using Swashbuckle.Application;
 using Swashbuckle.Dummy;
-using Swashbuckle.SwaggerUi;
 
 namespace Swashbuckle.Tests.SwaggerUi
 {
@@ -28,11 +26,11 @@ namespace Swashbuckle.Tests.SwaggerUi
         {
             var content = GetContentAsString("http://tempuri.org/swagger/ui/index");
 
-            StringAssert.Contains("rootUrl: 'http://tempuri.org:80'", content);
+            StringAssert.Contains("rootUrl: 'http://tempuri.org'", content);
             StringAssert.Contains("discoveryPaths: arrayFrom('swagger/docs/v1')", content);
             StringAssert.Contains("swagger-ui-container", content);
         }
-        
+
         [Test]
         public void It_exposes_config_to_inject_custom_stylesheets()
         {
@@ -57,24 +55,32 @@ namespace Swashbuckle.Tests.SwaggerUi
             content = GetContentAsString("http://tempuri.org/swagger/ui/ext/Swashbuckle-Dummy-SwaggerExtensions-testStyles2-css");
             StringAssert.StartsWith("h2", content);
         }
-        
+
+        [Test]
+        public void It_exposes_config_to_set_the_page_title()
+        {
+            string customTitle = string.Format("TEST_TITLE_{0}", Guid.NewGuid());
+            SetUpHandler(c => { c.DocumentTitle(customTitle); });
+
+            var content = GetContentAsString("http://tempuri.org/swagger/ui/index");
+            StringAssert.Contains(customTitle, content);
+        }
+
         [Test]
         public void It_exposes_config_for_swagger_ui_settings()
         {
             SetUpHandler(c =>
                 {
                     c.DocExpansion(DocExpansion.Full);
-                    c.BooleanValues(new[] { "1", "0" });
                     c.SupportedSubmitMethods("GET", "HEAD");
                 });
 
             var content = GetContentAsString("http://tempuri.org/swagger/ui/index");
 
             StringAssert.Contains("docExpansion: 'full'", content);
-            StringAssert.Contains("booleanValues: arrayFrom('1|0')", content);
             StringAssert.Contains("supportedSubmitMethods: arrayFrom('get|head')", content);
         }
-        
+
         [Test]
         public void It_exposes_config_for_swagger_ui_outh2_settings()
         {
@@ -134,7 +140,7 @@ namespace Swashbuckle.Tests.SwaggerUi
             content = GetContentAsString("http://tempuri.org/swagger/ui/ext/Swashbuckle-Dummy-SwaggerExtensions-testScript2-js");
             StringAssert.StartsWith("var str2", content);
         }
-        
+
         [Test]
         public void It_exposes_config_to_serve_custom_assets()
         {
@@ -168,7 +174,7 @@ namespace Swashbuckle.Tests.SwaggerUi
 
             StringAssert.Contains("validatorUrl: stringOrNullFrom('null')", content);
         }
-        
+
         [Test]
         public void It_errors_on_asset_not_found_and_returns_status_not_found()
         {
@@ -191,17 +197,16 @@ namespace Swashbuckle.Tests.SwaggerUi
             StringAssert.Contains("apiKeyIn: 'header'", content);
         }
 
-        [TestCase("http://tempuri.org/swagger/ui/images/logo_small-png",                   Result = "image/png")]
-        [TestCase("http://tempuri.org/swagger/ui/css/typography-css",                      Result = "text/css")]
-        public string It_returns_correct_asset_mime_type(string resourceUri)
+        [TestCase("http://tempuri.org/swagger/ui/images/logo_small-png", "image/png")]
+        [TestCase("http://tempuri.org/swagger/ui/css/typography-css", "text/css")]
+        public void It_returns_correct_asset_mime_type(string resourceUri, string expectedMimeType)
         {
             var response = Get(resourceUri);
 
             System.Diagnostics.Debug.WriteLine(string.Format("[{0}] {1} => {2}", response.StatusCode, resourceUri, response.Content.Headers.ContentType.MediaType));
 
-            Assert.AreEqual(response.StatusCode, HttpStatusCode.OK);
-
-            return response.Content.Headers.ContentType.MediaType;
+            Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
+            Assert.AreEqual(expectedMimeType, response.Content.Headers.ContentType.MediaType);
         }
 
         private void SetUpHandler(Action<SwaggerUiConfig> configure = null)
