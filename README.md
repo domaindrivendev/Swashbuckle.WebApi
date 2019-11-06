@@ -165,7 +165,7 @@ httpConfiguration
                     vc.Version("v2", "Swashbuckle Dummy API V2");
                     vc.Version("v1", "Swashbuckle Dummy API V1");
                 });
-        });
+        })
     .EnableSwaggerUi(c =>
         {
             c.EnableDiscoveryUrlSelector();
