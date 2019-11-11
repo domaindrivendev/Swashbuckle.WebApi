@@ -31,7 +31,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{67E5A2
 		.nuget\NuGet.targets = .nuget\NuGet.targets
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Swashbuckle.Core", "Swashbuckle.Core\Swashbuckle.Core.csproj", "{D50A26FF-02C6-4C16-BA94-4CD7D43EFBB3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Swashbuckle.Core", "Swashbuckle.Core\Swashbuckle.Core.csproj", "{D50A26FF-02C6-4C16-BA94-4CD7D43EFBB3}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{6A2C69FA-6824-44F3-A1A5-1313050FA567}"
 EndProject
@@ -53,8 +53,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		LICENSE = LICENSE
 		README.md = README.md
 	EndProjectSection
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Swashbuckle.Core.Lib", "Swashbuckle.Core.Lib\Swashbuckle.Core.Lib.csproj", "{348BFDEC-F453-4E6E-843C-7963B0D379DA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -89,10 +87,6 @@ Global
 		{2D1F2F73-5828-413C-9FD0-6F81A964C82D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2D1F2F73-5828-413C-9FD0-6F81A964C82D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2D1F2F73-5828-413C-9FD0-6F81A964C82D}.Release|Any CPU.Build.0 = Release|Any CPU
-		{348BFDEC-F453-4E6E-843C-7963B0D379DA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{348BFDEC-F453-4E6E-843C-7963B0D379DA}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{348BFDEC-F453-4E6E-843C-7963B0D379DA}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{348BFDEC-F453-4E6E-843C-7963B0D379DA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
