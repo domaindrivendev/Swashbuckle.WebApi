@@ -103,6 +103,15 @@ namespace Swashbuckle.Application
             if (path == "index") isTemplate = true;
             _pathToAssetMap[path] = new EmbeddedAssetDescriptor(resourceAssembly, resourceName, isTemplate);
         }
+	    
+        public void CustomTemplateParameter(string templateParameterName, string parameterValue)
+        {
+	    var nameWithPercentParenthesesWrapper =
+		templateParameterName.StartsWith("%(")
+		    ? templateParameterName
+		    : $"%({templateParameterName})";
+	    _templateParams[nameWithPercentParenthesesWrapper] = parameterValue;
+        }
 
         public void EnableDiscoveryUrlSelector()
         {
