@@ -17,3 +17,6 @@ _ReSharper.*
 
 # Visual Studio 2015 cache/options directory
 .vs/
+
+# Rider options directory
+.idea/
