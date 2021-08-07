@@ -40,7 +40,7 @@ namespace Swashbuckle.Tests.Owin
             _server = testServer;
         }
 
-        [TestFixtureTearDown]
+        [OneTimeTearDown]
         public void TeardownFixture()
         {
             if (_server != null) _server.Dispose();
